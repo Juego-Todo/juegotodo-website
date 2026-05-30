@@ -6,10 +6,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
+import { useAuth } from "@/lib/auth/context";
 import { navItems } from "@/data/site";
 
 export function Navbar() {
   const pathname = usePathname();
+  const { user, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const desktopNavRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,9 @@ export function Navbar() {
     };
   }, []);
 
+  const authHref = user ? "/profile" : "/login";
+  const authLabel = user ? "Profile" : "Register";
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-2xl">
       <nav
@@ -58,11 +63,11 @@ export function Navbar() {
               return (
                 <Link
                   className="inline-flex items-center rounded-full bg-red-600 px-5 py-2.5 text-sm font-black uppercase tracking-[0.14em] text-white shadow-[0_0_28px_rgba(229,9,20,0.45)] transition hover:-translate-y-0.5 hover:bg-red-500"
-                  href={item.href}
+                  href={authHref}
                   key={item.href}
                   onClick={() => setOpenMenu(null)}
                 >
-                  {item.label}
+                  {loading ? "Register" : authLabel}
                 </Link>
               );
             }
@@ -166,11 +171,11 @@ export function Navbar() {
                 item.cta ? (
                   <Link
                     className="inline-flex min-h-12 items-center justify-center rounded-full bg-red-600 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-white shadow-[0_0_28px_rgba(229,9,20,0.45)]"
-                    href={item.href}
+                    href={authHref}
                     key={item.href}
                     onClick={() => setIsOpen(false)}
                   >
-                    {item.label}
+                    {loading ? "Register" : authLabel}
                   </Link>
                 ) : (
                   <div

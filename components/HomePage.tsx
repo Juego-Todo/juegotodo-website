@@ -60,8 +60,8 @@ export function HomePage() {
               athlete profiles built for fans, matchmakers, gyms, and media.
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:flex-wrap">
-              <Link className="group inline-flex min-h-12 w-full items-center justify-center rounded-full bg-red-600 px-5 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-[0_0_40px_rgba(229,9,20,0.48)] transition hover:-translate-y-1 hover:bg-red-500 sm:w-auto sm:text-sm" href="/registration">
-                Register as Fighter
+              <Link className="group inline-flex min-h-12 w-full items-center justify-center rounded-full bg-red-600 px-5 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-[0_0_40px_rgba(229,9,20,0.48)] transition hover:-translate-y-1 hover:bg-red-500 sm:w-auto sm:text-sm" href="/login">
+                Register
                 <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
               </Link>
               <Link className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/20 bg-black/55 px-5 py-3.5 text-xs font-black uppercase tracking-[0.2em] text-white backdrop-blur-md transition hover:-translate-y-1 hover:bg-white/15 sm:w-auto sm:text-sm" href="/media">

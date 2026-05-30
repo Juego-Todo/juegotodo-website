@@ -35,6 +35,8 @@ export const navItems: NavItem[] = [
     label: "About",
     href: "/about-juego-todo",
     children: [
+      { label: "Grand Council", href: "/grand-council" },
+      { label: "FMA Lineage", href: "/fma-lineage" },
       { label: "Partnerships", href: "/partnerships" },
       { label: "Rules & Regulations", href: "/rules-regulations" },
       { label: "Contact", href: "/contact" },
@@ -54,7 +56,7 @@ export const navItems: NavItem[] = [
     ],
   },
   { label: "Shop", href: "/shop" },
-  { label: "Sign Up / Login", href: "/registration", cta: true },
+  { label: "Register", href: "/login", cta: true },
 ];
 
 export const stats = [
@@ -273,6 +275,18 @@ export const pageContent = {
     title: "Modernizing Filipino Martial Arts For A Global Fight Audience",
     intro:
       "Juego Todo elevates Arnis, Eskrima, Kali, Panuntukan, Sikaran, Dumog, Buno, and Yaw-Yan into a modern combat sports platform.",
+  },
+  "grand-council": {
+    eyebrow: "Leadership",
+    title: "Juego Todo Grand Council Members",
+    intro:
+      "The Grand Council guides rules, athlete safety, FMA heritage, legal governance, and competition operations as Juego Todo scales from the Philippines to the world.",
+  },
+  "fma-lineage": {
+    eyebrow: "Filipino Martial Arts",
+    title: "FMA Lineage Supporting Juego Todo",
+    intro:
+      "Explore the traditional Filipino martial arts lineages that form the foundation of Juego Todo's rules, seminars, and competition formats.",
   },
   contact: {
     eyebrow: "Connect",

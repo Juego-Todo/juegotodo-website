@@ -3,6 +3,7 @@ import { Bebas_Neue, Inter } from "next/font/google";
 import type { ReactNode } from "react";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { Providers } from "@/components/Providers";
 import "./globals.css";
 
 const inter = Inter({
@@ -58,9 +59,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <div className="noise" aria-hidden />
-        <Navbar />
-        <div id="main-content">{children}</div>
-        <Footer />
+        <Providers>
+          <Navbar />
+          <div id="main-content">{children}</div>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

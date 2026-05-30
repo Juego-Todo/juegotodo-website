@@ -43,9 +43,9 @@ export function Footer() {
           <div>
             <Link
               className="text-sm font-bold uppercase tracking-[0.18em] text-zinc-200 transition hover:text-white"
-              href="/registration"
+              href="/login"
             >
-              Sign Up / Login
+              Register
             </Link>
           </div>
         </div>

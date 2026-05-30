@@ -5,6 +5,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { FmaLineageSection } from "@/components/FmaLineageSection";
+import { GrandCouncilSection } from "@/components/GrandCouncilSection";
 import { MotionSection } from "@/components/MotionSection";
 import { RankingsFull } from "@/components/RankingsSystem";
 import { SeminarsHub } from "@/components/SeminarsHub";
@@ -53,6 +55,8 @@ export function InteriorPage({ slug }: { slug: PageSlug }) {
       {slug === "juego-todo-seminars" ? <SeminarsHub /> : null}
       {slug === "rules-regulations" ? <RulesSection /> : null}
       {slug === "about-juego-todo" ? <AboutSection /> : null}
+      {slug === "grand-council" ? <GrandCouncilSection /> : null}
+      {slug === "fma-lineage" ? <FmaLineageSection /> : null}
       {slug === "contact" ? <ContactSection /> : null}
     </main>
   );
@@ -317,13 +321,61 @@ function RulesSection() {
 
 function AboutSection() {
   return (
-    <MotionSection className="mx-auto grid max-w-7xl gap-5 pb-14 sm:grid-cols-2 sm:pb-20 lg:grid-cols-4">
+    <MotionSection className="mx-auto max-w-7xl space-y-8 pb-14 sm:pb-20">
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Link
+          className="glass-panel group overflow-hidden rounded-[1.75rem] border-red-500/20 transition hover:-translate-y-1 hover:border-red-500/40"
+          href="/grand-council"
+        >
+          <div className="bg-[radial-gradient(circle_at_80%_10%,rgba(229,9,20,0.28),transparent_24rem),linear-gradient(135deg,#120305,#050506)] p-6 sm:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-red-300">
+              Leadership
+            </p>
+            <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-5xl">
+              Grand Council Members
+            </h2>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-300 sm:text-base">
+              Meet the masters, officials, and advisors guiding Juego Todo governance,
+              athlete safety, and platform integrity.
+            </p>
+            <span className="mt-5 inline-flex items-center text-sm font-black uppercase tracking-[0.18em] text-white">
+              View Council
+              <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={16} aria-hidden />
+            </span>
+          </div>
+        </Link>
+
+        <Link
+          className="glass-panel group overflow-hidden rounded-[1.75rem] border-red-500/20 transition hover:-translate-y-1 hover:border-red-500/40"
+          href="/fma-lineage"
+        >
+          <div className="bg-[radial-gradient(circle_at_20%_10%,rgba(229,9,20,0.28),transparent_24rem),linear-gradient(135deg,#120305,#050506)] p-6 sm:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-red-300">
+              Heritage
+            </p>
+            <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-5xl">
+              FMA Lineage
+            </h2>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-300 sm:text-base">
+              Discover the Filipino martial arts styles and lineages that support
+              Juego Todo competition, seminars, and rules.
+            </p>
+            <span className="mt-5 inline-flex items-center text-sm font-black uppercase tracking-[0.18em] text-white">
+              Explore Lineages
+              <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={16} aria-hidden />
+            </span>
+          </div>
+        </Link>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {systems.map((system) => (
         <article className="broadcast-line glass-panel rounded-3xl p-6 pt-8" key={system.name}>
           <h2 className="font-display text-4xl uppercase text-white">{system.name}</h2>
           <p className="mt-4 text-sm leading-7 text-zinc-400">{system.text}</p>
         </article>
       ))}
+      </div>
     </MotionSection>
   );
 }

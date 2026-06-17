@@ -1,64 +1,87 @@
 "use client";
 
-import { ArrowRight, Download, Mail, MapPin, Play, ShieldCheck, ShoppingBag, Trophy, Users } from "lucide-react";
+import { Suspense } from "react";
+import { ArrowRight, Download, Mail, MapPin, Play, ShieldCheck, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { ShopPageClient } from "@/components/commerce/ShopPageClient";
+import { FighterDatabaseHub } from "@/components/FighterDatabaseHub";
+import { PartnersHub } from "@/components/PartnersHub";
+import { RankingsPageClient } from "@/components/RankingsPageClient";
+import { TeamsHub } from "@/components/TeamsHub";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { FmaLineageSection } from "@/components/FmaLineageSection";
-import { GrandCouncilSection } from "@/components/GrandCouncilSection";
+import { LegalPageContent } from "@/components/LegalPageContent";
+import { OrganizationalStructureSection } from "@/components/OrganizationalStructureSection";
+import { PageNavigation } from "@/components/PageNavigation";
 import { MotionSection } from "@/components/MotionSection";
-import { RankingsFull } from "@/components/RankingsSystem";
 import { SeminarsHub } from "@/components/SeminarsHub";
 import {
   events,
-  fighters,
   mediaReels,
   pageContent,
   partners,
-  shopProducts,
-  systems,
   type PageSlug,
 } from "@/data/site";
 import { rulebooks } from "@/data/rules";
+import { getLegalPage, isLegalPageSlug } from "@/data/legal-pages";
 
 export function InteriorPage({ slug }: { slug: PageSlug }) {
   const content = pageContent[slug];
   const isRulesPage = slug === "rules-regulations";
+  const isLegalPage = isLegalPageSlug(slug);
+  const legalPage = isLegalPage ? getLegalPage(slug) : undefined;
 
   return (
-    <main className="overflow-hidden px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
-      <section className={`relative mx-auto max-w-7xl ${isRulesPage ? "py-6 sm:py-8 lg:py-10" : "py-10 sm:py-14 lg:py-16"}`}>
+      <main className="overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pb-20 sm:pt-28 lg:px-8 lg:pt-32">
+      <section className={`relative mx-auto max-w-7xl ${isRulesPage || isLegalPage ? "py-6 sm:py-8 lg:py-10" : "py-10 sm:py-14 lg:py-16"}`}>
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
-        <div className={`relative ${isRulesPage ? "max-w-4xl" : "max-w-5xl"}`}>
-          <p className="text-xs font-black uppercase tracking-[0.28em] text-red-300 sm:text-sm sm:tracking-[0.34em]">{content.eyebrow}</p>
-          <h1 className={`font-display mt-4 uppercase leading-[0.9] text-white ${
-            isRulesPage
+        <div className={`relative ${isRulesPage || isLegalPage ? "max-w-4xl" : "max-w-5xl"}`}>
+          <PageNavigation categoryLabel={slug === "fighters" ? "Rankings" : undefined} />
+          <h1 className={`font-display mt-3 uppercase leading-[0.9] text-white sm:mt-4 ${
+            isRulesPage || isLegalPage
               ? "text-[clamp(2.75rem,12vw,4.5rem)] sm:text-6xl lg:text-7xl"
               : "text-[clamp(3.25rem,15vw,5.35rem)] sm:text-7xl lg:text-8xl"
           }`}>
             {content.title}
           </h1>
           <p className={`max-w-3xl text-base leading-7 text-zinc-300 ${
-            isRulesPage ? "mt-4 sm:text-lg" : "mt-5 sm:mt-7 sm:text-xl sm:leading-8"
+            isRulesPage || isLegalPage ? "mt-4 sm:mt-5 sm:text-lg" : "mt-5 sm:mt-7 sm:text-xl sm:leading-8"
           }`}>{content.intro}</p>
+          {legalPage ? (
+            <p className="mt-4 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-500">
+              Last updated: {legalPage.lastUpdated}
+            </p>
+          ) : null}
         </div>
       </section>
 
+      {legalPage ? <LegalPageContent page={legalPage} /> : null}
+
       {slug === "events" ? <EventsSection /> : null}
-      {slug === "fighters" ? <FightersSection /> : null}
-      {slug === "rankings" ? <RankingsSection /> : null}
+      {slug === "fighters" ? <FighterDatabaseHub /> : null}
+      {slug === "rankings" ? (
+        <Suspense>
+          <RankingsPageClient />
+        </Suspense>
+      ) : null}
       {slug === "media" ? <MediaSection /> : null}
-      {slug === "shop" ? <ShopSection /> : null}
+      {slug === "shop" ? (
+        <Suspense>
+          <ShopPageClient />
+        </Suspense>
+      ) : null}
       {slug === "registration" ? <RegistrationSection /> : null}
-      {slug === "partnerships" ? <PartnershipSection /> : null}
+      {slug === "teams" ? <TeamsHub /> : null}
+      {slug === "partners" || slug === "partnerships" ? <PartnersHub /> : null}
       {slug === "juego-todo-seminars" ? <SeminarsHub /> : null}
       {slug === "rules-regulations" ? <RulesSection /> : null}
       {slug === "about-juego-todo" ? <AboutSection /> : null}
-      {slug === "grand-council" ? <GrandCouncilSection /> : null}
+      {slug === "grand-council" ? <OrganizationalStructureSection /> : null}
       {slug === "fma-lineage" ? <FmaLineageSection /> : null}
       {slug === "contact" ? <ContactSection /> : null}
-    </main>
+      </main>
   );
 }
 
@@ -117,35 +140,6 @@ function EventsSection() {
   );
 }
 
-function FightersSection() {
-  return (
-    <MotionSection className="mx-auto grid max-w-7xl gap-5 pb-14 sm:grid-cols-2 sm:pb-20 lg:grid-cols-4">
-      {fighters.map((fighter) => (
-        <Link className="glass-panel rounded-[1.75rem] p-5 transition hover:-translate-y-2 hover:border-red-500/40" href={`/fighters/${fighter.slug}`} key={fighter.slug}>
-          <div className="rounded-[1.25rem] bg-[radial-gradient(circle_at_25%_10%,rgba(229,9,20,0.34),transparent_32%),linear-gradient(145deg,#151518,#050506)] p-5">
-            <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-black uppercase tracking-[0.22em]">{fighter.rank}</span>
-            <h2 className="font-display mt-16 text-4xl uppercase leading-none text-white sm:mt-24 sm:text-5xl">{fighter.name}</h2>
-            <p className="mt-2 text-sm font-bold uppercase tracking-[0.22em] text-red-200">{fighter.nickname}</p>
-          </div>
-          <div className="mt-5 space-y-2 text-sm text-zinc-400">
-            <p><span className="text-zinc-200">Style:</span> {fighter.style}</p>
-            <p><span className="text-zinc-200">Gym:</span> {fighter.gym}</p>
-            <p><span className="text-zinc-200">Record:</span> {fighter.record}</p>
-          </div>
-        </Link>
-      ))}
-    </MotionSection>
-  );
-}
-
-function RankingsSection() {
-  return (
-    <MotionSection className="mx-auto max-w-7xl pb-14 sm:pb-20">
-      <RankingsFull />
-    </MotionSection>
-  );
-}
-
 function MediaSection() {
   return (
     <MotionSection className="mx-auto grid max-w-7xl gap-5 pb-14 sm:grid-cols-2 sm:pb-20">
@@ -162,85 +156,6 @@ function MediaSection() {
 
 function RegistrationSection() {
   return <InquiryForm title="Official Registration" button="Submit Registration Interest" fields={["Full name", "Email address", "Gym / affiliation", "Fighter, official, gym, or media applicant"]} />;
-}
-
-function ShopSection() {
-  const categories = ["All", "Sticks", "Protective Gear", "Apparel", "Accessories"] as const;
-  const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("All");
-
-  const filteredProducts =
-    activeCategory === "All"
-      ? shopProducts
-      : shopProducts.filter((product) => product.category === activeCategory);
-
-  return (
-    <MotionSection className="mx-auto max-w-7xl pb-14 sm:pb-20">
-      <div className="mb-6 flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <button
-            className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.16em] transition ${
-              activeCategory === category
-                ? "bg-red-600 text-white shadow-[0_0_22px_rgba(229,9,20,0.35)]"
-                : "border border-white/10 bg-white/[0.04] text-zinc-300 hover:border-red-500/40 hover:text-white"
-            }`}
-            key={category}
-            onClick={() => setActiveCategory(category)}
-            type="button"
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredProducts.map((product) => (
-          <Link
-            className="glass-panel group overflow-hidden rounded-[1.75rem] transition hover:-translate-y-2 hover:border-red-500/40"
-            href={`/shop/${product.slug}`}
-            key={product.slug}
-          >
-            <div className={`relative min-h-48 bg-gradient-to-br ${product.tone} p-5 sm:min-h-56`}>
-              {product.badge ? (
-                <span className="rounded-full bg-red-600 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.18em] text-white">
-                  {product.badge}
-                </span>
-              ) : (
-                <span className="rounded-full border border-white/20 bg-black/35 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.18em] text-zinc-200">
-                  {product.category}
-                </span>
-              )}
-              <ShoppingBag className="absolute bottom-5 right-5 text-red-200/80 transition group-hover:scale-110" size={28} aria-hidden />
-              <h2 className="font-display mt-16 text-3xl uppercase leading-none text-white sm:mt-20 sm:text-4xl">
-                {product.name}
-              </h2>
-            </div>
-            <div className="space-y-4 p-5">
-              <p className="text-sm leading-6 text-zinc-400">{product.description}</p>
-              <div className="flex items-center justify-between gap-3">
-                <p className="font-display text-3xl text-white">{product.price}</p>
-                <span className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.16em] text-zinc-200 transition group-hover:border-red-500/40 group-hover:text-white">
-                  View Details
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      <div className="glass-panel mt-8 rounded-[1.75rem] p-6 sm:p-8">
-        <p className="text-xs font-black uppercase tracking-[0.28em] text-red-300 sm:text-sm">
-          Store Preview
-        </p>
-        <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-5xl">
-          Checkout Opens Soon
-        </h2>
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
-          This shop section uses placeholder products for now. Official Juego Todo sticks, protective
-          gear, and apparel will connect to payments and inventory in a future update.
-        </p>
-      </div>
-    </MotionSection>
-  );
 }
 
 function PartnershipSection() {
@@ -321,44 +236,22 @@ function RulesSection() {
 
 function AboutSection() {
   return (
-    <MotionSection className="mx-auto max-w-7xl space-y-8 pb-14 sm:pb-20">
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Link
-          className="glass-panel group overflow-hidden rounded-[1.75rem] border-red-500/20 transition hover:-translate-y-1 hover:border-red-500/40"
-          href="/grand-council"
-        >
-          <div className="bg-[radial-gradient(circle_at_80%_10%,rgba(229,9,20,0.28),transparent_24rem),linear-gradient(135deg,#120305,#050506)] p-6 sm:p-8">
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-red-300">
-              Leadership
-            </p>
-            <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-5xl">
-              Grand Council Members
-            </h2>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-300 sm:text-base">
-              Meet the masters, officials, and advisors guiding Juego Todo governance,
-              athlete safety, and platform integrity.
-            </p>
-            <span className="mt-5 inline-flex items-center text-sm font-black uppercase tracking-[0.18em] text-white">
-              View Council
-              <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={16} aria-hidden />
-            </span>
-          </div>
-        </Link>
+    <>
+      <OrganizationalStructureSection />
 
+      <MotionSection className="mx-auto max-w-7xl pb-14 sm:pb-20">
         <Link
-          className="glass-panel group overflow-hidden rounded-[1.75rem] border-red-500/20 transition hover:-translate-y-1 hover:border-red-500/40"
+          className="glass-panel group block overflow-hidden rounded-[1.75rem] border-[#FF1010]/20 transition hover:-translate-y-1 hover:border-[#FF1010]/40"
           href="/fma-lineage"
         >
-          <div className="bg-[radial-gradient(circle_at_20%_10%,rgba(229,9,20,0.28),transparent_24rem),linear-gradient(135deg,#120305,#050506)] p-6 sm:p-8">
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-red-300">
-              Heritage
-            </p>
+          <div className="bg-[radial-gradient(circle_at_20%_10%,rgba(255,16,16,0.28),transparent_24rem),linear-gradient(135deg,#120305,#050505)] p-6 sm:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-[#FF1010]">Heritage</p>
             <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-5xl">
               FMA Lineage
             </h2>
             <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-300 sm:text-base">
-              Discover the Filipino martial arts styles and lineages that support
-              Juego Todo competition, seminars, and rules.
+              Discover the Filipino martial arts styles and lineages that support Juego Todo
+              competition, seminars, and rules.
             </p>
             <span className="mt-5 inline-flex items-center text-sm font-black uppercase tracking-[0.18em] text-white">
               Explore Lineages
@@ -366,17 +259,8 @@ function AboutSection() {
             </span>
           </div>
         </Link>
-      </div>
-
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      {systems.map((system) => (
-        <article className="broadcast-line glass-panel rounded-3xl p-6 pt-8" key={system.name}>
-          <h2 className="font-display text-4xl uppercase text-white">{system.name}</h2>
-          <p className="mt-4 text-sm leading-7 text-zinc-400">{system.text}</p>
-        </article>
-      ))}
-      </div>
-    </MotionSection>
+      </MotionSection>
+    </>
   );
 }
 

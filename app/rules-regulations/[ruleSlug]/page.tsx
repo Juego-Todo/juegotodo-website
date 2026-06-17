@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import {
   AlertTriangle,
-  ArrowLeft,
   CalendarDays,
   CheckCircle2,
   Download,
@@ -17,7 +16,12 @@ import {
   UserCheck,
   XCircle,
 } from "lucide-react";
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { PageNavigation } from "@/components/PageNavigation";
+import { PrevNextNav } from "@/components/PrevNextNav";
 import { getRulebook, rulebooks } from "@/data/rules";
+import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { getRulebookNeighbors } from "@/lib/navigation/prev-next";
 
 type PageProps = {
   params: Promise<{ ruleSlug: string }>;
@@ -49,18 +53,20 @@ export default async function RulebookPage({ params }: PageProps) {
     notFound();
   }
 
-  return (
-    <main className="px-4 pb-14 pt-24 sm:px-6 sm:pb-20 sm:pt-28 lg:px-8 lg:pt-24">
-      <section className="mx-auto max-w-7xl">
-        <Link
-          className="inline-flex items-center text-sm font-black uppercase tracking-[0.2em] text-zinc-400 transition hover:text-white lg:text-xs"
-          href="/rules-regulations"
-        >
-          <ArrowLeft className="mr-2" size={16} aria-hidden />
-          Rules Library
-        </Link>
+  const breadcrumbs = resolveBreadcrumbs(`/rules-regulations/${ruleSlug}`, rulebook.division);
+  const neighbors = getRulebookNeighbors(ruleSlug);
 
-        <div className="mt-4 grid gap-3 lg:mt-3 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
+  return (
+    <>
+      <BreadcrumbJsonLd items={breadcrumbs} />
+      <main className="px-4 pb-0 pt-24 sm:px-6 sm:pt-28 lg:px-8">
+        <div className="mx-auto max-w-7xl pb-4">
+          <PageNavigation
+            currentLabel={rulebook.division}
+          />
+        </div>
+      <section className="mx-auto max-w-7xl pb-8">
+        <div className="grid gap-3 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
           <div className={`relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-gradient-to-br ${rulebook.accent} p-5 shadow-[0_24px_80px_rgba(0,0,0,0.46)] sm:rounded-[1.75rem] lg:p-4`}>
             <div className="cinematic-grid absolute inset-0 opacity-25" aria-hidden />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.18),transparent_18rem),linear-gradient(120deg,rgba(0,0,0,0.08),rgba(0,0,0,0.7))]" aria-hidden />
@@ -169,7 +175,9 @@ export default async function RulebookPage({ params }: PageProps) {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+      <PrevNextNav neighbors={neighbors} />
+    </>
   );
 }
 

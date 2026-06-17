@@ -1,4 +1,4 @@
-export type AccountType = "fan" | "fighter" | "gym" | "official" | "media";
+export type AccountType = "fan" | "athlete" | "coach" | "gym_owner" | "partner";
 
 export type StoredUser = {
   id: string;
@@ -31,8 +31,23 @@ export type ProfileUpdateInput = {
 
 export const accountTypeLabels: Record<AccountType, string> = {
   fan: "Fan",
-  fighter: "Fighter",
-  gym: "Gym / Team",
-  official: "Official",
-  media: "Media",
+  athlete: "Athlete",
+  coach: "Coach",
+  gym_owner: "Gym Owner",
+  partner: "Partner",
 };
+
+export function migrateAccountType(value: string): AccountType {
+  switch (value) {
+    case "fighter":
+      return "athlete";
+    case "gym":
+      return "gym_owner";
+    case "official":
+      return "coach";
+    case "media":
+      return "partner";
+    default:
+      return value as AccountType;
+  }
+}

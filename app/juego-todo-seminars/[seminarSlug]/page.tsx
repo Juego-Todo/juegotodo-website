@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  ArrowLeft,
   CalendarDays,
   CheckCircle2,
   Clock3,
@@ -10,6 +8,9 @@ import {
   ShieldCheck,
   Users,
 } from "lucide-react";
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { PageNavigation } from "@/components/PageNavigation";
+import { PrevNextNav } from "@/components/PrevNextNav";
 import { SeminarRegistrationPanel } from "@/components/SeminarRegistrationPanel";
 import {
   formatSeminarDate,
@@ -17,6 +18,8 @@ import {
   scheduledSeminars,
   seminarTopics,
 } from "@/data/seminars";
+import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { getSeminarNeighbors } from "@/lib/navigation/prev-next";
 
 type PageProps = {
   params: Promise<{ seminarSlug: string }>;
@@ -52,18 +55,18 @@ export default async function SeminarDetailPage({ params }: PageProps) {
     .map((slug) => seminarTopics.find((topic) => topic.slug === slug))
     .filter(Boolean);
 
-  return (
-    <main className="px-4 pb-14 pt-24 sm:px-6 sm:pb-20 sm:pt-28 lg:px-8">
-      <section className="mx-auto max-w-7xl">
-        <Link
-          className="inline-flex items-center text-sm font-black uppercase tracking-[0.2em] text-zinc-400 transition hover:text-white"
-          href="/juego-todo-seminars"
-        >
-          <ArrowLeft className="mr-2" size={16} aria-hidden />
-          Seminar Calendar
-        </Link>
+  const breadcrumbs = resolveBreadcrumbs(`/juego-todo-seminars/${seminarSlug}`, seminar.title);
+  const neighbors = getSeminarNeighbors(seminarSlug);
 
-        <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_0.95fr]">
+  return (
+    <>
+      <BreadcrumbJsonLd items={breadcrumbs} />
+      <main className="px-4 pb-0 pt-24 sm:px-6 sm:pt-28 lg:px-8">
+        <div className="mx-auto max-w-7xl pb-4">
+          <PageNavigation currentLabel={seminar.title} />
+        </div>
+      <section className="mx-auto max-w-7xl pb-8">
+        <div className="grid gap-8 lg:grid-cols-[1fr_0.95fr]">
           <div className={`glass-panel overflow-hidden rounded-[1.75rem] bg-gradient-to-br ${seminar.tone} p-6 sm:p-8`}>
             <div className="flex flex-wrap gap-2">
               <span
@@ -132,7 +135,9 @@ export default async function SeminarDetailPage({ params }: PageProps) {
           </div>
         </section>
       </section>
-    </main>
+      </main>
+      <PrevNextNav neighbors={neighbors} />
+    </>
   );
 }
 

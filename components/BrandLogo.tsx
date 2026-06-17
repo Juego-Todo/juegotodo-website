@@ -1,23 +1,39 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export function BrandLogo() {
+export function BrandLogo({ variant = "default" }: { variant?: "default" | "footer" }) {
+  const isFooter = variant === "footer";
+
   return (
     <Link
       aria-label="Juego Todo home"
-      className="group flex items-center"
+      className="group flex items-center gap-4"
       href="/"
     >
-      <span className="relative grid h-12 w-12 place-items-center overflow-hidden rounded-2xl border border-red-500/35 bg-black shadow-[0_0_28px_rgba(229,9,20,0.32)] transition group-hover:border-red-400/70 sm:h-16 sm:w-16">
+      <span
+        className={`relative grid place-items-center overflow-hidden rounded-[1.25rem] border border-[#FF1010]/35 bg-black shadow-[0_0_32px_rgba(255,16,16,0.35)] transition group-hover:border-[#FF1010]/70 ${
+          isFooter ? "h-20 w-20 sm:h-24 sm:w-24" : "h-12 w-12 sm:h-16 sm:w-16"
+        }`}
+      >
         <Image
           alt="Juego Todo official logo"
           className="h-full w-full object-contain"
           height={96}
-          priority
+          priority={!isFooter}
           src="/juego-todo-logo.png"
           width={96}
         />
       </span>
+      {isFooter ? (
+        <span className="hidden sm:block">
+          <span className="font-display block text-2xl uppercase leading-none tracking-wide text-white lg:text-3xl">
+            Juego Todo
+          </span>
+          <span className="mt-1 block text-[0.62rem] font-black uppercase tracking-[0.28em] text-[#FF1010]">
+            Combat Sports Platform
+          </span>
+        </span>
+      ) : null}
     </Link>
   );
 }

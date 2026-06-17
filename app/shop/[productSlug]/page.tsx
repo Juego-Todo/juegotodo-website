@@ -1,8 +1,15 @@
+import { CheckCircle2, ShieldCheck, ShoppingBag } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CheckCircle2, ShieldCheck, ShoppingBag } from "lucide-react";
+import { ProductActions } from "@/components/commerce/ProductActions";
+import { shopCategoryLabels } from "@/lib/commerce/types";
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { PageNavigation } from "@/components/PageNavigation";
+import { PrevNextNav } from "@/components/PrevNextNav";
 import { getShopProduct, shopProducts } from "@/data/shop";
+import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { getShopNeighbors } from "@/lib/navigation/prev-next";
 
 type PageProps = {
   params: Promise<{ productSlug: string }>;
@@ -37,19 +44,20 @@ export default async function ShopProductPage({ params }: PageProps) {
   const relatedProducts = shopProducts
     .filter((item) => item.category === product.category && item.slug !== product.slug)
     .slice(0, 3);
+  const breadcrumbs = resolveBreadcrumbs(`/shop/${productSlug}`, product.name);
+  const neighbors = getShopNeighbors(productSlug);
 
   return (
-    <main className="px-4 pb-14 pt-24 sm:px-6 sm:pb-20 sm:pt-28 lg:px-8">
-      <section className="mx-auto max-w-7xl">
-        <Link
-          className="inline-flex items-center text-sm font-black uppercase tracking-[0.2em] text-zinc-400 transition hover:text-white"
-          href="/shop"
-        >
-          <ArrowLeft className="mr-2" size={16} aria-hidden />
-          Back To Shop
-        </Link>
-
-        <div className="mt-6 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+    <>
+      <BreadcrumbJsonLd items={breadcrumbs} />
+      <main className="px-4 pb-0 pt-24 sm:px-6 sm:pt-28 lg:px-8">
+        <div className="mx-auto max-w-7xl pb-4">
+          <PageNavigation
+            currentLabel={product.name}
+          />
+        </div>
+      <section className="mx-auto max-w-7xl pb-8">
+        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div className={`glass-panel overflow-hidden rounded-[1.75rem] bg-gradient-to-br ${product.tone} p-6 sm:rounded-[2rem] sm:p-8`}>
             <div className="flex items-start justify-between gap-4">
               {product.badge ? (
@@ -58,7 +66,7 @@ export default async function ShopProductPage({ params }: PageProps) {
                 </span>
               ) : (
                 <span className="rounded-full border border-white/20 bg-black/35 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-white">
-                  {product.category}
+                  {shopCategoryLabels[product.category]}
                 </span>
               )}
               <ShoppingBag className="text-red-200" size={28} aria-hidden />
@@ -74,26 +82,20 @@ export default async function ShopProductPage({ params }: PageProps) {
           <div className="space-y-6">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.28em] text-red-300 sm:text-sm">
-                {product.category}
+                {shopCategoryLabels[product.category]}
               </p>
               <p className="font-display mt-4 text-6xl text-white">{product.price}</p>
               <p className="mt-5 text-base leading-8 text-zinc-300 sm:text-lg">{product.summary}</p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <button
-                className="inline-flex min-h-12 items-center justify-center rounded-full bg-red-600 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white shadow-[0_0_40px_rgba(229,9,20,0.48)] transition hover:bg-red-500"
-                type="button"
-              >
-                Coming Soon
-              </button>
-              <Link
-                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white transition hover:bg-white/10"
-                href="/contact"
-              >
-                Request Bulk Order
-              </Link>
-            </div>
+            <ProductActions product={product} />
+
+            <Link
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/15 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white transition hover:bg-white/10 sm:w-auto"
+              href="/contact"
+            >
+              Request Bulk Order
+            </Link>
 
             <div className="glass-panel rounded-[1.5rem] p-5 sm:p-6">
               <div className="flex items-center gap-2">
@@ -141,13 +143,12 @@ export default async function ShopProductPage({ params }: PageProps) {
                   href={`/shop/${item.slug}`}
                   key={item.slug}
                 >
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">{item.category}</p>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">{shopCategoryLabels[item.category]}</p>
                   <h3 className="font-display mt-3 text-3xl uppercase leading-none text-white">{item.name}</h3>
                   <p className="mt-3 text-sm leading-6 text-zinc-400">{item.description}</p>
                   <p className="mt-4 font-display text-2xl text-white">{item.price}</p>
                   <span className="mt-4 inline-flex items-center text-xs font-black uppercase tracking-[0.16em] text-red-200">
                     View Product
-                    <ArrowLeft className="ml-2 rotate-180 transition group-hover:translate-x-1" size={14} aria-hidden />
                   </span>
                 </Link>
               ))}
@@ -155,6 +156,8 @@ export default async function ShopProductPage({ params }: PageProps) {
           </section>
         ) : null}
       </section>
-    </main>
+      </main>
+      <PrevNextNav neighbors={neighbors} />
+    </>
   );
 }

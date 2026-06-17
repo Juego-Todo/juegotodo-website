@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bebas_Neue, Inter } from "next/font/google";
+import { Bebas_Neue, Inter, Space_Grotesk } from "next/font/google";
 import type { ReactNode } from "react";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
@@ -19,6 +19,12 @@ const bebas = Bebas_Neue({
   weight: "400",
 });
 
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
     default: "Juego Todo | Filipino Combat Sports",
@@ -28,7 +34,7 @@ export const metadata: Metadata = {
     "A cinematic, modern combat sports platform for Juego Todo and Filipino Martial Arts.",
   metadataBase: new URL("https://juegotodo.com"),
   openGraph: {
-    title: "Juego Todo | The Evolution of Filipino Combat Sports",
+    title: "Juego Todo | The World's First Weaponized Combat League",
     description:
       "Premium Filipino combat sports events, fighters, rankings, media, registration, and partnerships.",
     siteName: "Juego Todo",
@@ -37,12 +43,12 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Juego Todo",
-    description: "The Evolution of Filipino Combat Sports.",
+    description: "The World's First Weaponized Combat League.",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050506",
+  themeColor: "#050505",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
@@ -50,7 +56,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html className={`${inter.variable} ${bebas.variable}`} lang="en">
+    <html className={`${inter.variable} ${bebas.variable} ${spaceGrotesk.variable}`} lang="en">
       <body>
         <a
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-black"

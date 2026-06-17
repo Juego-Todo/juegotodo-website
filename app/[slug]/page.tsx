@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { InteriorPage } from "@/components/InteriorPage";
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { pageContent, type PageSlug } from "@/data/site";
+import { getLegalPage, isLegalPageSlug } from "@/data/legal-pages";
+import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -21,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: content.title,
-    description: content.intro,
+    description: isLegalPageSlug(slug) ? getLegalPage(slug)?.metaDescription ?? content.intro : content.intro,
   };
 }
 
@@ -32,5 +35,10 @@ export default async function Page({ params }: PageProps) {
     notFound();
   }
 
-  return <InteriorPage slug={slug as PageSlug} />;
+  return (
+    <>
+      <BreadcrumbJsonLd items={resolveBreadcrumbs(`/${slug}`)} />
+      <InteriorPage slug={slug as PageSlug} />
+    </>
+  );
 }

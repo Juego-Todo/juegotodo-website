@@ -1,7 +1,9 @@
 import type { ProfileUpdateInput, RegisterInput, StoredUser, UserProfile } from "@/lib/auth/types";
+import { migrateAccountType } from "@/lib/auth/types";
 
 const USERS_KEY = "juego-todo.users";
 const SESSION_KEY = "juego-todo.session";
+const REMEMBER_EMAIL_KEY = "juego-todo.remember-email";
 
 function readUsers(): StoredUser[] {
   if (typeof window === "undefined") {
@@ -15,7 +17,9 @@ function readUsers(): StoredUser[] {
     }
 
     const parsed = JSON.parse(raw) as StoredUser[];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed)
+      ? parsed.map((user) => ({ ...user, accountType: migrateAccountType(user.accountType) }))
+      : [];
   } catch {
     return [];
   }
@@ -94,6 +98,22 @@ export function loginStoredUser(email: string, password: string): UserProfile {
 
 export function logoutStoredUser() {
   window.localStorage.removeItem(SESSION_KEY);
+}
+
+export function getRememberedEmail(): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return window.localStorage.getItem(REMEMBER_EMAIL_KEY) ?? "";
+}
+
+export function setRememberedEmail(email: string) {
+  window.localStorage.setItem(REMEMBER_EMAIL_KEY, normalizeEmail(email));
+}
+
+export function clearRememberedEmail() {
+  window.localStorage.removeItem(REMEMBER_EMAIL_KEY);
 }
 
 export function updateStoredProfile(userId: string, input: ProfileUpdateInput): UserProfile {

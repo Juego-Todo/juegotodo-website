@@ -1,3 +1,5 @@
+import { rankingsNavItems } from "@/data/rankings-nav";
+
 export type Fighter = {
   slug: string;
   name: string;
@@ -20,6 +22,38 @@ export type Event = {
   mainEvent: string;
   posterTone: string;
   bouts: string[];
+  isChampionship?: boolean;
+  isLive?: boolean;
+};
+
+export type Champion = {
+  division: string;
+  name: string;
+  nickname: string;
+  initials: string;
+  record: string;
+  team: string;
+  teamShort: string;
+  ranking: string;
+  koWins: string;
+  titleDefenses: string;
+  style: string;
+};
+
+export type FighterProfile = {
+  slug: string;
+  name: string;
+  nickname: string;
+  initials: string;
+  record: string;
+  rank: string;
+  division: string;
+  nationality: string;
+  team: string;
+  teamShort: string;
+  style: string;
+  lastFight: string;
+  winStreak: number;
 };
 
 export type NavItem = {
@@ -29,41 +63,288 @@ export type NavItem = {
   cta?: boolean;
 };
 
+
 export const navItems: NavItem[] = [
-  { label: "Home", href: "/" },
+  { label: "Events", href: "/events" },
+  { label: "Rankings", href: "/rankings", children: rankingsNavItems },
+  { label: "Teams", href: "/teams" },
+  { label: "Partners", href: "/partners" },
   {
-    label: "About",
-    href: "/about-juego-todo",
+    label: "Shop",
+    href: "/shop",
     children: [
-      { label: "Grand Council", href: "/grand-council" },
-      { label: "FMA Lineage", href: "/fma-lineage" },
-      { label: "Partnerships", href: "/partnerships" },
-      { label: "Rules & Regulations", href: "/rules-regulations" },
-      { label: "Contact", href: "/contact" },
+      { label: "All Products", href: "/shop" },
+      { label: "Official Gear", href: "/shop?category=official-gear" },
+      { label: "Protective Equipment", href: "/shop?category=protective-equipment" },
+      { label: "Competition Equipment", href: "/shop?category=competition-equipment" },
+      { label: "Training Equipment", href: "/shop?category=training-equipment" },
+      { label: "Apparel", href: "/shop?category=apparel" },
+      { label: "Championship Collection", href: "/shop?category=championship-collection" },
+      { label: "Digital Products", href: "/shop?category=digital-products" },
     ],
   },
-  {
-    label: "Events",
-    href: "/events",
-    children: [{ label: "Juego Todo Seminars", href: "/juego-todo-seminars" }],
-  },
-  {
-    label: "Fighters",
-    href: "/fighters",
-    children: [
-      { label: "Rankings", href: "/rankings" },
-      { label: "Registration", href: "/registration" },
-    ],
-  },
-  { label: "Shop", href: "/shop" },
-  { label: "Register", href: "/login", cta: true },
+  { label: "Rules", href: "/rules-regulations" },
+  { label: "News", href: "/media" },
+  { label: "Login", href: "/login" },
+  { label: "Register", href: "/login?mode=register", cta: true },
 ];
 
 export const stats = [
-  { label: "FMA Systems", value: "08" },
-  { label: "Fight Divisions", value: "12" },
-  { label: "Partner Gyms", value: "40+" },
-  { label: "Broadcast Reach", value: "Global" },
+  { label: "Professional Fighters", value: 125, suffix: "+" },
+  { label: "Gyms", value: 32 },
+  { label: "Regions", value: 11 },
+  { label: "Matches", value: 500, suffix: "+" },
+];
+
+export const footerStats = [
+  { label: "Fighters", value: 125, suffix: "+" },
+  { label: "Gyms", value: 32, suffix: "+" },
+  { label: "Matches", value: 500, suffix: "+" },
+  { label: "Regions", value: 11, suffix: "+" },
+];
+
+export const broadcastPartners = [
+  "FightCast Global",
+  "RingSide Network",
+  "Manila Sports TV",
+  "Combat Stream PH",
+  "Apex Broadcast",
+];
+
+export const socialLinks = [
+  { label: "Instagram", href: "https://instagram.com", followers: "48K" },
+  { label: "Facebook", href: "https://facebook.com", followers: "62K" },
+  { label: "TikTok", href: "https://tiktok.com", followers: "91K" },
+  { label: "YouTube", href: "https://youtube.com", followers: "35K" },
+  { label: "Discord", href: "https://discord.com", followers: "12K" },
+];
+
+export const champions: Champion[] = [
+  {
+    division: "Lightweight Champion",
+    name: "Ilia Navarro",
+    nickname: "Kalasag",
+    initials: "IN",
+    record: "9-0",
+    team: "Cebu Blade Athletics",
+    teamShort: "CBA",
+    ranking: "#1 P4P",
+    koWins: "4",
+    titleDefenses: "2",
+    style: "Sikaran / Kali",
+  },
+  {
+    division: "Middleweight Champion",
+    name: "Ramon Cruz",
+    nickname: "Dumog",
+    initials: "RC",
+    record: "10-3",
+    team: "Lakbay Grappling Club",
+    teamShort: "LGC",
+    ranking: "Champion",
+    koWins: "3",
+    titleDefenses: "1",
+    style: "Dumog / Buno",
+  },
+  {
+    division: "Heavyweight Champion",
+    name: "Gabriel Datu",
+    nickname: "The Hammer",
+    initials: "GD",
+    record: "11-1",
+    team: "Manila Combat Lab",
+    teamShort: "MCL",
+    ranking: "Champion",
+    koWins: "7",
+    titleDefenses: "3",
+    style: "Dumog / Kali",
+  },
+];
+
+export const fighterDatabase: FighterProfile[] = [
+  {
+    slug: "miguel-lakan-reyes",
+    name: "Miguel Reyes",
+    nickname: "Lakan",
+    initials: "MR",
+    record: "8-1",
+    rank: "Champion",
+    division: "Welterweight",
+    nationality: "Philippines",
+    team: "Mandirigma Lab Manila",
+    teamShort: "MLM",
+    style: "Kali / Panuntukan",
+    lastFight: "Win vs Soriano",
+    winStreak: 4,
+  },
+  {
+    slug: "ana-bagaybay-santos",
+    name: "Ana Santos",
+    nickname: "Bagaybay",
+    initials: "AS",
+    record: "6-0",
+    rank: "Champion",
+    division: "Flyweight",
+    nationality: "Philippines",
+    team: "Cebu Blade Athletics",
+    teamShort: "CBA",
+    style: "Sikaran / Arnis",
+    lastFight: "Win vs Villanueva",
+    winStreak: 6,
+  },
+  {
+    slug: "ramon-dumog-cruz",
+    name: "Ramon Cruz",
+    nickname: "Dumog",
+    initials: "RC",
+    record: "10-3",
+    rank: "Champion",
+    division: "Middleweight",
+    nationality: "Philippines",
+    team: "Lakbay Grappling Club",
+    teamShort: "LGC",
+    style: "Dumog / Buno",
+    lastFight: "Win vs Tan",
+    winStreak: 3,
+  },
+  {
+    slug: "isabel-diwa-mendoza",
+    name: "Isabel Mendoza",
+    nickname: "Diwa",
+    initials: "IM",
+    record: "7-2",
+    rank: "#3",
+    division: "Flyweight",
+    nationality: "Philippines",
+    team: "Quezon Combat Project",
+    teamShort: "QCP",
+    style: "Eskrima / Yaw-Yan",
+    lastFight: "Win vs Javier",
+    winStreak: 2,
+  },
+  {
+    slug: "ilia-navarro-kalasag",
+    name: "Ilia Navarro",
+    nickname: "Kalasag",
+    initials: "IN",
+    record: "9-0",
+    rank: "Champion",
+    division: "Lightweight",
+    nationality: "Philippines",
+    team: "Cebu Blade Athletics",
+    teamShort: "CBA",
+    style: "Sikaran / Kali",
+    lastFight: "Win vs Flores",
+    winStreak: 9,
+  },
+  {
+    slug: "gabriel-datu-hammer",
+    name: "Gabriel Datu",
+    nickname: "The Hammer",
+    initials: "GD",
+    record: "11-1",
+    rank: "Champion",
+    division: "Heavyweight",
+    nationality: "Philippines",
+    team: "Manila Combat Lab",
+    teamShort: "MCL",
+    style: "Dumog / Kali",
+    lastFight: "Win vs Alvarez",
+    winStreak: 5,
+  },
+];
+
+export const videoCategories = [
+  {
+    id: "highlights",
+    label: "Fight Highlights",
+    videos: [
+      { title: "Reyes Retains Welterweight Gold", fighter: "Miguel Reyes", duration: "4:12", tone: "from-red-700 via-zinc-950 to-black" },
+      { title: "Santos vs Mendoza Full Sequence", fighter: "Ana Santos", duration: "6:08", tone: "from-zinc-950 via-red-900 to-black" },
+      { title: "Night of Blades Main Event", fighter: "Juego Todo", duration: "8:44", tone: "from-black via-red-950 to-zinc-900" },
+    ],
+  },
+  {
+    id: "knockouts",
+    label: "Knockouts",
+    videos: [
+      { title: "Spinning Back Elbow Finish", fighter: "Isabel Mendoza", duration: "0:42", tone: "from-red-800 via-black to-red-950" },
+      { title: "Stick Disarm to Knockout", fighter: "Kenji Sato", duration: "1:05", tone: "from-zinc-900 via-red-800 to-black" },
+      { title: "Clinch Dump & Ground Finish", fighter: "Ramon Cruz", duration: "1:18", tone: "from-black via-zinc-900 to-red-900" },
+    ],
+  },
+  {
+    id: "techniques",
+    label: "Techniques",
+    videos: [
+      { title: "Doble Baston Entry Patterns", fighter: "LATAYANOLOGY", duration: "5:30", tone: "from-red-950 via-black to-zinc-900" },
+      { title: "Weapon-to-Empty-Hand Transitions", fighter: "Mandirigma Lab", duration: "7:12", tone: "from-zinc-950 via-red-950 to-black" },
+      { title: "Panuntukan Angle Cutting", fighter: "Miguel Reyes", duration: "4:55", tone: "from-black via-red-900 to-zinc-950" },
+    ],
+  },
+  {
+    id: "stories",
+    label: "Athlete Stories",
+    videos: [
+      { title: "Road to Ascension Manila", fighter: "Miguel Reyes", duration: "12:04", tone: "from-red-900 via-black to-yellow-950" },
+      { title: "Cebu Blade Camp Documentary", fighter: "Ana Santos", duration: "9:48", tone: "from-zinc-950 via-red-900 to-black" },
+      { title: "From Dumog to Champion", fighter: "Ramon Cruz", duration: "11:22", tone: "from-black via-red-950 to-zinc-900" },
+    ],
+  },
+];
+
+export const heritageTimeline = [
+  {
+    era: "Ancient Warriors",
+    period: "Pre-Colonial Era",
+    description: "Tribal combat systems forged in island warfare — blade intelligence, ambush tactics, and warrior culture.",
+    accent: "from-red-900 via-[#990000] to-transparent",
+  },
+  {
+    era: "Tribal Combat",
+    period: "Indigenous Systems",
+    description: "Regional fighting traditions preserved through ritual, mentorship, and battlefield necessity across the archipelago.",
+    accent: "from-orange-900 via-red-900 to-transparent",
+  },
+  {
+    era: "Kali",
+    period: "Blade Mastery",
+    description: "Flow, angles, and live-blade timing evolve into structured combat science passed through generations.",
+    accent: "from-red-800 via-[#990000] to-transparent",
+  },
+  {
+    era: "Eskrima",
+    period: "Stick & Blade",
+    description: "Stick fighting systems refined for speed, rhythm, and disarming — the foundation of modern FMA competition.",
+    accent: "from-red-700 via-red-950 to-transparent",
+  },
+  {
+    era: "Arnis",
+    period: "National Identity",
+    description: "Filipino martial arts recognized as national sport — standardized for schools, tournaments, and global export.",
+    accent: "from-[#FF1010] via-[#990000] to-transparent",
+  },
+  {
+    era: "Juego Todo",
+    period: "Modern Era",
+    description: "Weaponized combat enters the cage — professional rules, verified rankings, and broadcast-grade championship sport.",
+    accent: "from-[#FF1010] via-yellow-600 to-transparent",
+  },
+];
+
+export const sponsorTiers = [
+  {
+    name: "Global Partner",
+    partners: ["FightCast Global", "Apex Broadcast", "Pacific Fight Media"],
+  },
+  {
+    name: "Official Partner",
+    partners: ["RingSide Network", "Manila Sports TV", "Combat Stream PH"],
+  },
+  {
+    name: "Equipment Partner",
+    partners: ["JT Live", "Arena Vision", "Mandirigma Gear"],
+  },
 ];
 
 export const systems = [
@@ -159,6 +440,8 @@ export const events: Event[] = [
     mainEvent: "Reyes vs Cruz - Welterweight Title",
     posterTone: "from-red-700 via-zinc-950 to-yellow-900",
     bouts: ["Santos vs Mendoza", "Dela Torre vs Bautista", "Lim vs Navarro"],
+    isChampionship: true,
+    isLive: true,
   },
   {
     slug: "jt-proving-ground-cebu",
@@ -170,6 +453,7 @@ export const events: Event[] = [
     mainEvent: "Santos vs Villanueva - Flyweight Grand Prix",
     posterTone: "from-zinc-950 via-red-950 to-black",
     bouts: ["Mendoza vs Aquino", "Garcia vs Flores", "Tan vs Uy"],
+    isChampionship: true,
   },
   {
     slug: "jt-night-of-blades",
@@ -181,6 +465,7 @@ export const events: Event[] = [
     mainEvent: "Reyes def. Soriano by TKO R3",
     posterTone: "from-black via-zinc-900 to-red-950",
     bouts: ["Cruz def. Ramos", "Mendoza def. Javier", "Bautista def. Lee"],
+    isChampionship: true,
   },
 ];
 
@@ -223,16 +508,16 @@ export const pageContent = {
       "Upcoming cards, countdowns, posters, bout lineups, results, and highlight-ready media blocks for every Juego Todo event.",
   },
   fighters: {
-    eyebrow: "Athlete Roster",
-    title: "Fighter Profiles With Style, Record, Gym, And Highlights",
+    eyebrow: "Fighter Database",
+    title: "Search, Filter, And Discover JTGC Competitors",
     intro:
-      "A scalable fighter system prepared for CMS-backed profiles, media reels, rankings, and division pages.",
+      "The official fighter database lives under Rankings — profiles, records, statistics, weight classes, and team connections in one hub.",
   },
   rankings: {
     eyebrow: "Official Standings",
-    title: "Champion Banners And Broadcast-Ready Ranking Tables",
+    title: "Division Rankings, Pound-For-Pound, And Fighter Discovery",
     intro:
-      "Clear division hierarchy, champion callouts, and contender cards designed for weekly updates.",
+      "Rankings is the primary athlete hub — championship tables, contender movement, the fighter database, and methodology in one destination.",
   },
   media: {
     eyebrow: "Video First",
@@ -241,10 +526,10 @@ export const pageContent = {
       "A cinematic media hub for finishes, documentary features, livestream previews, and partner content.",
   },
   shop: {
-    eyebrow: "Official Store",
-    title: "Juego Todo Gear, Sticks, And Fight Equipment",
+    eyebrow: "Fighter Equipment Armory",
+    title: "Official Gear Connected To Athlete Profiles",
     intro:
-      "Placeholder shop for official Arnis sticks, protective gear, apparel, and training accessories aligned with Juego Todo competition standards.",
+      "Premium Juego Todo merchandise, competition equipment, championship collectibles, and digital training products — integrated with member profiles, athlete discounts, and order history.",
   },
   registration: {
     eyebrow: "Official Funnel",
@@ -253,10 +538,22 @@ export const pageContent = {
       "A clean intake experience ready to connect with forms, CRM, payment, waivers, and athlete verification.",
   },
   partnerships: {
-    eyebrow: "Brand Growth",
-    title: "Sponsor, Gym, Media, And Broadcast Partnership System",
+    eyebrow: "Commercial Partnerships",
+    title: "Partner With The World's First Weaponized Combat League",
     intro:
-      "A premium partner destination for commercial sponsors, affiliated gyms, media teams, and livestream collaborators.",
+      "Premium commercial partnership destination for sponsors, broadcasters, equipment brands, venues, and media collaborators.",
+  },
+  partners: {
+    eyebrow: "Commercial Partnerships",
+    title: "Partner With The World's First Weaponized Combat League",
+    intro:
+      "Premium commercial partnership destination for sponsors, broadcasters, equipment brands, venues, and media collaborators.",
+  },
+  teams: {
+    eyebrow: "JTGC Team Ecosystem",
+    title: "Official Teams, Affiliated Gyms, And Regional Squads",
+    intro:
+      "Browse team rankings, official squads, affiliated gyms, regional teams, and coaches — connected to the JTGC athlete database and championship history.",
   },
   "juego-todo-seminars": {
     eyebrow: "Training & Education",
@@ -271,16 +568,16 @@ export const pageContent = {
       "A structured rules library for divisions, scoring, equipment, medical checks, fouls, and official procedures.",
   },
   "about-juego-todo": {
-    eyebrow: "The Mission",
-    title: "Modernizing Filipino Martial Arts For A Global Fight Audience",
+    eyebrow: "Leadership & Governance",
+    title: "JTGC Organizational Structure",
     intro:
-      "Juego Todo elevates Arnis, Eskrima, Kali, Panuntukan, Sikaran, Dumog, Buno, and Yaw-Yan into a modern combat sports platform.",
+      "The Juego Todo Grand Council (JTGC) governs league operations, athlete safety, regional command, arena standards, and the platform's global expansion.",
   },
   "grand-council": {
-    eyebrow: "Leadership",
-    title: "Juego Todo Grand Council Members",
+    eyebrow: "Leadership & Governance",
+    title: "JTGC Organizational Structure",
     intro:
-      "The Grand Council guides rules, athlete safety, FMA heritage, legal governance, and competition operations as Juego Todo scales from the Philippines to the world.",
+      "Supreme Grand Councils, elders, advisers, regional commanders, arena operations, and administrative leadership guiding Juego Todo worldwide.",
   },
   "fma-lineage": {
     eyebrow: "Filipino Martial Arts",
@@ -293,6 +590,78 @@ export const pageContent = {
     title: "Reach The Juego Todo Team",
     intro:
       "Contact channels for fight operations, athlete management, sponsorship, press, and gym affiliation.",
+  },
+  privacy: {
+    eyebrow: "Legal & Compliance",
+    title: "Privacy Policy",
+    intro:
+      "How Juego Todo collects, uses, stores, and protects personal data across registrations, newsletters, analytics, and LATAYANOLOGY.",
+  },
+  terms: {
+    eyebrow: "Legal & Compliance",
+    title: "Terms of Service",
+    intro:
+      "Terms governing website usage, platform access, intellectual property, user conduct, and liability across Juego Todo services.",
+  },
+  cookies: {
+    eyebrow: "Legal & Compliance",
+    title: "Cookie Policy",
+    intro:
+      "How Juego Todo uses cookies, analytics tools, and tracking technologies across the combat sports platform.",
+  },
+  disclaimer: {
+    eyebrow: "Legal & Compliance",
+    title: "Disclaimer",
+    intro:
+      "Important notices regarding information accuracy, rankings, schedules, athlete records, and platform content.",
+  },
+  "broadcast-rights": {
+    eyebrow: "Legal & Compliance",
+    title: "Broadcast Rights Policy",
+    intro:
+      "Rights and restrictions governing fight footage, livestreams, photography, highlight packages, and partner broadcasts.",
+  },
+  "fighter-agreement": {
+    eyebrow: "Athlete Compliance",
+    title: "Fighter Registration Agreement",
+    intro:
+      "Terms covering athlete eligibility, conduct, rankings participation, suspensions, and medical requirements.",
+  },
+  waiver: {
+    eyebrow: "Athlete Compliance",
+    title: "Waiver & Release",
+    intro:
+      "Release terms for seminars, sparring, tryouts, tournaments, and sanctioned Juego Todo competition activity.",
+  },
+  "safety-policy": {
+    eyebrow: "Athlete Compliance",
+    title: "Medical & Safety Policy",
+    intro:
+      "Medical examinations, equipment standards, injury protocols, and safety requirements for Juego Todo athletes and events.",
+  },
+  "media-accreditation": {
+    eyebrow: "Media & Broadcast",
+    title: "Media Accreditation",
+    intro:
+      "Press credentialing, event access tiers, photography permissions, and media compliance for Juego Todo coverage.",
+  },
+  sponsorships: {
+    eyebrow: "Business & Partners",
+    title: "Sponsorship Policy",
+    intro:
+      "Partnership requirements, advertising rules, brand guidelines, and sponsor integration standards for Juego Todo.",
+  },
+  "ranking-methodology": {
+    eyebrow: "Platform Integrity",
+    title: "Ranking Methodology",
+    intro:
+      "How Juego Todo rankings are calculated, verified, weighted, and published through official LATAYANOLOGY review.",
+  },
+  latayanology: {
+    eyebrow: "Platform Integrity",
+    title: "LATAYANOLOGY Methodology",
+    intro:
+      "The data engine behind verified fighter records, weapon statistics, performance analytics, and league intelligence.",
   },
 };
 

@@ -6,12 +6,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { OrderSummary, QuantityControl } from "@/components/commerce/OrderSummary";
+import { ProductVisual } from "@/components/commerce/ProductVisual";
 import { PageNavigation } from "@/components/PageNavigation";
-import { getShopProduct } from "@/data/shop";
+import { getShopProduct, shopProducts } from "@/data/shop";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import { PROMO_CODES } from "@/lib/commerce/pricing";
 import { formatCurrency } from "@/lib/commerce/pricing";
+import { getProductImageKey } from "@/lib/commerce/product-visuals";
 import { shopCategoryLabels } from "@/lib/commerce/types";
 
 export function CartPage() {
@@ -44,6 +46,12 @@ export function CartPage() {
     setPromoError(null);
     setCheckoutDraft({ ...checkoutDraft, promoCode: code });
   }
+
+  const cartSlugs = new Set(cart.map((item) => item.productSlug));
+  const upsellProducts = shopProducts
+    .filter((product) => !cartSlugs.has(product.slug))
+    .filter((product) => product.badge === "Best Seller" || product.category === "competition-equipment")
+    .slice(0, 2);
 
   if (loading || !user) {
     return (
@@ -98,9 +106,9 @@ export function CartPage() {
                         layout
                       >
                         <div className="flex gap-4 sm:gap-5">
-                          <div
-                            className={`h-24 w-24 shrink-0 rounded-2xl bg-gradient-to-br ${product.tone} sm:h-28 sm:w-28`}
-                          />
+                          <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl sm:h-28 sm:w-28">
+                            <ProductVisual imageKey={getProductImageKey(product)} size="sm" />
+                          </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-red-300">
                               {shopCategoryLabels[item.category]}
@@ -136,6 +144,30 @@ export function CartPage() {
                     );
                   })}
                 </AnimatePresence>
+
+                {upsellProducts.length > 0 ? (
+                  <div className="glass-panel rounded-[1.5rem] p-5">
+                    <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-[#FF1010]">Complete Your Kit</p>
+                    <h2 className="font-display mt-2 text-2xl uppercase text-white">Recommended Add-Ons</h2>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      {upsellProducts.map((product) => (
+                        <Link
+                          className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3 transition hover:border-[#FF1010]/30"
+                          href={`/shop/${product.slug}`}
+                          key={product.slug}
+                        >
+                          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg">
+                            <ProductVisual imageKey={getProductImageKey(product)} size="sm" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-white">{product.name}</p>
+                            <p className="text-xs text-zinc-400">{formatCurrency(product.priceAmount)}</p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               <div className="space-y-4">

@@ -64,6 +64,17 @@ a {
   font-family: var(--font-space-grotesk), var(--font-inter), sans-serif;
 }
 
+.diamond-plate {
+  background-color: #0a0a0a;
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.045) 25%, transparent 25%),
+    linear-gradient(225deg, rgba(255, 255, 255, 0.045) 25%, transparent 25%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.045) 25%, transparent 25%),
+    linear-gradient(315deg, rgba(255, 255, 255, 0.045) 25%, transparent 25%);
+  background-position: 6px 0, 6px 0, 0 0, 0 0;
+  background-size: 12px 12px;
+}
+
 .cinematic-grid {
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
@@ -103,13 +114,31 @@ a {
 }
 
 .red-glow {
-  box-shadow: 0 0 28px rgba(255, 16, 16, 0.28), inset 0 0 24px rgba(255, 16, 16, 0.08);
+  box-shadow: 0 0 18px rgba(255, 16, 16, 0.12), inset 0 0 12px rgba(255, 16, 16, 0.04);
+}
+
+.featured-event-poster {
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.72),
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 16, 16, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.featured-event-poster::after {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 16, 16, 0.35), transparent 42%, transparent 68%, rgba(255, 16, 16, 0.2));
+  content: "";
+  pointer-events: none;
+  opacity: 0.35;
 }
 
 .hero-rings {
   background:
-    radial-gradient(circle, transparent 0 42%, rgba(255, 16, 16, 0.38) 43% 44%, transparent 45% 100%),
-    conic-gradient(from 90deg, transparent, rgba(255, 16, 16, 0.25), transparent, rgba(255, 207, 106, 0.18), transparent);
+    radial-gradient(circle, transparent 0 42%, rgba(255, 16, 16, 0.13) 43% 44%, transparent 45% 100%),
+    conic-gradient(from 90deg, transparent, rgba(255, 16, 16, 0.09), transparent, rgba(255, 207, 106, 0.06), transparent);
   animation: spin-slow 28s linear infinite;
 }
 
@@ -281,6 +310,50 @@ a {
   100% {
     opacity: 0;
     transform: translateY(-120px) scale(1.2);
+  }
+}
+
+.partnership-logo-wall {
+  opacity: 0.5;
+  filter: grayscale(100%);
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+.partnership-logo-wall:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+.partner-wordmark {
+  opacity: 0.5;
+  filter: grayscale(100%);
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+.partner-wordmark:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+.premium-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.2), transparent);
+}
+
+.live-indicator-dot {
+  animation: live-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(255, 16, 16, 0.45);
+  }
+
+  50% {
+    opacity: 0.65;
+    box-shadow: 0 0 0 6px rgba(255, 16, 16, 0);
   }
 }
 

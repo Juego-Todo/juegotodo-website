@@ -6,11 +6,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { ShopPageClient } from "@/components/commerce/ShopPageClient";
-import { FighterDatabaseHub } from "@/components/FighterDatabaseHub";
+import { FighterDatabase } from "@/components/FighterDatabase";
 import { PartnersHub } from "@/components/PartnersHub";
-import { RankingsPageClient } from "@/components/RankingsPageClient";
 import { TeamsHub } from "@/components/TeamsHub";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { FmaLineageSection } from "@/components/FmaLineageSection";
 import { LegalPageContent } from "@/components/LegalPageContent";
 import { OrganizationalStructureSection } from "@/components/OrganizationalStructureSection";
@@ -31,14 +31,18 @@ export function InteriorPage({ slug }: { slug: PageSlug }) {
   const content = pageContent[slug];
   const isRulesPage = slug === "rules-regulations";
   const isLegalPage = isLegalPageSlug(slug);
-  const legalPage = isLegalPage ? getLegalPage(slug) : undefined;
+  const isShopPage = slug === "shop";
+  const isPartnersPage = slug === "partners" || slug === "partnerships";
+  const isLatayanologyPage = slug === "latayanology";
+  const legalPage = isLegalPage && !isLatayanologyPage ? getLegalPage(slug) : undefined;
 
   return (
-      <main className="overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pb-20 sm:pt-28 lg:px-8 lg:pt-32">
+      <main className={`overflow-hidden ${isPartnersPage || isLatayanologyPage ? "" : "px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8"} ${isShopPage || isPartnersPage || isLatayanologyPage ? "pt-20 sm:pt-24" : "pt-24 sm:pt-28 lg:pt-32"} ${isLatayanologyPage ? "pb-14 sm:pb-20" : ""}`}>
+      {!isShopPage && !isPartnersPage && !isLatayanologyPage ? (
       <section className={`relative mx-auto max-w-7xl ${isRulesPage || isLegalPage ? "py-6 sm:py-8 lg:py-10" : "py-10 sm:py-14 lg:py-16"}`}>
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
         <div className={`relative ${isRulesPage || isLegalPage ? "max-w-4xl" : "max-w-5xl"}`}>
-          <PageNavigation categoryLabel={slug === "fighters" ? "Rankings" : undefined} />
+          <PageNavigation />
           <h1 className={`font-display mt-3 uppercase leading-[0.9] text-white sm:mt-4 ${
             isRulesPage || isLegalPage
               ? "text-[clamp(2.75rem,12vw,4.5rem)] sm:text-6xl lg:text-7xl"
@@ -56,16 +60,12 @@ export function InteriorPage({ slug }: { slug: PageSlug }) {
           ) : null}
         </div>
       </section>
+      ) : null}
 
       {legalPage ? <LegalPageContent page={legalPage} /> : null}
 
       {slug === "events" ? <EventsSection /> : null}
-      {slug === "fighters" ? <FighterDatabaseHub /> : null}
-      {slug === "rankings" ? (
-        <Suspense>
-          <RankingsPageClient />
-        </Suspense>
-      ) : null}
+      {slug === "latayanology" ? <FighterDatabase /> : null}
       {slug === "media" ? <MediaSection /> : null}
       {slug === "shop" ? (
         <Suspense>
@@ -120,12 +120,12 @@ function EventsSection() {
       <div className="grid gap-5 lg:grid-cols-3">
       {events.map((event) => (
         <Link className="glass-panel group overflow-hidden rounded-[1.75rem] transition hover:-translate-y-2 hover:border-red-500/40" href={`/events/${event.slug}`} key={event.slug}>
-          <div className={`min-h-56 bg-gradient-to-br ${event.posterTone} p-5 sm:min-h-72 sm:p-6`}>
+          <EventCardBackdrop className="min-h-56 p-5 sm:min-h-72 sm:p-6">
             <span className="rounded-full border border-white/20 bg-black/35 px-3 py-1 text-xs font-black uppercase tracking-[0.22em]">
               {event.status}
             </span>
             <h2 className="font-display mt-16 text-4xl uppercase leading-none text-white sm:mt-24 sm:text-5xl">{event.title}</h2>
-          </div>
+          </EventCardBackdrop>
           <div className="space-y-5 p-6">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.24em] text-red-300">{event.city}</p>
@@ -142,14 +142,28 @@ function EventsSection() {
 
 function MediaSection() {
   return (
-    <MotionSection className="mx-auto grid max-w-7xl gap-5 pb-14 sm:grid-cols-2 sm:pb-20">
-      {mediaReels.map((reel) => (
-        <article className="group relative min-h-64 overflow-hidden rounded-[1.75rem] border border-white/10 bg-zinc-950 p-5 sm:min-h-80 sm:p-6" key={reel}>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(229,9,20,0.46),transparent_35%),linear-gradient(145deg,transparent,rgba(0,0,0,0.8))]" />
-          <Play className="relative z-10 rounded-full bg-red-600 p-4 text-white" size={64} aria-hidden />
-          <h2 className="font-display relative z-10 mt-24 text-4xl uppercase leading-none text-white sm:mt-32 sm:text-6xl">{reel}</h2>
-        </article>
-      ))}
+    <MotionSection className="mx-auto max-w-7xl space-y-10 pb-14 sm:pb-20">
+      <section id="clips">
+        <p className="text-xs font-black uppercase tracking-[0.28em] text-[#FF1010]">Media Clips</p>
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          {mediaReels.map((reel) => (
+            <article className="group relative min-h-64 overflow-hidden rounded-[1.75rem] border border-white/10 bg-zinc-950 p-5 sm:min-h-80 sm:p-6" key={reel}>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(229,9,20,0.46),transparent_35%),linear-gradient(145deg,transparent,rgba(0,0,0,0.8))]" />
+              <Play className="relative z-10 rounded-full bg-red-600 p-4 text-white" size={64} aria-hidden />
+              <h2 className="font-display relative z-10 mt-24 text-4xl uppercase leading-none text-white sm:mt-32 sm:text-6xl">{reel}</h2>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="glass-panel rounded-[1.75rem] p-6 sm:p-8" id="podcast">
+        <p className="text-xs font-black uppercase tracking-[0.28em] text-[#FF1010]">Podcast</p>
+        <h2 className="font-display mt-3 text-4xl uppercase text-white sm:text-5xl">JTGC Audio</h2>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
+          League interviews, fight-week breakdowns, and coach roundtables — podcast episodes publish here as the
+          broadcast library expands.
+        </p>
+      </section>
     </MotionSection>
   );
 }

@@ -12,7 +12,9 @@ export function OrderInvoicePage({ orderId }: { orderId: string }) {
   const [order, setOrder] = useState<Order | null | undefined>(undefined);
 
   useEffect(() => {
-    setOrder(getOrderById(orderId) ?? null);
+    void getOrderById(orderId).then((result) => {
+      setOrder(result ?? null);
+    });
   }, [orderId]);
 
   if (order === undefined) {

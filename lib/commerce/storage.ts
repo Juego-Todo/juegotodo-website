@@ -11,7 +11,21 @@ import type {
 } from "@/lib/commerce/types";
 import { generatePaymentReference } from "@/lib/commerce/pricing";
 import { calculateLineItems } from "@/lib/commerce/pricing";
-import type { AccountType } from "@/lib/auth/types";
+import type { AccountType, UserProfile } from "@/lib/auth/types";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import {
+  approveSupabaseOrderPayment,
+  createSupabaseOrder,
+  fetchAllOrders,
+  fetchOrderById,
+  fetchUserCommerceData,
+  fetchUserOrders,
+  isSupabaseAdmin,
+  markNotificationReadRemote,
+  saveUserCommerceDataRemote,
+  updateSupabaseOrderStatus,
+  upsertNotification,
+} from "@/lib/commerce/supabase";
 
 const CART_KEY = "juego-todo.commerce.cart";
 const ORDERS_KEY = "juego-todo.commerce.orders";
@@ -76,31 +90,59 @@ export function clearCheckoutDraft() {
   window.localStorage.removeItem(CHECKOUT_KEY);
 }
 
-export function getUserCommerceData(userId: string): UserCommerceData {
+function getUserCommerceDataLocal(userId: string): UserCommerceData {
   const data = readJson<UserCommerceData>(userDataKey(userId), defaultUserCommerceData());
   return { ...defaultUserCommerceData(), ...data, savedTeams: data.savedTeams ?? [] };
 }
 
-export function saveUserCommerceData(userId: string, data: UserCommerceData) {
+function saveUserCommerceDataLocal(userId: string, data: UserCommerceData) {
   writeJson(userDataKey(userId), data);
 }
 
-export function getAllOrders(): Order[] {
+export async function getUserCommerceData(userId: string): Promise<UserCommerceData> {
+  if (isSupabaseConfigured()) {
+    return fetchUserCommerceData(userId);
+  }
+  return getUserCommerceDataLocal(userId);
+}
+
+export async function saveUserCommerceData(userId: string, data: UserCommerceData) {
+  if (isSupabaseConfigured()) {
+    await saveUserCommerceDataRemote(userId, data);
+    return;
+  }
+  saveUserCommerceDataLocal(userId, data);
+}
+
+function getAllOrdersLocal(): Order[] {
   return readJson<Order[]>(ORDERS_KEY, []);
 }
 
-export function getUserOrders(userId: string): Order[] {
-  return getAllOrders()
+export async function getAllOrders(): Promise<Order[]> {
+  if (isSupabaseConfigured()) {
+    return fetchAllOrders();
+  }
+  return getAllOrdersLocal();
+}
+
+export async function getUserOrders(userId: string): Promise<Order[]> {
+  if (isSupabaseConfigured()) {
+    return fetchUserOrders(userId);
+  }
+  return getAllOrdersLocal()
     .filter((order) => order.userId === userId)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
-export function getOrderById(orderId: string): Order | undefined {
-  return getAllOrders().find((order) => order.id === orderId);
+export async function getOrderById(orderId: string): Promise<Order | undefined> {
+  if (isSupabaseConfigured()) {
+    return fetchOrderById(orderId);
+  }
+  return getAllOrdersLocal().find((order) => order.id === orderId);
 }
 
-export function updateOrder(orderId: string, updater: (order: Order) => Order): Order {
-  const orders = getAllOrders();
+function updateOrderLocal(orderId: string, updater: (order: Order) => Order): Order {
+  const orders = getAllOrdersLocal();
   const index = orders.findIndex((order) => order.id === orderId);
 
   if (index === -1) {
@@ -113,7 +155,7 @@ export function updateOrder(orderId: string, updater: (order: Order) => Order): 
   return updated;
 }
 
-export function createOrder(input: {
+export async function createOrder(input: {
   userId: string;
   userEmail: string;
   userName: string;
@@ -123,7 +165,14 @@ export function createOrder(input: {
   accountType: AccountType;
   membershipTier: MembershipTier;
   promoCode?: string;
-}): Order {
+}): Promise<Order> {
+  if (isSupabaseConfigured()) {
+    const order = await createSupabaseOrder(input);
+    saveCart([]);
+    clearCheckoutDraft();
+    return order;
+  }
+
   const totals = calculateLineItems(input.cart, {
     accountType: input.accountType,
     membershipTier: input.membershipTier,
@@ -169,11 +218,11 @@ export function createOrder(input: {
     updatedAt: now,
   };
 
-  writeJson(ORDERS_KEY, [...getAllOrders(), order]);
+  writeJson(ORDERS_KEY, [...getAllOrdersLocal(), order]);
   saveCart([]);
   clearCheckoutDraft();
 
-  const userData = getUserCommerceData(input.userId);
+  const userData = getUserCommerceDataLocal(input.userId);
   userData.notifications = [
     {
       id: crypto.randomUUID(),
@@ -184,29 +233,41 @@ export function createOrder(input: {
     },
     ...userData.notifications,
   ].slice(0, 20);
-  saveUserCommerceData(input.userId, userData);
+  saveUserCommerceDataLocal(input.userId, userData);
 
   return order;
 }
 
-export function approveOrderPayment(orderId: string): Order {
-  return updateOrder(orderId, (order) => {
+export async function approveOrderPayment(orderId: string): Promise<Order> {
+  if (isSupabaseConfigured()) {
+    return approveSupabaseOrderPayment(orderId);
+  }
+
+  return updateOrderLocal(orderId, (order) => {
     const now = new Date().toISOString();
     return {
       ...order,
       status: "payment_received",
       payment: {
         ...order.payment,
-      status: "approved",
-      verifiedAt: now,
+        status: "approved",
+        verifiedAt: now,
       },
       updatedAt: now,
     };
   });
 }
 
-export function updateOrderStatus(orderId: string, status: OrderStatus, trackingNumber?: string): Order {
-  return updateOrder(orderId, (order) => ({
+export async function updateOrderStatus(
+  orderId: string,
+  status: OrderStatus,
+  trackingNumber?: string,
+): Promise<Order> {
+  if (isSupabaseConfigured()) {
+    return updateSupabaseOrderStatus(orderId, status, trackingNumber);
+  }
+
+  return updateOrderLocal(orderId, (order) => ({
     ...order,
     status,
     trackingNumber: trackingNumber ?? order.trackingNumber,
@@ -214,8 +275,16 @@ export function updateOrderStatus(orderId: string, status: OrderStatus, tracking
   }));
 }
 
-export function addNotification(userId: string, notification: Omit<CommerceNotification, "id" | "createdAt" | "read">) {
-  const data = getUserCommerceData(userId);
+export async function addNotification(
+  userId: string,
+  notification: Omit<CommerceNotification, "id" | "createdAt" | "read">,
+) {
+  if (isSupabaseConfigured()) {
+    await upsertNotification(userId, notification);
+    return;
+  }
+
+  const data = getUserCommerceDataLocal(userId);
   data.notifications = [
     {
       id: crypto.randomUUID(),
@@ -225,9 +294,32 @@ export function addNotification(userId: string, notification: Omit<CommerceNotif
     },
     ...data.notifications,
   ].slice(0, 20);
-  saveUserCommerceData(userId, data);
+  saveUserCommerceDataLocal(userId, data);
 }
 
-export function isAdminUser(email: string, _accountType: AccountType): boolean {
+export async function markNotificationRead(userId: string, notificationId: string) {
+  if (isSupabaseConfigured()) {
+    await markNotificationReadRemote(userId, notificationId);
+    return;
+  }
+
+  const data = getUserCommerceDataLocal(userId);
+  data.notifications = data.notifications.map((entry) =>
+    entry.id === notificationId ? { ...entry, read: true } : entry,
+  );
+  saveUserCommerceDataLocal(userId, data);
+}
+
+export function isAdminUser(email: string, accountType: AccountType, role?: UserProfile["role"]) {
+  if (role === "admin") {
+    return true;
+  }
   return email.toLowerCase() === "admin@juegotodo.com";
+}
+
+export function isAdminProfile(profile: Pick<UserProfile, "email" | "role">) {
+  if (isSupabaseConfigured()) {
+    return isSupabaseAdmin(profile);
+  }
+  return isAdminUser(profile.email, "fan", profile.role);
 }

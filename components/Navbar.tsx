@@ -8,35 +8,46 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
-import { shopNavCategories } from "@/lib/commerce/types";
 import { navItems } from "@/data/site";
 
+const aboutUsPaths = [
+  "/about-juego-todo",
+  "/events",
+  "/juego-todo-seminars",
+  "/rules-regulations",
+  "/partners",
+  "/partnerships",
+  "/grand-council",
+];
+
+const latayanologyPaths = ["/latayanology", "/fighters", "/teams"];
+
 function isNavActive(pathname: string, href: string, label: string) {
-  if (pathname === href || pathname.startsWith(`${href}/`)) {
-    return true;
+  if (label === "Home") {
+    return pathname === "/";
   }
 
-  if (label === "Rankings") {
-    return pathname === "/rankings" || pathname.startsWith("/fighters") || pathname === "/ranking-methodology";
+  if (label === "About Us") {
+    return (
+      aboutUsPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`)) ||
+      pathname.startsWith("/juego-todo-seminars/") ||
+      pathname.startsWith("/rules-regulations/")
+    );
   }
 
-  if (label === "Teams") {
-    return pathname.startsWith("/teams");
+  if (label === "Latayanology") {
+    return latayanologyPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
   }
 
-  if (label === "Partners") {
-    return pathname === "/partners" || pathname === "/partnerships";
+  if (label === "Media") {
+    return pathname === "/media" || pathname.startsWith("/media/");
   }
 
   if (label === "Shop") {
     return pathname.startsWith("/shop");
   }
 
-  if (label === "News") {
-    return pathname.startsWith("/media");
-  }
-
-  return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export function Navbar() {
@@ -47,6 +58,14 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [lastPathname, setLastPathname] = useState(pathname);
+
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    setIsOpen(false);
+    setOpenDropdown(null);
+    setMobileExpanded(null);
+  }
 
   const centerLinks = navItems.filter((item) => !item.cta && item.label !== "Login" && item.label !== "Register");
   const loginItem = navItems.find((item) => item.label === "Login");
@@ -65,12 +84,6 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  useEffect(() => {
-    setIsOpen(false);
-    setOpenDropdown(null);
-    setMobileExpanded(null);
-  }, [pathname]);
 
   return (
     <header className={`glass-nav fixed inset-x-0 top-0 z-50 ${scrolled ? "glass-nav-scrolled" : ""}`}>
@@ -95,7 +108,7 @@ export function Navbar() {
                   onMouseLeave={() => setOpenDropdown(null)}
                 >
                   <Link
-                    className={`nav-link-underline inline-flex items-center gap-1 px-3 py-2 text-[0.72rem] font-bold uppercase tracking-[0.18em] transition sm:text-xs ${
+                    className={`nav-link-underline inline-flex items-center gap-1 px-3.5 py-2 text-[0.78rem] font-bold uppercase tracking-[0.16em] transition sm:text-[0.82rem] ${
                       active ? "text-white" : "text-zinc-400 hover:text-white"
                     }`}
                     href={item.href}
@@ -107,9 +120,7 @@ export function Navbar() {
                     {isOpenDropdown ? (
                       <motion.div
                         animate={{ opacity: 1, y: 0 }}
-                        className={`absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 rounded-2xl border border-white/10 bg-[#050505]/98 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.55)] ${
-                          item.label === "Rankings" ? "w-64" : "w-56"
-                        }`}
+                        className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-white/10 bg-[#050505]/98 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
                         exit={{ opacity: 0, y: 8 }}
                         initial={{ opacity: 0, y: 8 }}
                       >
@@ -131,7 +142,7 @@ export function Navbar() {
 
             return (
               <Link
-                className={`nav-link-underline px-3 py-2 text-[0.72rem] font-bold uppercase tracking-[0.18em] transition sm:text-xs ${
+                className={`nav-link-underline px-3.5 py-2 text-[0.78rem] font-bold uppercase tracking-[0.16em] transition sm:text-[0.82rem] ${
                   active ? "text-white" : "text-zinc-400 hover:text-white"
                 }`}
                 href={item.href}
@@ -199,10 +210,7 @@ export function Navbar() {
                 const active = isNavActive(pathname, item.href, item.label);
                 const hasChildren = Boolean(item.children?.length);
                 const expanded = mobileExpanded === item.label;
-                const mobileChildren =
-                  item.label === "Shop"
-                    ? shopNavCategories.map((child) => ({ label: child.label, href: child.href }))
-                    : item.children ?? [];
+                const mobileChildren = item.children ?? [];
 
                 if (hasChildren) {
                   return (

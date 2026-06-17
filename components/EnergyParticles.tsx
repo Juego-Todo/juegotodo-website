@@ -11,16 +11,21 @@ type Particle = {
   duration: number;
 };
 
+function seededUnit(seed: number) {
+  const value = Math.sin(seed * 12.9898) * 43758.5453;
+  return value - Math.floor(value);
+}
+
 export function EnergyParticles({ count = 24 }: { count?: number }) {
   const particles = useMemo<Particle[]>(
     () =>
       Array.from({ length: count }, (_, id) => ({
         id,
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        size: 2 + Math.random() * 3,
-        delay: Math.random() * 8,
-        duration: 6 + Math.random() * 8,
+        left: `${seededUnit(id * 5 + 1) * 100}%`,
+        top: `${seededUnit(id * 5 + 2) * 100}%`,
+        size: 2 + seededUnit(id * 5 + 3) * 3,
+        delay: seededUnit(id * 5 + 4) * 8,
+        duration: 6 + seededUnit(id * 5 + 5) * 8,
       })),
     [count],
   );

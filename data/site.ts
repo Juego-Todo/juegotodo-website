@@ -1,5 +1,3 @@
-import { rankingsNavItems } from "@/data/rankings-nav";
-
 export type Fighter = {
   slug: string;
   name: string;
@@ -27,17 +25,10 @@ export type Event = {
 };
 
 export type Champion = {
-  division: string;
+  title: string;
   name: string;
-  nickname: string;
+  crownedDate: string;
   initials: string;
-  record: string;
-  team: string;
-  teamShort: string;
-  ranking: string;
-  koWins: string;
-  titleDefenses: string;
-  style: string;
 };
 
 export type FighterProfile = {
@@ -65,29 +56,57 @@ export type NavItem = {
 
 
 export const navItems: NavItem[] = [
-  { label: "Events", href: "/events" },
-  { label: "Rankings", href: "/rankings", children: rankingsNavItems },
-  { label: "Teams", href: "/teams" },
-  { label: "Partners", href: "/partners" },
+  { label: "Home", href: "/" },
   {
-    label: "Shop",
-    href: "/shop",
+    label: "About Us",
+    href: "/about-juego-todo",
     children: [
-      { label: "All Products", href: "/shop" },
-      { label: "Official Gear", href: "/shop?category=official-gear" },
-      { label: "Protective Equipment", href: "/shop?category=protective-equipment" },
-      { label: "Competition Equipment", href: "/shop?category=competition-equipment" },
-      { label: "Training Equipment", href: "/shop?category=training-equipment" },
-      { label: "Apparel", href: "/shop?category=apparel" },
-      { label: "Championship Collection", href: "/shop?category=championship-collection" },
-      { label: "Digital Products", href: "/shop?category=digital-products" },
+      { label: "About Juego Todo", href: "/about-juego-todo" },
+      { label: "Events", href: "/events" },
+      { label: "Grand Council", href: "/grand-council" },
+      { label: "Rules & Regulations", href: "/rules-regulations" },
+      { label: "Partners", href: "/partners" },
+      { label: "Seminars", href: "/juego-todo-seminars" },
     ],
   },
-  { label: "Rules", href: "/rules-regulations" },
-  { label: "News", href: "/media" },
+  {
+    label: "Latayanology",
+    href: "/latayanology",
+    children: [
+      { label: "Teams", href: "/teams" },
+    ],
+  },
+  {
+    label: "Media",
+    href: "/media",
+    children: [
+      { label: "News", href: "/media" },
+      { label: "Media Clips", href: "/media#clips" },
+      { label: "Podcast", href: "/media#podcast" },
+    ],
+  },
+  { label: "Shop", href: "/shop" },
   { label: "Login", href: "/login" },
   { label: "Register", href: "/login?mode=register", cta: true },
 ];
+
+export const footerNavColumns = navItems
+  .filter((item) => !item.cta && item.label !== "Login" && item.label !== "Register")
+  .map((item) => ({
+    title: item.label,
+    links: item.children?.length
+      ? item.label === "Latayanology"
+        ? [{ label: "LATAYANOLOGY", href: item.href }, ...item.children]
+        : item.children.map((child) => ({ label: child.label, href: child.href }))
+      : [{ label: item.label, href: item.href }],
+  }));
+
+export const footerLegalLinks = [
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
+  { label: "Cookie Policy", href: "/cookies" },
+  { label: "Disclaimer", href: "/disclaimer" },
+] as const;
 
 export const stats = [
   { label: "Professional Fighters", value: 125, suffix: "+" },
@@ -112,52 +131,24 @@ export const broadcastPartners = [
 ];
 
 export const socialLinks = [
-  { label: "Instagram", href: "https://instagram.com", followers: "48K" },
-  { label: "Facebook", href: "https://facebook.com", followers: "62K" },
-  { label: "TikTok", href: "https://tiktok.com", followers: "91K" },
-  { label: "YouTube", href: "https://youtube.com", followers: "35K" },
-  { label: "Discord", href: "https://discord.com", followers: "12K" },
+  { label: "Instagram", href: "https://instagram.com" },
+  { label: "Facebook", href: "https://facebook.com" },
+  { label: "TikTok", href: "https://tiktok.com" },
+  { label: "YouTube", href: "https://youtube.com" },
 ];
 
 export const champions: Champion[] = [
   {
-    division: "Lightweight Champion",
-    name: "Ilia Navarro",
-    nickname: "Kalasag",
-    initials: "IN",
-    record: "9-0",
-    team: "Cebu Blade Athletics",
-    teamShort: "CBA",
-    ranking: "#1 P4P",
-    koWins: "4",
-    titleDefenses: "2",
-    style: "Sikaran / Kali",
+    title: "Juego Todo Inaugural Champion",
+    name: "Genil Francisco",
+    crownedDate: "December 20, 2019",
+    initials: "GF",
   },
   {
-    division: "Middleweight Champion",
-    name: "Ramon Cruz",
-    nickname: "Dumog",
-    initials: "RC",
-    record: "10-3",
-    team: "Lakbay Grappling Club",
-    teamShort: "LGC",
-    ranking: "Champion",
-    koWins: "3",
-    titleDefenses: "1",
-    style: "Dumog / Buno",
-  },
-  {
-    division: "Heavyweight Champion",
-    name: "Gabriel Datu",
-    nickname: "The Hammer",
-    initials: "GD",
-    record: "11-1",
-    team: "Manila Combat Lab",
-    teamShort: "MCL",
-    ranking: "Champion",
-    koWins: "7",
-    titleDefenses: "3",
-    style: "Dumog / Kali",
+    title: "Hari ng Latayan",
+    name: "Alfredo Melendres Jr.",
+    crownedDate: "Dec 12, 2025",
+    initials: "AM",
   },
 ];
 
@@ -476,16 +467,33 @@ export const mediaReels = [
   "Road to Ascension Manila",
 ];
 
+export const heroMainStats = [
+  { value: "50+", label: "Professional Fighters" },
+  { value: "500+", label: "Amateur Fighters" },
+  { value: "100+", label: "Matches" },
+  { value: "100+", label: "Styles" },
+  { value: "18", label: "Regions" },
+  { value: "20+", label: "Juego Todo PH" },
+  { value: "58+", label: "Juego Todo Int." },
+] as const;
+
+/** @deprecated Use heroMainStats for homepage hero */
+export const heroTrustStats = heroMainStats;
+
 export const mediaPartners = [
+  "ESPN",
+  "ONE Championship",
+  "Arena Vision",
   "FightCast Global",
   "RingSide Network",
   "Manila Sports TV",
+  "ABS-CBN Sports",
+  "GMA Sports",
   "Combat Stream PH",
+  "Sports5",
   "Apex Broadcast",
-  "JT Live",
   "Pacific Fight Media",
-  "Arena Vision",
-];
+] as const;
 
 export const partners = [
   "Official apparel",
@@ -507,18 +515,6 @@ export const pageContent = {
     intro:
       "Upcoming cards, countdowns, posters, bout lineups, results, and highlight-ready media blocks for every Juego Todo event.",
   },
-  fighters: {
-    eyebrow: "Fighter Database",
-    title: "Search, Filter, And Discover JTGC Competitors",
-    intro:
-      "The official fighter database lives under Rankings — profiles, records, statistics, weight classes, and team connections in one hub.",
-  },
-  rankings: {
-    eyebrow: "Official Standings",
-    title: "Division Rankings, Pound-For-Pound, And Fighter Discovery",
-    intro:
-      "Rankings is the primary athlete hub — championship tables, contender movement, the fighter database, and methodology in one destination.",
-  },
   media: {
     eyebrow: "Video First",
     title: "Highlight Reels, Camp Features, And Social-Ready Clips",
@@ -538,16 +534,16 @@ export const pageContent = {
       "A clean intake experience ready to connect with forms, CRM, payment, waivers, and athlete verification.",
   },
   partnerships: {
-    eyebrow: "Commercial Partnerships",
-    title: "Partner With The World's First Weaponized Combat League",
+    eyebrow: "Partnerships",
+    title: "Partner With The Future Of Filipino Combat Sports",
     intro:
-      "Premium commercial partnership destination for sponsors, broadcasters, equipment brands, venues, and media collaborators.",
+      "Access athletes, gyms, livestream audiences, events, seminars, and national competition circuits through JTGC commercial partnerships.",
   },
   partners: {
-    eyebrow: "Commercial Partnerships",
-    title: "Partner With The World's First Weaponized Combat League",
+    eyebrow: "Partnerships",
+    title: "Partner With The Future Of Filipino Combat Sports",
     intro:
-      "Premium commercial partnership destination for sponsors, broadcasters, equipment brands, venues, and media collaborators.",
+      "Access athletes, gyms, livestream audiences, events, seminars, and national competition circuits through JTGC commercial partnerships.",
   },
   teams: {
     eyebrow: "JTGC Team Ecosystem",
@@ -651,17 +647,11 @@ export const pageContent = {
     intro:
       "Partnership requirements, advertising rules, brand guidelines, and sponsor integration standards for Juego Todo.",
   },
-  "ranking-methodology": {
-    eyebrow: "Platform Integrity",
-    title: "Ranking Methodology",
-    intro:
-      "How Juego Todo rankings are calculated, verified, weighted, and published through official LATAYANOLOGY review.",
-  },
   latayanology: {
-    eyebrow: "Platform Integrity",
-    title: "LATAYANOLOGY Methodology",
+    eyebrow: "Athlete Intelligence",
+    title: "LATAYANOLOGY",
     intro:
-      "The data engine behind verified fighter records, weapon statistics, performance analytics, and league intelligence.",
+      "The official athlete intelligence platform of Juego Todo — verified rankings, records, teams, and performance analytics for the global JTGC roster.",
   },
 };
 

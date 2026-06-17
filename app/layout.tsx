@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Inter, Space_Grotesk } from "next/font/google";
 import type { ReactNode } from "react";
 import { Footer } from "@/components/Footer";
+import { LeagueConnectSection } from "@/components/LeagueConnectSection";
 import { Navbar } from "@/components/Navbar";
 import { Providers } from "@/components/Providers";
 import "./globals.css";
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Providers>
           <Navbar />
           <div id="main-content">{children}</div>
+          <LeagueConnectSection />
           <Footer />
         </Providers>
       </body>

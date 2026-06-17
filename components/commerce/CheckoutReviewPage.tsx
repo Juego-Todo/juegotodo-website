@@ -49,7 +49,7 @@ export function CheckoutReviewPage() {
     setError(null);
 
     try {
-      const order = placeOrder(checkoutDraft.paymentMethod, address, checkoutDraft.promoCode);
+      const order = await placeOrder(checkoutDraft.paymentMethod, address, checkoutDraft.promoCode);
       router.push(`/checkout/confirmation/${order.id}`);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to place order.");

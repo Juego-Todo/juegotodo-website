@@ -1,19 +1,13 @@
 "use client";
 
-import { ArrowRight, Calendar, ShoppingBag, Trophy, Users } from "lucide-react";
+import { ArrowRight, Calendar, ShoppingBag, Users } from "lucide-react";
 import Link from "next/link";
 import { MotionSection } from "@/components/MotionSection";
 
 const journeys = [
   {
-    label: "Rankings",
-    href: "/rankings",
-    description: "Division tables, pound-for-pound standings, and championship hierarchy.",
-    icon: Trophy,
-  },
-  {
-    label: "Fighter Database",
-    href: "/fighters",
+    label: "LATAYANOLOGY",
+    href: "/latayanology",
     description: "Search profiles, records, statistics, and weight-class filters.",
     icon: Users,
   },
@@ -52,7 +46,7 @@ export function EcosystemJourney() {
           JTGC Ecosystem
         </h2>
         <p className="mt-4 text-base leading-7 text-zinc-400">
-          Navigate the full combat sports platform — rankings, athletes, teams, partners, and official commerce.
+          Navigate the full combat sports platform — athletes, teams, partners, and official commerce.
         </p>
       </div>
 

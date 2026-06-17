@@ -1,4 +1,5 @@
 export type AccountType = "fan" | "athlete" | "coach" | "gym_owner" | "partner";
+export type UserRole = "user" | "admin";
 
 export type StoredUser = {
   id: string;
@@ -6,6 +7,7 @@ export type StoredUser = {
   password: string;
   fullName: string;
   accountType: AccountType;
+  role: UserRole;
   gym: string;
   city: string;
   bio: string;

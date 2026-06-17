@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Search, Shield, Trophy, Users } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { SaveEntityButton } from "@/components/commerce/SaveEntityButton";
 import {
@@ -25,11 +25,7 @@ export function TeamsHub() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<TeamCategory | "all">("all");
   const rankedTeams = getRankedTeams();
-
-  const filteredTeams = useMemo(
-    () => searchTeams(query, category),
-    [query, category],
-  );
+  const filteredTeams = searchTeams(query, category);
 
   return (
     <>

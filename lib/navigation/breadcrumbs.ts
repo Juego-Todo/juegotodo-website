@@ -4,9 +4,8 @@ export type BreadcrumbItem = {
 };
 
 const SEGMENT_LABELS: Record<string, string> = {
-  fighters: "Fighter Database",
+  fighters: "LATAYANOLOGY",
   events: "Events",
-  rankings: "Rankings",
   media: "Media",
   shop: "Shop",
   registration: "Registration",
@@ -35,14 +34,11 @@ const SEGMENT_LABELS: Record<string, string> = {
   "safety-policy": "Safety Policy",
   "media-accreditation": "Media Accreditation",
   sponsorships: "Sponsorships",
-  "ranking-methodology": "Ranking Methodology",
   latayanology: "LATAYANOLOGY",
 };
 
 const STATIC_PAGE_LABELS: Record<string, string> = {
-  "/fighters": "Fighter Database",
   "/events": "Fight Calendar",
-  "/rankings": "Official Rankings",
   "/media": "Broadcast Library",
   "/shop": "Official Store",
   "/registration": "Registration",
@@ -73,12 +69,11 @@ const STATIC_PAGE_LABELS: Record<string, string> = {
   "/safety-policy": "Safety Policy",
   "/media-accreditation": "Media Accreditation",
   "/sponsorships": "Sponsorship Policy",
-  "/ranking-methodology": "Ranking Methodology",
   "/latayanology": "LATAYANOLOGY",
 };
 
 const DETAIL_PARENTS: Record<string, { href: string; label: string; backLabel: string }> = {
-  fighters: { href: "/fighters", label: "Fighter Database", backLabel: "Back to Fighter Database" },
+  fighters: { href: "/latayanology", label: "LATAYANOLOGY", backLabel: "Back to LATAYANOLOGY" },
   teams: { href: "/teams", label: "Teams", backLabel: "Back to Teams" },
   events: { href: "/events", label: "Events", backLabel: "Back to Events" },
   shop: { href: "/shop", label: "Shop", backLabel: "Back to Shop" },
@@ -96,8 +91,8 @@ const DETAIL_PARENTS: Record<string, { href: string; label: string; backLabel: s
 };
 
 export function resolvePageCategoryLabel(pathname: string, currentLabel?: string) {
-  if (pathname === "/fighters" || pathname.startsWith("/fighters/") || pathname === "/ranking-methodology") {
-    return "Rankings";
+  if (pathname === "/fighters" || pathname.startsWith("/fighters/")) {
+    return "Latayanology";
   }
 
   const items = resolveBreadcrumbs(pathname, currentLabel);
@@ -133,11 +128,6 @@ export function resolveBreadcrumbs(pathname: string, currentLabel?: string): Bre
 
   if (segments.length === 1) {
     const segment = segments[0];
-    if (segment === "fighters") {
-      crumbs.push({ label: "Rankings", href: "/rankings" });
-      crumbs.push({ label: "Fighter Database" });
-      return crumbs;
-    }
     const label = STATIC_PAGE_LABELS[`/${segment}`] ?? SEGMENT_LABELS[segment] ?? formatSegment(segment);
     crumbs.push({ label });
     return crumbs;
@@ -146,8 +136,7 @@ export function resolveBreadcrumbs(pathname: string, currentLabel?: string): Bre
   const parentSegment = segments[0];
 
   if (parentSegment === "fighters") {
-    crumbs.push({ label: "Rankings", href: "/rankings" });
-    crumbs.push({ label: "Fighter Database", href: "/fighters" });
+    crumbs.push({ label: "LATAYANOLOGY", href: "/latayanology" });
     crumbs.push({ label: currentLabel ?? formatSegment(segments[segments.length - 1]) });
     return crumbs;
   }
@@ -178,9 +167,6 @@ export function resolveBackNavigation(pathname: string) {
   const segments = pathname.split("/").filter(Boolean);
 
   if (segments.length <= 1) {
-    if (segments[0] === "fighters") {
-      return { label: "Back to Rankings", href: "/rankings" };
-    }
     return { label: "Back to Home", href: "/" };
   }
 

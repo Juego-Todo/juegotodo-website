@@ -173,7 +173,7 @@ export const legalPages: Record<string, LegalPage> = {
     metaDescription:
       "Important disclaimers regarding rankings, schedules, athlete data, and informational content on Juego Todo.",
     relatedLinks: [
-      { label: "Ranking Methodology", href: "/ranking-methodology" },
+      { label: "LATAYANOLOGY", href: "/latayanology" },
       { label: "Safety Policy", href: "/safety-policy" },
     ],
     sections: [
@@ -471,57 +471,6 @@ export const legalPages: Record<string, LegalPage> = {
       },
     ],
   },
-  "ranking-methodology": {
-    slug: "ranking-methodology",
-    category: "platform",
-    lastUpdated: LAST_UPDATED,
-    metaDescription:
-      "Official Juego Todo ranking methodology including verification, point weighting, division movement, and LATAYANOLOGY data standards.",
-    relatedLinks: [
-      { label: "Rankings", href: "/rankings" },
-      { label: "LATAYANOLOGY", href: "/latayanology" },
-      { label: "Disclaimer", href: "/disclaimer" },
-    ],
-    sections: [
-      {
-        id: "principles",
-        title: "Ranking Principles",
-        paragraphs: [
-          "Juego Todo rankings are designed for transparency, competitive integrity, and broadcast clarity. Movement is driven by sanctioned results reviewed through LATAYANOLOGY and approved by JTGC combat operations.",
-        ],
-      },
-      {
-        id: "criteria",
-        title: "Primary Criteria",
-        bullets: [
-          "Recent sanctioned Juego Todo results and official bout outcomes",
-          "Strength of schedule and quality of opposition",
-          "Round dominance across Doble Baston, Solo Baston, and Mano y Mano formats",
-          "Activity level, medical clearance, and commission eligibility",
-          "Champion status, title defenses, and contender eliminator results",
-        ],
-      },
-      {
-        id: "verification",
-        title: "Verification Process",
-        bullets: [
-          "Bout results entered by certified JT Head Officials and judges",
-          "Cross-check against event records, medical reports, and video review when needed",
-          "Provisional updates published within 72 hours of sanctioned events",
-          "Final ranking lock after JTGC review window closes",
-        ],
-      },
-      {
-        id: "movement",
-        title: "Division Movement",
-        bullets: [
-          "Weight class changes require official notification and medical re-certification",
-          "Inactive athletes may be marked inactive after 12 months without sanctioned activity",
-          "Pound-for-pound lists combine division performance and strength of opposition",
-        ],
-      },
-    ],
-  },
   latayanology: {
     slug: "latayanology",
     category: "platform",
@@ -529,8 +478,7 @@ export const legalPages: Record<string, LegalPage> = {
     metaDescription:
       "LATAYANOLOGY methodology for verified fighter records, weapon statistics, performance analytics, and the Juego Todo data engine.",
     relatedLinks: [
-      { label: "Ranking Methodology", href: "/ranking-methodology" },
-      { label: "Fighter Roster", href: "/fighters" },
+      { label: "LATAYANOLOGY", href: "/latayanology" },
       { label: "Privacy Policy", href: "/privacy" },
     ],
     sections: [
@@ -543,7 +491,7 @@ export const legalPages: Record<string, LegalPage> = {
       },
       {
         id: "fighter-database",
-        title: "Fighter Database",
+        title: "LATAYANOLOGY",
         bullets: [
           "Centralized athlete profiles with record, gym, division, and nationality data",
           "Historical match logs across seminars, qualifiers, and championship events",

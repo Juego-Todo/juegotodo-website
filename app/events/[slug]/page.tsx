@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SaveEntityButton } from "@/components/commerce/SaveEntityButton";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { PageNavigation } from "@/components/PageNavigation";
 import { PrevNextNav } from "@/components/PrevNextNav";
 import { events } from "@/data/site";
@@ -52,17 +53,22 @@ export default async function EventPage({ params }: PageProps) {
           <PageNavigation currentLabel={eventTitle} />
         </div>
         <section className="mx-auto grid max-w-7xl gap-8 pb-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className={`min-h-[26rem] rounded-[1.5rem] border border-white/10 bg-gradient-to-br ${event.posterTone} p-5 shadow-[0_24px_80px_rgba(0,0,0,0.46)] sm:min-h-[38rem] sm:rounded-[2rem] sm:p-8`}>
-            <span className="rounded-full border border-white/20 bg-black/35 px-4 py-2 text-xs font-black uppercase tracking-[0.26em] text-white">
-              {event.status}
-            </span>
-            <div className="mt-44 sm:mt-72">
-              <p className="text-sm font-black uppercase tracking-[0.32em] text-red-100">{event.city}</p>
-              <h1 className="font-display mt-4 text-6xl uppercase leading-none text-white sm:text-8xl">
-                {event.title}
-              </h1>
+          <EventCardBackdrop
+            className="min-h-[26rem] rounded-[1.5rem] border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.46)] sm:min-h-[38rem] sm:rounded-[2rem]"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+          >
+            <div className="p-5 sm:p-8">
+              <span className="rounded-full border border-white/20 bg-black/35 px-4 py-2 text-xs font-black uppercase tracking-[0.26em] text-white">
+                {event.status}
+              </span>
+              <div className="mt-44 sm:mt-72">
+                <p className="text-sm font-black uppercase tracking-[0.32em] text-red-100">{event.city}</p>
+                <h1 className="font-display mt-4 text-6xl uppercase leading-none text-white sm:text-8xl">
+                  {event.title}
+                </h1>
+              </div>
             </div>
-          </div>
+          </EventCardBackdrop>
           <div className="space-y-6">
             <div className="glass-panel rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-8">
               <p className="text-sm font-black uppercase tracking-[0.32em] text-[#FF1010]">Main Event</p>

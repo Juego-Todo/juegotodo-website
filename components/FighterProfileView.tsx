@@ -61,9 +61,9 @@ export function FighterProfileView({ fighter }: { fighter: EnrichedFighterProfil
             </Link>
             <Link
               className="min-h-12 rounded-full border border-white/15 px-6 py-4 text-center text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-white/10"
-              href="/rankings"
+              href="/latayanology"
             >
-              View Rankings
+              LATAYANOLOGY
             </Link>
             <SaveEntityButton slug={fighter.slug} type="fighter" />
           </div>

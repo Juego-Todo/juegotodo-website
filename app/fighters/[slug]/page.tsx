@@ -46,7 +46,7 @@ export default async function FighterPage({ params }: PageProps) {
       <BreadcrumbJsonLd items={breadcrumbs} />
       <main className="px-4 pb-0 pt-24 sm:px-6 sm:pt-28 lg:px-8">
         <div className="mx-auto max-w-7xl pb-4">
-          <PageNavigation categoryLabel="Rankings" currentLabel={fighter.name} />
+          <PageNavigation categoryLabel="Latayanology" currentLabel={fighter.name} />
         </div>
         <FighterProfileView fighter={fighter} />
       </main>

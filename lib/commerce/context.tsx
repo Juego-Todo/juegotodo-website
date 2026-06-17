@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -19,6 +20,7 @@ import {
   getCheckoutDraft,
   getUserCommerceData,
   getUserOrders,
+  markNotificationRead as persistNotificationRead,
   saveCart,
   saveCheckoutDraft,
   saveUserCommerceData,
@@ -35,6 +37,10 @@ import type {
   UserCommerceData,
 } from "@/lib/commerce/types";
 
+type AddToCartOptions = {
+  openDrawer?: boolean;
+};
+
 type CommerceContextValue = {
   cart: CartItem[];
   cartCount: number;
@@ -42,7 +48,11 @@ type CommerceContextValue = {
   checkoutDraft: CheckoutDraft;
   userData: UserCommerceData;
   orders: Order[];
-  addToCart: (productSlug: string, quantity?: number) => void;
+  cartDrawerOpen: boolean;
+  lastAddedSlug: string | null;
+  openCartDrawer: () => void;
+  closeCartDrawer: () => void;
+  addToCart: (productSlug: string, quantity?: number, options?: AddToCartOptions) => void;
   removeFromCart: (productSlug: string) => void;
   updateQuantity: (productSlug: string, quantity: number) => void;
   clearCart: () => void;
@@ -54,52 +64,71 @@ type CommerceContextValue = {
   updateUserCommerceProfile: (input: Partial<Pick<UserCommerceData, "phone" | "country" | "membershipTier">>) => void;
   saveAddress: (address: Omit<ShippingAddress, "id"> & { id?: string }) => ShippingAddress;
   deleteAddress: (addressId: string) => void;
-  placeOrder: (paymentMethod: PaymentMethod, address: ShippingAddress, promoCode?: string) => Order;
+  placeOrder: (paymentMethod: PaymentMethod, address: ShippingAddress, promoCode?: string) => Promise<Order>;
   markNotificationRead: (notificationId: string) => void;
-  adminApprovePayment: (orderId: string) => Order;
-  adminUpdateOrderStatus: (orderId: string, status: OrderStatus, trackingNumber?: string) => Order;
+  adminApprovePayment: (orderId: string) => Promise<Order>;
+  adminUpdateOrderStatus: (orderId: string, status: OrderStatus, trackingNumber?: string) => Promise<Order>;
 };
 
 const CommerceContext = createContext<CommerceContextValue | null>(null);
 
 export function CommerceProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [checkoutDraft, setCheckoutDraftState] = useState<CheckoutDraft>({});
+  const [cart, setCart] = useState<CartItem[]>(() => getCart());
+  const [checkoutDraft, setCheckoutDraftState] = useState<CheckoutDraft>(() => getCheckoutDraft());
   const [userData, setUserData] = useState<UserCommerceData>(defaultUserCommerceData());
   const [orders, setOrders] = useState<Order[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const [lastAddedSlug, setLastAddedSlug] = useState<string | null>(null);
+  const [clearedUserId, setClearedUserId] = useState<string | null | undefined>(undefined);
+  const skipInitialCartSave = useRef(true);
 
   useEffect(() => {
-    setCart(getCart());
-    setCheckoutDraftState(getCheckoutDraft());
-    setHydrated(true);
+    skipInitialCartSave.current = false;
   }, []);
 
   useEffect(() => {
-    if (!hydrated) {
+    if (skipInitialCartSave.current) {
       return;
     }
     saveCart(cart);
-  }, [cart, hydrated]);
+  }, [cart]);
+
+  if (!user) {
+    if (clearedUserId !== null) {
+      setClearedUserId(null);
+      setUserData(defaultUserCommerceData());
+      setOrders([]);
+    }
+  } else if (clearedUserId === null) {
+    setClearedUserId(user.id);
+  }
 
   useEffect(() => {
     if (!user) {
-      setUserData(defaultUserCommerceData());
-      setOrders([]);
       return;
     }
 
-    setUserData(getUserCommerceData(user.id));
-    setOrders(getUserOrders(user.id));
+    let active = true;
+
+    Promise.all([getUserCommerceData(user.id), getUserOrders(user.id)]).then(([data, nextOrders]) => {
+      if (active) {
+        setUserData(data);
+        setOrders(nextOrders);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
   }, [user]);
 
   const persistUserData = useCallback(
-    (next: UserCommerceData) => {
+    async (next: UserCommerceData) => {
       if (!user) {
         return;
       }
-      saveUserCommerceData(user.id, next);
+      await saveUserCommerceData(user.id, next);
       setUserData(next);
     },
     [user],
@@ -117,7 +146,10 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
 
   const cartCount = totals.itemCount;
 
-  const addToCart = useCallback((productSlug: string, quantity = 1) => {
+  const openCartDrawer = useCallback(() => setCartDrawerOpen(true), []);
+  const closeCartDrawer = useCallback(() => setCartDrawerOpen(false), []);
+
+  const addToCart = useCallback((productSlug: string, quantity = 1, options?: AddToCartOptions) => {
     setCart((current) => {
       const existing = current.find((item) => item.productSlug === productSlug);
       if (existing) {
@@ -129,6 +161,10 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       }
       return [...current, { productSlug, quantity }];
     });
+    setLastAddedSlug(productSlug);
+    if (options?.openDrawer !== false) {
+      setCartDrawerOpen(true);
+    }
   }, []);
 
   const removeFromCart = useCallback((productSlug: string) => {
@@ -160,7 +196,7 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       next.wishlist = next.wishlist.includes(productSlug)
         ? next.wishlist.filter((slug) => slug !== productSlug)
         : [...next.wishlist, productSlug];
-      persistUserData(next);
+      void persistUserData(next);
     },
     [persistUserData, userData],
   );
@@ -171,7 +207,7 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       next.savedFighters = next.savedFighters.includes(fighterSlug)
         ? next.savedFighters.filter((slug) => slug !== fighterSlug)
         : [...next.savedFighters, fighterSlug];
-      persistUserData(next);
+      void persistUserData(next);
     },
     [persistUserData, userData],
   );
@@ -182,7 +218,7 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       next.savedTeams = next.savedTeams.includes(teamSlug)
         ? next.savedTeams.filter((slug) => slug !== teamSlug)
         : [...next.savedTeams, teamSlug];
-      persistUserData(next);
+      void persistUserData(next);
     },
     [persistUserData, userData],
   );
@@ -193,14 +229,14 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       next.savedEvents = next.savedEvents.includes(eventSlug)
         ? next.savedEvents.filter((slug) => slug !== eventSlug)
         : [...next.savedEvents, eventSlug];
-      persistUserData(next);
+      void persistUserData(next);
     },
     [persistUserData, userData],
   );
 
   const updateUserCommerceProfile = useCallback(
     (input: Partial<Pick<UserCommerceData, "phone" | "country" | "membershipTier">>) => {
-      persistUserData({ ...userData, ...input });
+      void persistUserData({ ...userData, ...input });
     },
     [persistUserData, userData],
   );
@@ -236,7 +272,7 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
         }));
       }
 
-      persistUserData(next);
+      void persistUserData(next);
       return normalized;
     },
     [persistUserData, userData],
@@ -244,7 +280,7 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
 
   const deleteAddress = useCallback(
     (addressId: string) => {
-      persistUserData({
+      void persistUserData({
         ...userData,
         addresses: userData.addresses.filter((entry) => entry.id !== addressId),
       });
@@ -253,12 +289,12 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
   );
 
   const placeOrder = useCallback(
-    (paymentMethod: PaymentMethod, address: ShippingAddress, promoCode?: string) => {
+    async (paymentMethod: PaymentMethod, address: ShippingAddress, promoCode?: string) => {
       if (!user) {
         throw new Error("You must be signed in to place an order.");
       }
 
-      const order = createOrder({
+      const order = await createOrder({
         userId: user.id,
         userEmail: user.email,
         userName: user.fullName,
@@ -272,8 +308,12 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
 
       setCart([]);
       setCheckoutDraftState({});
-      setOrders(getUserOrders(user.id));
-      setUserData(getUserCommerceData(user.id));
+      const [nextUserData, nextOrders] = await Promise.all([
+        getUserCommerceData(user.id),
+        getUserOrders(user.id),
+      ]);
+      setUserData(nextUserData);
+      setOrders(nextOrders);
       return order;
     },
     [cart, checkoutDraft.promoCode, user, userData.membershipTier],
@@ -281,21 +321,27 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
 
   const markNotificationRead = useCallback(
     (notificationId: string) => {
-      persistUserData({
-        ...userData,
-        notifications: userData.notifications.map((entry) =>
-          entry.id === notificationId ? { ...entry, read: true } : entry,
-        ),
+      if (!user) {
+        return;
+      }
+
+      void persistNotificationRead(user.id, notificationId).then(() => {
+        setUserData((current) => ({
+          ...current,
+          notifications: current.notifications.map((entry) =>
+            entry.id === notificationId ? { ...entry, read: true } : entry,
+          ),
+        }));
       });
     },
-    [persistUserData, userData],
+    [user],
   );
 
   const adminApprovePayment = useCallback(
-    (orderId: string) => {
-      const order = approveOrderPayment(orderId);
+    async (orderId: string) => {
+      const order = await approveOrderPayment(orderId);
       if (user) {
-        setOrders(getUserOrders(user.id));
+        setOrders(await getUserOrders(user.id));
       }
       return order;
     },
@@ -303,10 +349,10 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
   );
 
   const adminUpdateOrderStatus = useCallback(
-    (orderId: string, status: OrderStatus, trackingNumber?: string) => {
-      const order = updateOrderStatus(orderId, status, trackingNumber);
+    async (orderId: string, status: OrderStatus, trackingNumber?: string) => {
+      const order = await updateOrderStatus(orderId, status, trackingNumber);
       if (user) {
-        setOrders(getUserOrders(user.id));
+        setOrders(await getUserOrders(user.id));
       }
       return order;
     },
@@ -321,6 +367,10 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       checkoutDraft,
       userData,
       orders,
+      cartDrawerOpen,
+      lastAddedSlug,
+      openCartDrawer,
+      closeCartDrawer,
       addToCart,
       removeFromCart,
       updateQuantity,
@@ -345,6 +395,10 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       checkoutDraft,
       userData,
       orders,
+      cartDrawerOpen,
+      lastAddedSlug,
+      openCartDrawer,
+      closeCartDrawer,
       addToCart,
       removeFromCart,
       updateQuantity,

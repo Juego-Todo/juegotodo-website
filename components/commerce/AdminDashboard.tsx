@@ -5,7 +5,7 @@ import { PageNavigation } from "@/components/PageNavigation";
 import { shopProducts } from "@/data/shop";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
-import { getAllOrders, isAdminUser } from "@/lib/commerce/storage";
+import { getAllOrders, isAdminProfile } from "@/lib/commerce/storage";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import { orderStatusLabels, paymentMethodLabels, paymentStatusLabels, type Order, type OrderStatus } from "@/lib/commerce/types";
 import { useRouter } from "next/navigation";
@@ -29,7 +29,7 @@ export function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [trackingDraft, setTrackingDraft] = useState<Record<string, string>>({});
 
-  const isAdmin = user ? isAdminUser(user.email, user.accountType) : false;
+  const isAdmin = user ? isAdminProfile(user) : false;
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -38,7 +38,9 @@ export function AdminDashboard() {
   }, [loading, user, isAdmin, router]);
 
   useEffect(() => {
-    setOrders(getAllOrders().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+    void getAllOrders().then((nextOrders) => {
+      setOrders(nextOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+    });
   }, [tab]);
 
   const customers = useMemo(() => {
@@ -61,7 +63,9 @@ export function AdminDashboard() {
   }, [orders]);
 
   function refreshOrders() {
-    setOrders(getAllOrders().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+    void getAllOrders().then((nextOrders) => {
+      setOrders(nextOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+    });
   }
 
   if (loading || !user || !isAdmin) {

@@ -16,6 +16,8 @@ export type ShopProduct = {
   digital?: boolean;
   stock: number;
   searchTags: string[];
+  rating?: number;
+  reviewCount?: number;
 };
 
 export const shopProducts: ShopProduct[] = [
@@ -45,6 +47,8 @@ export const shopProducts: ShopProduct[] = [
     tone: "from-red-900 via-zinc-950 to-black",
     badge: "Best Seller",
     stock: 48,
+    rating: 4.9,
+    reviewCount: 128,
     searchTags: ["sticks", "doble baston", "competition", "rattan"],
   },
   {
@@ -71,7 +75,10 @@ export const shopProducts: ShopProduct[] = [
     ],
     competitionUse: "Approved hand protection for registered athletes across weapon and empty-hand rounds.",
     tone: "from-zinc-900 via-red-950 to-black",
+    badge: "Best Seller",
     stock: 32,
+    rating: 4.9,
+    reviewCount: 156,
     searchTags: ["gloves", "competition", "official"],
   },
   {
@@ -98,7 +105,10 @@ export const shopProducts: ShopProduct[] = [
     ],
     competitionUse: "Required head protection in divisions where helmet use is mandated at check-in.",
     tone: "from-red-950 via-black to-zinc-900",
+    badge: "Best Seller",
     stock: 18,
+    rating: 4.8,
+    reviewCount: 94,
     searchTags: ["helmet", "headgear", "protection"],
   },
   {
@@ -125,8 +135,10 @@ export const shopProducts: ShopProduct[] = [
     ],
     competitionUse: "Approved upper-body competition apparel for registered athletes.",
     tone: "from-red-700 via-zinc-950 to-black",
-    badge: "New",
+    badge: "Best Seller",
     stock: 40,
+    rating: 4.7,
+    reviewCount: 87,
     searchTags: ["jersey", "competition", "apparel"],
   },
   {
@@ -617,6 +629,35 @@ export const shopProducts: ShopProduct[] = [
     tone: "from-zinc-950 via-red-950 to-black",
     stock: 6,
     searchTags: ["heavy bag", "gym", "training"],
+  },
+  {
+    slug: "barrio-brawls-tickets",
+    name: "Barrio Brawls — Event Tickets",
+    category: "digital-products",
+    price: "₱1,500",
+    priceAmount: 1500,
+    description: "General admission tickets for Juego Todo Barrio Brawls, August 29, 2026.",
+    summary:
+      "Secure your seat for Juego Todo Barrio Brawls — the flagship hybrid FMA card featuring professional weaponized competition and championship stakes.",
+    features: [
+      "General admission seating",
+      "August 29, 2026 — 1:00 PM",
+      "Digital QR ticket delivery",
+      "Venue access details sent before event",
+      "Official JTGC event experience",
+    ],
+    specs: [
+      { label: "Event", value: "Barrio Brawls" },
+      { label: "Date", value: "August 29, 2026" },
+      { label: "Time", value: "1:00 PM" },
+      { label: "Delivery", value: "Digital QR ticket" },
+    ],
+    competitionUse: "Spectator admission for JTGC sanctioned event.",
+    tone: "from-red-900 via-zinc-950 to-black",
+    badge: "On Sale",
+    digital: true,
+    stock: 500,
+    searchTags: ["tickets", "barrio brawls", "event", "admission"],
   },
   {
     slug: "rules-handbook-digital",

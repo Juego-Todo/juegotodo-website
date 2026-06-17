@@ -3,6 +3,7 @@
 import { Radio, Ticket, Trophy } from "lucide-react";
 import Link from "next/link";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { events } from "@/data/site";
 
 export function EventCardsSection() {
@@ -22,9 +23,8 @@ export function EventCardsSection() {
               className="card-3d glass-panel animated-border group overflow-hidden rounded-[1.75rem] border-white/[0.08] bg-[#0D0D0D]/75"
               key={event.slug}
             >
-              <div className={`relative min-h-52 bg-gradient-to-br ${event.posterTone} p-5`}>
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.15),rgba(0,0,0,0.75))]" />
-                <div className="relative flex flex-wrap items-center gap-2">
+              <EventCardBackdrop className="min-h-52 p-5">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.18em]">
                     {event.status}
                   </span>
@@ -41,11 +41,11 @@ export function EventCardsSection() {
                     </span>
                   ) : null}
                 </div>
-                <h3 className="font-display relative mt-12 text-4xl uppercase leading-none text-white sm:text-5xl">
+                <h3 className="font-display mt-12 text-4xl uppercase leading-none text-white sm:text-5xl">
                   {event.title.replace("Juego Todo: ", "")}
                 </h3>
-                <p className="relative mt-2 text-sm font-semibold text-zinc-200">{event.venue}</p>
-              </div>
+                <p className="mt-2 text-sm font-semibold text-zinc-200">{event.venue}</p>
+              </EventCardBackdrop>
 
               <div className="p-5">
                 <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#FF1010]">{event.mainEvent}</p>

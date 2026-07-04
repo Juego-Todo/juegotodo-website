@@ -12,6 +12,7 @@ import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/a
 import { legacyTestLoginEmails, testLoginAccount, testLoginStoredUser } from "@/data/test-account";
 import { initializeNewUserCommerceData } from "@/lib/commerce/storage";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import {
   checkUsernameAvailabilitySupabase,
   getSupabaseSessionUser,
@@ -30,7 +31,7 @@ const REMEMBER_EMAIL_KEY = "juego-todo.remember-email";
 const RESET_EMAIL_KEY = "juego-todo.reset-email";
 
 function resolveRole(email: string): UserRole {
-  return email.toLowerCase() === "admin@juegotodo.com" ? "admin" : "user";
+  return resolveRoleForEmail(email);
 }
 
 function ensureLocalTestAccount(users: StoredUser[]) {

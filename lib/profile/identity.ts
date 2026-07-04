@@ -5,6 +5,7 @@ import {
   type VerificationId,
   verificationLabels,
 } from "@/data/profile-roles";
+import { isPlatformOwnerEmail } from "@/lib/auth/platform-owners";
 import type { UserProfile } from "@/lib/auth/types";
 import type { MembershipTier, UserCommerceData } from "@/lib/commerce/types";
 import { getEnrichedFighter } from "@/lib/fighters/profile";
@@ -56,7 +57,7 @@ export function resolveProfileRoles(user: UserProfile): ProfileRoleId[] {
     roles.add("grand_council");
   }
 
-  if (user.role === "admin" || user.email.toLowerCase() === "admin@juegotodo.com") {
+  if (user.role === "admin" || isPlatformOwnerEmail(user.email)) {
     roles.add("administrator");
     roles.add("grand_council");
   }

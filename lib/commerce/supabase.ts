@@ -11,6 +11,7 @@ import type {
   ShippingAddress,
   UserCommerceData,
 } from "@/lib/commerce/types";
+import { isPlatformOwnerEmail } from "@/lib/auth/platform-owners";
 import type { AccountType, UserProfile } from "@/lib/auth/types";
 import { calculateLineItems, generatePaymentReference } from "@/lib/commerce/pricing";
 import type { CartItem } from "@/lib/commerce/types";
@@ -378,5 +379,5 @@ export async function updateSupabaseOrderStatus(
 }
 
 export function isSupabaseAdmin(profile: Pick<ProfileRow, "role" | "email"> | Pick<UserProfile, "role" | "email">) {
-  return profile.role === "admin" || profile.email.toLowerCase() === "admin@juegotodo.com";
+  return profile.role === "admin" || isPlatformOwnerEmail(profile.email);
 }

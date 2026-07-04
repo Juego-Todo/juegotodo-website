@@ -1,4 +1,5 @@
 import { buildFullName, validateDateOfBirth } from "@/lib/auth/name";
+import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ProfileRow } from "@/lib/supabase/types";
@@ -117,7 +118,7 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
     fullName,
     username,
     accountType: input.accountType,
-    role: email === "admin@juegotodo.com" ? "admin" : "user",
+    role: resolveRoleForEmail(email),
     gender: input.gender.trim(),
     dateOfBirth,
     gym: "",

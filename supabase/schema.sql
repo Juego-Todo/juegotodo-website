@@ -141,7 +141,7 @@ begin
       split_part(coalesce(new.email, ''), '@', 1)
     ),
     case
-      when lower(coalesce(new.email, '')) = 'admin@juegotodo.com' then 'admin'
+      when lower(coalesce(new.email, '')) in ('admin@juegotodo.com', 'kiran.aames@gmail.com') then 'admin'
       else 'user'
     end
   )

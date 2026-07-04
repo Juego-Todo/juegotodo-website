@@ -52,7 +52,7 @@ In **Supabase → Authentication → URL Configuration**, add:
 
 ## 5. Admin access
 
-Set a user's `profiles.role` to `admin` in the database, or register with `admin@juegotodo.com`.
+Set a user's `profiles.role` to `admin` in the database, or register with a platform owner email (`admin@juegotodo.com`, `kiran.aames@gmail.com`).
 
 ## Fallback mode
 

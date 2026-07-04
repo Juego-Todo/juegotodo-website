@@ -14,6 +14,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   partnerships: "Partners",
   "rules-regulations": "Rules & Regulations",
   "juego-todo-seminars": "Seminars",
+  consultation: "Consultation",
   "about-juego-todo": "About JTGC",
   "grand-council": "Grand Council",
   "fma-lineage": "FMA Lineage",
@@ -47,6 +48,8 @@ const STATIC_PAGE_LABELS: Record<string, string> = {
   "/partnerships": "Partners",
   "/rules-regulations": "Rules Library",
   "/juego-todo-seminars": "Seminar Calendar",
+  "/consultation": "Consultation",
+  "/consultation/book": "Book Consultation",
   "/about-juego-todo": "Organizational Structure",
   "/grand-council": "Organizational Structure",
   "/fma-lineage": "FMA Lineage",
@@ -87,6 +90,11 @@ const DETAIL_PARENTS: Record<string, { href: string; label: string; backLabel: s
     href: "/juego-todo-seminars",
     label: "Seminars",
     backLabel: "Back to Seminars",
+  },
+  consultation: {
+    href: "/consultation",
+    label: "Consultation",
+    backLabel: "Back to Consultation",
   },
 };
 

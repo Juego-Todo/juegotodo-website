@@ -57,7 +57,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html className={`${inter.variable} ${bebas.variable} ${spaceGrotesk.variable}`} lang="en">
+    <html className={`${inter.variable} ${bebas.variable} ${spaceGrotesk.variable}`} data-scroll-behavior="smooth" lang="en">
       <body>
         <a
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-black"

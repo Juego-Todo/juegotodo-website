@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Ticket } from "lucide-react";
+import { ArrowRight, Play, Ticket } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -43,6 +43,7 @@ export function HeroSection() {
           alt="Juego Todo FMA athletes in weaponized competition"
           className="h-full w-full object-cover object-[center_30%]"
           fill
+          loading="eager"
           priority
           sizes="100vw"
           src="/juego-todo-event-background.png"
@@ -75,16 +76,20 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 28 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
+            <p className="mb-4 inline-flex rounded-full border border-white/15 bg-black/35 px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.24em] text-red-100 backdrop-blur">
+              Limited fight calendar · Global FMA platform
+            </p>
             <h1 className="font-display max-w-5xl text-[clamp(2.6rem,10vw,4.5rem)] uppercase leading-[0.9] tracking-wide text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.95)] sm:text-[clamp(3.2rem,7.5vw,6rem)] lg:text-[clamp(3.5rem,6vw,6.5rem)]">
-              <span className="block text-white/90">World&apos;s 1st</span>
+              <span className="block text-white/90">Not A Fight Night.</span>
               <span className="block bg-gradient-to-r from-white via-white to-red-200 bg-clip-text text-transparent">
-                Professional FMA Hybrid Sport Platform
+                A Combat Sports Universe.
               </span>
             </h1>
 
             <p className="mt-5 max-w-2xl text-[1rem] leading-8 text-zinc-300 drop-shadow-[0_3px_16px_rgba(0,0,0,0.9)] sm:mt-6 sm:text-lg sm:leading-8">
-              Juego Todo transforms Filipino Martial Arts into a professional spectator sport featuring
-              live weaponized competition, verified athlete rankings, and championship titles.
+              Juego Todo transforms Filipino Martial Arts into a professional spectator sport with
+              weaponized competition, verified athlete identity, official rules, media, commerce,
+              seminars, and championship legacy connected in one platform.
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
@@ -92,6 +97,13 @@ export function HeroSection() {
                 Register Now
                 <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
               </MagneticButton>
+              <Link
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-black/30 px-6 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-white backdrop-blur transition hover:border-[#FF1010]/40 hover:bg-[#FF1010]/10 sm:text-sm"
+                href="#fight-format"
+              >
+                <Play className="mr-2" size={15} aria-hidden />
+                Watch The Format
+              </Link>
             </div>
           </motion.div>
 

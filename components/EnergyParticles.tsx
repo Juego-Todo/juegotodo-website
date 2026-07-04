@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Particle = {
   id: number;
@@ -17,18 +17,28 @@ function seededUnit(seed: number) {
 }
 
 export function EnergyParticles({ count = 24 }: { count?: number }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const particles = useMemo<Particle[]>(
     () =>
       Array.from({ length: count }, (_, id) => ({
         id,
-        left: `${seededUnit(id * 5 + 1) * 100}%`,
-        top: `${seededUnit(id * 5 + 2) * 100}%`,
-        size: 2 + seededUnit(id * 5 + 3) * 3,
-        delay: seededUnit(id * 5 + 4) * 8,
-        duration: 6 + seededUnit(id * 5 + 5) * 8,
+        left: `${(seededUnit(id * 5 + 1) * 100).toFixed(2)}%`,
+        top: `${(seededUnit(id * 5 + 2) * 100).toFixed(2)}%`,
+        size: Number((2 + seededUnit(id * 5 + 3) * 3).toFixed(2)),
+        delay: Number((seededUnit(id * 5 + 4) * 8).toFixed(2)),
+        duration: Number((6 + seededUnit(id * 5 + 5) * 8).toFixed(2)),
       })),
     [count],
   );
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -39,8 +49,8 @@ export function EnergyParticles({ count = 24 }: { count?: number }) {
           style={{
             left: particle.left,
             top: particle.top,
-            width: particle.size,
-            height: particle.size,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
             animationDelay: `${particle.delay}s`,
             animationDuration: `${particle.duration}s`,
           }}

@@ -5,6 +5,7 @@ import { ArrowRight, Download, Mail, MapPin, Play, ShieldCheck, Trophy, Users } 
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { ConsultationPage } from "@/components/ConsultationPage";
 import { ShopPageClient } from "@/components/commerce/ShopPageClient";
 import { FighterDatabase } from "@/components/FighterDatabase";
 import { PartnersHub } from "@/components/PartnersHub";
@@ -76,6 +77,7 @@ export function InteriorPage({ slug }: { slug: PageSlug }) {
       {slug === "teams" ? <TeamsHub /> : null}
       {slug === "partners" || slug === "partnerships" ? <PartnersHub /> : null}
       {slug === "juego-todo-seminars" ? <SeminarsHub /> : null}
+      {slug === "consultation" ? <ConsultationPage /> : null}
       {slug === "rules-regulations" ? <RulesSection /> : null}
       {slug === "about-juego-todo" ? <AboutSection /> : null}
       {slug === "grand-council" ? <OrganizationalStructureSection /> : null}

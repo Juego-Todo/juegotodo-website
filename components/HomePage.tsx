@@ -2,6 +2,12 @@ import { ChampionsSection } from "@/components/ChampionsSection";
 import { CompetitionStructureSection } from "@/components/CompetitionStructureSection";
 import { HeritageSection } from "@/components/HeritageSection";
 import { HeroSection } from "@/components/HeroSection";
+import {
+  AuthorityProofSection,
+  EcosystemUniverseSection,
+  LuxuryBookingCtaSection,
+  SignatureArenaMoment,
+} from "@/components/HomepageExperienceSections";
 import { LatayanologySection } from "@/components/LatayanologySection";
 import { LeagueStatsSection } from "@/components/LeagueStatsSection";
 import { MotionSection } from "@/components/MotionSection";
@@ -12,6 +18,8 @@ export function HomePage() {
   return (
     <main className="overflow-hidden">
       <HeroSection />
+      <AuthorityProofSection />
+      <SignatureArenaMoment />
 
       <MotionSection>
         <VideoCarousel />
@@ -21,9 +29,11 @@ export function HomePage() {
 
       <PremiumDivider />
       <HeritageSection />
+      <EcosystemUniverseSection />
       <LatayanologySection />
       <LeagueStatsSection />
       <CompetitionStructureSection />
+      <LuxuryBookingCtaSection />
     </main>
   );
 }

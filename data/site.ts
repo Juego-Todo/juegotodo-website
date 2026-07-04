@@ -67,6 +67,7 @@ export const navItems: NavItem[] = [
       { label: "Rules & Regulations", href: "/rules-regulations" },
       { label: "Partners", href: "/partners" },
       { label: "Seminars", href: "/juego-todo-seminars" },
+      { label: "Consultation", href: "/consultation" },
     ],
   },
   {
@@ -556,6 +557,12 @@ export const pageContent = {
     title: "Juego Todo Seminars Calendar And Registration",
     intro:
       "Browse upcoming paid and free seminars focused on Disarming, Striking, Legs, Grappling, and official Juego Todo rules — built for first-time athletes, parents, coaches, and gym teams.",
+  },
+  consultation: {
+    eyebrow: "Consultation Atelier",
+    title: "Guidance For Every Chapter Of Life",
+    intro:
+      "Explore a refined suite of Feng Shui, BaZi, destiny, and timing services before continuing to the dedicated booking page.",
   },
   "rules-regulations": {
     eyebrow: "Combat Integrity",

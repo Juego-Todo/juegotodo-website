@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Camera, Loader2, Pencil, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { formatLicenseDate, type LicenseApplication } from "@/data/license-applications";
 import { adminUpdateMemberProfile } from "@/lib/admin/member-directory";
 import { useAuth } from "@/lib/auth/context";
@@ -153,18 +153,10 @@ export function AdminProfileHeroCard({
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [savedDob, setSavedDob] = useState("");
+  const [savedDobOverride, setSavedDobOverride] = useState<string | null>(null);
   const [form, setForm] = useState<AdminProfileForm>(() => buildForm(user, licenseApplication));
 
-  useEffect(() => {
-    setSavedDob(getProfileDateOfBirth(user.id) ?? "");
-  }, [user.id]);
-
-  useEffect(() => {
-    if (!editing) {
-      setForm(buildForm(user, licenseApplication));
-    }
-  }, [user, licenseApplication, editing]);
+  const savedDob = savedDobOverride ?? getProfileDateOfBirth(user.id) ?? "";
 
   const dateJoined = new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -177,10 +169,14 @@ export function AdminProfileHeroCard({
   );
   const accountTypeLabel = accountTypeLabels[user.accountType];
 
+  function startEditing() {
+    setForm(buildForm(user, licenseApplication));
+    setEditing(true);
+  }
+
   function handleCancel() {
     setEditing(false);
     setError(null);
-    setForm(buildForm(user, licenseApplication));
   }
 
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
@@ -200,7 +196,7 @@ export function AdminProfileHeroCard({
         bio: user.bio,
       });
       saveProfileDateOfBirth(user.id, form.dateOfBirth || null);
-      setSavedDob(form.dateOfBirth);
+      setSavedDobOverride(form.dateOfBirth);
       await refreshUser();
       setEditing(false);
     } catch (caught) {
@@ -227,7 +223,7 @@ export function AdminProfileHeroCard({
         <button
           aria-label={editing ? "Cancel editing profile" : "Edit profile"}
           className="absolute right-0 top-0 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/30 text-zinc-300 transition hover:border-amber-400/40 hover:bg-amber-500/10 hover:text-amber-100"
-          onClick={() => (editing ? handleCancel() : setEditing(true))}
+          onClick={() => (editing ? handleCancel() : startEditing())}
           type="button"
         >
           {editing ? <X size={16} aria-hidden /> : <Pencil size={16} aria-hidden />}

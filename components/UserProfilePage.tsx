@@ -121,10 +121,22 @@ export function UserProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [licenseApplication, setLicenseApplication] = useState<LicenseApplication | null>(null);
-  const [adminAssignedTags, setAdminAssignedTags] = useState<ReturnType<typeof getAdminAssignedTags>>([]);
-  const [pendingLicenseCount, setPendingLicenseCount] = useState(0);
-  const [previewRoleKind, setPreviewRoleKind] = useState<ProfileRoleKind | null>(null);
-  const [pendingPreviewRole, setPendingPreviewRole] = useState<ProfileRoleKind | "">("");
+  const [previewRoleKind, setPreviewRoleKind] = useState<ProfileRoleKind | null>(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    const stored = localStorage.getItem(PROFILE_VIEW_AS_STORAGE_KEY);
+    return stored && isProfileRoleKind(stored) ? stored : null;
+  });
+  const [pendingPreviewRole, setPendingPreviewRole] = useState<ProfileRoleKind | "">(() => {
+    if (typeof window === "undefined") {
+      return "";
+    }
+
+    const stored = localStorage.getItem(PROFILE_VIEW_AS_STORAGE_KEY);
+    return stored && isProfileRoleKind(stored) ? stored : "";
+  });
   const profileSyncKey = user ? `${user.id}|${userData.membershipTier}` : null;
   const [lastProfileSyncKey, setLastProfileSyncKey] = useState<string | null>(null);
   const { portraitImage, savePortrait, removePortrait } = useProfilePortrait(
@@ -139,22 +151,21 @@ export function UserProfilePage() {
   }, [loading, user, router]);
 
   useEffect(() => {
-    const stored = localStorage.getItem(PROFILE_VIEW_AS_STORAGE_KEY);
-    if (stored && isProfileRoleKind(stored)) {
-      setPreviewRoleKind(stored);
-      setPendingPreviewRole(stored);
-    }
-  }, []);
-
-  useEffect(() => {
     if (!user) {
       return;
     }
 
     void fetchLicenseApplicationByUserId(user.id).then(setLicenseApplication);
-    setAdminAssignedTags(getAdminAssignedTags(user.id));
-    setPendingLicenseCount(getPendingLicenseApplicationCount());
   }, [user]);
+
+  const adminAssignedTags = useMemo(
+    () => (user ? getAdminAssignedTags(user.id) : []),
+    [user],
+  );
+  const pendingLicenseCount = useMemo(
+    () => (user ? getPendingLicenseApplicationCount() : 0),
+    [user],
+  );
 
   useEffect(() => {
     const tab = searchParams.get("tab");
@@ -179,19 +190,25 @@ export function UserProfilePage() {
     }
   }, [searchParams, user, router]);
 
-  useEffect(() => {
-    if (!user || !isAdminProfile(user)) {
-      return;
-    }
+  const adminTabDirective =
+    user && isAdminProfile(user)
+      ? searchParams.get("tab") === "membership" || searchParams.get("tab") === "admin-licenses"
+        ? "membership-activity"
+        : searchParams.get("tab") === "calendar"
+          ? "calendar"
+          : null
+      : null;
+  const [lastAdminTabDirective, setLastAdminTabDirective] = useState<string | null>(null);
 
-    const tab = searchParams.get("tab");
-    if (tab === "membership" || tab === "admin-licenses") {
+  if (adminTabDirective && adminTabDirective !== lastAdminTabDirective) {
+    setLastAdminTabDirective(adminTabDirective);
+    if (adminTabDirective === "membership-activity") {
       setActiveSection("membership");
       setActiveTab("activity");
-    } else if (tab === "calendar") {
+    } else if (adminTabDirective === "calendar") {
       setActiveTab("calendar");
     }
-  }, [searchParams, user]);
+  }
 
   if (profileSyncKey && profileSyncKey !== lastProfileSyncKey) {
     setLastProfileSyncKey(profileSyncKey);

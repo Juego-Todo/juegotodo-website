@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   calendarEventTypeLabels,
   calendarOperationalStatusLabels,
@@ -212,14 +212,19 @@ export function AdminCalendarEventWizard({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    if (!open) return;
-    setStep(0);
-    const base = editingEntry ? toForm(editingEntry) : { ...emptyForm(), ...preset };
-    const eventType = base.eventType ?? "juego_todo_event";
-    setForm(applyTypeSpecificFields(base, eventType, base.typeDetails ?? defaultTypeDetails(eventType)));
-    setError("");
-  }, [open, editingEntry, preset]);
+  const wizardSyncKey = open ? `${editingEntry?.id ?? "new"}:${category}` : "closed";
+  const [lastWizardSyncKey, setLastWizardSyncKey] = useState("");
+
+  if (wizardSyncKey !== lastWizardSyncKey) {
+    setLastWizardSyncKey(wizardSyncKey);
+    if (open) {
+      setStep(0);
+      const base = editingEntry ? toForm(editingEntry) : { ...emptyForm(), ...preset };
+      const eventType = base.eventType ?? "juego_todo_event";
+      setForm(applyTypeSpecificFields(base, eventType, base.typeDetails ?? defaultTypeDetails(eventType)));
+      setError("");
+    }
+  }
 
   const categoryEventTypeOptions = useMemo(
     () => categoryEventTypes[category].map((type) => [type, calendarEventTypeLabels[type]] as [string, string]),

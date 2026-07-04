@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 function getRemaining(target: string) {
   const difference = Math.max(new Date(target).getTime() - Date.now(), 0);
@@ -12,17 +12,28 @@ function getRemaining(target: string) {
   };
 }
 
+const emptyRemaining = {
+  days: 0,
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+};
+
+function subscribeToCountdown(onStoreChange: () => void) {
+  const timer = window.setInterval(onStoreChange, 1000);
+  return () => window.clearInterval(timer);
+}
+
 export function CountdownTimer({ target }: { target: string }) {
-  const [remaining, setRemaining] = useState(() => getRemaining(target));
+  const remaining = useSyncExternalStore(
+    subscribeToCountdown,
+    () => getRemaining(target),
+    () => emptyRemaining,
+  );
   const entries = useMemo<[string, number | null][]>(
     () => Object.entries(remaining),
     [remaining],
   );
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setRemaining(getRemaining(target)), 1000);
-    return () => window.clearInterval(timer);
-  }, [target]);
 
   return (
     <div className="grid grid-cols-4 gap-2" aria-label="Event countdown">

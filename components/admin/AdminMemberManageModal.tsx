@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AdminAccountTagEditor } from "@/components/profile/AdminAccountTagEditor";
 import { accountTypeLabels, type AccountType, type AdminUserUpdateInput, type UserRole } from "@/lib/auth/types";
 import {
@@ -16,6 +16,21 @@ type ManageMode = "edit" | "reset" | "delete" | "tags";
 
 const fieldClassName =
   "mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm text-white outline-none ring-red-500/40 focus:ring-4";
+
+function memberToForm(member: AdminMemberRecord): AdminUserUpdateInput {
+  return {
+    fullName: member.fullName,
+    username: member.username === "—" ? "" : member.username,
+    email: member.email,
+    accountType: member.accountType,
+    role: member.role,
+    gym: member.gym === "—" ? "" : member.gym,
+    city: member.city === "—" ? "" : member.city,
+    bio: member.bio === "—" ? "" : member.bio,
+    phone: member.phone === "—" ? "" : member.phone,
+    country: member.country === "—" ? "" : member.country,
+  };
+}
 
 export function AdminMemberManageModal({
   member,
@@ -32,40 +47,31 @@ export function AdminMemberManageModal({
   const [busy, setBusy] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [form, setForm] = useState<AdminUserUpdateInput>({
-    fullName: "",
-    username: "",
-    email: "",
-    accountType: "fan",
-    role: "user",
-    gym: "",
-    city: "",
-    bio: "",
-    phone: "",
-    country: "",
-  });
+  const [form, setForm] = useState<AdminUserUpdateInput>(() =>
+    member ? memberToForm(member) : {
+      fullName: "",
+      username: "",
+      email: "",
+      accountType: "fan",
+      role: "user",
+      gym: "",
+      city: "",
+      bio: "",
+      phone: "",
+      country: "",
+    },
+  );
 
-  useEffect(() => {
-    if (!member) {
-      return;
-    }
+  const memberSyncKey = member && mode ? `${member.userId}:${mode}` : null;
+  const [lastMemberSyncKey, setLastMemberSyncKey] = useState<string | null>(null);
 
+  if (memberSyncKey && memberSyncKey !== lastMemberSyncKey) {
+    setLastMemberSyncKey(memberSyncKey);
     setError("");
     setPassword("");
     setConfirmPassword("");
-    setForm({
-      fullName: member.fullName,
-      username: member.username === "—" ? "" : member.username,
-      email: member.email,
-      accountType: member.accountType,
-      role: member.role,
-      gym: member.gym === "—" ? "" : member.gym,
-      city: member.city === "—" ? "" : member.city,
-      bio: member.bio === "—" ? "" : member.bio,
-      phone: member.phone === "—" ? "" : member.phone,
-      country: member.country === "—" ? "" : member.country,
-    });
-  }, [member, mode]);
+    setForm(memberToForm(member!));
+  }
 
   if (!member || !mode) {
     return null;

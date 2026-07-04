@@ -1,19 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { getProfilePortrait, saveProfilePortrait } from "@/lib/profile/portrait-storage";
 
 export function useProfilePortrait(userId: string | undefined, licensePhoto?: string | null) {
-  const [userPortrait, setUserPortrait] = useState<string | null>(null);
+  const [portraitOverride, setPortraitOverride] = useState<string | null | undefined>(undefined);
+  const [trackedUserId, setTrackedUserId] = useState(userId);
 
-  useEffect(() => {
-    if (!userId) {
-      setUserPortrait(null);
-      return;
-    }
+  if (userId !== trackedUserId) {
+    setTrackedUserId(userId);
+    setPortraitOverride(undefined);
+  }
 
-    setUserPortrait(getProfilePortrait(userId));
-  }, [userId]);
+  const storedPortrait = userId ? getProfilePortrait(userId) : null;
+  const userPortrait = portraitOverride !== undefined ? portraitOverride : storedPortrait;
 
   const portraitImage = userPortrait ?? licensePhoto ?? undefined;
 
@@ -24,7 +24,7 @@ export function useProfilePortrait(userId: string | undefined, licensePhoto?: st
       }
 
       saveProfilePortrait(userId, dataUrl);
-      setUserPortrait(dataUrl);
+      setPortraitOverride(dataUrl);
     },
     [userId],
   );
@@ -35,7 +35,7 @@ export function useProfilePortrait(userId: string | undefined, licensePhoto?: st
     }
 
     saveProfilePortrait(userId, null);
-    setUserPortrait(null);
+    setPortraitOverride(null);
   }, [userId]);
 
   return {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Command, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ProfileSectionId } from "@/components/profile/ProfileSidebarNav";
 import {
@@ -30,6 +30,11 @@ export function ProfileCommandPalette({
   const [query, setQuery] = useState("");
   const actions = useMemo(() => buildCommandActions(role, isAdmin), [role, isAdmin]);
 
+  const closePalette = useCallback(() => {
+    setQuery("");
+    onClose();
+  }, [onClose]);
+
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return actions;
@@ -41,25 +46,19 @@ export function ProfileCommandPalette({
   }, [actions, query]);
 
   useEffect(() => {
-    if (!open) {
-      setQuery("");
-    }
-  }, [open]);
-
-  useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape" && open) {
-        onClose();
+        closePalette();
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose]);
+  }, [open, closePalette]);
 
   if (!open) return null;
 
   function runAction(action: CommandAction) {
-    onClose();
+    closePalette();
     if (action.href) {
       router.push(action.href);
       return;
@@ -74,7 +73,7 @@ export function ProfileCommandPalette({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/70 px-4 pt-[12vh] backdrop-blur-sm">
-      <button aria-label="Close command palette" className="absolute inset-0" onClick={onClose} type="button" />
+      <button aria-label="Close command palette" className="absolute inset-0" onClick={closePalette} type="button" />
       <div className="relative w-full max-w-xl overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0d0d0d] shadow-2xl">
         <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
           <Search className="text-zinc-500" size={18} aria-hidden />

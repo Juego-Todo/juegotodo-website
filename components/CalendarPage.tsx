@@ -316,19 +316,15 @@ function CalendarEntryList({
 export function CalendarPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
-  const [entries, setEntries] = useState<CalendarEntry[]>([]);
-  const [view, setView] = useState<CalendarViewMode>("grid");
-
-  useEffect(() => {
+  const [entries, setEntries] = useState<CalendarEntry[]>(() => getAllCalendarEntries(false));
+  const [view, setView] = useState<CalendarViewMode>(() => {
     if (typeof window === "undefined") {
-      return;
+      return "grid";
     }
 
     const saved = window.localStorage.getItem(CALENDAR_VIEW_KEY);
-    if (saved === "grid" || saved === "linear") {
-      setView(saved);
-    }
-  }, []);
+    return saved === "grid" || saved === "linear" ? saved : "grid";
+  });
 
   function handleViewChange(nextView: CalendarViewMode) {
     setView(nextView);
@@ -340,10 +336,6 @@ export function CalendarPage() {
       router.replace(`/login?next=${encodeURIComponent("/calendar")}`);
     }
   }, [loading, user, router]);
-
-  useEffect(() => {
-    setEntries(getAllCalendarEntries(false));
-  }, []);
 
   const { upcoming, past } = useMemo(() => splitCalendarEntries(entries), [entries]);
   const nextEntry = upcoming[0];

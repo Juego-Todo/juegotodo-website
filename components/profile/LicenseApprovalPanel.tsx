@@ -22,8 +22,7 @@ export function LicenseApprovalPanel() {
   }
 
   useEffect(() => {
-    refreshApplications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    void fetchAllLicenseApplications().then(setApplications);
   }, []);
 
   const filteredApplications = useMemo(() => {

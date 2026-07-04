@@ -3,7 +3,7 @@
 import { UserTypeBadge } from "@/components/profile/UserTypeBadge";
 import { assignableUserTypeTags, toggleAdminAssignedTag } from "@/lib/profile/account-tags";
 import type { UserTypeTagId } from "@/data/user-type-tags";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function AdminAccountTagEditor({
   userId,
@@ -17,10 +17,13 @@ export function AdminAccountTagEditor({
   compact?: boolean;
 }) {
   const [tags, setTags] = useState<UserTypeTagId[]>(initialTags);
+  const tagSyncKey = `${userId}:${initialTags.join(",")}`;
+  const [lastTagSyncKey, setLastTagSyncKey] = useState(tagSyncKey);
 
-  useEffect(() => {
+  if (tagSyncKey !== lastTagSyncKey) {
+    setLastTagSyncKey(tagSyncKey);
     setTags(initialTags);
-  }, [initialTags, userId]);
+  }
 
   function handleToggle(tagId: UserTypeTagId) {
     const next = toggleAdminAssignedTag(userId, tagId);

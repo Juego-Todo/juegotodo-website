@@ -21,8 +21,9 @@ export function LicenseApplicationPageShell({ presetKey }: { presetKey: LicenseP
   const viewSubmissionStatus = searchParams.get("status") === "pending";
   const { user, loading } = useAuth();
   const { userData } = useCommerce();
-  const [applicationLoaded, setApplicationLoaded] = useState(false);
+  const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
   const [application, setApplication] = useState<LicenseApplication | null>(null);
+  const applicationLoaded = Boolean(user && loadedUserId === user.id);
 
   useEffect(() => {
     if (loading) {
@@ -36,7 +37,6 @@ export function LicenseApplicationPageShell({ presetKey }: { presetKey: LicenseP
 
     let cancelled = false;
     let redirecting = false;
-    setApplicationLoaded(false);
 
     void fetchLicenseApplicationByUserId(user.id)
       .then((existing) => {
@@ -62,14 +62,14 @@ export function LicenseApplicationPageShell({ presetKey }: { presetKey: LicenseP
       })
       .finally(() => {
         if (!cancelled && !redirecting) {
-          setApplicationLoaded(true);
+          setLoadedUserId(user.id);
         }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [loading, user, router, preset.href, preset.match]);
+  }, [loading, user, router, preset]);
 
   if (loading || !user || !applicationLoaded) {
     return (

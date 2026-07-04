@@ -56,8 +56,8 @@ function useIsMobile(breakpoint = 768) {
 export function AdminCalendarDashboard() {
   const { user } = useAuth();
   const isMobile = useIsMobile();
-  const [entries, setEntries] = useState<CalendarEntry[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [entries, setEntries] = useState(() => getAllCalendarEntries(true));
+  const [loaded, setLoaded] = useState(true);
   const [category, setCategory] = useState<EventCategory>("competitions");
   const [view, setView] = useState<AdminCalendarView>("timeline");
   const [filters, setFilters] = useState(defaultCalendarFilters());
@@ -71,18 +71,12 @@ export function AdminCalendarDashboard() {
   const [formPreset, setFormPreset] = useState<Partial<CalendarEntryInput> | undefined>();
   const [toast, setToast] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isMobile) setView("agenda");
-  }, [isMobile]);
+  const displayView: AdminCalendarView = isMobile ? "agenda" : view;
 
   const refreshEntries = useCallback(() => {
     setEntries(getAllCalendarEntries(true));
     setLoaded(true);
   }, []);
-
-  useEffect(() => {
-    refreshEntries();
-  }, [refreshEntries]);
 
   useEffect(() => {
     if (!toast) return;
@@ -207,7 +201,7 @@ export function AdminCalendarDashboard() {
         onViewChange={setView}
         search={filters.search}
         stats={categoryStats}
-        view={view}
+        view={displayView}
       />
 
       <AdminCalendarCategoryNav category={category} onChange={handleCategoryChange} />
@@ -217,12 +211,12 @@ export function AdminCalendarDashboard() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 8 }}
           initial={{ opacity: 0, y: 8 }}
-          key={`${category}-${view}`}
+          key={`${category}-${displayView}`}
           transition={{ duration: 0.2 }}
         >
           {!loaded ? (
             <div className="rounded-[1.25rem] border border-white/10 bg-black/20 px-6 py-16 text-center text-zinc-400">Loading events...</div>
-          ) : view === "calendar" ? (
+          ) : displayView === "calendar" ? (
             <AdminCalendarMonthView
               activeMonth={activeMonth}
               entries={filteredEntries}
@@ -231,13 +225,13 @@ export function AdminCalendarDashboard() {
               onSelectEntry={handleSelectEntry}
               selectedEntryId={selectedEntry?.id ?? null}
             />
-          ) : view === "timeline" ? (
+          ) : displayView === "timeline" ? (
             <AdminCalendarTimelineView entries={filteredEntries} onSelectEntry={handleSelectEntry} selectedEntryId={selectedEntry?.id ?? null} />
-          ) : view === "agenda" ? (
+          ) : displayView === "agenda" ? (
             <AdminCalendarAgendaView entries={filteredEntries} onSelectEntry={handleSelectEntry} selectedEntryId={selectedEntry?.id ?? null} />
-          ) : view === "year" ? (
+          ) : displayView === "year" ? (
             <AdminCalendarYearView entries={filteredEntries} onSelectEntry={handleSelectEntry} selectedEntryId={selectedEntry?.id ?? null} />
-          ) : view === "analytics" ? (
+          ) : displayView === "analytics" ? (
             <AdminCalendarAnalyticsView entries={filteredEntries} stats={analyticsStats} />
           ) : (
             <AdminCalendarListView

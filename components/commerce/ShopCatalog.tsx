@@ -4,54 +4,71 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
-import { PremiumProductCard } from "@/components/commerce/shop/ShopExperience";
+import { ShopProductCard } from "@/components/commerce/ShopProductCard";
 import { shopProducts } from "@/data/shop";
+import { bestSellerSlugs } from "@/lib/commerce/product-visuals";
+import { getShopCollection, matchesShopCollection, type ShopCollectionId } from "@/lib/commerce/shop-collections";
 import { shopCategoryLabels, type ShopCategory } from "@/lib/commerce/types";
 
 const filterCategories: { label: string; value: ShopCategory | "all" }[] = [
   { label: "All", value: "all" },
-  { label: "Official Gear", value: "official-gear" },
-  { label: "Protective Equipment", value: "protective-equipment" },
-  { label: "Competition Equipment", value: "competition-equipment" },
-  { label: "Training Equipment", value: "training-equipment" },
-  { label: "Apparel", value: "apparel" },
-  { label: "Championship", value: "championship-collection" },
-  { label: "Digital", value: "digital-products" },
+  ...(
+    Object.entries(shopCategoryLabels) as [ShopCategory, string][]
+  ).map(([value, label]) => ({ label, value })),
 ];
 
 type ShopCatalogProps = {
-  initialCategory?: ShopCategory;
+  activeCategory: ShopCategory | "all";
+  activeCollection: ShopCollectionId;
+  onCategoryChange: (category: ShopCategory | "all") => void;
 };
 
-export function ShopCatalog({ initialCategory }: ShopCatalogProps) {
+export function ShopCatalog({ activeCategory, activeCollection, onCategoryChange }: ShopCatalogProps) {
   const [query, setQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState<ShopCategory | "all">(initialCategory ?? "all");
   const [sort, setSort] = useState<"featured" | "price-asc" | "price-desc">("featured");
+  const activeCollectionMeta = getShopCollection(activeCollection);
 
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     let results = shopProducts.filter((product) => {
       const matchesCategory = activeCategory === "all" || product.category === activeCategory;
+      const matchesCollection = matchesShopCollection(product, activeCollection);
       if (!normalized) {
-        return matchesCategory;
+        return matchesCategory && matchesCollection;
       }
       const haystack = [product.name, product.description, ...product.searchTags].join(" ").toLowerCase();
-      return matchesCategory && haystack.includes(normalized);
+      return matchesCategory && matchesCollection && haystack.includes(normalized);
     });
 
     if (sort === "price-asc") {
       results = [...results].sort((a, b) => a.priceAmount - b.priceAmount);
     } else if (sort === "price-desc") {
       results = [...results].sort((a, b) => b.priceAmount - a.priceAmount);
+    } else {
+      results = [...results].sort((a, b) => {
+        const aIndex = bestSellerSlugs.indexOf(a.slug as (typeof bestSellerSlugs)[number]);
+        const bIndex = bestSellerSlugs.indexOf(b.slug as (typeof bestSellerSlugs)[number]);
+        if (aIndex === -1 && bIndex === -1) return 0;
+        if (aIndex === -1) return 1;
+        if (bIndex === -1) return -1;
+        return aIndex - bIndex;
+      });
     }
 
     return results;
-  }, [activeCategory, query, sort]);
+  }, [activeCategory, activeCollection, query, sort]);
 
   return (
-    <MotionSection className="mt-20 pb-14 sm:pb-20" id="full-catalog">
+    <MotionSection className="mt-10 border-t border-white/[0.06] pb-14 pt-10 sm:mt-12 sm:pb-20 sm:pt-12" id="full-catalog">
       <p className="text-[0.65rem] font-medium uppercase tracking-[0.22em] text-[#FF1010]">Full Armory</p>
-      <h2 className="font-display mt-2 text-4xl font-normal uppercase text-white sm:text-5xl">All Products</h2>
+      <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <h2 className="font-display text-4xl font-normal uppercase text-white sm:text-5xl">All Products</h2>
+        {activeCollectionMeta ? (
+          <p className="text-sm text-zinc-400">
+            Showing <span className="font-semibold text-white">{activeCollectionMeta.label}</span>
+          </p>
+        ) : null}
+      </div>
 
       <div className="mb-6 mt-8 rounded-lg bg-white/[0.02] p-4 sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -85,7 +102,7 @@ export function ShopCatalog({ initialCategory }: ShopCatalogProps) {
                 : "border border-white/10 bg-white/[0.04] text-zinc-300 hover:border-red-500/40 hover:text-white"
             }`}
             key={category.value}
-            onClick={() => setActiveCategory(category.value)}
+            onClick={() => onCategoryChange(category.value)}
             type="button"
           >
             {category.label}
@@ -96,10 +113,10 @@ export function ShopCatalog({ initialCategory }: ShopCatalogProps) {
       {filteredProducts.length === 0 ? (
         <div className="glass-panel rounded-[1.75rem] p-8 text-center">
           <p className="font-display text-4xl uppercase text-white">No Gear Found</p>
-          <p className="mt-3 text-sm text-zinc-400">Try another search term or category filter.</p>
+          <p className="mt-3 text-sm text-zinc-400">Try another search term, collection, or category filter.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-6 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {filteredProducts.map((product, index) => (
             <motion.div
               animate={{ opacity: 1, y: 0 }}
@@ -108,7 +125,7 @@ export function ShopCatalog({ initialCategory }: ShopCatalogProps) {
               key={product.slug}
               transition={{ delay: index * 0.03, duration: 0.35 }}
             >
-              <PremiumProductCard product={product} />
+              <ShopProductCard product={product} />
             </motion.div>
           ))}
         </div>

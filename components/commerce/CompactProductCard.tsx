@@ -2,20 +2,24 @@
 
 import Link from "next/link";
 import { Star } from "lucide-react";
+import { ProductDisplayImage } from "@/components/commerce/ProductDisplayImage";
 import { QuickAddToCart } from "@/components/commerce/QuickAddToCart";
-import { ProductVisual } from "@/components/commerce/ProductVisual";
 import type { ShopProduct } from "@/data/shop";
-import { getProductImageKey, getProductRating } from "@/lib/commerce/product-visuals";
+import { getProductRating } from "@/lib/commerce/product-visuals";
 import { formatCurrency } from "@/lib/commerce/pricing";
 
 export function CompactProductCard({ product }: { product: ShopProduct }) {
   const { rating } = getProductRating(product);
-  const imageKey = getProductImageKey(product);
 
   return (
     <div className="group flex flex-col">
       <Link className="block overflow-hidden rounded-lg bg-white/[0.02]" href={`/shop/${product.slug}`}>
-        <ProductVisual className="!min-h-[7.5rem] !rounded-lg" imageKey={imageKey} size="sm" />
+        <ProductDisplayImage
+          alt={product.name}
+          className="!min-h-[7.5rem] !rounded-lg"
+          product={product}
+          size="sm"
+        />
       </Link>
       <Link className="mt-3 block" href={`/shop/${product.slug}`}>
         <h3 className="line-clamp-2 text-sm font-medium leading-snug text-white transition group-hover:text-[#FF1010]">

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { Star } from "lucide-react";
+import { ProductDisplayImage } from "@/components/commerce/ProductDisplayImage";
 import { QuickAddToCart } from "@/components/commerce/QuickAddToCart";
-import { ProductVisual } from "@/components/commerce/ProductVisual";
 import type { ShopProduct } from "@/data/shop";
-import { getProductImageKey, getProductRating } from "@/lib/commerce/product-visuals";
+import { getProductRating } from "@/lib/commerce/product-visuals";
 import { formatCurrency } from "@/lib/commerce/pricing";
 
 function StarRating({ rating }: { rating: number }) {
@@ -31,17 +31,15 @@ export function ShopProductCard({
   championship?: boolean;
 }) {
   const { rating } = getProductRating(product);
-  const imageKey = getProductImageKey(product);
 
   return (
     <div className="group flex h-full flex-col">
       <div className="relative overflow-hidden rounded-lg bg-white/[0.02]">
         <Link href={`/shop/${product.slug}`}>
-          <ProductVisual
-            championship={championship}
+          <ProductDisplayImage
+            alt={product.name}
             className="!h-[13rem] !min-h-[13rem] sm:!h-[14rem] sm:!min-h-[14rem]"
-            imageKey={imageKey}
-            photographic
+            product={product}
             size="lg"
           />
         </Link>
@@ -63,7 +61,7 @@ export function ShopProductCard({
       </div>
 
       <div className="mt-3">
-        <QuickAddToCart compact product={product} />
+        <QuickAddToCart className="w-full" compact product={product} />
       </div>
     </div>
   );

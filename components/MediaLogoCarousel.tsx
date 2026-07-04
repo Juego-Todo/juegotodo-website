@@ -1,3 +1,4 @@
+import { MediaPartnerLogo } from "@/components/MediaPartnerLogo";
 import { mediaPartners } from "@/data/site";
 
 export function MediaLogoCarousel() {
@@ -18,12 +19,10 @@ export function MediaLogoCarousel() {
         <div className="media-marquee-track flex w-max items-center gap-3">
           {loop.map((partner, index) => (
             <div
-              className="flex min-w-[9.5rem] items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 sm:min-w-[11rem]"
-              key={`${partner}-${index}`}
+              className="flex min-w-[9.5rem] items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3 py-3 sm:min-w-[11rem] sm:px-4"
+              key={`${partner.name}-${index}`}
             >
-              <span className="text-center text-[0.68rem] font-black uppercase tracking-[0.14em] text-zinc-200 sm:text-xs">
-                {partner}
-              </span>
+              <MediaPartnerLogo compact partner={partner} />
             </div>
           ))}
         </div>

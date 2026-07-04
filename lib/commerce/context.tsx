@@ -39,6 +39,7 @@ import type {
 
 type AddToCartOptions = {
   openDrawer?: boolean;
+  variantSelections?: Record<string, string>;
 };
 
 type CommerceContextValue = {
@@ -151,15 +152,21 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
 
   const addToCart = useCallback((productSlug: string, quantity = 1, options?: AddToCartOptions) => {
     setCart((current) => {
-      const existing = current.find((item) => item.productSlug === productSlug);
+      const variantSelections = options?.variantSelections;
+      const existing = current.find(
+        (item) =>
+          item.productSlug === productSlug &&
+          JSON.stringify(item.variantSelections ?? {}) === JSON.stringify(variantSelections ?? {}),
+      );
       if (existing) {
         return current.map((item) =>
-          item.productSlug === productSlug
+          item.productSlug === productSlug &&
+          JSON.stringify(item.variantSelections ?? {}) === JSON.stringify(variantSelections ?? {})
             ? { ...item, quantity: item.quantity + quantity }
             : item,
         );
       }
-      return [...current, { productSlug, quantity }];
+      return [...current, { productSlug, quantity, variantSelections }];
     });
     setLastAddedSlug(productSlug);
     if (options?.openDrawer !== false) {

@@ -7,13 +7,15 @@ import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import type { ShopProduct } from "@/data/shop";
 import { formatCurrency } from "@/lib/commerce/pricing";
+import { getSelectedVariantPrice } from "@/lib/commerce/product-options";
 
 type StickyPurchaseBarProps = {
   product: ShopProduct;
   observeId: string;
+  variantSelections?: Record<string, string>;
 };
 
-export function StickyPurchaseBar({ product, observeId }: StickyPurchaseBarProps) {
+export function StickyPurchaseBar({ product, observeId, variantSelections }: StickyPurchaseBarProps) {
   const router = useRouter();
   const { user } = useAuth();
   const { addToCart } = useCommerce();
@@ -41,8 +43,10 @@ export function StickyPurchaseBar({ product, observeId }: StickyPurchaseBarProps
       router.push(`/login?next=${encodeURIComponent(`/shop/${product.slug}`)}`);
       return;
     }
-    addToCart(product.slug, 1, { openDrawer: true });
+    addToCart(product.slug, 1, { openDrawer: true, variantSelections });
   }
+
+  const displayPrice = getSelectedVariantPrice(product, variantSelections ?? {});
 
   return (
     <div
@@ -53,7 +57,7 @@ export function StickyPurchaseBar({ product, observeId }: StickyPurchaseBarProps
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-white">{product.name}</p>
-          <p className="font-display text-xl text-white">{formatCurrency(product.priceAmount)}</p>
+          <p className="font-display text-xl text-white">{formatCurrency(displayPrice)}</p>
         </div>
         <button
           className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#FF1010] px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2828]"

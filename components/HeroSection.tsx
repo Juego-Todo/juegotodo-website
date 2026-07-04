@@ -1,13 +1,13 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Play, Ticket } from "lucide-react";
+import { ArrowRight, Ticket } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { EnergyParticles } from "@/components/EnergyParticles";
 import { MagneticButton } from "@/components/MagneticButton";
+import { MediaPartnerLogo } from "@/components/MediaPartnerLogo";
 import { mediaPartners } from "@/data/site";
 
 const heroFeaturedEvent = {
@@ -20,16 +20,6 @@ const heroFeaturedEvent = {
   ticketProductSlug: "barrio-brawls-tickets",
 };
 
-function PartnerWordmark({ name }: { name: string }) {
-  return (
-    <span className="partner-wordmark inline-flex shrink-0 items-center px-6 sm:px-10">
-      <span className="font-display text-lg uppercase tracking-[0.16em] text-white sm:text-xl sm:tracking-[0.2em]">
-        {name}
-      </span>
-    </span>
-  );
-}
-
 export function HeroSection() {
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.35], [0, 60]);
@@ -37,7 +27,7 @@ export function HeroSection() {
   const marqueePartners = [...mediaPartners, ...mediaPartners];
 
   return (
-    <section className="relative flex min-h-0 flex-col overflow-hidden lg:min-h-[100svh]">
+    <section className="relative flex flex-col overflow-x-hidden">
       <motion.div className="absolute inset-0" style={{ y: heroY, scale: heroScale }}>
         <Image
           alt="Juego Todo FMA athletes in weaponized competition"
@@ -68,21 +58,19 @@ export function HeroSection() {
       />
       <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/85 to-transparent" aria-hidden />
 
-      <div className="relative z-10 flex flex-1 flex-col">
-        <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-7 px-4 pb-6 pt-20 sm:px-6 sm:pt-20 lg:min-h-[calc(100svh-14rem)] lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 lg:px-8 lg:pb-6 lg:pt-24">
+      <div className="relative z-10 flex min-h-[calc(100svh-4.5rem)] flex-col">
+        <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-7 px-4 pb-6 pt-20 sm:px-6 sm:pt-20 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 lg:px-8 lg:pb-6 lg:pt-24">
           <motion.div
             animate={{ opacity: 1, y: 0 }}
             className="relative z-10"
             initial={{ opacity: 0, y: 28 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="mb-4 inline-flex rounded-full border border-white/15 bg-black/35 px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.24em] text-red-100 backdrop-blur">
-              Limited fight calendar · Global FMA platform
-            </p>
+
             <h1 className="font-display max-w-5xl text-[clamp(2.6rem,10vw,4.5rem)] uppercase leading-[0.9] tracking-wide text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.95)] sm:text-[clamp(3.2rem,7.5vw,6rem)] lg:text-[clamp(3.5rem,6vw,6.5rem)]">
-              <span className="block text-white/90">Not A Fight Night.</span>
+              <span className="block text-white/90">The Evolution of</span>
               <span className="block bg-gradient-to-r from-white via-white to-red-200 bg-clip-text text-transparent">
-                A Combat Sports Universe.
+                Filipino Combat Sports
               </span>
             </h1>
 
@@ -92,18 +80,15 @@ export function HeroSection() {
               seminars, and championship legacy connected in one platform.
             </p>
 
-            <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
+            <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
               <MagneticButton href="/registration">
                 Register Now
                 <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
               </MagneticButton>
-              <Link
-                className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-black/30 px-6 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-white backdrop-blur transition hover:border-[#FF1010]/40 hover:bg-[#FF1010]/10 sm:text-sm"
-                href="#fight-format"
-              >
-                <Play className="mr-2" size={15} aria-hidden />
-                Watch The Format
-              </Link>
+              <MagneticButton href={`/shop/${heroFeaturedEvent.ticketProductSlug}`} variant="secondary">
+                <Ticket className="mr-2" size={16} aria-hidden />
+                Buy Tickets
+              </MagneticButton>
             </div>
           </motion.div>
 
@@ -137,13 +122,6 @@ export function HeroSection() {
                     <div className="mt-4 sm:mt-5">
                       <CountdownTimer target={heroFeaturedEvent.target} />
                     </div>
-                    <Link
-                      className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-3 text-[0.62rem] font-black uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2828] sm:mt-5"
-                      href={`/shop/${heroFeaturedEvent.ticketProductSlug}`}
-                    >
-                      <Ticket size={13} aria-hidden />
-                      Buy Tickets
-                    </Link>
                   </div>
                 </EventCardBackdrop>
               </div>
@@ -151,27 +129,27 @@ export function HeroSection() {
           </motion.div>
         </div>
 
-        <div className="mt-auto w-full border-t border-white/[0.08] bg-[#050505] py-6 sm:py-8">
+        <div className="mt-auto w-full shrink-0 border-t border-white/[0.08] bg-[#050505] py-6 sm:py-8">
           <p className="text-center text-[0.62rem] font-medium uppercase tracking-[0.32em] text-zinc-500">
             As Seen On
           </p>
 
-          <div className="relative mt-5 w-full overflow-hidden sm:mt-6">
+          <div className="relative mt-5 min-h-[3.25rem] w-full sm:mt-6 sm:min-h-[3.75rem]">
               <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#050505] to-transparent sm:w-24" aria-hidden />
               <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#050505] to-transparent sm:w-24" aria-hidden />
 
-              <div className="hidden lg:block">
+              <div className="hidden overflow-hidden lg:block">
                 <div className="media-marquee-track flex w-max items-center py-2">
                   {marqueePartners.map((partner, index) => (
-                    <PartnerWordmark key={`${partner}-${index}`} name={partner} />
+                    <MediaPartnerLogo key={`${partner.name}-${index}`} partner={partner} />
                   ))}
                 </div>
               </div>
 
-              <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-5 px-4 sm:grid-cols-3 sm:px-6 lg:hidden">
+              <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-6 px-4 pb-2 sm:grid-cols-3 sm:px-6 lg:hidden">
                 {mediaPartners.map((partner) => (
-                  <div className="flex items-center justify-center" key={partner}>
-                    <PartnerWordmark name={partner} />
+                  <div className="flex items-center justify-center" key={partner.name}>
+                    <MediaPartnerLogo partner={partner} />
                   </div>
                 ))}
               </div>

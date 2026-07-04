@@ -1,4 +1,18 @@
 import type { ShopCategory } from "@/lib/commerce/types";
+import { merchandiseProducts } from "@/data/shop-merchandise";
+
+export type ProductVariantOption = {
+  id: string;
+  label: string;
+  imageSrc?: string;
+  priceAmount?: number;
+};
+
+export type ProductVariantGroup = {
+  id: string;
+  label: string;
+  options: ProductVariantOption[];
+};
 
 export type ShopProduct = {
   slug: string;
@@ -18,9 +32,11 @@ export type ShopProduct = {
   searchTags: string[];
   rating?: number;
   reviewCount?: number;
+  imageSrc?: string;
+  variantGroups?: ProductVariantGroup[];
 };
 
-export const shopProducts: ShopProduct[] = [
+const legacyShopProducts: ShopProduct[] = [
   {
     slug: "official-arnis-stick-pair",
     name: "Official Arnis Stick Pair",
@@ -80,36 +96,6 @@ export const shopProducts: ShopProduct[] = [
     rating: 4.9,
     reviewCount: 156,
     searchTags: ["gloves", "competition", "official"],
-  },
-  {
-    slug: "jt-competition-helmet",
-    name: "JT Competition Helmet",
-    category: "competition-equipment",
-    price: "₱3,450",
-    priceAmount: 3450,
-    description: "Headgear for youth and amateur weapon divisions.",
-    summary:
-      "Low-profile competition helmet with ventilated shell and secure chin strap. Built for stick exchanges and transition phases.",
-    features: [
-      "Ventilated competition shell",
-      "Adjustable chin strap",
-      "Low-profile cheek protection",
-      "JT crest decal",
-      "Youth and adult sizing",
-    ],
-    specs: [
-      { label: "Shell", value: "Impact-resistant composite" },
-      { label: "Sizes", value: "S — XL" },
-      { label: "Weight", value: "Light competition cut" },
-      { label: "Use", value: "Youth / amateur divisions" },
-    ],
-    competitionUse: "Required head protection in divisions where helmet use is mandated at check-in.",
-    tone: "from-red-950 via-black to-zinc-900",
-    badge: "Best Seller",
-    stock: 18,
-    rating: 4.8,
-    reviewCount: 94,
-    searchTags: ["helmet", "headgear", "protection"],
   },
   {
     slug: "jt-competition-jersey",
@@ -745,6 +731,8 @@ export const shopProducts: ShopProduct[] = [
     searchTags: ["seminar", "pass", "digital", "registration"],
   },
 ];
+
+export const shopProducts: ShopProduct[] = [...legacyShopProducts, ...merchandiseProducts];
 
 export function getShopProduct(slug: string) {
   return shopProducts.find((product) => product.slug === slug);

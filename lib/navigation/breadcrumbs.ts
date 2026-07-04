@@ -40,6 +40,7 @@ const SEGMENT_LABELS: Record<string, string> = {
 
 const STATIC_PAGE_LABELS: Record<string, string> = {
   "/events": "Fight Calendar",
+  "/calendar": "Official Calendar",
   "/media": "Broadcast Library",
   "/shop": "Official Store",
   "/registration": "Registration",

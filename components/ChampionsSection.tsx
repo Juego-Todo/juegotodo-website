@@ -20,8 +20,8 @@ export function ChampionsSection() {
               The titleholders who defined Juego Todo — from the inaugural champion to the reigning Hari ng Latayan.
             </p>
           </div>
-          <MagneticButton href="/latayanology#hall-of-fame">
-            See Hall Of Fame
+          <MagneticButton href="/latayanology">
+            Search Fighter
             <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={16} aria-hidden />
           </MagneticButton>
         </div>

@@ -1,17 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Check, Plus, Star, Truck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CompactProductCard } from "@/components/commerce/CompactProductCard";
 import { ProductActions } from "@/components/commerce/ProductActions";
+import { ProductDisplayImage } from "@/components/commerce/ProductDisplayImage";
+import { ProductVariantSelector } from "@/components/commerce/ProductVariantSelector";
 import { ProductVisual } from "@/components/commerce/ProductVisual";
 import { StickyPurchaseBar } from "@/components/commerce/StickyPurchaseBar";
 import type { ShopProduct } from "@/data/shop";
 import { getShopProduct, shopProducts } from "@/data/shop";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
+import {
+  getDefaultVariantSelections,
+  getSelectedVariantImage,
+  getSelectedVariantPrice,
+} from "@/lib/commerce/product-options";
 import {
   bundleSlugs,
   getAthletesUsingProduct,
@@ -82,11 +89,21 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
   const { user } = useAuth();
   const { addToCart } = useCommerce();
   const [activeImage, setActiveImage] = useState(0);
+  const [variantSelections, setVariantSelections] = useState(() => getDefaultVariantSelections(product));
   const imageKey = getProductImageKey(product);
+  const displayImage = getSelectedVariantImage(product, variantSelections);
+  const displayPrice = useMemo(
+    () => getSelectedVariantPrice(product, variantSelections),
+    [product, variantSelections],
+  );
   const { rating, reviewCount } = getProductRating(product);
   const stock = getStockLabel(product.stock);
   const badges = getProductBadges(product);
   const athletesUsing = getAthletesUsingProduct(product.slug);
+
+  function handleVariantChange(groupId: string, optionId: string) {
+    setVariantSelections((current) => ({ ...current, [groupId]: optionId }));
+  }
 
   const relatedProducts = shopProducts
     .filter((item) => item.category === product.category && item.slug !== product.slug)
@@ -113,17 +130,19 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
 
   return (
     <>
-      <StickyPurchaseBar observeId="purchase-anchor" product={product} />
+      <StickyPurchaseBar observeId="purchase-anchor" product={product} variantSelections={variantSelections} />
 
       <section className="mx-auto max-w-7xl pb-24">
         {/* Hero — photography first */}
         <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:items-start">
           <div className="space-y-3">
             <div className="overflow-hidden rounded-lg bg-white/[0.02]">
-              <ProductVisual
-                championship={product.category === "championship-collection"}
-                className="!min-h-[28rem] !rounded-lg sm:!min-h-[34rem] lg:!min-h-[40rem]"
-                imageKey={imageKey}
+              <ProductDisplayImage
+                alt={product.name}
+                className="!rounded-lg"
+                imageSrc={displayImage}
+                priority
+                product={product}
                 size="hero"
               />
             </div>
@@ -137,7 +156,13 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                   onClick={() => setActiveImage(index)}
                   type="button"
                 >
-                  <ProductVisual className="!min-h-[3.5rem] !rounded-md" imageKey={imageKey} size="sm" />
+                  <ProductDisplayImage
+                    alt={`${product.name} ${angle}`}
+                    className="!min-h-[3.5rem] !rounded-md"
+                    imageSrc={displayImage}
+                    product={product}
+                    size="sm"
+                  />
                   <span className="mt-1.5 block">{angle}</span>
                 </button>
               ))}
@@ -168,9 +193,15 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
               <StarRating rating={rating} reviewCount={reviewCount} />
             </div>
 
-            <p className="font-display mt-6 text-4xl font-normal text-white">{product.price}</p>
+            <p className="font-display mt-6 text-4xl font-normal text-white">{formatCurrency(displayPrice)}</p>
 
             <p className="mt-4 text-base leading-7 text-zinc-400">{product.summary}</p>
+
+            <ProductVariantSelector
+              onChange={handleVariantChange}
+              product={product}
+              selections={variantSelections}
+            />
 
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs uppercase tracking-[0.12em] text-zinc-500">
               <span className={stock.urgent ? "text-[#FF1010]" : ""}>{stock.label}</span>
@@ -182,7 +213,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
             </div>
 
             <div className="mt-8" id="purchase-anchor">
-              <ProductActions product={product} />
+              <ProductActions product={product} variantSelections={variantSelections} />
             </div>
 
             <ul className="mt-8 space-y-2 border-t border-white/[0.06] pt-6">

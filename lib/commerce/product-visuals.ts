@@ -21,6 +21,12 @@ const slugImageMap: Record<string, ProductImageKey> = {
   "jt-competition-jersey": "jersey",
   "championship-replica-belt": "belt",
   "champion-jersey-signed": "jersey",
+  "juego-todo-id-lanyard": "apparel",
+  "juego-todo-shirt": "apparel",
+  "juego-todo-premium-shirt": "apparel",
+  "juego-todo-fight-shorts": "apparel",
+  "juego-todo-trucker-cap": "apparel",
+  "juego-todo-sleeveless-hoodie": "apparel",
 };
 
 const categoryImageMap: Record<ShopCategory, ProductImageKey> = {
@@ -42,10 +48,14 @@ export const heroFeaturedSlugs = [
 ] as const;
 
 export const bestSellerSlugs = [
-  "jt-competition-gloves",
+  "juego-todo-shirt",
   "jt-competition-helmet",
-  "jt-competition-jersey",
-  "official-arnis-stick-pair",
+  "juego-todo-fight-shorts",
+  "juego-todo-premium-shirt",
+  "juego-todo-trucker-cap",
+  "juego-todo-id-lanyard",
+  "juego-todo-sleeveless-hoodie",
+  "jt-competition-gloves",
 ] as const;
 
 export const bundleSlugs = ["jt-competition-gloves", "jt-competition-helmet", "jt-competition-jersey"] as const;
@@ -58,6 +68,10 @@ export const memberBenefits = [
 ] as const;
 
 export const newArrivalSlugs = [
+  "juego-todo-shirt",
+  "juego-todo-fight-shorts",
+  "juego-todo-trucker-cap",
+  "juego-todo-id-lanyard",
   "jt-fight-shorts",
   "jt-competition-jersey",
   "mouth-guard-elite",

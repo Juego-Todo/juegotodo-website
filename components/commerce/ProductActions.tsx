@@ -9,9 +9,10 @@ import { shopCategoryLabels } from "@/lib/commerce/types";
 
 type ProductActionsProps = {
   product: ShopProduct;
+  variantSelections?: Record<string, string>;
 };
 
-export function ProductActions({ product }: ProductActionsProps) {
+export function ProductActions({ product, variantSelections }: ProductActionsProps) {
   const router = useRouter();
   const { user } = useAuth();
   const { addToCart, toggleWishlist, userData } = useCommerce();
@@ -28,13 +29,13 @@ export function ProductActions({ product }: ProductActionsProps) {
 
   function handleAddToCart() {
     requireAuth(`/shop/${product.slug}`, () => {
-      addToCart(product.slug, 1, { openDrawer: true });
+      addToCart(product.slug, 1, { openDrawer: true, variantSelections });
     });
   }
 
   function handleBuyNow() {
     requireAuth("/checkout/shipping", () => {
-      addToCart(product.slug, 1, { openDrawer: false });
+      addToCart(product.slug, 1, { openDrawer: false, variantSelections });
       router.push("/checkout/shipping");
     });
   }

@@ -1,5 +1,6 @@
 import type { AccountType } from "@/lib/auth/types";
 import { getShopProduct } from "@/data/shop";
+import { getSelectedVariantPrice, getVariantSummary } from "@/lib/commerce/product-options";
 import type { CartItem, MembershipTier } from "@/lib/commerce/types";
 
 export const TAX_RATE = 0.12;
@@ -58,7 +59,7 @@ export function calculateLineItems(
         return null;
       }
 
-      const basePrice = product.priceAmount;
+      const basePrice = getSelectedVariantPrice(product, entry.variantSelections ?? {});
       let unitPrice = basePrice;
 
       const athleteDiscount = getAthleteDiscountPercent(options?.accountType);
@@ -75,7 +76,9 @@ export function calculateLineItems(
 
       return {
         productSlug: product.slug,
-        name: product.name,
+        name: getVariantSummary(product, entry.variantSelections ?? {})
+          ? `${product.name} (${getVariantSummary(product, entry.variantSelections ?? {})})`
+          : product.name,
         category: product.category,
         unitPrice,
         quantity: entry.quantity,

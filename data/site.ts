@@ -67,14 +67,15 @@ export const navItems: NavItem[] = [
       { label: "Rules & Regulations", href: "/rules-regulations" },
       { label: "Partners", href: "/partners" },
       { label: "Seminars", href: "/juego-todo-seminars" },
-      { label: "Consultation", href: "/consultation" },
     ],
   },
   {
     label: "Latayanology",
     href: "/latayanology",
     children: [
-      { label: "Teams", href: "/teams" },
+      { label: "Search Fighter", href: "/latayanology" },
+      { label: "Lineage Finder", href: "/fma-lineage" },
+      { label: "JT Seminars", href: "/calendar" },
     ],
   },
   {
@@ -423,6 +424,18 @@ export const fighters: Fighter[] = [
 
 export const events: Event[] = [
   {
+    slug: "barrio-brawls",
+    title: "Juego Todo: Barrio Brawls",
+    date: "2026-08-29T13:00:00+08:00",
+    venue: "TBA",
+    city: "Philippines",
+    status: "Upcoming",
+    mainEvent: "Flagship hybrid FMA card",
+    posterTone: "from-red-950 via-black to-zinc-950",
+    bouts: ["Main card TBA", "Regional qualifiers", "Amateur showcase"],
+    isChampionship: true,
+  },
+  {
     slug: "jt-ascension-manila",
     title: "Juego Todo: Ascension Manila",
     date: "2026-08-22T19:00:00+08:00",
@@ -481,20 +494,19 @@ export const heroMainStats = [
 /** @deprecated Use heroMainStats for homepage hero */
 export const heroTrustStats = heroMainStats;
 
-export const mediaPartners = [
-  "ESPN",
-  "ONE Championship",
-  "Arena Vision",
-  "FightCast Global",
-  "RingSide Network",
-  "Manila Sports TV",
-  "ABS-CBN Sports",
-  "GMA Sports",
-  "Combat Stream PH",
-  "Sports5",
-  "Apex Broadcast",
-  "Pacific Fight Media",
-] as const;
+export type MediaPartner = {
+  name: string;
+  logoSrc: string;
+};
+
+export const mediaPartners: MediaPartner[] = [
+  { name: "Manila Bulletin", logoSrc: "/as-seen-on/manila-bulletin.png" },
+  { name: "Powcast", logoSrc: "/as-seen-on/powcast.png" },
+  { name: "GMA Sports", logoSrc: "/as-seen-on/gma-sports.png" },
+  { name: "Black Belt Magazine", logoSrc: "/as-seen-on/black-belt-magazine.png" },
+  { name: "Philippine Daily Inquirer", logoSrc: "/as-seen-on/daily-inquirer.png" },
+  { name: "Games and Amusements Board", logoSrc: "/as-seen-on/games-and-amusements-board.png" },
+];
 
 export const partners = [
   "Official apparel",

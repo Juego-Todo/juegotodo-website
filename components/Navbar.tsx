@@ -20,7 +20,7 @@ const aboutUsPaths = [
   "/grand-council",
 ];
 
-const latayanologyPaths = ["/latayanology", "/fighters", "/teams"];
+const latayanologyPaths = ["/latayanology", "/fighters", "/fma-lineage", "/calendar"];
 
 function isNavActive(pathname: string, href: string, label: string) {
   if (label === "Home") {

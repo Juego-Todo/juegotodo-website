@@ -30,6 +30,7 @@ export type PaymentStatus = "pending" | "awaiting_verification" | "approved" | "
 export type CartItem = {
   productSlug: string;
   quantity: number;
+  variantSelections?: Record<string, string>;
 };
 
 export type ShippingAddress = {

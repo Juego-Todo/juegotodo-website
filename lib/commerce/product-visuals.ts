@@ -14,13 +14,7 @@ export type ProductImageKey =
   | "gear";
 
 const slugImageMap: Record<string, ProductImageKey> = {
-  "barrio-brawls-tickets": "digital",
-  "official-arnis-stick-pair": "sticks",
-  "jt-competition-gloves": "gloves",
   "jt-competition-helmet": "helmet",
-  "jt-competition-jersey": "jersey",
-  "championship-replica-belt": "belt",
-  "champion-jersey-signed": "jersey",
   "juego-todo-id-lanyard": "apparel",
   "juego-todo-shirt": "apparel",
   "juego-todo-premium-shirt": "apparel",
@@ -39,12 +33,16 @@ const categoryImageMap: Record<ShopCategory, ProductImageKey> = {
   "digital-products": "digital",
 };
 
-export const heroShowcaseSlugs = ["jt-competition-gloves", "jt-competition-helmet", "jt-competition-jersey"] as const;
+export const heroShowcaseSlugs = [
+  "jt-competition-helmet",
+  "juego-todo-sleeveless-hoodie",
+  "juego-todo-shirt",
+] as const;
 
 export const heroFeaturedSlugs = [
-  { slug: "jt-competition-gloves", badge: "Best Seller" as const },
-  { slug: "jt-competition-jersey", badge: "New Arrival" as const },
-  { slug: "championship-replica-belt", badge: "Limited Drop" as const },
+  { slug: "jt-competition-helmet", badge: "Best Seller" as const },
+  { slug: "juego-todo-sleeveless-hoodie", badge: "New Arrival" as const },
+  { slug: "juego-todo-premium-shirt", badge: "Limited Drop" as const },
 ] as const;
 
 export const bestSellerSlugs = [
@@ -55,10 +53,9 @@ export const bestSellerSlugs = [
   "juego-todo-trucker-cap",
   "juego-todo-id-lanyard",
   "juego-todo-sleeveless-hoodie",
-  "jt-competition-gloves",
 ] as const;
 
-export const bundleSlugs = ["jt-competition-gloves", "jt-competition-helmet", "jt-competition-jersey"] as const;
+export const bundleSlugs = ["juego-todo-fight-shorts", "juego-todo-shirt", "juego-todo-trucker-cap"] as const;
 
 export const memberBenefits = [
   "Athlete Discounts",
@@ -72,28 +69,26 @@ export const newArrivalSlugs = [
   "juego-todo-fight-shorts",
   "juego-todo-trucker-cap",
   "juego-todo-id-lanyard",
-  "jt-fight-shorts",
-  "jt-competition-jersey",
-  "mouth-guard-elite",
-  "jt-team-jersey",
+  "juego-todo-sleeveless-hoodie",
+  "juego-todo-premium-shirt",
 ] as const;
 
 export const shopCollections = [
   {
     id: "competitor",
     name: "Competitor Collection",
-    description: "Helmet, gloves, and wraps built for sanctioned JTGC competition.",
+    description: "Helmet, fight shorts, and league apparel built for JTGC competition.",
     href: "#bundles",
     imageKey: "gear" as ProductImageKey,
-    items: ["JT Competition Helmet", "JT Competition Gloves", "Competition Hand Wraps"],
+    items: ["JT Competition Helmet", "Juego Todo Fight Shorts", "Juego Todo Shirt"],
   },
   {
     id: "champion",
     name: "Champion Collection",
-    description: "Walkout jersey, fight shorts, and official league equipment.",
+    description: "Walkout hoodies, premium shirts, and official league equipment.",
     href: "/shop?category=apparel",
     imageKey: "jersey" as ProductImageKey,
-    items: ["JT Competition Jersey", "JT Fight Shorts", "JT Team Jersey"],
+    items: ["Juego Todo Sleeveless Hoodie", "Juego Todo Premium Shirt", "Juego Todo Trucker Cap"],
   },
 ] as const;
 
@@ -125,59 +120,47 @@ export const athletePicks = [
   {
     athlete: "Doug Marcaida",
     title: "Weapons Master",
-    productSlug: "jt-competition-gloves",
-    quote: "The grip profile is built for real weapon transitions.",
+    productSlug: "jt-competition-helmet",
+    quote: "The fit and visibility are built for real weapon transitions.",
   },
   {
     athlete: "Brandon Vera",
     title: "Championship Veteran",
-    productSlug: "foam-trainer-sticks",
-    quote: "My go-to training kit for camp intensity without compromise.",
+    productSlug: "juego-todo-fight-shorts",
+    quote: "My go-to walkout gear for camp intensity without compromise.",
   },
 ] as const;
 
 export const shopBundles = [
   {
-    id: "beginner-kit",
-    name: "Beginner Kit",
-    slugs: ["solo-baston-training-stick", "training-knife-trainer", "competition-hand-wraps"],
-    price: 2999,
-    savings: 520,
+    id: "fan-kit",
+    name: "Fan Kit",
+    slugs: ["juego-todo-shirt", "juego-todo-trucker-cap", "juego-todo-id-lanyard"],
+    price: 1299,
+    savings: 98,
   },
   {
     id: "competitor-kit",
     name: "Competitor Kit",
-    slugs: ["jt-competition-gloves", "jt-competition-helmet", "jt-competition-jersey"],
-    price: 8999,
-    savings: 1400,
+    slugs: ["jt-competition-helmet", "juego-todo-fight-shorts", "juego-todo-sleeveless-hoodie"],
+    price: 5749,
+    savings: 399,
   },
   {
-    id: "champion-bundle",
-    name: "Champion Bundle",
-    slugs: ["jt-competition-gloves", "jt-competition-helmet", "jt-competition-jersey", "championship-replica-belt"],
-    price: 15999,
-    savings: 3200,
+    id: "walkout-bundle",
+    name: "Walkout Bundle",
+    slugs: ["juego-todo-sleeveless-hoodie", "juego-todo-fight-shorts", "juego-todo-premium-shirt"],
+    price: 3299,
+    savings: 198,
   },
 ] as const;
 
 export const shopCategoryTiles = [
   {
-    label: "Official Gear",
-    href: "/shop?category=official-gear",
-    imageKey: "sticks" as ProductImageKey,
-    description: "League sticks, bags, and sanctioned competition tools.",
-  },
-  {
-    label: "Protective Equipment",
-    href: "/shop?category=protective-equipment",
-    imageKey: "protective" as ProductImageKey,
-    description: "Wraps, guards, and safety essentials.",
-  },
-  {
-    label: "Training Equipment",
-    href: "/shop?category=training-equipment",
-    imageKey: "training" as ProductImageKey,
-    description: "Sticks, trainers, and gym-ready drill tools.",
+    label: "Competition Equipment",
+    href: "/shop?category=competition-equipment",
+    imageKey: "helmet" as ProductImageKey,
+    description: "Helmets and sanctioned competition gear.",
   },
   {
     label: "Apparel",
@@ -185,25 +168,13 @@ export const shopCategoryTiles = [
     imageKey: "apparel" as ProductImageKey,
     description: "Walkout gear, hoodies, and league apparel.",
   },
-  {
-    label: "Digital Courses",
-    href: "/shop?category=digital-products",
-    imageKey: "digital" as ProductImageKey,
-    description: "Courses, rulebooks, and training libraries.",
-  },
-  {
-    label: "Championship Collection",
-    href: "/shop?category=championship-collection",
-    imageKey: "belt" as ProductImageKey,
-    description: "Belts, replicas, and premium collectibles.",
-  },
 ] as const;
 
 export const productAthleteUsers: Record<string, string[]> = {
-  "jt-competition-gloves": ["Juan Reyes", "Mark Cruz", "Daniel Santos"],
   "jt-competition-helmet": ["Ana Bagaybay Santos", "Ramon Dumog Cruz"],
-  "jt-competition-jersey": ["Miguel Lakan Reyes", "Carlo Diaz"],
-  "official-arnis-stick-pair": ["Juan Reyes", "Noah Park"],
+  "juego-todo-shirt": ["Miguel Lakan Reyes", "Carlo Diaz"],
+  "juego-todo-fight-shorts": ["Juan Reyes", "Mark Cruz"],
+  "juego-todo-sleeveless-hoodie": ["Daniel Santos", "Noah Park"],
 };
 
 export function getProductImageKey(product: ShopProduct): ProductImageKey {

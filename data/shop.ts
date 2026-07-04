@@ -732,7 +732,9 @@ const legacyShopProducts: ShopProduct[] = [
   },
 ];
 
-export const shopProducts: ShopProduct[] = [...legacyShopProducts, ...merchandiseProducts];
+export const shopProducts: ShopProduct[] = [...legacyShopProducts, ...merchandiseProducts].filter(
+  (product) => Boolean(product.imageSrc),
+);
 
 export function getShopProduct(slug: string) {
   return shopProducts.find((product) => product.slug === slug);

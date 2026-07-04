@@ -85,7 +85,7 @@ export function HeroSection() {
                 Register Now
                 <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
               </MagneticButton>
-              <MagneticButton href={`/shop/${heroFeaturedEvent.ticketProductSlug}`} variant="secondary">
+              <MagneticButton href="/events/barrio-brawls" variant="secondary">
                 <Ticket className="mr-2" size={16} aria-hidden />
                 Buy Tickets
               </MagneticButton>

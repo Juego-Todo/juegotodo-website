@@ -1,59 +1,79 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, ShoppingBag, Trash2 } from "lucide-react";
+import { Bookmark, Heart, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { CartItemPhoto } from "@/components/commerce/CartItemPhoto";
+import { CartRecommendations, EmptyCartState } from "@/components/commerce/CartRecommendations";
+import { FreeShippingBar } from "@/components/commerce/FreeShippingBar";
 import { OrderSummary, QuantityControl } from "@/components/commerce/OrderSummary";
-import { ProductVisual } from "@/components/commerce/ProductVisual";
 import { PageNavigation } from "@/components/PageNavigation";
-import { getShopProduct, shopProducts } from "@/data/shop";
+import { getShopProduct } from "@/data/shop";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
-import { PROMO_CODES } from "@/lib/commerce/pricing";
-import { formatCurrency } from "@/lib/commerce/pricing";
-import { getProductImageKey } from "@/lib/commerce/product-visuals";
+import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
+import { PROMO_CODES, formatCurrency } from "@/lib/commerce/pricing";
+import { getStockLabel } from "@/lib/commerce/product-visuals";
+import { getVariantSummary } from "@/lib/commerce/product-options";
 import { shopCategoryLabels } from "@/lib/commerce/types";
 
 export function CartPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
-  const { cart, totals, updateQuantity, removeFromCart, setCheckoutDraft, checkoutDraft } = useCommerce();
+  const {
+    cart,
+    totals,
+    savedForLater,
+    updateQuantity,
+    removeFromCartWithUndo,
+    saveForLater,
+    moveSavedToCart,
+    removeSavedForLater,
+    toggleWishlist,
+    userData,
+    setCheckoutDraft,
+    checkoutDraft,
+  } = useCommerce();
   const [promoInput, setPromoInput] = useState(checkoutDraft.promoCode ?? "");
   const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoSuccess, setPromoSuccess] = useState(Boolean(checkoutDraft.promoCode));
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/login?next=/cart");
-    }
-  }, [loading, user, router]);
+  const cartSlugs = new Set(cart.map((item) => item.productSlug));
+
+  function handleCheckout() {
+    setCheckoutLoading(true);
+    window.setTimeout(() => {
+      if (!user) {
+        router.push(getCheckoutAuthHref("/checkout/shipping"));
+      } else {
+        router.push("/checkout/shipping");
+      }
+      setCheckoutLoading(false);
+    }, 350);
+  }
 
   function applyPromo() {
     const code = promoInput.trim().toUpperCase();
     const promo = PROMO_CODES[code];
-
     if (!promo) {
       setPromoError("Invalid promo code.");
+      setPromoSuccess(false);
       return;
     }
-
     if (promo.fighterOnly && user?.accountType !== "athlete") {
       setPromoError("This code is for athlete members only.");
+      setPromoSuccess(false);
       return;
     }
-
     setPromoError(null);
+    setPromoSuccess(true);
     setCheckoutDraft({ ...checkoutDraft, promoCode: code });
   }
 
-  const cartSlugs = new Set(cart.map((item) => item.productSlug));
-  const upsellProducts = shopProducts
-    .filter((product) => !cartSlugs.has(product.slug))
-    .filter((product) => product.badge === "Best Seller" || product.category === "competition-equipment")
-    .slice(0, 2);
-
-  if (loading || !user) {
+  if (loading) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center px-4 pt-24">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">Loading cart...</p>
@@ -62,7 +82,7 @@ export function CartPage() {
   }
 
   return (
-    <main className="overflow-hidden px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
+    <main className="overflow-hidden px-4 pt-24 pb-28 sm:px-6 sm:pt-28 sm:pb-14 lg:px-8 lg:pt-32">
       <section className="relative mx-auto max-w-7xl py-10 sm:py-14">
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
         <div className="relative">
@@ -71,126 +91,184 @@ export function CartPage() {
             Your Cart
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
-            Premium fighter equipment armory. Review your gear, apply promo codes, and proceed to secure checkout.
+            Review your gear, apply rewards, and checkout securely — no page reloads.
           </p>
 
-          {cart.length === 0 ? (
-            <div className="glass-panel mt-10 rounded-[1.75rem] p-10 text-center">
-              <ShoppingBag className="mx-auto text-red-300" size={40} aria-hidden />
-              <p className="font-display mt-6 text-4xl uppercase text-white">Cart Empty</p>
-              <p className="mt-3 text-sm text-zinc-400">Browse official gear connected to your athlete profile.</p>
-              <Link
-                className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-red-600 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white"
-                href="/shop"
-              >
-                Browse Shop
-              </Link>
+          {cart.length > 0 ? (
+            <div className="mt-6">
+              <FreeShippingBar totals={totals} />
             </div>
-          ) : (
-            <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-              <div className="space-y-4">
-                <AnimatePresence mode="popLayout">
-                  {totals.items.map((item) => {
-                    const product = getShopProduct(item.productSlug);
-                    if (!product) {
-                      return null;
-                    }
+          ) : null}
 
-                    return (
-                      <motion.div
-                        animate={{ opacity: 1, y: 0 }}
-                        className="glass-panel rounded-[1.5rem] p-4 sm:p-5"
-                        exit={{ opacity: 0, x: -20 }}
-                        initial={{ opacity: 0, y: 12 }}
-                        key={item.productSlug}
-                        layout
-                      >
-                        <div className="flex gap-4 sm:gap-5">
-                          <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl sm:h-28 sm:w-28">
-                            <ProductVisual imageKey={getProductImageKey(product)} size="sm" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-red-300">
-                              {shopCategoryLabels[item.category]}
-                            </p>
+          {cart.length === 0 ? (
+            <EmptyCartState />
+          ) : (
+            <>
+              <div className="mt-10 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
+                <div className="space-y-4">
+                  <AnimatePresence mode="popLayout">
+                    {totals.items.map((item) => {
+                      const product = getShopProduct(item.productSlug);
+                      if (!product) return null;
+                      const stock = getStockLabel(product.stock);
+                      const cartEntry = cart.find((entry) => entry.productSlug === item.productSlug);
+                      const variantLabel = getVariantSummary(product, cartEntry?.variantSelections ?? {});
+                      const inWishlist = userData.wishlist.includes(item.productSlug);
+
+                      return (
+                        <motion.div
+                          animate={{ opacity: 1, y: 0 }}
+                          className="glass-panel rounded-[1.5rem] p-4 sm:p-6"
+                          exit={{ opacity: 0, x: -48, height: 0, marginBottom: 0 }}
+                          initial={{ opacity: 0, y: 12 }}
+                          key={item.productSlug}
+                          layout
+                          transition={{ duration: 0.28, ease: "easeOut" }}
+                        >
+                          <div className="flex flex-col gap-5 sm:flex-row">
                             <Link
-                              className="font-display mt-1 block text-2xl uppercase leading-none text-white hover:text-red-200 sm:text-3xl"
+                              className="mx-auto block shrink-0 sm:mx-0"
                               href={`/shop/${item.productSlug}`}
                             >
-                              {item.name}
+                              <CartItemPhoto className="h-36 w-36 sm:h-40 sm:w-40" product={product} sizes="160px" variantSelections={cartEntry?.variantSelections} />
                             </Link>
-                            <p className="mt-2 text-sm text-zinc-400">{formatCurrency(item.unitPrice)} each</p>
-                            <div className="mt-4 flex flex-wrap items-center gap-3">
-                              <QuantityControl
-                                onDecrease={() => updateQuantity(item.productSlug, item.quantity - 1)}
-                                onIncrease={() => updateQuantity(item.productSlug, item.quantity + 1)}
-                                quantity={item.quantity}
-                              />
-                              <button
-                                className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-[0.16em] text-zinc-400 transition hover:text-red-300"
-                                onClick={() => removeFromCart(item.productSlug)}
-                                type="button"
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-red-300">
+                                {shopCategoryLabels[item.category]}
+                              </p>
+                              <Link
+                                className="font-display mt-1 block text-2xl uppercase leading-none text-white hover:text-red-200 sm:text-3xl"
+                                href={`/shop/${item.productSlug}`}
                               >
-                                <Trash2 size={14} aria-hidden />
-                                Remove
-                              </button>
+                                {item.name}
+                              </Link>
+                              {variantLabel ? <p className="mt-2 text-sm text-zinc-500">{variantLabel}</p> : null}
+                              <p className="mt-2 text-sm text-zinc-400">{formatCurrency(item.unitPrice)} each</p>
+                              <p className={`mt-1 text-xs ${stock.urgent ? "text-amber-300" : "text-emerald-300/90"}`}>
+                                {product.stock <= 0 ? "Out of stock" : stock.urgent ? stock.label : `✓ ${stock.label}`}
+                              </p>
+                              <div className="mt-5 flex flex-wrap items-center gap-3">
+                                <QuantityControl
+                                  maxStock={product.stock}
+                                  onDecrease={() => updateQuantity(item.productSlug, item.quantity - 1, product.stock)}
+                                  onIncrease={() => updateQuantity(item.productSlug, item.quantity + 1, product.stock)}
+                                  quantity={item.quantity}
+                                />
+                                <button
+                                  aria-label="Remove item"
+                                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:border-red-500/40 hover:text-red-300"
+                                  onClick={() => removeFromCartWithUndo(item.productSlug)}
+                                  type="button"
+                                >
+                                  <Trash2 size={15} aria-hidden />
+                                </button>
+                                <button
+                                  aria-label="Save for later"
+                                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:text-white"
+                                  onClick={() => saveForLater(item.productSlug)}
+                                  type="button"
+                                >
+                                  <Bookmark size={15} aria-hidden />
+                                </button>
+                                <button
+                                  aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 transition ${
+                                    inWishlist ? "border-red-500/30 text-red-300" : "text-zinc-400 hover:text-white"
+                                  }`}
+                                  onClick={() => toggleWishlist(item.productSlug)}
+                                  type="button"
+                                >
+                                  <Heart fill={inWishlist ? "currentColor" : "none"} size={15} aria-hidden />
+                                </button>
+                              </div>
                             </div>
+                            <p className="font-display shrink-0 text-3xl text-white sm:text-right">{formatCurrency(item.lineTotal)}</p>
                           </div>
-                          <p className="font-display shrink-0 text-2xl text-white sm:text-3xl">
-                            {formatCurrency(item.lineTotal)}
-                          </p>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
 
-                {upsellProducts.length > 0 ? (
-                  <div className="glass-panel rounded-[1.5rem] p-5">
-                    <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-[#FF1010]">Complete Your Kit</p>
-                    <h2 className="font-display mt-2 text-2xl uppercase text-white">Recommended Add-Ons</h2>
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      {upsellProducts.map((product) => (
-                        <Link
-                          className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3 transition hover:border-[#FF1010]/30"
-                          href={`/shop/${product.slug}`}
-                          key={product.slug}
-                        >
-                          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg">
-                            <ProductVisual imageKey={getProductImageKey(product)} size="sm" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-semibold text-white">{product.name}</p>
-                            <p className="text-xs text-zinc-400">{formatCurrency(product.priceAmount)}</p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
+                  {savedForLater.length > 0 ? (
+                    <section className="glass-panel rounded-[1.5rem] p-5 sm:p-6">
+                      <h2 className="font-display text-2xl uppercase text-white">Saved For Later</h2>
+                      <div className="mt-4 space-y-3">
+                        {savedForLater.map((item) => {
+                          const product = getShopProduct(item.productSlug);
+                          if (!product) return null;
+                          return (
+                            <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/30 p-3" key={item.productSlug}>
+                              <div className="min-w-0">
+                                <p className="truncate text-sm font-semibold text-white">{product.name}</p>
+                                <p className="text-xs text-zinc-500">Qty {item.quantity}</p>
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  className="rounded-full border border-white/10 px-3 py-1.5 text-[0.58rem] font-black uppercase tracking-[0.1em] text-white"
+                                  onClick={() => moveSavedToCart(item.productSlug)}
+                                  type="button"
+                                >
+                                  Move To Cart
+                                </button>
+                                <button
+                                  className="text-[0.58rem] font-black uppercase tracking-[0.1em] text-zinc-500 hover:text-red-300"
+                                  onClick={() => removeSavedForLater(item.productSlug)}
+                                  type="button"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  ) : null}
+                </div>
+
+                <div className="space-y-4">
+                  <OrderSummary
+                    checkoutLabel={user ? "Checkout Securely" : "Create Account To Checkout"}
+                    checkoutLoading={checkoutLoading}
+                    onApplyPromo={applyPromo}
+                    onCheckout={handleCheckout}
+                    onPromoChange={setPromoInput}
+                    promoCode={promoInput}
+                    promoError={promoError}
+                    promoSuccess={promoSuccess}
+                    sticky
+                    totals={totals}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-4">
-                <OrderSummary
-                  onApplyPromo={applyPromo}
-                  onPromoChange={setPromoInput}
-                  promoCode={promoInput}
-                  promoError={promoError}
-                  totals={totals}
-                />
-                <button
-                  className="inline-flex w-full min-h-12 items-center justify-center rounded-full bg-red-600 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white transition hover:bg-red-500"
-                  onClick={() => router.push("/checkout/shipping")}
-                  type="button"
-                >
-                  Continue To Shipping
-                  <ArrowRight className="ml-2" size={18} aria-hidden />
-                </button>
+              <div className="mt-10 space-y-8">
+                <CartRecommendations excludeSlugs={cartSlugs} title="Complete The Look" />
+                <CartRecommendations excludeSlugs={cartSlugs} title="Customers Also Bought" />
+                <CartRecommendations excludeSlugs={cartSlugs} title="Recently Viewed" />
               </div>
-            </div>
+            </>
           )}
         </div>
       </section>
+
+      {cart.length > 0 ? (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#050505]/95 p-4 backdrop-blur-md lg:hidden">
+          <div className="mx-auto flex max-w-lg items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[0.58rem] font-black uppercase tracking-[0.14em] text-zinc-500">Total</p>
+              <p className="font-display text-2xl text-white">{formatCurrency(totals.total)}</p>
+            </div>
+            <button
+              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-[#FF1010] text-xs font-black uppercase tracking-[0.14em] text-white"
+              onClick={handleCheckout}
+              type="button"
+            >
+              Checkout
+            </button>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

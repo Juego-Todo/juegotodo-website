@@ -27,6 +27,7 @@ import {
 } from "@/data/site";
 import { rulebooks } from "@/data/rules";
 import { getLegalPage, isLegalPageSlug } from "@/data/legal-pages";
+import { CALENDAR_PATH } from "@/lib/navigation/calendar";
 
 export function InteriorPage({ slug }: { slug: PageSlug }) {
   const content = pageContent[slug];
@@ -92,7 +93,7 @@ function EventsSection() {
     <MotionSection className="mx-auto max-w-7xl space-y-6 pb-14 sm:pb-20">
       <Link
         className="glass-panel group block overflow-hidden rounded-[1.75rem] border-red-500/20 transition hover:-translate-y-1 hover:border-red-500/40"
-        href="/juego-todo-seminars"
+        href={CALENDAR_PATH}
       >
         <div className="grid gap-6 bg-[radial-gradient(circle_at_80%_10%,rgba(229,9,20,0.28),transparent_24rem),linear-gradient(135deg,#120305,#050506)] p-6 sm:grid-cols-[1.1fr_0.9fr] sm:items-center sm:p-8">
           <div>
@@ -112,7 +113,7 @@ function EventsSection() {
               Free & Paid Sessions
             </span>
             <span className="inline-flex items-center text-sm font-black uppercase tracking-[0.18em] text-white">
-              View Seminar Calendar
+              View Official Calendar
               <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={16} aria-hidden />
             </span>
           </div>

@@ -7,6 +7,8 @@ type ProfileRow = {
   username: string;
   account_type: string;
   role: string;
+  gender: string;
+  date_of_birth: string;
   gym: string;
   city: string;
   bio: string;
@@ -144,7 +146,12 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      is_username_available: {
+        Args: { check_username: string };
+        Returns: boolean;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

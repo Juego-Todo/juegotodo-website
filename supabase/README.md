@@ -14,8 +14,11 @@ Copy `.env.example` to `.env.local` and fill in:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
+
+`SUPABASE_SERVICE_ROLE_KEY` enables server-side username availability checks during registration without extra SQL setup.
 
 Add the same variables in **Vercel → Project Settings → Environment Variables**.
 
@@ -32,6 +35,11 @@ This creates:
 - `orders` with JSON line items and payment payloads
 - Row Level Security policies
 - Auto profile creation on signup
+
+For username availability during sign-up, either:
+
+- Add `SUPABASE_SERVICE_ROLE_KEY` to `.env.local` (recommended), or
+- Run `supabase/migrations/20260705000000_is_username_available.sql` in the SQL Editor
 
 ## 4. Auth redirect URLs
 

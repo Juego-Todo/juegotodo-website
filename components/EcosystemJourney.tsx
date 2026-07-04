@@ -12,9 +12,9 @@ const journeys = [
     icon: Users,
   },
   {
-    label: "Events",
-    href: "/events",
-    description: "Upcoming cards, results, broadcasts, and fight-week coverage.",
+    label: "Calendar",
+    href: "/calendar",
+    description: "Official JTGC events, competitions, seminars, and registration windows.",
     icon: Calendar,
   },
   {

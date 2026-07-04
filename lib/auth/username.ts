@@ -1,3 +1,5 @@
+import { getUsernameProfanityError } from "@/lib/auth/username-profanity";
+
 export function normalizeUsername(value: string) {
   return value.trim().replace(/^@+/, "").toLowerCase();
 }
@@ -5,15 +7,29 @@ export function normalizeUsername(value: string) {
 export function validateUsername(value: string) {
   const username = normalizeUsername(value);
 
-  if (username.length < 3 || username.length > 20) {
-    throw new Error("Username must be 3–20 characters.");
+  if (username.length < 6 || username.length > 20) {
+    throw new Error("Username must be 6–20 characters.");
   }
 
   if (!/^[a-z0-9_]+$/.test(username)) {
     throw new Error("Username can only use letters, numbers, and underscores.");
   }
 
+  const profanityError = getUsernameProfanityError(username);
+  if (profanityError) {
+    throw new Error(profanityError);
+  }
+
   return username;
+}
+
+export function getUsernameValidationError(value: string) {
+  try {
+    validateUsername(value);
+    return null;
+  } catch (error) {
+    return error instanceof Error ? error.message : "Invalid username.";
+  }
 }
 
 export function deriveUsernameSeed(email: string, fullName?: string) {

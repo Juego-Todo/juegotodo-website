@@ -11,6 +11,8 @@ import { MediaPartnerLogo } from "@/components/MediaPartnerLogo";
 import { MediaPartnerMarquee } from "@/components/MediaPartnerMarquee";
 import { mediaPartners } from "@/data/site";
 
+import { barrioBrawlsTicketSlug } from "@/data/shop-tickets";
+
 const heroFeaturedEvent = {
   title: "Barrio Brawls",
   series: "Juego Todo",
@@ -18,7 +20,7 @@ const heroFeaturedEvent = {
   timeLabel: "1:00 PM",
   venue: "TBA",
   target: "2026-08-29T13:00:00+08:00",
-  ticketProductSlug: "barrio-brawls-tickets",
+  ticketProductSlug: barrioBrawlsTicketSlug,
 };
 
 export function HeroSection() {
@@ -85,7 +87,7 @@ export function HeroSection() {
                 Register Now
                 <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
               </MagneticButton>
-              <MagneticButton href="/events/barrio-brawls" variant="secondary">
+              <MagneticButton href={`/shop/${heroFeaturedEvent.ticketProductSlug}`} variant="secondary">
                 <Ticket className="mr-2" size={16} aria-hidden />
                 Buy Tickets
               </MagneticButton>

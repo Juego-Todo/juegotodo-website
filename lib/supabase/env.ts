@@ -1,21 +1,20 @@
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+
 export function isSupabaseConfigured() {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+  return supabaseUrl.length > 0 && supabaseAnonKey.length > 0;
 }
 
 export function getSupabaseUrl() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!url) {
+  if (!supabaseUrl) {
     throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL.");
   }
-  return url;
+  return supabaseUrl;
 }
 
 export function getSupabaseAnonKey() {
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!key) {
+  if (!supabaseAnonKey) {
     throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY.");
   }
-  return key;
+  return supabaseAnonKey;
 }

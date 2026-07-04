@@ -1,18 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Check, Plus, Star, Truck } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { CompactProductCard } from "@/components/commerce/CompactProductCard";
 import { ProductActions } from "@/components/commerce/ProductActions";
 import { ProductDisplayImage } from "@/components/commerce/ProductDisplayImage";
 import { ProductVariantSelector } from "@/components/commerce/ProductVariantSelector";
-import { ProductVisual } from "@/components/commerce/ProductVisual";
 import { StickyPurchaseBar } from "@/components/commerce/StickyPurchaseBar";
 import type { ShopProduct } from "@/data/shop";
 import { getShopProduct, shopProducts } from "@/data/shop";
-import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import {
   getDefaultVariantSelections,
@@ -23,7 +20,6 @@ import {
   bundleSlugs,
   getAthletesUsingProduct,
   getProductBadges,
-  getProductImageKey,
   getProductRating,
   getProductSocialProof,
   getStockLabel,
@@ -85,12 +81,9 @@ function StarRating({ rating, reviewCount }: { rating: number; reviewCount: numb
 }
 
 export function ProductDetailClient({ product }: { product: ShopProduct }) {
-  const router = useRouter();
-  const { user } = useAuth();
-  const { addToCart } = useCommerce();
+  const { addToCart, trackProductView } = useCommerce();
   const [activeImage, setActiveImage] = useState(0);
   const [variantSelections, setVariantSelections] = useState(() => getDefaultVariantSelections(product));
-  const imageKey = getProductImageKey(product);
   const displayImage = getSelectedVariantImage(product, variantSelections);
   const displayPrice = useMemo(
     () => getSelectedVariantPrice(product, variantSelections),
@@ -100,6 +93,10 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
   const stock = getStockLabel(product.stock);
   const badges = getProductBadges(product);
   const athletesUsing = getAthletesUsingProduct(product.slug);
+
+  useEffect(() => {
+    trackProductView(product.slug);
+  }, [product.slug, trackProductView]);
 
   function handleVariantChange(groupId: string, optionId: string) {
     setVariantSelections((current) => ({ ...current, [groupId]: optionId }));
@@ -119,12 +116,8 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
     bundleItems.length >= 3 ? "Competitor Bundle" : bundleItems.length === 2 ? "Training Pair" : "Essential Add-On";
 
   function addBundle() {
-    if (!user) {
-      router.push(`/login?next=/shop/${product.slug}`);
-      return;
-    }
-    bundleItems.forEach((item, index) => {
-      addToCart(item.slug, 1, { openDrawer: index === bundleItems.length - 1 });
+    bundleItems.forEach((item) => {
+      addToCart(item.slug, 1);
     });
   }
 
@@ -156,13 +149,16 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                   onClick={() => setActiveImage(index)}
                   type="button"
                 >
-                  <ProductDisplayImage
-                    alt={`${product.name} ${angle}`}
-                    className="!min-h-[3.5rem] !rounded-md"
-                    imageSrc={displayImage}
-                    product={product}
-                    size="sm"
-                  />
+                  <div className="aspect-square w-full overflow-hidden rounded-md">
+                    <ProductDisplayImage
+                      alt={`${product.name} ${angle}`}
+                      className="rounded-none"
+                      imageSrc={displayImage}
+                      product={product}
+                      size="sm"
+                      variant="thumb"
+                    />
+                  </div>
                   <span className="mt-1.5 block">{angle}</span>
                 </button>
               ))}
@@ -242,10 +238,12 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
               <div className={`grid items-center gap-10 lg:grid-cols-2 lg:gap-16 ${index > 0 ? "pt-24" : ""}`}>
                 <div className={index % 2 === 1 ? "lg:order-2" : ""}>
                   <div className="overflow-hidden rounded-lg bg-white/[0.02]">
-                    <ProductVisual
-                      className="!min-h-[18rem] !rounded-lg sm:!min-h-[22rem]"
-                      imageKey={imageKey}
+                    <ProductDisplayImage
+                      alt={product.name}
+                      className="rounded-lg"
+                      product={product}
                       size="lg"
+                      stage="catalog"
                     />
                   </div>
                 </div>
@@ -304,7 +302,13 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                       <div className="flex items-center gap-3 sm:gap-4" key={item.slug}>
                         <Link className="group flex items-center gap-3" href={`/shop/${item.slug}`}>
                           <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-white/[0.02] sm:h-20 sm:w-20">
-                            <ProductVisual className="!min-h-full !rounded-lg" imageKey={getProductImageKey(item)} size="sm" />
+                            <ProductDisplayImage
+                              alt={item.name}
+                              className="rounded-lg"
+                              product={item}
+                              size="sm"
+                              variant="thumb"
+                            />
                           </div>
                           <div>
                             <p className="max-w-[8rem] text-sm font-medium text-white transition group-hover:text-[#FF1010] sm:max-w-none">

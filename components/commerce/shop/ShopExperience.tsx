@@ -8,7 +8,6 @@ import { useCallback, useEffect, useState } from "react";
 
 type ShopHeroSlide = {
   id: string;
-  eyebrow: string;
   title: string;
   description: string;
   imageSrc: string;
@@ -21,7 +20,6 @@ type ShopHeroSlide = {
 const shopHeroSlides: ShopHeroSlide[] = [
   {
     id: "armory",
-    eyebrow: "Juego Todo Combat Commerce",
     title: "The Official Juego Todo Armory",
     description: "Competition-certified equipment used by JTGC athletes nationwide.",
     imageSrc: "/shop-hero-banner.png",
@@ -32,7 +30,6 @@ const shopHeroSlides: ShopHeroSlide[] = [
   },
   {
     id: "helmet",
-    eyebrow: "Best Seller",
     title: "JT Competition Helmet",
     description: "Sanctioned head protection trusted in JTGC weaponized competition.",
     imageSrc: "/shop/products/juego-todo-red-helmet.png",
@@ -43,7 +40,6 @@ const shopHeroSlides: ShopHeroSlide[] = [
   },
   {
     id: "apparel",
-    eyebrow: "Official Apparel",
     title: "Juego Todo Fight Gear",
     description: "Walkout shirts, fight shorts, caps, and league apparel for athletes and fans.",
     imageSrc: "/shop/products/juego-todo-tshirt-jtc.png",
@@ -54,7 +50,6 @@ const shopHeroSlides: ShopHeroSlide[] = [
   },
   {
     id: "shorts",
-    eyebrow: "Performance Wear",
     title: "JT Fight Shorts",
     description: "Built for movement, durability, and the intensity of three-round combat.",
     imageSrc: "/shop/products/jt-short-design-b.png",
@@ -205,13 +200,7 @@ export function ShopHero() {
                 key={activeSlide.id}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className="flex items-center gap-3">
-                  <span className="h-px w-8 bg-[#FF1010]" aria-hidden />
-                  <p className="text-[0.65rem] font-medium uppercase tracking-[0.24em] text-[#FF1010]">
-                    {activeSlide.eyebrow}
-                  </p>
-                </div>
-                <h1 className="font-display mt-5 text-[clamp(2.35rem,6.5vw,4.75rem)] font-normal uppercase leading-[0.9] text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
+                <h1 className="font-display text-[clamp(2.35rem,6.5vw,4.75rem)] font-normal uppercase leading-[0.9] text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
                   {activeSlide.title}
                 </h1>
                 <p className="mt-5 max-w-lg text-base leading-8 text-zinc-300 sm:text-lg">{activeSlide.description}</p>
@@ -230,9 +219,6 @@ export function ShopHero() {
                     Browse All
                   </Link>
                 </div>
-                <p className="mt-8 text-[0.62rem] font-black uppercase tracking-[0.22em] text-zinc-600">
-                  {String(activeIndex + 1).padStart(2, "0")} / {String(slideCount).padStart(2, "0")}
-                </p>
               </motion.div>
             </AnimatePresence>
 
@@ -262,7 +248,7 @@ export function ShopHero() {
               style={{ width: `${progress * 100}%` }}
               aria-hidden
             />
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+            <div className="mx-auto flex max-w-7xl items-center px-4 py-3 sm:px-6 lg:px-8">
               <div className="flex items-center gap-2">
                 {shopHeroSlides.map((slide, index) => (
                   <button
@@ -279,9 +265,6 @@ export function ShopHero() {
                   />
                 ))}
               </div>
-              <p className="hidden text-[0.62rem] font-black uppercase tracking-[0.18em] text-zinc-500 sm:block">
-                {activeSlide.eyebrow}
-              </p>
             </div>
           </div>
         </div>

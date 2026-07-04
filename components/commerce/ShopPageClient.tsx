@@ -2,7 +2,6 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { BackButton } from "@/components/BackButton";
 import { ShopCatalog } from "@/components/commerce/ShopCatalog";
 import { ShopCollectionButtons } from "@/components/commerce/shop/ShopCollectionButtons";
 import { ShopHero } from "@/components/commerce/shop/ShopExperience";
@@ -39,21 +38,10 @@ function ShopCatalogWithParams() {
     }
   }
 
-  function handleCategoryChange(category: ShopCategory | "all") {
-    setActiveCategory(category);
-    if (category !== "all") {
-      setActiveCollection("all");
-    }
-  }
-
   return (
     <>
       <ShopCollectionButtons activeCollection={activeCollection} onSelect={handleCollectionSelect} />
-      <ShopCatalog
-        activeCategory={activeCategory}
-        activeCollection={activeCollection}
-        onCategoryChange={handleCategoryChange}
-      />
+      <ShopCatalog activeCategory={activeCategory} activeCollection={activeCollection} />
     </>
   );
 }
@@ -61,10 +49,6 @@ function ShopCatalogWithParams() {
 export function ShopPageClient() {
   return (
     <>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <BackButton className="mb-8" href="/" label="Back to Home" />
-      </div>
-
       <ShopHero />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

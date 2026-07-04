@@ -1,4 +1,5 @@
-import { deriveUsernameSeed, validateUsername } from "@/lib/auth/username";
+import { buildFullName, validateDateOfBirth } from "@/lib/auth/name";
+import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ProfileRow } from "@/lib/supabase/types";
 import { migrateAccountType, type ProfileUpdateInput, type RegisterInput, type UserProfile } from "@/lib/auth/types";
@@ -11,6 +12,8 @@ function mapProfile(row: ProfileRow): UserProfile {
     username: row.username?.trim() || deriveUsernameSeed(row.email, row.full_name),
     accountType: migrateAccountType(row.account_type),
     role: row.role === "admin" ? "admin" : "user",
+    gender: row.gender ?? "",
+    dateOfBirth: row.date_of_birth ?? "",
     gym: row.gym,
     city: row.city,
     bio: row.bio,
@@ -48,6 +51,8 @@ export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
         deriveUsernameSeed(user.email ?? "", user.user_metadata?.full_name ?? ""),
       accountType: "fan",
       role: user.email?.toLowerCase() === "admin@juegotodo.com" ? "admin" : "user",
+      gender: "",
+      dateOfBirth: "",
       gym: "",
       city: "",
       bio: "",
@@ -62,14 +67,17 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
   const supabase = createSupabaseBrowserClient();
   const email = input.email.trim().toLowerCase();
   const username = validateUsername(input.username);
+  const fullName = buildFullName(input);
+  const dateOfBirth = validateDateOfBirth(input.dateOfBirth);
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password: input.password,
     options: {
       data: {
-        full_name: input.fullName.trim(),
+        full_name: fullName,
         username,
+        gender: input.gender.trim(),
       },
       emailRedirectTo: `${window.location.origin}/auth/callback?next=/profile`,
     },
@@ -87,10 +95,14 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
     await supabase
       .from("profiles")
       .update({
+        full_name: fullName,
         username,
-        gym: input.gym?.trim() ?? "",
+        gender: input.gender.trim(),
+        date_of_birth: dateOfBirth,
         city: input.city?.trim() ?? "",
         bio: input.bio?.trim() ?? "",
+        phone: input.phone?.trim() ?? "",
+        country: input.country?.trim() ?? "Philippines",
       })
       .eq("id", data.user.id);
     const profile = await getSupabaseSessionUser();
@@ -102,11 +114,13 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
   return {
     id: data.user.id,
     email,
-    fullName: input.fullName.trim(),
+    fullName,
     username,
     accountType: input.accountType,
     role: email === "admin@juegotodo.com" ? "admin" : "user",
-    gym: input.gym?.trim() ?? "",
+    gender: input.gender.trim(),
+    dateOfBirth,
+    gym: "",
     city: input.city?.trim() ?? "",
     bio: input.bio?.trim() ?? "",
     createdAt: data.user.created_at,
@@ -186,6 +200,23 @@ export async function updateSupabasePassword(password: string) {
   if (error) {
     throw new Error(error.message);
   }
+}
+
+export async function checkUsernameAvailabilitySupabase(username: string): Promise<boolean> {
+  const normalized = normalizeUsername(username);
+  const response = await fetch(`/api/auth/check-username?username=${encodeURIComponent(normalized)}`);
+
+  const payload = (await response.json()) as {
+    available?: boolean;
+    message?: string;
+    error?: string;
+  };
+
+  if (!response.ok) {
+    throw new Error(payload.error ?? payload.message ?? "Unable to check username.");
+  }
+
+  return Boolean(payload.available);
 }
 
 export function subscribeSupabaseAuth(onChange: (user: UserProfile | null) => void) {

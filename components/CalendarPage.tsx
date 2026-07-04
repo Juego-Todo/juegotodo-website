@@ -2,8 +2,7 @@
 
 import { ArrowRight, CalendarDays, LayoutGrid, List, Radio, Settings2, Ticket, Trophy } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { MotionSection } from "@/components/MotionSection";
@@ -314,8 +313,7 @@ function CalendarEntryList({
 }
 
 export function CalendarPage() {
-  const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const [entries, setEntries] = useState<CalendarEntry[]>(() => getAllCalendarEntries(false));
   const [view, setView] = useState<CalendarViewMode>(() => {
     if (typeof window === "undefined") {
@@ -331,23 +329,9 @@ export function CalendarPage() {
     window.localStorage.setItem(CALENDAR_VIEW_KEY, nextView);
   }
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace(`/login?next=${encodeURIComponent("/calendar")}`);
-    }
-  }, [loading, user, router]);
-
   const { upcoming, past } = useMemo(() => splitCalendarEntries(entries), [entries]);
   const nextEntry = upcoming[0];
   const isAdmin = user ? isAdminProfile(user) : false;
-
-  if (loading || !user) {
-    return (
-      <main className="flex min-h-[60vh] items-center justify-center px-4 pt-24">
-        <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">Loading calendar...</p>
-      </main>
-    );
-  }
 
   return (
     <main className="overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pb-20 sm:pt-28 lg:px-8">
@@ -362,8 +346,8 @@ export function CalendarPage() {
                 Official Calendar
               </h1>
               <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300 sm:mt-7 sm:text-xl sm:leading-8">
-                Your member view of every sanctioned Juego Todo event and competition — upcoming cards,
-                registration windows, countdowns, and archived results in one official calendar.
+                Every sanctioned Juego Todo event and competition — upcoming cards, registration windows,
+                countdowns, and archived results in one official calendar.
               </p>
             </div>
             {isAdmin ? (

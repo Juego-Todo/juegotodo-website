@@ -26,6 +26,15 @@ import {
   saveUserCommerceData,
   updateOrderStatus,
 } from "@/lib/commerce/storage";
+import {
+  cartItemKey,
+  getCompareList,
+  getRecentlyViewed,
+  getSavedForLater,
+  saveSavedForLater,
+  toggleCompareSlug,
+  trackRecentlyViewed,
+} from "@/lib/commerce/cart-extras";
 import type {
   CartItem,
   CheckoutDraft,
@@ -51,11 +60,25 @@ type CommerceContextValue = {
   orders: Order[];
   cartDrawerOpen: boolean;
   lastAddedSlug: string | null;
+  cartAddedSignal: number;
+  lastAddedQuantity: number;
+  pendingRemoval: CartItem | null;
+  savedForLater: CartItem[];
+  compareList: string[];
+  recentlyViewed: string[];
   openCartDrawer: () => void;
   closeCartDrawer: () => void;
   addToCart: (productSlug: string, quantity?: number, options?: AddToCartOptions) => void;
   removeFromCart: (productSlug: string) => void;
-  updateQuantity: (productSlug: string, quantity: number) => void;
+  removeFromCartWithUndo: (productSlug: string) => void;
+  undoRemove: () => void;
+  dismissPendingRemoval: () => void;
+  saveForLater: (productSlug: string) => void;
+  moveSavedToCart: (productSlug: string) => void;
+  removeSavedForLater: (productSlug: string) => void;
+  toggleCompare: (productSlug: string) => void;
+  trackProductView: (productSlug: string) => void;
+  updateQuantity: (productSlug: string, quantity: number, maxStock?: number) => void;
   clearCart: () => void;
   setCheckoutDraft: (draft: CheckoutDraft) => void;
   toggleWishlist: (productSlug: string) => void;
@@ -81,8 +104,15 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [lastAddedSlug, setLastAddedSlug] = useState<string | null>(null);
+  const [cartAddedSignal, setCartAddedSignal] = useState(0);
+  const [lastAddedQuantity, setLastAddedQuantity] = useState(1);
+  const [pendingRemoval, setPendingRemoval] = useState<CartItem | null>(null);
+  const [savedForLater, setSavedForLater] = useState<CartItem[]>(() => getSavedForLater());
+  const [compareList, setCompareList] = useState<string[]>(() => getCompareList());
+  const [recentlyViewed, setRecentlyViewed] = useState<string[]>(() => getRecentlyViewed());
   const [clearedUserId, setClearedUserId] = useState<string | null | undefined>(undefined);
   const skipInitialCartSave = useRef(true);
+  const undoTimerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     skipInitialCartSave.current = false;
@@ -94,6 +124,14 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
     }
     saveCart(cart);
   }, [cart]);
+
+  useEffect(() => {
+    saveSavedForLater(savedForLater);
+  }, [savedForLater]);
+
+  useEffect(() => {
+    return () => window.clearTimeout(undoTimerRef.current);
+  }, []);
 
   if (!user) {
     if (clearedUserId !== null) {
@@ -169,24 +207,110 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       return [...current, { productSlug, quantity, variantSelections }];
     });
     setLastAddedSlug(productSlug);
-    if (options?.openDrawer !== false) {
+    setLastAddedQuantity(quantity);
+    setCartAddedSignal((signal) => signal + 1);
+    if (options?.openDrawer) {
       setCartDrawerOpen(true);
     }
   }, []);
 
-  const removeFromCart = useCallback((productSlug: string) => {
-    setCart((current) => current.filter((item) => item.productSlug !== productSlug));
+  const dismissPendingRemoval = useCallback(() => {
+    window.clearTimeout(undoTimerRef.current);
+    setPendingRemoval(null);
   }, []);
 
-  const updateQuantity = useCallback((productSlug: string, quantity: number) => {
-    if (quantity <= 0) {
-      setCart((current) => current.filter((item) => item.productSlug !== productSlug));
+  const undoRemove = useCallback(() => {
+    setPendingRemoval((item) => {
+      if (!item) {
+        return null;
+      }
+      window.clearTimeout(undoTimerRef.current);
+      setCart((current) => {
+        if (current.some((entry) => cartItemKey(entry) === cartItemKey(item))) {
+          return current;
+        }
+        return [...current, item];
+      });
+      return null;
+    });
+  }, []);
+
+  const removeFromCartWithUndo = useCallback((productSlug: string) => {
+    setCart((current) => {
+      const item = current.find((entry) => entry.productSlug === productSlug);
+      if (!item) {
+        return current;
+      }
+      window.clearTimeout(undoTimerRef.current);
+      setPendingRemoval(item);
+      undoTimerRef.current = window.setTimeout(() => setPendingRemoval(null), 5000);
+      return current.filter((entry) => entry.productSlug !== productSlug);
+    });
+  }, []);
+
+  const saveForLater = useCallback((productSlug: string) => {
+    setCart((current) => {
+      const item = current.find((entry) => entry.productSlug === productSlug);
+      if (!item) {
+        return current;
+      }
+      setSavedForLater((saved) => {
+        const key = cartItemKey(item);
+        return [...saved.filter((entry) => cartItemKey(entry) !== key), item];
+      });
+      dismissPendingRemoval();
+      return current.filter((entry) => entry.productSlug !== productSlug);
+    });
+  }, [dismissPendingRemoval]);
+
+  const moveSavedToCart = useCallback((productSlug: string) => {
+    setSavedForLater((saved) => {
+      const item = saved.find((entry) => entry.productSlug === productSlug);
+      if (!item) {
+        return saved;
+      }
+      setCart((current) => {
+        const key = cartItemKey(item);
+        const existing = current.find((entry) => cartItemKey(entry) === key);
+        if (existing) {
+          return current.map((entry) =>
+            cartItemKey(entry) === key ? { ...entry, quantity: entry.quantity + item.quantity } : entry,
+          );
+        }
+        return [...current, item];
+      });
+      return saved.filter((entry) => entry.productSlug !== productSlug);
+    });
+  }, []);
+
+  const removeSavedForLater = useCallback((productSlug: string) => {
+    setSavedForLater((saved) => saved.filter((entry) => entry.productSlug !== productSlug));
+  }, []);
+
+  const toggleCompare = useCallback((productSlug: string) => {
+    setCompareList(toggleCompareSlug(productSlug));
+  }, []);
+
+  const trackProductView = useCallback((productSlug: string) => {
+    setRecentlyViewed(trackRecentlyViewed(productSlug));
+  }, []);
+
+  const removeFromCart = useCallback((productSlug: string) => {
+    dismissPendingRemoval();
+    setCart((current) => current.filter((item) => item.productSlug !== productSlug));
+  }, [dismissPendingRemoval]);
+
+  const updateQuantity = useCallback((productSlug: string, quantity: number, maxStock?: number) => {
+    const capped =
+      maxStock !== undefined ? Math.min(Math.max(quantity, 1), maxStock) : Math.max(quantity, 1);
+    if (capped <= 0) {
+      removeFromCartWithUndo(productSlug);
       return;
     }
     setCart((current) =>
-      current.map((item) => (item.productSlug === productSlug ? { ...item, quantity } : item)),
+      current.map((item) => (item.productSlug === productSlug ? { ...item, quantity: capped } : item)),
     );
-  }, []);
+  }, [removeFromCartWithUndo]);
 
   const clearCart = useCallback(() => {
     setCart([]);
@@ -376,10 +500,24 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       orders,
       cartDrawerOpen,
       lastAddedSlug,
+      cartAddedSignal,
+      lastAddedQuantity,
+      pendingRemoval,
+      savedForLater,
+      compareList,
+      recentlyViewed,
       openCartDrawer,
       closeCartDrawer,
       addToCart,
       removeFromCart,
+      removeFromCartWithUndo,
+      undoRemove,
+      dismissPendingRemoval,
+      saveForLater,
+      moveSavedToCart,
+      removeSavedForLater,
+      toggleCompare,
+      trackProductView,
       updateQuantity,
       clearCart,
       setCheckoutDraft,
@@ -404,10 +542,24 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       orders,
       cartDrawerOpen,
       lastAddedSlug,
+      cartAddedSignal,
+      lastAddedQuantity,
+      pendingRemoval,
+      savedForLater,
+      compareList,
+      recentlyViewed,
       openCartDrawer,
       closeCartDrawer,
       addToCart,
       removeFromCart,
+      removeFromCartWithUndo,
+      undoRemove,
+      dismissPendingRemoval,
+      saveForLater,
+      moveSavedToCart,
+      removeSavedForLater,
+      toggleCompare,
+      trackProductView,
       updateQuantity,
       clearCart,
       setCheckoutDraft,

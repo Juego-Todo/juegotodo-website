@@ -1,17 +1,19 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Menu, ShoppingBag, X } from "lucide-react";
+import { ChevronDown, Menu, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
+import { NavbarCartLink } from "@/components/commerce/NavbarCartLink";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import { navItems } from "@/data/site";
 
 const aboutUsPaths = [
   "/about-juego-todo",
+  "/calendar",
   "/events",
   "/juego-todo-seminars",
   "/rules-regulations",
@@ -53,7 +55,7 @@ function isNavActive(pathname: string, href: string, label: string) {
 export function Navbar() {
   const pathname = usePathname();
   const { user, loading } = useAuth();
-  const { cartCount } = useCommerce();
+  const { cartCount, openCartDrawer } = useCommerce();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -155,18 +157,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link
-            aria-label={`Cart${cartCount > 0 ? `, ${cartCount} items` : ""}`}
-            className="relative rounded-full border border-white/10 bg-white/5 p-2.5 text-white transition hover:border-red-500/40"
-            href="/cart"
-          >
-            <ShoppingBag size={18} aria-hidden />
-            {cartCount > 0 ? (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FF1010] px-1 text-[0.6rem] font-black text-white">
-                {cartCount}
-              </span>
-            ) : null}
-          </Link>
+          <NavbarCartLink />
 
           <div className="hidden items-center gap-2 lg:flex">
             <Link
@@ -278,12 +269,17 @@ export function Navbar() {
                     Register
                   </Link>
                 ) : (
-                  <Link
-                    className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/[0.08] px-4 text-sm font-black uppercase tracking-[0.16em] text-white"
-                    href="/cart"
+                  <button
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/[0.08] px-4 text-sm font-black uppercase tracking-[0.16em] text-white"
+                    onClick={() => {
+                      setIsOpen(false);
+                      openCartDrawer();
+                    }}
+                    type="button"
                   >
+                    <ShoppingCart aria-hidden size={16} />
                     Cart {cartCount > 0 ? `(${cartCount})` : ""}
-                  </Link>
+                  </button>
                 )}
               </div>
             </div>

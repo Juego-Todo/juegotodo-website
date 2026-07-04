@@ -4,17 +4,21 @@ import { Radio, Ticket, Trophy } from "lucide-react";
 import Link from "next/link";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
+import { SeeCalendarButton } from "@/components/SeeCalendarButton";
 import { events } from "@/data/site";
 
 export function EventCardsSection() {
   return (
     <section className="py-16 sm:py-20" id="events">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl">
-          <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Fight Calendar</p>
-          <h2 className="font-display mt-3 text-5xl uppercase leading-none text-white sm:text-7xl">
-            Championship Events
-          </h2>
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Fight Calendar</p>
+            <h2 className="font-display mt-3 text-5xl uppercase leading-none text-white sm:text-7xl">
+              Championship Events
+            </h2>
+          </div>
+          <SeeCalendarButton label="View Full Calendar" variant="hero" />
         </div>
 
         <div className="mt-10 grid gap-5 lg:grid-cols-3">

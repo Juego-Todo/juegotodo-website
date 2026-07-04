@@ -729,7 +729,7 @@ export function UserProfilePage() {
           <CommerceSection title="Saved Events">
             <div className="grid gap-4 sm:grid-cols-2">
               {savedEvents.length === 0 ? (
-                <EmptyPanel href="/events" linkLabel="View Events" message="No saved events yet." />
+                <EmptyPanel href="/calendar" linkLabel="View Calendar" message="No saved events yet." />
               ) : (
                 savedEvents.map((event) => (
                   <div className="glass-panel rounded-[1.5rem] p-5" key={event.slug}>

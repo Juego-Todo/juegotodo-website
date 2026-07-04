@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useRef, useSyncExternalStore } from "react";
 
 function getRemaining(target: string) {
   const difference = Math.max(new Date(target).getTime() - Date.now(), 0);
@@ -24,10 +24,28 @@ function subscribeToCountdown(onStoreChange: () => void) {
   return () => window.clearInterval(timer);
 }
 
+function remainingEqual(
+  a: ReturnType<typeof getRemaining>,
+  b: ReturnType<typeof getRemaining>,
+) {
+  return a.days === b.days && a.hours === b.hours && a.minutes === b.minutes && a.seconds === b.seconds;
+}
+
 export function CountdownTimer({ target }: { target: string }) {
+  const snapshotRef = useRef(emptyRemaining);
+
+  const getSnapshot = useCallback(() => {
+    const next = getRemaining(target);
+    if (remainingEqual(snapshotRef.current, next)) {
+      return snapshotRef.current;
+    }
+    snapshotRef.current = next;
+    return next;
+  }, [target]);
+
   const remaining = useSyncExternalStore(
     subscribeToCountdown,
-    () => getRemaining(target),
+    getSnapshot,
     () => emptyRemaining,
   );
   const entries = useMemo<[string, number | null][]>(

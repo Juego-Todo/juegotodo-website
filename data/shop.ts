@@ -1,5 +1,15 @@
 import type { ShopCategory } from "@/lib/commerce/types";
 import { merchandiseProducts } from "@/data/shop-merchandise";
+import { eventTicketProducts } from "@/data/shop-tickets";
+
+export type ShopEventTicket = {
+  series: string;
+  title: string;
+  dateLabel: string;
+  timeLabel: string;
+  venue: string;
+  target: string;
+};
 
 export type ProductVariantOption = {
   id: string;
@@ -33,6 +43,7 @@ export type ShopProduct = {
   rating?: number;
   reviewCount?: number;
   imageSrc?: string;
+  eventTicket?: ShopEventTicket;
   variantGroups?: ProductVariantGroup[];
 };
 
@@ -617,35 +628,6 @@ const legacyShopProducts: ShopProduct[] = [
     searchTags: ["heavy bag", "gym", "training"],
   },
   {
-    slug: "barrio-brawls-tickets",
-    name: "Barrio Brawls — Event Tickets",
-    category: "digital-products",
-    price: "₱1,500",
-    priceAmount: 1500,
-    description: "General admission tickets for Juego Todo Barrio Brawls, August 29, 2026.",
-    summary:
-      "Secure your seat for Juego Todo Barrio Brawls — the flagship hybrid FMA card featuring professional weaponized competition and championship stakes.",
-    features: [
-      "General admission seating",
-      "August 29, 2026 — 1:00 PM",
-      "Digital QR ticket delivery",
-      "Venue access details sent before event",
-      "Official JTGC event experience",
-    ],
-    specs: [
-      { label: "Event", value: "Barrio Brawls" },
-      { label: "Date", value: "August 29, 2026" },
-      { label: "Time", value: "1:00 PM" },
-      { label: "Delivery", value: "Digital QR ticket" },
-    ],
-    competitionUse: "Spectator admission for JTGC sanctioned event.",
-    tone: "from-red-900 via-zinc-950 to-black",
-    badge: "On Sale",
-    digital: true,
-    stock: 500,
-    searchTags: ["tickets", "barrio brawls", "event", "admission"],
-  },
-  {
     slug: "rules-handbook-digital",
     name: "JT Rules Handbook — Digital",
     category: "digital-products",
@@ -732,9 +714,11 @@ const legacyShopProducts: ShopProduct[] = [
   },
 ];
 
-export const shopProducts: ShopProduct[] = [...legacyShopProducts, ...merchandiseProducts].filter(
-  (product) => Boolean(product.imageSrc),
-);
+export const shopProducts: ShopProduct[] = [
+  ...legacyShopProducts,
+  ...merchandiseProducts,
+  ...eventTicketProducts,
+].filter((product) => Boolean(product.imageSrc));
 
 export function getShopProduct(slug: string) {
   return shopProducts.find((product) => product.slug === slug);

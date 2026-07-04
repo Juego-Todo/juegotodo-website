@@ -9,6 +9,8 @@ export type StoredUser = {
   username: string;
   accountType: AccountType;
   role: UserRole;
+  gender: string;
+  dateOfBirth: string;
   gym: string;
   city: string;
   bio: string;
@@ -18,7 +20,11 @@ export type StoredUser = {
 export type UserProfile = Omit<StoredUser, "password">;
 
 export type RegisterInput = {
-  fullName: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  gender: string;
+  dateOfBirth: string;
   username: string;
   email: string;
   password: string;
@@ -26,7 +32,6 @@ export type RegisterInput = {
   phone?: string;
   country?: string;
   city?: string;
-  gym?: string;
   bio?: string;
 };
 

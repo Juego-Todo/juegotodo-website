@@ -1,3 +1,4 @@
+import { buildFullName, validateDateOfBirth } from "@/lib/auth/name";
 import type {
   AdminUserUpdateInput,
   ProfileUpdateInput,
@@ -7,11 +8,12 @@ import type {
   UserRole,
 } from "@/lib/auth/types";
 import { migrateAccountType } from "@/lib/auth/types";
-import { deriveUsernameSeed, validateUsername } from "@/lib/auth/username";
+import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
 import { legacyTestLoginEmails, testLoginAccount, testLoginStoredUser } from "@/data/test-account";
 import { initializeNewUserCommerceData } from "@/lib/commerce/storage";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import {
+  checkUsernameAvailabilitySupabase,
   getSupabaseSessionUser,
   loginSupabaseUser,
   logoutSupabaseUser,
@@ -65,6 +67,8 @@ function readUsers(): StoredUser[] {
           username: user.username?.trim() || deriveUsernameSeed(user.email, user.fullName),
           accountType: migrateAccountType(user.accountType),
           role: user.role ?? resolveRole(user.email),
+          gender: user.gender ?? "",
+          dateOfBirth: user.dateOfBirth ?? "",
         }))
       : [];
 
@@ -125,15 +129,31 @@ function registerStoredUserLocal(input: RegisterInput): UserProfile {
     throw new Error("Password must be at least 8 characters.");
   }
 
+  if (!input.firstName.trim()) {
+    throw new Error("First name is required.");
+  }
+
+  if (!input.lastName.trim()) {
+    throw new Error("Last name is required.");
+  }
+
+  if (!input.gender.trim()) {
+    throw new Error("Please select a gender.");
+  }
+
+  const dateOfBirth = validateDateOfBirth(input.dateOfBirth);
+
   const user: StoredUser = {
     id: crypto.randomUUID(),
     email,
     password: input.password,
-    fullName: input.fullName.trim(),
+    fullName: buildFullName(input),
     username,
     accountType: input.accountType,
     role: resolveRole(email),
-    gym: input.gym?.trim() ?? "",
+    gender: input.gender.trim(),
+    dateOfBirth,
+    gym: "",
     city: input.city?.trim() ?? "",
     bio: input.bio?.trim() ?? "",
     createdAt: new Date().toISOString(),
@@ -362,6 +382,48 @@ export async function updateStoredPassword(email: string, password: string) {
 
 export function usesSupabaseBackend() {
   return isSupabaseConfigured();
+}
+
+export function isUsernameAvailableLocal(username: string) {
+  const normalized = normalizeUsername(username);
+  return !readUsers().some((entry) => entry.username === normalized);
+}
+
+export async function checkUsernameAvailability(username: string) {
+  const validationError = (() => {
+    try {
+      validateUsername(username);
+      return null;
+    } catch (error) {
+      return error instanceof Error ? error.message : "Invalid username.";
+    }
+  })();
+
+  if (validationError) {
+    return {
+      available: false,
+      username: normalizeUsername(username),
+      message: validationError,
+    };
+  }
+
+  const normalized = validateUsername(username);
+
+  if (isSupabaseConfigured()) {
+    const available = await checkUsernameAvailabilitySupabase(normalized);
+    return {
+      available,
+      username: normalized,
+      message: available ? "Username is available." : "That username is already taken.",
+    };
+  }
+
+  const available = isUsernameAvailableLocal(normalized);
+  return {
+    available,
+    username: normalized,
+    message: available ? "Username is available." : "That username is already taken.",
+  };
 }
 
 export async function getStoredSessionUser(): Promise<UserProfile | null> {

@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
+import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
 
 const steps = [
   { label: "Cart", href: "/cart" },
-  { label: "Account", href: "/login?next=/checkout/shipping" },
+  { label: "Account", href: getCheckoutAuthHref("/checkout/shipping") },
   { label: "Verification", href: "/profile" },
   { label: "Shipping", href: "/checkout/shipping" },
   { label: "Payment", href: "/checkout/payment" },

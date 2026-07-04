@@ -1,10 +1,12 @@
 "use client";
 
-import { Heart, ShoppingBag, Zap } from "lucide-react";
+import { Heart, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { AddToCartButton } from "@/components/commerce/AddToCartButton";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import type { ShopProduct } from "@/data/shop";
+import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
 import { shopCategoryLabels } from "@/lib/commerce/types";
 
 type ProductActionsProps = {
@@ -19,29 +21,21 @@ export function ProductActions({ product, variantSelections }: ProductActionsPro
   const inWishlist = userData.wishlist.includes(product.slug);
   const athleteDiscount = user?.accountType === "athlete";
 
-  function requireAuth(nextPath: string, action: () => void) {
+  function handleBuyNow() {
+    addToCart(product.slug, 1, { variantSelections });
     if (!user) {
-      router.push(`/login?next=${encodeURIComponent(nextPath)}`);
+      router.push(getCheckoutAuthHref("/checkout/shipping"));
       return;
     }
-    action();
-  }
-
-  function handleAddToCart() {
-    requireAuth(`/shop/${product.slug}`, () => {
-      addToCart(product.slug, 1, { openDrawer: true, variantSelections });
-    });
-  }
-
-  function handleBuyNow() {
-    requireAuth("/checkout/shipping", () => {
-      addToCart(product.slug, 1, { openDrawer: false, variantSelections });
-      router.push("/checkout/shipping");
-    });
+    router.push("/checkout/shipping");
   }
 
   function handleWishlist() {
-    requireAuth(`/shop/${product.slug}`, () => toggleWishlist(product.slug));
+    if (!user) {
+      router.push(`/login?next=${encodeURIComponent(`/shop/${product.slug}`)}`);
+      return;
+    }
+    toggleWishlist(product.slug);
   }
 
   return (
@@ -51,14 +45,7 @@ export function ProductActions({ product, variantSelections }: ProductActionsPro
       ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button
-          className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-[#FF1010] px-6 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2828]"
-          onClick={handleAddToCart}
-          type="button"
-        >
-          <ShoppingBag className="mr-2" size={16} aria-hidden />
-          Add To Cart
-        </button>
+        <AddToCartButton fullWidth product={product} variantSelections={variantSelections} />
         <button
           className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-white/[0.06] px-6 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-white/10"
           onClick={handleBuyNow}

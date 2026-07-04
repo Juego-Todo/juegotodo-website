@@ -8,6 +8,7 @@ import { OrderSummary } from "@/components/commerce/OrderSummary";
 import { PageNavigation } from "@/components/PageNavigation";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
+import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
 import { paymentMethodLabels, type PaymentMethod } from "@/lib/commerce/types";
 
 const paymentOptions: { method: PaymentMethod; icon: React.ReactNode; description: string }[] = [
@@ -26,7 +27,7 @@ export function CheckoutPaymentPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/login?next=/checkout/payment");
+      router.replace(getCheckoutAuthHref("/checkout/payment"));
     }
   }, [loading, user, router]);
 

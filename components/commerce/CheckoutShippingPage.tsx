@@ -8,6 +8,7 @@ import { OrderSummary } from "@/components/commerce/OrderSummary";
 import { PageNavigation } from "@/components/PageNavigation";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
+import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
 
 export function CheckoutShippingPage() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export function CheckoutShippingPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/login?next=/checkout/shipping");
+      router.replace(getCheckoutAuthHref("/checkout/shipping"));
     }
   }, [loading, user, router]);
 

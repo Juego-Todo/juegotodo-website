@@ -16,6 +16,8 @@ export const testLoginStoredUser: StoredUser = {
   username: "testuser",
   accountType: "fan",
   role: "admin",
+  gender: "",
+  dateOfBirth: "",
   gym: "",
   city: "",
   bio: "",

@@ -62,7 +62,7 @@ export const navItems: NavItem[] = [
     href: "/about-juego-todo",
     children: [
       { label: "About Juego Todo", href: "/about-juego-todo" },
-      { label: "Events", href: "/events" },
+      { label: "Calendar", href: "/calendar" },
       { label: "Grand Council", href: "/grand-council" },
       { label: "Rules & Regulations", href: "/rules-regulations" },
       { label: "Partners", href: "/partners" },

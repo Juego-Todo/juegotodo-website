@@ -8,6 +8,7 @@ import { OrderSummary } from "@/components/commerce/OrderSummary";
 import { PageNavigation } from "@/components/PageNavigation";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
+import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import { paymentMethodLabels } from "@/lib/commerce/types";
 
@@ -24,7 +25,7 @@ export function CheckoutReviewPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/login?next=/checkout/review");
+      router.replace(getCheckoutAuthHref("/checkout/review"));
     }
   }, [loading, user, router]);
 

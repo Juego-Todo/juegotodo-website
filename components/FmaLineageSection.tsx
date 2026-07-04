@@ -2,6 +2,7 @@
 
 import { ArrowRight, Flame, Swords } from "lucide-react";
 import Link from "next/link";
+import { CALENDAR_PATH } from "@/lib/navigation/calendar";
 import { MotionSection } from "@/components/MotionSection";
 import { fmaLineageStyles } from "@/data/fma-lineage";
 
@@ -96,9 +97,9 @@ export function FmaLineageSection() {
           <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
             <Link
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-red-600 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-red-500"
-              href="/juego-todo-seminars"
+              href={CALENDAR_PATH}
             >
-              View Seminar Calendar
+              View Official Calendar
               <ArrowRight className="ml-2" size={16} aria-hidden />
             </Link>
             <Link

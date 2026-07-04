@@ -1,7 +1,9 @@
+import { EventTicketProductImage } from "@/components/commerce/EventTicketProductImage";
 import { ProductVisual } from "@/components/commerce/ProductVisual";
-import type { ShopProduct } from "@/data/shop";
-import { getProductImageKey } from "@/lib/commerce/product-visuals";
 import { ProductImage } from "@/components/commerce/ProductImage";
+import type { ShopProduct } from "@/data/shop";
+import { getProductFrameClassName, type ProductImageSize, type ProductImageVariant } from "@/lib/commerce/product-image-layout";
+import { getProductImageKey } from "@/lib/commerce/product-visuals";
 
 type ProductDisplayImageProps = {
   alt: string;
@@ -10,7 +12,9 @@ type ProductDisplayImageProps = {
   imageKey?: ReturnType<typeof getProductImageKey>;
   priority?: boolean;
   product?: ShopProduct;
-  size?: "sm" | "md" | "lg" | "hero";
+  size?: ProductImageSize;
+  stage?: "default" | "catalog" | "hero";
+  variant?: ProductImageVariant;
 };
 
 export function ProductDisplayImage({
@@ -21,24 +25,34 @@ export function ProductDisplayImage({
   priority = false,
   product,
   size = "md",
+  stage = "default",
+  variant = "card",
 }: ProductDisplayImageProps) {
   const resolvedImageSrc = imageSrc ?? product?.imageSrc;
   const resolvedImageKey = imageKey ?? (product ? getProductImageKey(product) : "gear");
+  const resolvedStage = stage === "default" && size === "hero" ? "hero" : stage === "default" ? "catalog" : stage;
+  const resolvedVariant = variant === "card" && size === "hero" ? "hero" : variant;
+  const frameClass = getProductFrameClassName(size, resolvedVariant);
+
+  if (product?.eventTicket) {
+    return <EventTicketProductImage className={className} product={product} size={size} />;
+  }
 
   if (resolvedImageSrc) {
     return (
       <ProductImage
         alt={alt}
-        className={`${size === "hero" ? "min-h-[28rem] sm:min-h-[34rem] lg:min-h-[40rem]" : size === "lg" ? "min-h-[16rem]" : size === "sm" ? "min-h-[8rem]" : "min-h-[12rem]"} ${className}`}
+        className={`${frameClass} ${className}`}
         priority={priority}
         src={resolvedImageSrc}
+        stage={resolvedStage}
       />
     );
   }
 
   return (
     <ProductVisual
-      className={className}
+      className={`${frameClass} ${className}`}
       imageKey={resolvedImageKey}
       photographic
       size={size}

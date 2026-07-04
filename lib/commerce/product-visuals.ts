@@ -182,14 +182,19 @@ export function getProductImageKey(product: ShopProduct): ProductImageKey {
 }
 
 export function getProductRating(product: ShopProduct) {
-  if (product.rating) {
-    return { rating: product.rating, reviewCount: product.reviewCount ?? 0 };
+  let hash = 0;
+  for (let index = 0; index < product.slug.length; index += 1) {
+    hash = (hash * 31 + product.slug.charCodeAt(index)) >>> 0;
   }
+  hash = (hash + product.priceAmount * 17 + product.stock * 3) >>> 0;
 
-  const seed = product.slug.length + product.priceAmount;
-  const rating = 4.6 + (seed % 4) * 0.1;
-  const reviewCount = 48 + (seed % 140);
-  return { rating: Math.min(5, Math.round(rating * 10) / 10), reviewCount };
+  const rating = 3.4 + (hash % 17) / 10;
+  const reviewCount = 8 + (hash % 312);
+
+  return {
+    rating: Math.min(5, Math.round(rating * 10) / 10),
+    reviewCount,
+  };
 }
 
 export function isBestSeller(product: ShopProduct) {
@@ -206,7 +211,7 @@ export function getProductSocialProof(product: ShopProduct) {
     return "Used in championship events";
   }
   if (product.badge === "New" || product.badge === "New Arrival") {
-    return "New arrival — ships tomorrow";
+    return "Popular with fighters";
   }
   if (product.category === "championship-collection") {
     return "Limited drop — collector demand";

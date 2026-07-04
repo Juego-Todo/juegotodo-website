@@ -6,14 +6,19 @@ export type ShopCollectionId =
   | "all"
   | "juego-todo-merch"
   | "event-tickets"
-  | "jt-official-gear"
-  | "championship"
-  | "digital-courses";
+  | "jt-official-gear";
 
 export type ShopCollection = {
   id: ShopCollectionId;
   label: string;
+  /** Large campaign headline shown on the collection card. */
+  displayTitle: string;
   description: string;
+  metadata: string;
+  /** Drop a JPG/PNG at this path under `public/` (recommended 1080×1920). */
+  imageSrc: string;
+  /** Keeps subject framing above the lower text block. */
+  imagePosition?: string;
 };
 
 const merchandiseSlugs = new Set(merchandiseProducts.map((product) => product.slug));
@@ -29,27 +34,29 @@ export const shopCollections: ShopCollection[] = [
   {
     id: "juego-todo-merch",
     label: "Juego Todo Merch",
-    description: "Shirts, shorts, caps, lanyards, and league apparel.",
+    displayTitle: "Merch",
+    description: "Official licensed apparel designed for Juego Todo athletes and supporters.",
+    metadata: "40+ Products",
+    imageSrc: "/shop/collections/juego-todo-merch.png",
+    imagePosition: "center 18%",
   },
   {
     id: "event-tickets",
     label: "Event Tickets",
-    description: "Admission and access for JTGC fight cards.",
+    displayTitle: "Event Tickets",
+    description: "Official tickets for championships, seminars and special events.",
+    metadata: "Upcoming Events",
+    imageSrc: "/shop/collections/event-tickets.png",
+    imagePosition: "center 35%",
   },
   {
     id: "jt-official-gear",
     label: "JT Official Gear",
-    description: "Sticks, gloves, helmets, wraps, and training tools.",
-  },
-  {
-    id: "championship",
-    label: "Championship Collection",
-    description: "Belts, signed jerseys, and premium collectibles.",
-  },
-  {
-    id: "digital-courses",
-    label: "Digital Courses",
-    description: "Rulebooks, training libraries, and seminar access.",
+    displayTitle: "Official Gear",
+    description: "Professional licensed training equipment and protective gear.",
+    metadata: "Official Equipment",
+    imageSrc: "/shop/collections/jt-official-gear.png",
+    imagePosition: "center 22%",
   },
 ];
 
@@ -72,18 +79,6 @@ export function matchesShopCollection(product: ShopProduct, collectionId: ShopCo
 
   if (collectionId === "jt-official-gear") {
     return officialGearCategories.includes(product.category);
-  }
-
-  if (collectionId === "championship") {
-    return product.category === "championship-collection";
-  }
-
-  if (collectionId === "digital-courses") {
-    return (
-      product.category === "digital-products" &&
-      !product.searchTags.some((tag) => tag.includes("ticket")) &&
-      !product.slug.includes("ticket")
-    );
   }
 
   return true;

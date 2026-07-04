@@ -7,6 +7,14 @@ export const TAX_RATE = 0.12;
 export const FREE_SHIPPING_THRESHOLD = 5000;
 export const BASE_SHIPPING = 150;
 export const SHIPPING_PER_ITEM = 50;
+/** Shown on product cards to highlight JT member value */
+export const JT_MEMBER_CARD_DISCOUNT_PERCENT = 7;
+
+export function getMemberDisplayPricing(priceAmount: number) {
+  const memberPrice = Math.round(priceAmount * (1 - JT_MEMBER_CARD_DISCOUNT_PERCENT / 100));
+  const savings = Math.max(0, priceAmount - memberPrice);
+  return { memberPrice, savings };
+}
 
 export const PROMO_CODES: Record<
   string,

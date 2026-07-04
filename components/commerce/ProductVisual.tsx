@@ -1,8 +1,9 @@
 import type { ProductImageKey } from "@/lib/commerce/product-visuals";
+import { getProductFrameClassName, type ProductImageSize } from "@/lib/commerce/product-image-layout";
 
 type ProductVisualProps = {
   imageKey: ProductImageKey;
-  size?: "sm" | "md" | "lg" | "hero";
+  size?: ProductImageSize;
   className?: string;
   championship?: boolean;
   photographic?: boolean;
@@ -15,12 +16,11 @@ export function ProductVisual({
   championship = false,
   photographic = false,
 }: ProductVisualProps) {
-  const height =
-    size === "hero" ? "min-h-[22rem] sm:min-h-[28rem]" : size === "lg" ? "min-h-[16rem]" : size === "sm" ? "min-h-[8rem]" : "min-h-[12rem]";
+  const frameClass = getProductFrameClassName(size);
 
   return (
     <div
-      className={`relative overflow-hidden rounded-lg ${height} ${
+      className={`relative overflow-hidden ${frameClass} ${
         championship
           ? "bg-gradient-to-br from-zinc-950 via-black to-amber-950/40"
           : photographic

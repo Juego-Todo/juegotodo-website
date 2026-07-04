@@ -29,7 +29,7 @@ export function LicenseApplicationReviewPage({ applicationId }: { applicationId:
   if (loading || !user || !isAdmin || application === undefined) {
     return (
       <AdminPortalShell
-        backHref="/admin/license-approvals"
+        backHref="/profile?tab=membership&view=approvals"
         backLabel="Back to Applications"
         loadingLabel="Loading application..."
         loginNext={`/admin/license-approvals/${applicationId}`}
@@ -45,7 +45,7 @@ export function LicenseApplicationReviewPage({ applicationId }: { applicationId:
 
   return (
     <AdminPortalShell
-      backHref="/admin/license-approvals"
+      backHref="/profile?tab=membership&view=approvals"
       backLabel="Back to Applications"
       loginNext={`/admin/license-approvals/${applicationId}`}
     >

@@ -59,6 +59,28 @@ export type ProfileRoleModule = {
   statistics: MemberStatistic[];
 };
 
+export const profileRolePreviewOptions: { kind: ProfileRoleKind; label: string }[] = [
+  { kind: "community", label: "Community Member" },
+  { kind: "fighter", label: "Fighter" },
+  { kind: "coach", label: "Coach" },
+  { kind: "grand_council", label: "Grand Council" },
+  { kind: "grandmaster", label: "Grand Master" },
+  { kind: "referee", label: "Referee" },
+  { kind: "judge", label: "Judge" },
+  { kind: "club_owner", label: "Club Owner" },
+  { kind: "adviser", label: "Adviser" },
+  { kind: "staff", label: "Staff" },
+  { kind: "admin", label: "Administrator" },
+];
+
+export function getProfileRolePreviewLabel(kind: ProfileRoleKind) {
+  return profileRolePreviewOptions.find((option) => option.kind === kind)?.label ?? kind;
+}
+
+export function isProfileRoleKind(value: string): value is ProfileRoleKind {
+  return profileRolePreviewOptions.some((option) => option.kind === value);
+}
+
 const rolePriority: { kind: ProfileRoleKind; tag: UserTypeTagId | "admin" }[] = [
   { kind: "admin", tag: "admin" },
   { kind: "grandmaster", tag: "grandmaster" },
@@ -105,6 +127,7 @@ export function buildProfileRoleModule(input: {
   ordersCount: number;
   pendingLicenseCount?: number;
   memberCountEstimate?: number;
+  overrideKind?: ProfileRoleKind;
 }): ProfileRoleModule {
   const {
     user,
@@ -117,9 +140,10 @@ export function buildProfileRoleModule(input: {
     ordersCount,
     pendingLicenseCount = 0,
     memberCountEstimate = 14292,
+    overrideKind,
   } = input;
 
-  const kind = resolvePrimaryRole(tagIds, isAdmin);
+  const kind = overrideKind ?? resolvePrimaryRole(tagIds, isAdmin);
   const answers = licenseAnswers(licenseApplication);
   const athlete = identity.athlete;
   const club = officialRecord.club !== "—" ? officialRecord.club : "Unaffiliated";
@@ -157,7 +181,6 @@ export function buildProfileRoleModule(input: {
         careerSnapshot: [
           { icon: "📊", label: "Platform Health", value: `${pendingLicenseCount || 18} Applications Pending` },
           { icon: "✅", label: "License Approval Rate", value: "92%" },
-          { icon: "📅", label: "Events This Week", value: "5" },
           { icon: "🪪", label: "Cards Waiting", value: `${Math.max(pendingLicenseCount - 6, 12)}` },
         ],
         statistics: [

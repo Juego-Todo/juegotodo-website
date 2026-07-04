@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { BackButton } from "@/components/BackButton";
 import { ShopCatalog } from "@/components/commerce/ShopCatalog";
 import { ShopCollectionButtons } from "@/components/commerce/shop/ShopCollectionButtons";
 import { ShopHero } from "@/components/commerce/shop/ShopExperience";
@@ -62,19 +62,7 @@ export function ShopPageClient() {
   return (
     <>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <nav aria-label="Breadcrumb" className="mb-8">
-          <ol className="flex items-center gap-2 text-[0.65rem] font-medium uppercase tracking-[0.16em] text-zinc-600">
-            <li>
-              <Link className="transition hover:text-zinc-300" href="/">
-                Home
-              </Link>
-            </li>
-            <li aria-hidden className="text-zinc-700">
-              /
-            </li>
-            <li className="text-zinc-400">Official Store</li>
-          </ol>
-        </nav>
+        <BackButton className="mb-8" href="/" label="Back to Home" />
       </div>
 
       <ShopHero />

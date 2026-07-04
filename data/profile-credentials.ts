@@ -46,6 +46,33 @@ export type AthleteCredentialProfile = {
   achievements: string[];
   bannerTone: string;
   winStreak?: number;
+  age?: number;
+  coach?: string;
+  biography?: string;
+  debut?: string;
+  portraitImage?: string;
+  actionBackground?: string;
+  upcomingFight?: {
+    event: string;
+    opponent: string;
+    opponentRecord: string;
+    opponentRank: number;
+    opponentHeight: string;
+    opponentReach: string;
+    date: string;
+    venue: string;
+    forceCampMode?: boolean;
+  };
+  weightCut?: {
+    currentKg: number;
+    targetKg: number;
+    progressPercent: number;
+  };
+  rankMovement?: {
+    current: number;
+    previous: number;
+    periodLabel: string;
+  };
 };
 
 export const demoAthleteProfiles: Record<string, AthleteCredentialProfile> = {
@@ -106,22 +133,38 @@ export const demoAthleteProfiles: Record<string, AthleteCredentialProfile> = {
       "2 Fight Win Streak",
     ],
     bannerTone: "from-red-950/90 via-black/80 to-zinc-950/90",
-    winStreak: 2,
+    winStreak: 5,
+    age: 28,
+    coach: "Master Rey Galang",
+    weightCut: { currentKg: 74, targetKg: 70, progressPercent: 82 },
+    rankMovement: { current: 4, previous: 7, periodLabel: "Last Month" },
+    actionBackground: "/juego-todo-event-background.png",
+    upcomingFight: {
+      event: "JT Ascension Manila",
+      opponent: "Carlos Soriano",
+      opponentRecord: "11-3",
+      opponentRank: 4,
+      opponentHeight: "174cm",
+      opponentReach: "176cm",
+      date: "2026-07-29",
+      venue: "Mall of Asia Arena",
+      forceCampMode: true,
+    },
   },
   default: {
-    rank: "#12",
+    rank: "#5",
     division: "Lightweight",
-    record: "8-2-0",
-    wins: 8,
+    record: "12-2-0",
+    wins: 12,
     losses: 2,
     draws: 0,
-    koWins: 4,
-    submissionWins: 1,
-    decisionWins: 3,
+    koWins: 8,
+    submissionWins: 2,
+    decisionWins: 2,
     winRate: 80,
     finishRate: 63,
-    team: "Bahad Zubu",
-    gym: "Bahad Zubu HQ",
+    team: "Lakas Katorse",
+    gym: "Lakas Katorse HQ",
     region: "Metro Manila",
     country: "Philippines",
     status: "Active",
@@ -135,10 +178,10 @@ export const demoAthleteProfiles: Record<string, AthleteCredentialProfile> = {
       fightStyle: "FMA / BJJ",
     },
     statistics: {
-      knockouts: 4,
-      submissions: 1,
-      decisions: 3,
-      avgFightTime: "12:04",
+      knockouts: 8,
+      submissions: 2,
+      decisions: 2,
+      avgFightTime: "7:42",
       weaponRoundWins: 6,
     },
     analytics: {
@@ -157,6 +200,23 @@ export const demoAthleteProfiles: Record<string, AthleteCredentialProfile> = {
     ],
     achievements: ["2025 Regional Finalist", "3 Fight Win Streak"],
     bannerTone: "from-red-950/85 via-black/75 to-zinc-950/90",
-    winStreak: 3,
+    winStreak: 5,
+    age: 28,
+    coach: "Coach Santos",
+    debut: "2023",
+    weightCut: { currentKg: 74, targetKg: 70, progressPercent: 82 },
+    rankMovement: { current: 5, previous: 7, periodLabel: "Last Month" },
+    actionBackground: "/juego-todo-event-background.png",
+    upcomingFight: {
+      event: "JT Ascension Manila",
+      opponent: "Carlos Soriano",
+      opponentRecord: "11-3",
+      opponentRank: 4,
+      opponentHeight: "174cm",
+      opponentReach: "176cm",
+      date: "2026-07-29",
+      venue: "Mall of Asia Arena",
+      forceCampMode: true,
+    },
   },
 };

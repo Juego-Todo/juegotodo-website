@@ -7,7 +7,11 @@ import { resolveAccountTypeLabel, resolveUserTypeTagIds, type UserTypeTagId } fr
 import type { UserProfile } from "@/lib/auth/types";
 import type { UserCommerceData } from "@/lib/commerce/types";
 import type { ProfileIdentity } from "@/lib/profile/identity";
-import { buildProfileRoleModule, type ProfileRoleModule } from "@/lib/profile/role-modules";
+import {
+  buildProfileRoleModule,
+  type ProfileRoleKind,
+  type ProfileRoleModule,
+} from "@/lib/profile/role-modules";
 
 export type MemberRecordStatus = "verified" | "pending" | "locked" | "none";
 export type ProgressStepState = "complete" | "current" | "waiting" | "locked";
@@ -331,6 +335,7 @@ export function buildMemberRecord(input: {
   isAdmin?: boolean;
   ordersCount?: number;
   pendingLicenseCount?: number;
+  previewRoleKind?: ProfileRoleKind | null;
 }): MemberRecord {
   const {
     user,
@@ -341,6 +346,7 @@ export function buildMemberRecord(input: {
     isAdmin = false,
     ordersCount = 0,
     pendingLicenseCount = 0,
+    previewRoleKind = null,
   } = input;
 
   const tagIds = resolveUserTypeTagIds(user, licenseApplication, adminAssignedTags);
@@ -415,6 +421,7 @@ export function buildMemberRecord(input: {
     isAdmin,
     ordersCount,
     pendingLicenseCount,
+    overrideKind: previewRoleKind ?? undefined,
   });
 
   return {

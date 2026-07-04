@@ -1,9 +1,8 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { BackButton } from "@/components/BackButton";
 import { useAuth } from "@/lib/auth/context";
 import { isAdminProfile } from "@/lib/commerce/storage";
 
@@ -44,13 +43,7 @@ export function AdminPortalShell({
       <section className="relative mx-auto max-w-[90rem] py-6 sm:py-8">
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
         <div className="relative">
-          <Link
-            className="inline-flex items-center gap-2 text-[0.7rem] font-black uppercase tracking-[0.18em] text-zinc-500 transition hover:text-[#FF1010]"
-            href={backHref}
-          >
-            <ChevronLeft size={14} aria-hidden />
-            {backLabel}
-          </Link>
+          <BackButton href={backHref} label={backLabel} />
           <div className="mt-4">{children}</div>
         </div>
       </section>

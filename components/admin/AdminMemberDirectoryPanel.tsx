@@ -35,7 +35,7 @@ function DetailField({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function AdminMemberDirectoryPanel() {
+export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boolean }) {
   const [members, setMembers] = useState<AdminMemberRecord[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState("");
@@ -101,11 +101,21 @@ export function AdminMemberDirectoryPanel() {
 
   return (
     <div className="space-y-6">
-      <AdminPortalHeader
-        description="Search members, review account standing, and manage official account type tags."
-        tag="Administration"
-        title="Member Directory"
-      />
+      {embedded ? (
+        <div>
+          <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-zinc-500">Registry</p>
+          <h3 className="font-display mt-2 text-3xl uppercase text-white sm:text-4xl">Registered Members</h3>
+          <p className="mt-2 text-sm text-zinc-400">
+            Full directory of users who have signed up. Search, review standing, and manage account tags.
+          </p>
+        </div>
+      ) : (
+        <AdminPortalHeader
+          description="Search members, review account standing, and manage official account type tags."
+          tag="Administration"
+          title="Member Directory"
+        />
+      )}
 
       <div className="glass-panel rounded-[1.75rem] p-4 sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

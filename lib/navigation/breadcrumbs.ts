@@ -182,6 +182,37 @@ export function resolveBackNavigation(pathname: string) {
     return { label: "Back to Home", href: "/" };
   }
 
+  if (segments[0] === "admin" && segments[1] === "license-approvals" && segments.length === 3) {
+    return { label: "Back to Applications", href: "/profile?tab=membership&view=approvals" };
+  }
+
+  if (segments[0] === "admin" && segments.length === 2 && segments[1] !== "license-approvals") {
+    return { label: "Back to Admin Console", href: "/admin" };
+  }
+
+  if (segments[0] === "admin" && segments.length === 1) {
+    return { label: "Back to Profile", href: "/profile" };
+  }
+
+  if (segments[0] === "checkout") {
+    if (segments[1] === "review") {
+      return { label: "Back to Payment", href: "/checkout/payment" };
+    }
+    if (segments[1] === "payment") {
+      return { label: "Back to Shipping", href: "/checkout/shipping" };
+    }
+    if (segments[1] === "shipping") {
+      return { label: "Back to Cart", href: "/cart" };
+    }
+    if (segments[1] === "confirmation") {
+      return { label: "Back to Orders", href: "/orders" };
+    }
+  }
+
+  if (segments[0] === "orders" && segments.length === 3) {
+    return { label: "Back to Orders", href: "/orders" };
+  }
+
   const parentSegment = segments[0];
   const parent = DETAIL_PARENTS[parentSegment];
 

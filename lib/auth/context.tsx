@@ -30,6 +30,7 @@ type AuthContextValue = {
   login: (email: string, password: string) => Promise<UserProfile>;
   logout: () => Promise<void>;
   updateProfile: (input: ProfileUpdateInput) => Promise<UserProfile>;
+  refreshUser: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<{ delivery: "email" | "demo" }>;
   updatePassword: (email: string, password: string) => Promise<void>;
 };
@@ -98,6 +99,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user],
   );
 
+  const refreshUser = useCallback(async () => {
+    const profile = await getStoredSessionUser();
+    setUser(profile);
+  }, []);
+
   const requestPasswordResetFn = useCallback(async (email: string) => {
     return requestPasswordReset(email);
   }, []);
@@ -115,10 +121,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       updateProfile,
+      refreshUser,
       requestPasswordReset: requestPasswordResetFn,
       updatePassword,
     }),
-    [user, loading, usesSupabase, register, login, logout, updateProfile, requestPasswordResetFn, updatePassword],
+    [user, loading, usesSupabase, register, login, logout, updateProfile, refreshUser, requestPasswordResetFn, updatePassword],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

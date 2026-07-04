@@ -45,7 +45,7 @@ export function AdminPortalSectionPage({ section }: { section: string }) {
   }
 
   return (
-    <AdminPortalShell loginNext={`/admin/${section}`}>
+    <AdminPortalShell backHref="/admin" backLabel="Back to Admin Console" loginNext={`/admin/${section}`}>
       <SectionContent sectionId={config.id} />
     </AdminPortalShell>
   );

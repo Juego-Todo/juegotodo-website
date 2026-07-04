@@ -1,5 +1,5 @@
-import { LicenseApprovalsPage } from "@/components/profile/LicenseApprovalsPage";
+import { redirect } from "next/navigation";
 
 export default function LicenseApprovalsRoute() {
-  return <LicenseApprovalsPage />;
+  redirect("/profile?tab=membership&view=approvals");
 }

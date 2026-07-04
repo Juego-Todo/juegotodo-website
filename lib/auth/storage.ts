@@ -1,6 +1,6 @@
 import type { ProfileUpdateInput, RegisterInput, StoredUser, UserProfile, UserRole } from "@/lib/auth/types";
 import { migrateAccountType } from "@/lib/auth/types";
-import { testLoginAccount, testLoginStoredUser } from "@/data/test-account";
+import { legacyTestLoginEmails, testLoginAccount, testLoginStoredUser } from "@/data/test-account";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import {
   getSupabaseSessionUser,
@@ -23,22 +23,22 @@ function resolveRole(email: string): UserRole {
 }
 
 function ensureLocalTestAccount(users: StoredUser[]) {
-  const hasTestAccount = users.some((entry) => entry.email === testLoginAccount.email);
-  if (hasTestAccount) {
-    return users.map((entry) =>
-      entry.email === testLoginAccount.email
-        ? {
-            ...entry,
-            password: testLoginAccount.password,
-            fullName: testLoginAccount.fullName,
-            accountType: migrateAccountType(entry.accountType),
-            role: entry.role ?? "user",
-          }
-        : entry,
-    );
+  const legacyEmails = new Set<string>(legacyTestLoginEmails);
+  const filteredUsers = users.filter((entry) => !legacyEmails.has(entry.email));
+  const existingIndex = filteredUsers.findIndex((entry) => entry.email === testLoginAccount.email);
+
+  if (existingIndex >= 0) {
+    filteredUsers[existingIndex] = {
+      ...filteredUsers[existingIndex],
+      password: testLoginAccount.password,
+      fullName: testLoginAccount.fullName,
+      accountType: migrateAccountType(filteredUsers[existingIndex].accountType),
+      role: filteredUsers[existingIndex].role ?? "user",
+    };
+    return filteredUsers;
   }
 
-  return [...users, testLoginStoredUser];
+  return [...filteredUsers, testLoginStoredUser];
 }
 
 function readUsers(): StoredUser[] {

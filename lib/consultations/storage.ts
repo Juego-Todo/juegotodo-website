@@ -4,6 +4,7 @@ import type { Order, PaymentMethod } from "@/lib/commerce/types";
 
 const BOOKINGS_KEY = "juego-todo.consultation.bookings";
 const ORDERS_KEY = "juego-todo.commerce.orders";
+const BOOKINGS_UPDATED_EVENT = "juego-todo-consultation-bookings-updated";
 
 export type ConsultationBooking = {
   id: string;

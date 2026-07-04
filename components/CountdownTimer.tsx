@@ -12,22 +12,14 @@ function getRemaining(target: string) {
   };
 }
 
-const placeholderEntries: [string, number | null][] = [
-  ["days", null],
-  ["hours", null],
-  ["minutes", null],
-  ["seconds", null],
-];
-
 export function CountdownTimer({ target }: { target: string }) {
-  const [remaining, setRemaining] = useState<ReturnType<typeof getRemaining> | null>(null);
+  const [remaining, setRemaining] = useState(() => getRemaining(target));
   const entries = useMemo<[string, number | null][]>(
-    () => (remaining ? Object.entries(remaining) : placeholderEntries),
+    () => Object.entries(remaining),
     [remaining],
   );
 
   useEffect(() => {
-    setRemaining(getRemaining(target));
     const timer = window.setInterval(() => setRemaining(getRemaining(target)), 1000);
     return () => window.clearInterval(timer);
   }, [target]);

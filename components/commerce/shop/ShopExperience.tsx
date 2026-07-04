@@ -155,13 +155,12 @@ export function ShopHero() {
       return;
     }
 
-    setProgress(0);
     const startedAt = Date.now();
 
     const progressTimer = window.setInterval(() => {
       const elapsed = Date.now() - startedAt;
       setProgress(Math.min(elapsed / AUTO_ADVANCE_MS, 1));
-    }, 50);
+    }, 100);
 
     const advanceTimer = window.setTimeout(goNext, AUTO_ADVANCE_MS);
 

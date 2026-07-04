@@ -1,10 +1,12 @@
 import type { StoredUser } from "@/lib/auth/types";
 
 export const testLoginAccount = {
-  email: "test@youremail.com",
+  email: "test@yourmail.com",
   password: "1234567890",
-  fullName: "Test",
+  fullName: "Test User",
 } as const;
+
+export const legacyTestLoginEmails = ["test@youremail.com"] as const;
 
 export const testLoginStoredUser: StoredUser = {
   id: "test-user-juego-todo",

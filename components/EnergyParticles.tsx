@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 type Particle = {
   id: number;
@@ -17,12 +17,6 @@ function seededUnit(seed: number) {
 }
 
 export function EnergyParticles({ count = 24 }: { count?: number }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const particles = useMemo<Particle[]>(
     () =>
       Array.from({ length: count }, (_, id) => ({
@@ -35,10 +29,6 @@ export function EnergyParticles({ count = 24 }: { count?: number }) {
       })),
     [count],
   );
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">

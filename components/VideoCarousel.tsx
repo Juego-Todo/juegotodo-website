@@ -69,7 +69,6 @@ export function VideoCarousel() {
                     fill
                     sizes="(max-width: 1024px) 16rem, 20vw"
                     src={getYouTubeThumbnail(video.youtubeId)}
-                    unoptimized
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(0,0,0,0.88))]" />
                   <div

@@ -52,7 +52,7 @@ export function Footer() {
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <section className="border-b border-white/[0.08] py-12 sm:py-16">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-7">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
             {footerColumns.map((column) => (
               <div key={column.title}>
                 <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white">{column.title}</h3>
@@ -94,12 +94,18 @@ export function Footer() {
 
         <div className="flex flex-col gap-4 border-t border-white/[0.08] py-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap gap-5 text-xs font-bold uppercase tracking-[0.16em] text-zinc-600">
-            <Link className="transition hover:text-white" href="/">Home</Link>
-            <Link className="transition hover:text-white" href="/login">Login</Link>
-            <Link className="transition hover:text-white" href="/login?mode=register">Register</Link>
-            <Link className="transition hover:text-white" href="/privacy">Privacy Policy</Link>
-            <Link className="transition hover:text-white" href="/terms">Terms</Link>
-            <Link className="transition hover:text-white" href="/latayanology">LATAYANOLOGY</Link>
+            <Link className="transition hover:text-white" href="/login">
+              Login
+            </Link>
+            <Link className="transition hover:text-white" href="/login?mode=register">
+              Register
+            </Link>
+            <Link className="transition hover:text-white" href="/privacy">
+              Privacy Policy
+            </Link>
+            <Link className="transition hover:text-white" href="/terms">
+              Terms
+            </Link>
           </div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-600">
             © {new Date().getFullYear()} Juego Todo Combat Sports Platform

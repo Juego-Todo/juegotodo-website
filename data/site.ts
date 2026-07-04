@@ -93,13 +93,23 @@ export const navItems: NavItem[] = [
 ];
 
 export const footerNavColumns = navItems
-  .filter((item) => !item.cta && item.label !== "Login" && item.label !== "Register")
+  .filter(
+    (item) =>
+      !item.cta &&
+      item.label !== "Login" &&
+      item.label !== "Register" &&
+      item.label !== "Home" &&
+      item.label !== "About Us" &&
+      item.label !== "Latayanology",
+  )
   .map((item) => ({
     title: item.label,
     links: item.children?.length
-      ? item.label === "Latayanology"
-        ? [{ label: "LATAYANOLOGY", href: item.href }, ...item.children]
-        : item.children.map((child) => ({ label: child.label, href: child.href }))
+      ? item.children.filter(
+          (child, index, arr) =>
+            child.href !== item.href &&
+            arr.findIndex((entry) => entry.href === child.href) === index,
+        )
       : [{ label: item.label, href: item.href }],
   }));
 

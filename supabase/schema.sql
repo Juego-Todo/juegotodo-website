@@ -7,6 +7,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   email text not null,
   full_name text not null default '',
+  username text not null default '',
   account_type text not null default 'fan',
   role text not null default 'user',
   gym text not null default '',
@@ -99,6 +100,7 @@ create table if not exists public.orders (
 create index if not exists orders_user_id_idx on public.orders (user_id);
 create index if not exists orders_created_at_idx on public.orders (created_at desc);
 create index if not exists notifications_user_id_idx on public.notifications (user_id);
+create unique index if not exists profiles_username_lower_idx on public.profiles (lower(username));
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -127,11 +129,15 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name, role)
+  insert into public.profiles (id, email, full_name, username, role)
   values (
     new.id,
     coalesce(new.email, ''),
     coalesce(new.raw_user_meta_data ->> 'full_name', ''),
+    coalesce(
+      nullif(lower(new.raw_user_meta_data ->> 'username'), ''),
+      split_part(coalesce(new.email, ''), '@', 1)
+    ),
     case
       when lower(coalesce(new.email, '')) = 'admin@juegotodo.com' then 'admin'
       else 'user'

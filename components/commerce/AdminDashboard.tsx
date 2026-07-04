@@ -8,7 +8,12 @@ import { useCommerce } from "@/lib/commerce/context";
 import { getAllOrders, isAdminProfile } from "@/lib/commerce/storage";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import { orderStatusLabels, paymentMethodLabels, paymentStatusLabels, type Order, type OrderStatus } from "@/lib/commerce/types";
+import type { LicenseApplication } from "@/data/license-applications";
+import { AdminAccountTagEditor } from "@/components/profile/AdminAccountTagEditor";
+import { fetchAllLicenseApplications } from "@/lib/licenses/storage";
+import { getAdminAssignedTags } from "@/lib/profile/account-tags";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type AdminTab = "orders" | "payments" | "products" | "customers";
 
@@ -27,6 +32,7 @@ export function AdminDashboard() {
   const { adminApprovePayment, adminUpdateOrderStatus } = useCommerce();
   const [tab, setTab] = useState<AdminTab>("orders");
   const [orders, setOrders] = useState<Order[]>([]);
+  const [licenses, setLicenses] = useState<LicenseApplication[]>([]);
   const [trackingDraft, setTrackingDraft] = useState<Record<string, string>>({});
 
   const isAdmin = user ? isAdminProfile(user) : false;
@@ -41,10 +47,14 @@ export function AdminDashboard() {
     void getAllOrders().then((nextOrders) => {
       setOrders(nextOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
     });
+
+    if (tab === "customers") {
+      void fetchAllLicenseApplications().then(setLicenses);
+    }
   }, [tab]);
 
   const customers = useMemo(() => {
-    const map = new Map<string, { email: string; name: string; orders: number; spent: number }>();
+    const map = new Map<string, { userId: string; email: string; name: string; orders: number; spent: number }>();
     orders.forEach((order) => {
       const existing = map.get(order.userId);
       if (existing) {
@@ -52,6 +62,7 @@ export function AdminDashboard() {
         existing.spent += order.total;
       } else {
         map.set(order.userId, {
+          userId: order.userId,
           email: order.userEmail,
           name: order.userName,
           orders: 1,
@@ -59,8 +70,23 @@ export function AdminDashboard() {
         });
       }
     });
+
+    licenses.forEach((application) => {
+      if (map.has(application.userId)) {
+        return;
+      }
+
+      map.set(application.userId, {
+        userId: application.userId,
+        email: application.userEmail,
+        name: application.fullName,
+        orders: 0,
+        spent: 0,
+      });
+    });
+
     return [...map.values()];
-  }, [orders]);
+  }, [orders, licenses]);
 
   function refreshOrders() {
     void getAllOrders().then((nextOrders) => {
@@ -81,7 +107,7 @@ export function AdminDashboard() {
       <section className="relative mx-auto max-w-7xl py-10 sm:py-14">
         <PageNavigation currentLabel="Admin Dashboard" />
         <h1 className="font-display mt-3 text-5xl uppercase text-white sm:text-6xl">Commerce Admin</h1>
-        <p className="mt-3 text-sm text-zinc-400">Manage orders, payments, products, customers, and inventory.</p>
+        <p className="mt-3 text-sm text-zinc-400">Manage orders, payments, products, customers, licenses, and inventory.</p>
 
         <div className="mt-8 flex flex-wrap gap-2">
           {(
@@ -103,6 +129,24 @@ export function AdminDashboard() {
               {label}
             </button>
           ))}
+          <Link
+            className="rounded-full border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-zinc-300 transition hover:border-red-500/40 hover:text-white"
+            href="/admin/members"
+          >
+            Member Directory →
+          </Link>
+          <Link
+            className="rounded-full border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-zinc-300 transition hover:border-red-500/40 hover:text-white"
+            href="/admin/store-orders"
+          >
+            Store Orders →
+          </Link>
+          <Link
+            className="rounded-full border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-zinc-300 transition hover:border-red-500/40 hover:text-white"
+            href="/admin/license-approvals"
+          >
+            License Approvals →
+          </Link>
         </div>
 
         {tab === "orders" || tab === "payments" ? (
@@ -207,15 +251,21 @@ export function AdminDashboard() {
               <div className="glass-panel rounded-[1.75rem] p-8 text-center text-zinc-400">No customers yet.</div>
             ) : (
               customers.map((customer) => (
-                <div className="glass-panel flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] p-4" key={customer.email}>
-                  <div>
-                    <p className="font-semibold text-white">{customer.name}</p>
-                    <p className="text-sm text-zinc-400">{customer.email}</p>
+                <div className="glass-panel rounded-[1.25rem] p-4" key={customer.userId}>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-white">{customer.name}</p>
+                      <p className="text-sm text-zinc-400">{customer.email}</p>
+                    </div>
+                    <div className="text-right text-sm text-zinc-400">
+                      <p>{customer.orders} orders</p>
+                      <p>{formatCurrency(customer.spent)} lifetime</p>
+                    </div>
                   </div>
-                  <div className="text-right text-sm text-zinc-400">
-                    <p>{customer.orders} orders</p>
-                    <p>{formatCurrency(customer.spent)} lifetime</p>
-                  </div>
+                  <AdminAccountTagEditor
+                    initialTags={getAdminAssignedTags(customer.userId)}
+                    userId={customer.userId}
+                  />
                 </div>
               ))
             )}

@@ -70,6 +70,17 @@ export function defaultUserCommerceData(): UserCommerceData {
   };
 }
 
+export function initializeNewUserCommerceData(
+  userId: string,
+  input: Partial<Pick<UserCommerceData, "phone" | "country">> = {},
+) {
+  saveUserCommerceDataLocal(userId, {
+    ...defaultUserCommerceData(),
+    phone: input.phone?.trim() ?? "",
+    country: input.country?.trim() || "Philippines",
+  });
+}
+
 export function getCart(): CartItem[] {
   return readJson<CartItem[]>(CART_KEY, []);
 }
@@ -97,6 +108,21 @@ function getUserCommerceDataLocal(userId: string): UserCommerceData {
 
 function saveUserCommerceDataLocal(userId: string, data: UserCommerceData) {
   writeJson(userDataKey(userId), data);
+}
+
+export function deleteUserCommerceDataLocal(userId: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+  window.localStorage.removeItem(userDataKey(userId));
+}
+
+export async function deleteUserCommerceData(userId: string) {
+  if (isSupabaseConfigured()) {
+    deleteUserCommerceDataLocal(userId);
+    return;
+  }
+  deleteUserCommerceDataLocal(userId);
 }
 
 export async function getUserCommerceData(userId: string): Promise<UserCommerceData> {

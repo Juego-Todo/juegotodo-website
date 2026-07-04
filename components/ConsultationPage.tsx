@@ -13,7 +13,7 @@ import {
   Video,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import {
   buildConsultationCalendar,
@@ -175,22 +175,13 @@ export function ConsultationBookingPage() {
   );
   const [selectedSlot, setSelectedSlot] = useState<ConsultationSlot | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("gcash");
-  const [phone, setPhone] = useState("");
+  const [phoneOverride, setPhoneOverride] = useState<string | null>(null);
+  const phone = phoneOverride ?? userData.phone ?? "";
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<ConsultationBooking | null>(null);
-  const [bookedSlotIds, setBookedSlotIds] = useState<Set<string>>(() => new Set());
-
-  useEffect(() => {
-    setBookedSlotIds(getBookedConsultationSlotIds());
-  }, []);
-
-  useEffect(() => {
-    if (userData.phone) {
-      setPhone(userData.phone);
-    }
-  }, [userData.phone]);
+  const [bookedSlotIds, setBookedSlotIds] = useState(() => getBookedConsultationSlotIds());
 
   const slots = useMemo(
     () => buildConsultationCalendar(new Date(), 28, bookedSlotIds),
@@ -537,7 +528,7 @@ export function ConsultationBookingPage() {
                 <input
                   aria-label="Contact phone"
                   className="rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 transition placeholder:text-zinc-500 focus:ring-4"
-                  onChange={(event) => setPhone(event.target.value)}
+                  onChange={(event) => setPhoneOverride(event.target.value)}
                   placeholder="Contact phone"
                   value={phone}
                 />

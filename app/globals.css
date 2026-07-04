@@ -359,6 +359,7 @@ a {
 
 .media-marquee-track {
   animation: media-marquee 28s linear infinite;
+  will-change: transform;
 }
 
 .sponsor-marquee-track {

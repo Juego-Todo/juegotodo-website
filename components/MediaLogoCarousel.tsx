@@ -1,8 +1,9 @@
 import { MediaPartnerLogo } from "@/components/MediaPartnerLogo";
 import { mediaPartners } from "@/data/site";
+import { buildSeamlessMarqueeLoop } from "@/lib/marquee";
 
 export function MediaLogoCarousel() {
-  const loop = [...mediaPartners, ...mediaPartners];
+  const loop = buildSeamlessMarqueeLoop(mediaPartners);
 
   return (
     <div

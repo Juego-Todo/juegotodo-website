@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { currentPartnerLogos } from "@/data/partners-page";
+import { buildSeamlessMarqueeLoop } from "@/lib/marquee";
 
 export function SponsorsSection() {
-  const marqueeLogos = [...currentPartnerLogos, ...currentPartnerLogos];
+  const marqueeLogos = buildSeamlessMarqueeLoop(currentPartnerLogos);
 
   return (
     <section className="border-y border-white/[0.08] bg-[#050505] py-16 sm:py-20">

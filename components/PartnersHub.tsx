@@ -25,6 +25,7 @@ import {
   sponsorshipOpportunities,
   whyPartnerBenefits,
 } from "@/data/partners-page";
+import { buildSeamlessMarqueeLoop } from "@/lib/marquee";
 
 const categoryIcons = {
   broadcast: Radio,
@@ -45,7 +46,7 @@ function PartnerLogo({ name }: { name: string }) {
 }
 
 export function PartnersHub() {
-  const marqueeLogos = [...currentPartnerLogos, ...currentPartnerLogos];
+  const marqueeLogos = buildSeamlessMarqueeLoop([...currentPartnerLogos]);
 
   return (
     <>

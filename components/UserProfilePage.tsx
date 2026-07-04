@@ -1,28 +1,31 @@
 "use client";
 
 import {
-  ArrowRight,
   LogOut,
-  ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { EquipmentOwned } from "@/components/commerce/EquipmentOwned";
 import { MotionSection } from "@/components/MotionSection";
-import { PageNavigation } from "@/components/PageNavigation";
 import {
   AchievementsSection,
   FightHistorySection,
   FighterAnalyticsSection,
   FighterCardHero,
-  FighterIdentityDashboard,
   PhysicalAttributesCard,
 } from "@/components/profile/FighterIdentitySections";
-import { ProfileIdentityHeader } from "@/components/profile/ProfileIdentityHeader";
+import { MemberPortalHero } from "@/components/profile/MemberPortalHero";
+import { LicenseApplicationProfileSection } from "@/components/profile/LicenseApplicationProfileSection";
+import {
+  LicenseProgressPanel,
+  RequirementsPanel,
+} from "@/components/profile/MemberPortalPanels";
+import { ProfileOverviewShell } from "@/components/profile/ProfileOverviewShell";
 import { ProfileRightRail } from "@/components/profile/ProfileRightRail";
 import { ProfileSidebarNav, type ProfileSectionId } from "@/components/profile/ProfileSidebarNav";
 import { events, fighters, getShopProduct } from "@/data/site";
+import { getAdminAssignedTags } from "@/lib/profile/account-tags";
+import { buildMemberRecord } from "@/lib/profile/member-record";
 import { teams } from "@/data/teams";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
@@ -34,34 +37,56 @@ import {
   paymentMethodLabels,
   type MembershipTier,
 } from "@/lib/commerce/types";
-import { buildProfileIdentity, getJtgcTierLabel, getPrimaryStatLabel } from "@/lib/profile/identity";
+import type { LicenseApplication } from "@/data/license-applications";
+import { fetchLicenseApplicationByUserId, getPendingLicenseApplicationCount } from "@/lib/licenses/storage";
+import { buildProfileIdentity, getJtgcTierLabel } from "@/lib/profile/identity";
 
 const membershipTiers = Object.keys(membershipTierLabels) as MembershipTier[];
 
 function resolveSection(tab: string | null): ProfileSectionId {
   const map: Record<string, ProfileSectionId> = {
-    profile: "profile",
-    dashboard: "dashboard",
+    overview: "overview",
+    profile: "overview",
+    membership: "membership",
+    licenses: "licenses",
+    "important-documents": "important-documents",
+    "digital-id": "digital-id",
+    calendar: "calendar",
+    "competition-entries": "competition-entries",
+    certificates: "certificates",
+    club: "club",
+    payments: "payments",
+    medical: "medical",
+    rankings: "rankings",
+    dashboard: "overview",
     fighter: "fighter",
     record: "record",
     history: "history",
     achievements: "achievements",
+    "coach-tools": "coach-tools",
+    "official-tools": "official-tools",
+    "judge-tools": "judge-tools",
+    "council-tools": "council-tools",
+    "staff-tools": "staff-tools",
+    "admin-members": "admin-members",
+    "admin-licenses": "admin-licenses",
+    "admin-reports": "admin-reports",
     orders: "orders",
     wishlist: "wishlist",
     fighters: "saved-fighters",
     teams: "saved-teams",
-    events: "saved-events",
+    events: "events",
     notifications: "notifications",
     settings: "settings",
   };
-  return map[tab ?? "profile"] ?? "profile";
+  return map[tab ?? "overview"] ?? "overview";
 }
 
 export function UserProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialSection = resolveSection(searchParams.get("tab"));
-  const { user, loading, logout, updateProfile } = useAuth();
+  const { user, loading, logout } = useAuth();
   const {
     userData,
     orders,
@@ -74,19 +99,14 @@ export function UserProfilePage() {
   } = useCommerce();
 
   const [activeSection, setActiveSection] = useState<ProfileSectionId>(initialSection);
-  const [fullName, setFullName] = useState("");
-  const [gym, setGym] = useState("");
-  const [city, setCity] = useState("");
-  const [bio, setBio] = useState("");
-  const [phone, setPhone] = useState("");
-  const [country, setCountry] = useState("Philippines");
   const [membershipTier, setMembershipTier] = useState<MembershipTier>("free");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const profileSyncKey = user
-    ? `${user.id}|${user.fullName}|${user.gym}|${user.city}|${user.bio}|${userData.phone}|${userData.country}|${userData.membershipTier}`
-    : null;
+  const [licenseApplication, setLicenseApplication] = useState<LicenseApplication | null>(null);
+  const [adminAssignedTags, setAdminAssignedTags] = useState<ReturnType<typeof getAdminAssignedTags>>([]);
+  const [pendingLicenseCount, setPendingLicenseCount] = useState(0);
+  const profileSyncKey = user ? `${user.id}|${userData.membershipTier}` : null;
   const [lastProfileSyncKey, setLastProfileSyncKey] = useState<string | null>(null);
 
   useEffect(() => {
@@ -95,14 +115,45 @@ export function UserProfilePage() {
     }
   }, [loading, user, router]);
 
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    void fetchLicenseApplicationByUserId(user.id).then(setLicenseApplication);
+    setAdminAssignedTags(getAdminAssignedTags(user.id));
+    setPendingLicenseCount(getPendingLicenseApplicationCount());
+  }, [user]);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (!user || !isAdminProfile(user)) {
+      return;
+    }
+
+    const adminRouteMap: Partial<Record<ProfileSectionId, string>> = {
+      "admin-licenses": "/admin/license-approvals",
+      "admin-members": "/admin/members",
+      "admin-reports": "/admin/reports",
+      "important-documents": "/admin/documents",
+      calendar: "/admin/calendar",
+      "competition-entries": "/admin/calendar",
+      events: "/admin/calendar",
+      "official-tools": "/admin/officials",
+      "council-tools": "/admin/grand-council",
+      orders: "/admin/store-orders",
+      notifications: "/admin/announcements",
+      settings: "/admin/settings",
+    };
+
+    const route = tab ? adminRouteMap[resolveSection(tab)] : undefined;
+    if (route) {
+      router.replace(route);
+    }
+  }, [searchParams, user, router]);
+
   if (profileSyncKey && profileSyncKey !== lastProfileSyncKey) {
     setLastProfileSyncKey(profileSyncKey);
-    setFullName(user!.fullName);
-    setGym(user!.gym);
-    setCity(user!.city);
-    setBio(user!.bio);
-    setPhone(userData.phone);
-    setCountry(userData.country);
     setMembershipTier(userData.membershipTier);
   }
 
@@ -113,26 +164,29 @@ export function UserProfilePage() {
     return buildProfileIdentity(user, userData);
   }, [user, userData]);
 
-  if (loading || !user || !identity) {
+  const memberRecord = useMemo(() => {
+    if (!user || !identity) {
+      return null;
+    }
+    return buildMemberRecord({
+      user,
+      userData,
+      identity,
+      licenseApplication,
+      adminAssignedTags,
+      isAdmin: isAdminProfile(user),
+      ordersCount: orders.length,
+      pendingLicenseCount,
+    });
+  }, [user, userData, identity, licenseApplication, adminAssignedTags, orders.length, pendingLicenseCount]);
+
+  if (loading || !user || !identity || !memberRecord) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center px-4 pt-8">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">Loading profile...</p>
       </main>
     );
   }
-
-  const initials = user.fullName
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
-
-  const joinedDate = new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(user.createdAt));
 
   const savedFighters = fighters.filter((fighter) => userData.savedFighters.includes(fighter.slug));
   const savedTeamsList = teams.filter((team) => userData.savedTeams.includes(team.slug));
@@ -142,29 +196,18 @@ export function UserProfilePage() {
     .filter((product): product is NonNullable<typeof product> => Boolean(product));
   const isAdmin = isAdminProfile(user);
   const unreadCount = userData.notifications.filter((entry) => !entry.read).length;
-  const primaryStat = getPrimaryStatLabel(identity, orders.length);
-  const tierLabel = identity.roles.includes("grand_council")
-    ? "Grand Council"
-    : getJtgcTierLabel(userData.membershipTier);
 
-  async function handleSaveProfile(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSaveSettings(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
     setError(null);
     setMessage(null);
 
     try {
-      await updateProfile({
-        fullName,
-        accountType: user?.accountType ?? "fan",
-        gym,
-        city,
-        bio,
-      });
-      updateUserCommerceProfile({ phone, country, membershipTier });
-      setMessage("Profile updated successfully.");
+      updateUserCommerceProfile({ membershipTier });
+      setMessage("Settings updated successfully.");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unable to save profile.");
+      setError(caught instanceof Error ? caught.message : "Unable to save settings.");
     } finally {
       setSaving(false);
     }
@@ -177,187 +220,110 @@ export function UserProfilePage() {
   }
 
   function handleSectionChange(section: ProfileSectionId) {
+    if (section === "calendar") {
+      router.push("/calendar");
+      return;
+    }
+
     setActiveSection(section);
   }
 
-  const showFighterDashboard =
-    identity.isFighter &&
-    identity.athlete &&
-    (activeSection === "profile" || activeSection === "dashboard");
+  const isOverview =
+    activeSection === "overview" ||
+    activeSection === "profile" ||
+    activeSection === "dashboard" ||
+    activeSection === "membership";
 
   return (
-    <main className="overflow-hidden px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
-      <section className="relative mx-auto max-w-[90rem] py-10 sm:py-14">
+    <main className="overflow-hidden px-4 pt-20 sm:px-6 sm:pt-24 lg:px-8 lg:pt-24">
+      <section className="relative mx-auto max-w-[90rem] py-6 sm:py-8">
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
         <div className="relative">
-          <PageNavigation currentLabel="Your Profile" />
+          <MemberPortalHero
+            identity={identity}
+            licenseApplication={licenseApplication}
+            memberRecord={memberRecord}
+            onNavigate={handleSectionChange}
+            user={user}
+          />
 
-          <div className="mt-4 flex flex-wrap items-center justify-end gap-2 sm:mt-6">
-            {isAdmin ? (
-              <Link
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-amber-200"
-                href="/admin"
-              >
-                Admin Dashboard
-              </Link>
-            ) : null}
-            <Link
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 bg-black/40 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:border-red-500/40"
-              href="/cart"
-            >
-              <ShoppingBag className="mr-2" size={16} aria-hidden />
-              Cart
-            </Link>
-            <button
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 bg-black/40 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:border-red-500/40"
-              onClick={handleLogout}
-              type="button"
-            >
-              <LogOut className="mr-2" size={16} aria-hidden />
-              Logout
-            </button>
-          </div>
-
-          <div className="mt-6">
-            <ProfileIdentityHeader identity={identity} initials={initials} user={user} />
-          </div>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <QuickStat label="Member Since" value={joinedDate} />
-            <QuickStat label="JTGC Tier" value={tierLabel} />
-            <QuickStat label={primaryStat.label} value={primaryStat.value} accent={identity.isFighter} />
-            <QuickStat label="Profile Completion" value={`${identity.profileCompletion}%`} />
-          </div>
-
-          <div className="mt-8 grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)_18rem]">
+          <div className="mt-6 grid gap-6 xl:grid-cols-[19rem_minmax(0,1fr)_18rem]">
             <ProfileSidebarNav
               activeSection={activeSection}
-              identity={identity}
+              adminAssignedTags={adminAssignedTags}
+              licenseApplication={licenseApplication}
+              memberRecord={memberRecord}
               onSectionChange={handleSectionChange}
+              pendingLicenseCount={pendingLicenseCount}
               unreadCount={unreadCount}
+              user={user}
             />
 
             <div className="min-w-0 space-y-6">
-              {showFighterDashboard ? <FighterIdentityDashboard identity={identity} orderCount={orders.length} /> : null}
-
-              {!identity.isFighter && activeSection === "profile" ? (
-                <FanProfileOverview joinedDate={joinedDate} tierLabel={tierLabel} user={user} />
+              {isOverview ? (
+                <ProfileOverviewShell memberRecord={memberRecord} onNavigate={handleSectionChange} />
               ) : null}
 
-              {activeSection === "fighter" && identity.athlete ? (
+              {activeSection === "important-documents" ? (
                 <div className="space-y-6">
-                  <FighterCardHero athlete={identity.athlete} identity={identity} orderCount={orders.length} />
-                  <PhysicalAttributesCard athlete={identity.athlete} />
+                  <RequirementsPanel
+                    percent={memberRecord.requirementsPercent}
+                    requirements={memberRecord.requirements}
+                  />
+                  <LicenseProgressPanel steps={memberRecord.progressSteps} />
                 </div>
               ) : null}
 
-              {activeSection === "record" && identity.athlete ? (
-                <div className="space-y-6">
-                  <FighterCardHero athlete={identity.athlete} identity={identity} orderCount={orders.length} />
-                  <FighterAnalyticsSection athlete={identity.athlete} />
-                </div>
+              {activeSection === "licenses" || activeSection === "digital-id" ? (
+                <LicenseApplicationProfileSection application={licenseApplication} />
               ) : null}
 
-              {activeSection === "history" && identity.athlete ? <FightHistorySection athlete={identity.athlete} /> : null}
-
-              {activeSection === "achievements" && identity.athlete ? (
-                <AchievementsSection athlete={identity.athlete} />
+              {activeSection === "membership" ? (
+                <PortalPlaceholderSection
+                  description="Track membership standing, renewal dates, and official league affiliation."
+                  title="My Membership"
+                />
               ) : null}
 
-              {(activeSection === "profile" || activeSection === "dashboard") && user ? (
-                <EquipmentOwned />
+              {activeSection === "competition-entries" ? (
+                <PortalPlaceholderSection
+                  ctaHref="/registration"
+                  ctaLabel="Open Registration"
+                  description="View sanctioned competition entries, bout assignments, and registration status."
+                  title="Competition Entries"
+                />
               ) : null}
 
-              {(activeSection === "profile" || activeSection === "settings") && !showFighterDashboard ? (
-                <MotionSection>
-                  <form className="glass-panel rounded-[1.75rem] p-5 sm:p-8" onSubmit={handleSaveProfile}>
-                    <h2 className="font-display text-4xl uppercase text-white sm:text-5xl">
-                      {activeSection === "settings" ? "Settings" : "Identity Details"}
-                    </h2>
-                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                      <ProfileField label="Full name" onChange={setFullName} value={fullName} />
-                      <ProfileField label="Email" onChange={() => undefined} readOnly value={user.email} />
-                      <ProfileField label="Phone" onChange={setPhone} value={phone} />
-                      <ProfileField label="Country" onChange={setCountry} value={country} />
-                      <ProfileField label="Gym / affiliation" onChange={setGym} placeholder="Optional" value={gym} />
-                      <ProfileField label="City" onChange={setCity} placeholder="Optional" value={city} />
-                      {activeSection === "settings" ? (
-                        <label className="block sm:col-span-2">
-                          <span className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-zinc-400">
-                            Membership tier (demo)
-                          </span>
-                          <select
-                            className="w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 focus:ring-4"
-                            onChange={(event) => setMembershipTier(event.target.value as MembershipTier)}
-                            value={membershipTier}
-                          >
-                            {membershipTiers.map((tier) => (
-                              <option key={tier} value={tier}>
-                                {getJtgcTierLabel(tier)}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      ) : (
-                        <label className="block sm:col-span-2">
-                          <span className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-zinc-400">Bio</span>
-                          <textarea
-                            className="min-h-32 w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 transition placeholder:text-zinc-500 focus:ring-4"
-                            onChange={(event) => setBio(event.target.value)}
-                            value={bio}
-                          />
-                        </label>
-                      )}
-                    </div>
-                    {message ? <p className="mt-4 text-sm text-emerald-300">{message}</p> : null}
-                    {error ? <p className="mt-4 text-sm text-red-300">{error}</p> : null}
-                    <button
-                      className="mt-6 inline-flex min-h-12 items-center rounded-full bg-red-600 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white"
-                      disabled={saving}
-                      type="submit"
-                    >
-                      {saving ? "Saving..." : activeSection === "settings" ? "Save Settings" : "Save Profile"}
-                    </button>
-                  </form>
-                </MotionSection>
+              {activeSection === "certificates" ? (
+                <PortalPlaceholderSection
+                  description="Official certificates, coaching credentials, and league recognitions appear here once issued."
+                  title="Certificates"
+                />
               ) : null}
 
-              {activeSection === "profile" && identity.isFighter ? (
-                <MotionSection>
-                  <form className="glass-panel rounded-[1.75rem] p-5 sm:p-8" onSubmit={handleSaveProfile}>
-                    <h2 className="font-display text-4xl uppercase text-white sm:text-5xl">Credential Details</h2>
-                    <p className="mt-2 text-sm text-zinc-400">
-                      Update your official JTGC profile information. Rankings and fight history sync from sanctioned results.
-                    </p>
-                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                      <ProfileField label="Full name" onChange={setFullName} value={fullName} />
-                      <ProfileField label="Gym / team" onChange={setGym} placeholder="Optional" value={gym} />
-                      <ProfileField label="City / region" onChange={setCity} placeholder="Optional" value={city} />
-                      <ProfileField label="Phone" onChange={setPhone} value={phone} />
-                      <label className="block sm:col-span-2">
-                        <span className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-zinc-400">Bio</span>
-                        <textarea
-                          className="min-h-28 w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 transition placeholder:text-zinc-500 focus:ring-4"
-                          onChange={(event) => setBio(event.target.value)}
-                          value={bio}
-                        />
-                      </label>
-                    </div>
-                    {message ? <p className="mt-4 text-sm text-emerald-300">{message}</p> : null}
-                    {error ? <p className="mt-4 text-sm text-red-300">{error}</p> : null}
-                    <button
-                      className="mt-6 inline-flex min-h-12 items-center rounded-full bg-red-600 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white"
-                      disabled={saving}
-                      type="submit"
-                    >
-                      {saving ? "Saving..." : "Update Credential"}
-                    </button>
-                  </form>
-                </MotionSection>
+              {activeSection === "club" ? (
+                <PortalPlaceholderSection
+                  description={`Official club affiliation: ${memberRecord.club}. Club management tools unlock for gym owners and coaches.`}
+                  title="Club"
+                />
               ) : null}
 
-              {activeSection === "orders" ? (
-                <CommerceSection title="Orders">
+              {activeSection === "medical" ? (
+                <PortalPlaceholderSection
+                  description="Medical clearance, expiry dates, and upload status for competition eligibility."
+                  title="Medical Clearance"
+                />
+              ) : null}
+
+              {activeSection === "rankings" && identity.athlete ? (
+                <PortalPlaceholderSection
+                  description={`Current league rank: ${identity.athlete.rank}. Rankings sync from sanctioned JTGC results.`}
+                  title="Rankings"
+                />
+              ) : null}
+
+              {activeSection === "payments" || activeSection === "orders" ? (
+                <CommerceSection title="Payments & Orders">
                   <div className="mb-4 flex justify-end">
                     <Link className="text-xs font-black uppercase tracking-[0.16em] text-red-200" href="/orders">
                       Full Order History
@@ -387,9 +353,6 @@ export function UserProfilePage() {
                             <li key={item.productSlug}>{item.name} × {item.quantity}</li>
                           ))}
                         </ul>
-                        {order.trackingNumber ? (
-                          <p className="mt-3 text-xs text-zinc-500">Tracking: {order.trackingNumber}</p>
-                        ) : null}
                         <div className="mt-3 flex gap-2">
                           <Link className="text-xs font-black uppercase tracking-[0.14em] text-red-200" href={`/orders/${order.id}/tracking`}>
                             Tracking
@@ -402,6 +365,118 @@ export function UserProfilePage() {
                     ))
                   )}
                 </CommerceSection>
+              ) : null}
+
+              {activeSection === "fighter" && identity.athlete ? (
+                <div className="space-y-6">
+                  <FighterCardHero athlete={identity.athlete} identity={identity} orderCount={orders.length} />
+                  <PhysicalAttributesCard athlete={identity.athlete} />
+                </div>
+              ) : null}
+
+              {activeSection === "record" && identity.athlete ? (
+                <div className="space-y-6">
+                  <FighterCardHero athlete={identity.athlete} identity={identity} orderCount={orders.length} />
+                  <FighterAnalyticsSection athlete={identity.athlete} />
+                </div>
+              ) : null}
+
+              {activeSection === "history" && identity.athlete ? <FightHistorySection athlete={identity.athlete} /> : null}
+
+              {activeSection === "achievements" && identity.athlete ? (
+                <AchievementsSection athlete={identity.athlete} />
+              ) : null}
+
+              {activeSection === "coach-tools" ? (
+                <IdentityToolsSection
+                  description="Manage coaching credentials, athlete assignments, and certification visibility."
+                  title="Coach Tools"
+                />
+              ) : null}
+
+              {activeSection === "official-tools" ? (
+                <IdentityToolsSection
+                  description="Access referee assignments, bout oversight tools, and official credential controls."
+                  title="Official Tools"
+                />
+              ) : null}
+
+              {activeSection === "judge-tools" ? (
+                <IdentityToolsSection
+                  description="Review scoring assignments, judge credentials, and sanctioned event access."
+                  title="Judge Tools"
+                />
+              ) : null}
+
+              {activeSection === "council-tools" ? (
+                <IdentityToolsSection
+                  description="Grand Council governance tools, league oversight, and membership administration."
+                  title="Council Tools"
+                />
+              ) : null}
+
+              {activeSection === "staff-tools" ? (
+                <IdentityToolsSection
+                  description="Staff operations, event support workflows, and internal league utilities."
+                  title="Staff Tools"
+                />
+              ) : null}
+
+              {activeSection === "settings" ? (
+                <MotionSection>
+                  <form className="glass-panel rounded-[1.75rem] p-5 sm:p-8" onSubmit={handleSaveSettings}>
+                    <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">System</p>
+                    <h2 className="font-display mt-2 text-4xl uppercase text-white sm:text-5xl">Settings</h2>
+                    <label className="mt-6 block">
+                      <span className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-zinc-400">
+                        Membership tier (demo)
+                      </span>
+                      <select
+                        className="w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 focus:ring-4"
+                        onChange={(event) => setMembershipTier(event.target.value as MembershipTier)}
+                        value={membershipTier}
+                      >
+                        {membershipTiers.map((tier) => (
+                          <option key={tier} value={tier}>
+                            {getJtgcTierLabel(tier)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {message ? <p className="mt-4 text-sm text-emerald-300">{message}</p> : null}
+                    {error ? <p className="mt-4 text-sm text-red-300">{error}</p> : null}
+                    <button
+                      className="mt-6 inline-flex min-h-12 items-center rounded-full bg-red-600 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white"
+                      disabled={saving}
+                      type="submit"
+                    >
+                      {saving ? "Saving..." : "Save Settings"}
+                    </button>
+
+                    <div className="mt-8 border-t border-white/10 pt-6">
+                      <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-zinc-500">Session</p>
+                      <p className="mt-2 text-sm text-zinc-400">Sign out of your JTGC account on this device.</p>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        {isAdmin ? (
+                          <Link
+                            className="inline-flex min-h-11 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-amber-200"
+                            href="/admin"
+                          >
+                            Admin Dashboard
+                          </Link>
+                        ) : null}
+                        <button
+                          className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 bg-black/40 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:border-red-500/40"
+                          onClick={handleLogout}
+                          type="button"
+                        >
+                          <LogOut className="mr-2" size={16} aria-hidden />
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </MotionSection>
               ) : null}
 
               {activeSection === "wishlist" ? (
@@ -482,7 +557,7 @@ export function UserProfilePage() {
                 </CommerceSection>
               ) : null}
 
-              {activeSection === "saved-events" ? (
+              {activeSection === "events" || activeSection === "saved-events" ? (
                 <CommerceSection title="Saved Events">
                   <div className="grid gap-4 sm:grid-cols-2">
                     {savedEvents.length === 0 ? (
@@ -533,11 +608,7 @@ export function UserProfilePage() {
             </div>
 
             <div className="hidden xl:block">
-              <ProfileRightRail
-                identity={identity}
-                membershipTier={userData.membershipTier}
-                onCompleteProfile={() => setActiveSection("profile")}
-              />
+              <ProfileRightRail memberRecord={memberRecord} />
             </div>
           </div>
         </div>
@@ -546,43 +617,45 @@ export function UserProfilePage() {
   );
 }
 
-function QuickStat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function PortalPlaceholderSection({
+  title,
+  description,
+  ctaHref,
+  ctaLabel,
+}: {
+  title: string;
+  description: string;
+  ctaHref?: string;
+  ctaLabel?: string;
+}) {
   return (
-    <div className="glass-panel rounded-2xl p-4">
-      <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-zinc-500">{label}</p>
-      <p className={`mt-2 font-semibold ${accent ? "font-display text-2xl uppercase text-[#FF1010]" : "text-white"}`}>{value}</p>
+    <div className="glass-panel rounded-[1.75rem] p-6 sm:p-8">
+      <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">Member Portal</p>
+      <h2 className="font-display mt-2 text-4xl uppercase text-white sm:text-5xl">{title}</h2>
+      <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400">{description}</p>
+      {ctaHref ? (
+        <Link
+          className="mt-6 inline-flex min-h-11 items-center rounded-full bg-red-600 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white"
+          href={ctaHref}
+        >
+          {ctaLabel ?? "Open"} →
+        </Link>
+      ) : null}
     </div>
   );
 }
 
-function FanProfileOverview({
-  user,
-  tierLabel,
-  joinedDate,
-}: {
-  user: { email: string; fullName: string };
-  tierLabel: string;
-  joinedDate: string;
-}) {
+function IdentityToolsSection({ title, description }: { title: string; description: string }) {
   return (
-    <div className="glass-panel rounded-[1.5rem] p-6 sm:p-8">
-      <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">Fan Profile</p>
-      <h2 className="font-display mt-2 text-4xl uppercase text-white">Community Member</h2>
-      <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400">
-        Follow fighters, save events, and manage your JTGC membership. Register for competition to unlock your official
-        athlete credential, rankings, and fight history.
-      </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <QuickStat label="Email" value={user.email} />
-        <QuickStat label="JTGC Tier" value={tierLabel} />
-        <QuickStat label="Member Since" value={joinedDate} />
-      </div>
+    <div className="glass-panel rounded-[1.75rem] p-6 sm:p-8">
+      <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">Identity Tools</p>
+      <h2 className="font-display mt-2 text-4xl uppercase text-white sm:text-5xl">{title}</h2>
+      <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400">{description}</p>
       <Link
-        className="glass-panel mt-6 flex items-center justify-between rounded-[1.25rem] p-5 transition hover:border-red-500/40"
-        href="/registration"
+        className="mt-6 inline-flex min-h-11 items-center rounded-full bg-red-600 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white"
+        href="/register-for-license"
       >
-        <span className="font-display text-2xl uppercase text-white">Competition Registration</span>
-        <ArrowRight size={18} aria-hidden />
+        Manage License →
       </Link>
     </div>
   );
@@ -594,36 +667,6 @@ function CommerceSection({ title, children }: { title: string; children: React.R
       <h2 className="font-display text-4xl uppercase text-white">{title}</h2>
       {children}
     </div>
-  );
-}
-
-function ProfileField({
-  label,
-  value,
-  onChange,
-  placeholder,
-  readOnly,
-  className,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  readOnly?: boolean;
-  className?: string;
-}) {
-  return (
-    <label className={`block ${className ?? ""}`}>
-      <span className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-zinc-400">{label}</span>
-      <input
-        className="w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 transition placeholder:text-zinc-500 focus:ring-4 disabled:opacity-60"
-        disabled={readOnly}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        readOnly={readOnly}
-        value={value}
-      />
-    </label>
   );
 }
 

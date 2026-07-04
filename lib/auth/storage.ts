@@ -1,6 +1,15 @@
-import type { ProfileUpdateInput, RegisterInput, StoredUser, UserProfile, UserRole } from "@/lib/auth/types";
+import type {
+  AdminUserUpdateInput,
+  ProfileUpdateInput,
+  RegisterInput,
+  StoredUser,
+  UserProfile,
+  UserRole,
+} from "@/lib/auth/types";
 import { migrateAccountType } from "@/lib/auth/types";
+import { deriveUsernameSeed, validateUsername } from "@/lib/auth/username";
 import { legacyTestLoginEmails, testLoginAccount, testLoginStoredUser } from "@/data/test-account";
+import { initializeNewUserCommerceData } from "@/lib/commerce/storage";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import {
   getSupabaseSessionUser,
@@ -32,8 +41,9 @@ function ensureLocalTestAccount(users: StoredUser[]) {
       ...filteredUsers[existingIndex],
       password: testLoginAccount.password,
       fullName: testLoginAccount.fullName,
+      username: filteredUsers[existingIndex].username || "testuser",
       accountType: migrateAccountType(filteredUsers[existingIndex].accountType),
-      role: filteredUsers[existingIndex].role ?? "user",
+      role: "admin",
     };
     return filteredUsers;
   }
@@ -52,6 +62,7 @@ function readUsers(): StoredUser[] {
     const users = Array.isArray(parsed)
       ? parsed.map((user) => ({
           ...user,
+          username: user.username?.trim() || deriveUsernameSeed(user.email, user.fullName),
           accountType: migrateAccountType(user.accountType),
           role: user.role ?? resolveRole(user.email),
         }))
@@ -99,10 +110,15 @@ function getStoredSessionUserLocal(): UserProfile | null {
 
 function registerStoredUserLocal(input: RegisterInput): UserProfile {
   const email = normalizeEmail(input.email);
+  const username = validateUsername(input.username);
   const users = readUsers();
 
   if (users.some((entry) => entry.email === email)) {
     throw new Error("An account with this email already exists.");
+  }
+
+  if (users.some((entry) => entry.username === username)) {
+    throw new Error("That username is already taken.");
   }
 
   if (input.password.length < 8) {
@@ -114,15 +130,20 @@ function registerStoredUserLocal(input: RegisterInput): UserProfile {
     email,
     password: input.password,
     fullName: input.fullName.trim(),
+    username,
     accountType: input.accountType,
     role: resolveRole(email),
-    gym: "",
-    city: "",
-    bio: "",
+    gym: input.gym?.trim() ?? "",
+    city: input.city?.trim() ?? "",
+    bio: input.bio?.trim() ?? "",
     createdAt: new Date().toISOString(),
   };
 
   writeUsers([...users, user]);
+  initializeNewUserCommerceData(user.id, {
+    phone: input.phone,
+    country: input.country,
+  });
   window.localStorage.setItem(SESSION_KEY, user.id);
 
   return toProfile(user);
@@ -188,6 +209,109 @@ function updateStoredPasswordLocal(email: string, password: string) {
   };
   writeUsers(users);
   window.sessionStorage.removeItem(RESET_EMAIL_KEY);
+}
+
+function adminUpdateStoredUserLocal(userId: string, input: AdminUserUpdateInput): UserProfile {
+  const users = readUsers();
+  const index = users.findIndex((entry) => entry.id === userId);
+
+  if (index === -1) {
+    throw new Error("Account not found.");
+  }
+
+  const email = normalizeEmail(input.email);
+  const username = validateUsername(input.username);
+
+  if (users.some((entry, entryIndex) => entryIndex !== index && entry.email === email)) {
+    throw new Error("An account with this email already exists.");
+  }
+
+  if (users.some((entry, entryIndex) => entryIndex !== index && entry.username === username)) {
+    throw new Error("That username is already taken.");
+  }
+
+  users[index] = {
+    ...users[index],
+    fullName: input.fullName.trim(),
+    username,
+    email,
+    accountType: input.accountType,
+    role: input.role,
+    gym: input.gym.trim(),
+    city: input.city.trim(),
+    bio: input.bio.trim(),
+  };
+
+  writeUsers(users);
+  return toProfile(users[index]);
+}
+
+function adminResetStoredUserPasswordLocal(userId: string, password: string) {
+  if (password.length < 8) {
+    throw new Error("Password must be at least 8 characters.");
+  }
+
+  const users = readUsers();
+  const index = users.findIndex((entry) => entry.id === userId);
+
+  if (index === -1) {
+    throw new Error("Account not found.");
+  }
+
+  users[index] = {
+    ...users[index],
+    password,
+  };
+  writeUsers(users);
+}
+
+function adminDeleteStoredUserLocal(userId: string) {
+  const users = readUsers();
+  const nextUsers = users.filter((entry) => entry.id !== userId);
+
+  if (nextUsers.length === users.length) {
+    throw new Error("Account not found.");
+  }
+
+  writeUsers(nextUsers);
+
+  if (window.localStorage.getItem(SESSION_KEY) === userId) {
+    window.localStorage.removeItem(SESSION_KEY);
+  }
+}
+
+export function getAllStoredUsersLocal(): UserProfile[] {
+  return readUsers().map(toProfile);
+}
+
+export async function getAllStoredUsers(): Promise<UserProfile[]> {
+  if (isSupabaseConfigured()) {
+    return getAllStoredUsersLocal();
+  }
+  return getAllStoredUsersLocal();
+}
+
+export async function adminUpdateStoredUser(userId: string, input: AdminUserUpdateInput): Promise<UserProfile> {
+  if (isSupabaseConfigured()) {
+    return adminUpdateStoredUserLocal(userId, input);
+  }
+  return adminUpdateStoredUserLocal(userId, input);
+}
+
+export async function adminResetStoredUserPassword(userId: string, password: string) {
+  if (isSupabaseConfigured()) {
+    adminResetStoredUserPasswordLocal(userId, password);
+    return;
+  }
+  adminResetStoredUserPasswordLocal(userId, password);
+}
+
+export async function adminDeleteStoredUser(userId: string) {
+  if (isSupabaseConfigured()) {
+    adminDeleteStoredUserLocal(userId);
+    return;
+  }
+  adminDeleteStoredUserLocal(userId);
 }
 
 function requestPasswordResetLocal(email: string) {

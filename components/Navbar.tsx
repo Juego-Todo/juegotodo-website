@@ -58,12 +58,14 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [navPathname, setNavPathname] = useState(pathname);
 
-  useEffect(() => {
+  if (pathname !== navPathname) {
+    setNavPathname(pathname);
     setIsOpen(false);
     setOpenDropdown(null);
     setMobileExpanded(null);
-  }, [pathname]);
+  }
 
   const centerLinks = navItems.filter((item) => !item.cta && item.label !== "Login" && item.label !== "Register");
   const loginItem = navItems.find((item) => item.label === "Login");

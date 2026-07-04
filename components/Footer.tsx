@@ -12,7 +12,7 @@ const footerColumns = [
 ];
 
 function SocialIcon({ label }: { label: string }) {
-  const className = "h-4 w-4";
+  const className = "h-3.5 w-3.5";
 
   switch (label) {
     case "Instagram":
@@ -51,15 +51,15 @@ export function Footer() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,16,16,0.08),transparent_45rem)]" aria-hidden />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <section className="border-b border-white/[0.08] py-12 sm:py-16">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+        <section className="border-b border-white/[0.08] py-8 sm:py-10">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4">
             {footerColumns.map((column) => (
               <div key={column.title}>
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white">{column.title}</h3>
-                <div className="mt-5 grid gap-3.5">
+                <h3 className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-white">{column.title}</h3>
+                <div className="mt-3 grid gap-2">
                   {column.links.map((link) => (
                     <Link
-                      className="text-sm font-medium text-zinc-500 transition hover:translate-x-0.5 hover:text-white"
+                      className="text-xs font-medium text-zinc-500 transition hover:translate-x-0.5 hover:text-white"
                       href={link.href}
                       key={`${column.title}-${link.href}`}
                     >
@@ -71,11 +71,11 @@ export function Footer() {
             ))}
 
             <div>
-              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white">Follow The League</h3>
-              <div className="mt-5 grid gap-3">
+              <h3 className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-white">Follow The League</h3>
+              <div className="mt-3 grid gap-2">
                 {socialLinks.map((social) => (
                   <a
-                    className="group/social inline-flex items-center gap-2.5 text-sm font-medium text-zinc-500 transition hover:text-white"
+                    className="group/social inline-flex items-center gap-2 text-xs font-medium text-zinc-500 transition hover:text-white"
                     href={social.href}
                     key={social.label}
                     rel="noreferrer"
@@ -92,22 +92,8 @@ export function Footer() {
           </div>
         </section>
 
-        <div className="flex flex-col gap-4 border-t border-white/[0.08] py-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-5 text-xs font-bold uppercase tracking-[0.16em] text-zinc-600">
-            <Link className="transition hover:text-white" href="/login">
-              Login
-            </Link>
-            <Link className="transition hover:text-white" href="/login?mode=register">
-              Register
-            </Link>
-            <Link className="transition hover:text-white" href="/privacy">
-              Privacy Policy
-            </Link>
-            <Link className="transition hover:text-white" href="/terms">
-              Terms
-            </Link>
-          </div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-600">
+        <div className="py-4">
+          <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-zinc-600">
             © {new Date().getFullYear()} Juego Todo Combat Sports Platform
           </p>
         </div>

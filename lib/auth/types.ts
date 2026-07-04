@@ -6,6 +6,7 @@ export type StoredUser = {
   email: string;
   password: string;
   fullName: string;
+  username: string;
   accountType: AccountType;
   role: UserRole;
   gym: string;
@@ -18,9 +19,15 @@ export type UserProfile = Omit<StoredUser, "password">;
 
 export type RegisterInput = {
   fullName: string;
+  username: string;
   email: string;
   password: string;
   accountType: AccountType;
+  phone?: string;
+  country?: string;
+  city?: string;
+  gym?: string;
+  bio?: string;
 };
 
 export type ProfileUpdateInput = {
@@ -29,6 +36,19 @@ export type ProfileUpdateInput = {
   gym: string;
   city: string;
   bio: string;
+};
+
+export type AdminUserUpdateInput = {
+  fullName: string;
+  username: string;
+  email: string;
+  accountType: AccountType;
+  role: UserRole;
+  gym: string;
+  city: string;
+  bio: string;
+  phone?: string;
+  country?: string;
 };
 
 export const accountTypeLabels: Record<AccountType, string> = {

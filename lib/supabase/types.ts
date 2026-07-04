@@ -4,6 +4,7 @@ type ProfileRow = {
   id: string;
   email: string;
   full_name: string;
+  username: string;
   account_type: string;
   role: string;
   gym: string;

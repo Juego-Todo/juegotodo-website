@@ -1,3 +1,4 @@
+import { deriveUsernameSeed, validateUsername } from "@/lib/auth/username";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ProfileRow } from "@/lib/supabase/types";
 import { migrateAccountType, type ProfileUpdateInput, type RegisterInput, type UserProfile } from "@/lib/auth/types";
@@ -7,6 +8,7 @@ function mapProfile(row: ProfileRow): UserProfile {
     id: row.id,
     email: row.email,
     fullName: row.full_name,
+    username: row.username?.trim() || deriveUsernameSeed(row.email, row.full_name),
     accountType: migrateAccountType(row.account_type),
     role: row.role === "admin" ? "admin" : "user",
     gym: row.gym,
@@ -41,6 +43,9 @@ export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
       id: user.id,
       email: user.email ?? "",
       fullName: user.user_metadata?.full_name ?? "",
+      username:
+        user.user_metadata?.username?.trim() ||
+        deriveUsernameSeed(user.email ?? "", user.user_metadata?.full_name ?? ""),
       accountType: "fan",
       role: user.email?.toLowerCase() === "admin@juegotodo.com" ? "admin" : "user",
       gym: "",
@@ -56,6 +61,7 @@ export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
 export async function registerSupabaseUser(input: RegisterInput): Promise<UserProfile> {
   const supabase = createSupabaseBrowserClient();
   const email = input.email.trim().toLowerCase();
+  const username = validateUsername(input.username);
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -63,6 +69,7 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
     options: {
       data: {
         full_name: input.fullName.trim(),
+        username,
       },
       emailRedirectTo: `${window.location.origin}/auth/callback?next=/profile`,
     },
@@ -77,6 +84,15 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
   }
 
   if (data.session) {
+    await supabase
+      .from("profiles")
+      .update({
+        username,
+        gym: input.gym?.trim() ?? "",
+        city: input.city?.trim() ?? "",
+        bio: input.bio?.trim() ?? "",
+      })
+      .eq("id", data.user.id);
     const profile = await getSupabaseSessionUser();
     if (profile) {
       return profile;
@@ -87,11 +103,12 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
     id: data.user.id,
     email,
     fullName: input.fullName.trim(),
+    username,
     accountType: input.accountType,
     role: email === "admin@juegotodo.com" ? "admin" : "user",
-    gym: "",
-    city: "",
-    bio: "",
+    gym: input.gym?.trim() ?? "",
+    city: input.city?.trim() ?? "",
+    bio: input.bio?.trim() ?? "",
     createdAt: data.user.created_at,
   };
 }

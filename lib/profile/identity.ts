@@ -127,6 +127,7 @@ export function calculateProfileCompletion(
 ): number {
   const checks = [
     Boolean(user.fullName.trim()),
+    Boolean(user.username?.trim()),
     Boolean(user.email.trim()),
     Boolean(userData.phone.trim()),
     Boolean(user.city.trim()),

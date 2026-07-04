@@ -75,7 +75,8 @@ export const navItems: NavItem[] = [
     children: [
       { label: "Search Fighter", href: "/latayanology" },
       { label: "Lineage Finder", href: "/fma-lineage" },
-      { label: "JT Seminars", href: "/calendar" },
+      { label: "JT Seminars", href: "/juego-todo-seminars" },
+      { label: "Calendar", href: "/calendar" },
     ],
   },
   {
@@ -93,22 +94,12 @@ export const navItems: NavItem[] = [
 ];
 
 export const footerNavColumns = navItems
-  .filter(
-    (item) =>
-      !item.cta &&
-      item.label !== "Login" &&
-      item.label !== "Register" &&
-      item.label !== "Home" &&
-      item.label !== "About Us" &&
-      item.label !== "Latayanology",
-  )
+  .filter((item) => !item.cta && item.label !== "Login" && item.label !== "Register")
   .map((item) => ({
     title: item.label,
     links: item.children?.length
       ? item.children.filter(
-          (child, index, arr) =>
-            child.href !== item.href &&
-            arr.findIndex((entry) => entry.href === child.href) === index,
+          (child, index, arr) => arr.findIndex((entry) => entry.href === child.href) === index,
         )
       : [{ label: item.label, href: item.href }],
   }));

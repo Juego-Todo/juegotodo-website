@@ -1,8 +1,38 @@
 "use client";
 
-import { CheckCircle2 } from "lucide-react";
-import { RoleBadge, VerificationBadge } from "@/components/profile/RoleBadge";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { VerificationBadge } from "@/components/profile/RoleBadge";
+import { UserTypeBadge } from "@/components/profile/UserTypeBadge";
+import { resolveUserTypeTagIds, type UserTypeTagId } from "@/data/user-type-tags";
+import { formatUsername } from "@/lib/auth/username";
+import { JudgeLicenseIdCard } from "@/components/profile/JudgeLicenseIdCard";
+import { FighterLicenseIdCard } from "@/components/profile/FighterLicenseIdCard";
+import { StaffLicenseIdCard } from "@/components/profile/StaffLicenseIdCard";
+import { SeniorCoachLicenseIdCard } from "@/components/profile/SeniorCoachLicenseIdCard";
+import { RefereeLicenseIdCard } from "@/components/profile/RefereeLicenseIdCard";
+import { TrainerLicenseIdCard } from "@/components/profile/TrainerLicenseIdCard";
+import { AdviserLicenseIdCard } from "@/components/profile/AdviserLicenseIdCard";
+import { ClubOwnerIdCard } from "@/components/profile/ClubOwnerIdCard";
+import { CoachLicenseIdCard } from "@/components/profile/CoachLicenseIdCard";
+import { GrandCouncilMemberIdCard } from "@/components/profile/GrandCouncilMemberIdCard";
+import { GrandCouncilOfficerIdCard } from "@/components/profile/GrandCouncilOfficerIdCard";
 import { JtgcMemberIdCard } from "@/components/profile/JtgcMemberIdCard";
+import { LicenseCardApplyPlaceholder } from "@/components/profile/LicenseCardApplyPlaceholder";
+import type { LicenseApplication } from "@/data/license-applications";
+import {
+  isAdviserLicenseApplication,
+  isClubOwnerApplication,
+  isCoachLicenseApplication,
+  isGrandCouncilMemberApplication,
+  isGrandCouncilOfficerApplication,
+  isFighterLicenseApplication,
+  isStaffLicenseApplication,
+  isJudgeLicenseApplication,
+  isRefereeLicenseApplication,
+  isSeniorCoachLicenseApplication,
+  isTrainerLicenseApplication,
+} from "@/data/license-applications";
 import type { ProfileIdentity } from "@/lib/profile/identity";
 import { getVerificationLabel } from "@/lib/profile/identity";
 import type { UserProfile } from "@/lib/auth/types";
@@ -11,12 +41,36 @@ export function ProfileIdentityHeader({
   user,
   identity,
   initials,
+  licenseApplication = null,
+  adminAssignedTags = [],
+  tierLabel,
+  joinedDate,
+  showCommunityMember = false,
 }: {
   user: UserProfile;
   identity: ProfileIdentity;
   initials: string;
+  licenseApplication?: LicenseApplication | null;
+  adminAssignedTags?: UserTypeTagId[];
+  tierLabel?: string;
+  joinedDate?: string;
+  showCommunityMember?: boolean;
 }) {
   const bannerTone = identity.athlete?.bannerTone ?? "from-red-950/90 via-black/80 to-zinc-950/90";
+
+  const hasApprovedLicense = licenseApplication?.status === "approved";
+  const isOfficerCredential = isGrandCouncilOfficerApplication(licenseApplication);
+  const isCouncilMemberCredential = isGrandCouncilMemberApplication(licenseApplication);
+  const isClubOwnerCredential = isClubOwnerApplication(licenseApplication);
+  const isCoachCredential = isCoachLicenseApplication(licenseApplication);
+  const isSeniorCoachCredential = isSeniorCoachLicenseApplication(licenseApplication);
+  const isAdviserCredential = isAdviserLicenseApplication(licenseApplication);
+  const isTrainerCredential = isTrainerLicenseApplication(licenseApplication);
+  const isRefereeCredential = isRefereeLicenseApplication(licenseApplication);
+  const isJudgeCredential = isJudgeLicenseApplication(licenseApplication);
+  const isFighterCredential = isFighterLicenseApplication(licenseApplication);
+  const isStaffCredential = isStaffLicenseApplication(licenseApplication);
+  const userTypeTags = resolveUserTypeTagIds(user, licenseApplication, adminAssignedTags);
 
   return (
     <div className="glass-panel overflow-hidden rounded-[1.75rem]">
@@ -55,9 +109,12 @@ export function ProfileIdentityHeader({
                   <span className="ml-2 inline-block text-emerald-300">✓</span>
                 ) : null}
               </h1>
+              <p className="mt-2 text-sm font-semibold tracking-[0.08em] text-red-200">
+                {formatUsername(user.username)}
+              </p>
               <div className="mt-3 flex flex-wrap gap-2">
-                {identity.roles.map((roleId) => (
-                  <RoleBadge key={roleId} roleId={roleId} />
+                {userTypeTags.map((tagId) => (
+                  <UserTypeBadge key={tagId} tagId={tagId} />
                 ))}
               </div>
               <p className="mt-3 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-300">
@@ -67,9 +124,70 @@ export function ProfileIdentityHeader({
             </div>
           </div>
 
-          <JtgcMemberIdCard identity={identity} user={user} />
+          {hasApprovedLicense ? (
+            isOfficerCredential ? (
+              <GrandCouncilOfficerIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isCouncilMemberCredential ? (
+              <GrandCouncilMemberIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isClubOwnerCredential ? (
+              <ClubOwnerIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isSeniorCoachCredential ? (
+              <SeniorCoachLicenseIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isCoachCredential ? (
+              <CoachLicenseIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isAdviserCredential ? (
+              <AdviserLicenseIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isTrainerCredential ? (
+              <TrainerLicenseIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isRefereeCredential ? (
+              <RefereeLicenseIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isJudgeCredential ? (
+              <JudgeLicenseIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isFighterCredential ? (
+              <FighterLicenseIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : isStaffCredential ? (
+              <StaffLicenseIdCard application={licenseApplication} identity={identity} user={user} />
+            ) : (
+              <JtgcMemberIdCard application={licenseApplication} identity={identity} user={user} />
+            )
+          ) : (
+            <LicenseCardApplyPlaceholder />
+          )}
         </div>
       </div>
+
+      {showCommunityMember && tierLabel && joinedDate ? (
+        <div className="border-t border-white/10 bg-black/50 p-6 sm:p-8">
+          <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">Fan Profile</p>
+          <h2 className="font-display mt-2 text-3xl uppercase text-white sm:text-4xl">Community Member</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-zinc-400">
+            Follow fighters, save events, and manage your JTGC membership.
+          </p>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <ProfileSummaryStat label="Email" value={user.email} />
+            <ProfileSummaryStat label="JTGC Tier" value={tierLabel} />
+            <ProfileSummaryStat label="Member Since" value={joinedDate} />
+          </div>
+
+          <Link
+            className="glass-panel mt-6 flex items-center justify-between rounded-[1.25rem] border border-white/10 p-5 transition hover:border-[#FF1010]/40"
+            href="/registration"
+          >
+            <span className="font-display text-xl uppercase text-white sm:text-2xl">Competition Registration</span>
+            <ArrowRight className="shrink-0 text-[#FF1010]" size={18} aria-hidden />
+          </Link>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function ProfileSummaryStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
+      <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-zinc-500">{label}</p>
+      <p className="mt-2 break-all text-sm font-semibold text-white sm:text-base">{value}</p>
     </div>
   );
 }

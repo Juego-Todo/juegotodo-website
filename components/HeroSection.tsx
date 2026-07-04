@@ -8,6 +8,7 @@ import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { EnergyParticles } from "@/components/EnergyParticles";
 import { MagneticButton } from "@/components/MagneticButton";
 import { MediaPartnerLogo } from "@/components/MediaPartnerLogo";
+import { MediaPartnerMarquee } from "@/components/MediaPartnerMarquee";
 import { mediaPartners } from "@/data/site";
 
 const heroFeaturedEvent = {
@@ -24,7 +25,6 @@ export function HeroSection() {
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.35], [0, 60]);
   const heroScale = useTransform(scrollYProgress, [0, 0.35], [1, 1.06]);
-  const marqueePartners = [...mediaPartners, ...mediaPartners];
 
   return (
     <section className="relative flex flex-col overflow-x-hidden">
@@ -138,12 +138,8 @@ export function HeroSection() {
               <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#050505] to-transparent sm:w-24" aria-hidden />
               <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#050505] to-transparent sm:w-24" aria-hidden />
 
-              <div className="hidden overflow-hidden lg:block">
-                <div className="media-marquee-track flex w-max items-center py-2">
-                  {marqueePartners.map((partner, index) => (
-                    <MediaPartnerLogo key={`${partner.name}-${index}`} partner={partner} />
-                  ))}
-                </div>
+              <div className="hidden lg:block">
+                <MediaPartnerMarquee />
               </div>
 
               <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-6 px-4 pb-2 sm:grid-cols-3 sm:px-6 lg:hidden">

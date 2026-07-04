@@ -7,6 +7,7 @@ import { useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { PageNavigation } from "@/components/PageNavigation";
 import { useAuth } from "@/lib/auth/context";
+import { normalizeUsername, validateUsername } from "@/lib/auth/username";
 import {
   clearRememberedEmail,
   getPendingPasswordResetEmail,
@@ -37,6 +38,7 @@ export function AuthPage() {
   const { user, login, register, requestPasswordReset, updatePassword, usesSupabase } = useAuth();
 
   const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState(() => {
     const pendingResetEmail = getPendingPasswordResetEmail();
     if (pendingResetEmail) {
@@ -46,6 +48,10 @@ export function AuthPage() {
   });
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState("Philippines");
+  const [city, setCity] = useState("");
+  const [gym, setGym] = useState("");
   const [rememberMe, setRememberMe] = useState(() => {
     if (getPendingPasswordResetEmail()) {
       return false;
@@ -72,6 +78,13 @@ export function AuthPage() {
     setSuccess(null);
     setPassword("");
     setConfirmPassword("");
+    if (nextMode !== "register") {
+      setUsername("");
+      setPhone("");
+      setCountry("Philippines");
+      setCity("");
+      setGym("");
+    }
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -86,7 +99,17 @@ export function AuthPage() {
           throw new Error("Passwords do not match.");
         }
 
-        await register({ fullName, email, password, accountType: "fan" });
+        await register({
+          fullName,
+          username: validateUsername(username),
+          email,
+          password,
+          accountType: "fan",
+          phone,
+          country,
+          city,
+          gym,
+        });
         router.push(nextPath);
         return;
       }
@@ -154,7 +177,7 @@ export function AuthPage() {
 
   const description =
     mode === "register"
-      ? "Create a Juego Todo account to manage your profile, save fighters and events, and shop official JTGC gear."
+      ? "Create a Juego Todo account with your contact details, then manage your official JTGC membership and credentials from your portal."
       : mode === "forgot"
         ? "Enter the email tied to your JTGC account and we will send password reset instructions."
         : mode === "reset"
@@ -222,13 +245,41 @@ export function AuthPage() {
 
               <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
                 {mode === "register" ? (
-                  <AuthField
-                    label="Full name"
-                    onChange={setFullName}
-                    placeholder="Your full name"
-                    required
-                    value={fullName}
-                  />
+                  <>
+                    <AuthField
+                      label="Full name"
+                      onChange={setFullName}
+                      placeholder="Your full name"
+                      required
+                      value={fullName}
+                    />
+                    <AuthUsernameField onChange={setUsername} value={username} />
+                    <AuthField
+                      label="Phone"
+                      onChange={setPhone}
+                      placeholder="Mobile number"
+                      type="tel"
+                      value={phone}
+                    />
+                    <AuthField
+                      label="Country"
+                      onChange={setCountry}
+                      placeholder="Philippines"
+                      value={country}
+                    />
+                    <AuthField
+                      label="City / region"
+                      onChange={setCity}
+                      placeholder="Optional"
+                      value={city}
+                    />
+                    <AuthField
+                      label="Club affiliation"
+                      onChange={setGym}
+                      placeholder="Optional"
+                      value={gym}
+                    />
+                  </>
                 ) : null}
 
                 <AuthField
@@ -335,6 +386,34 @@ export function AuthPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function AuthUsernameField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-zinc-400">Username</span>
+      <div className="relative">
+        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-zinc-500">
+          @
+        </span>
+        <input
+          autoComplete="username"
+          className="w-full rounded-2xl border border-white/10 bg-black/50 py-3 pl-8 pr-4 text-white outline-none ring-red-500/40 transition placeholder:text-zinc-500 focus:ring-4"
+          onChange={(event) => onChange(normalizeUsername(event.target.value))}
+          placeholder="yourname"
+          required
+          value={value}
+        />
+      </div>
+      <p className="mt-2 text-xs text-zinc-500">3–20 characters. Letters, numbers, and underscores only.</p>
+    </label>
   );
 }
 

@@ -19,22 +19,14 @@ export function NavbarProfileLink({
   className = "",
   showUsername = true,
 }: NavbarProfileLinkProps) {
-  if (loading || !user) {
+  if (loading || !user || !showUsername) {
     return null;
   }
 
   const greeting = `Hi ${getProfileFirstName(user)}`;
 
-  if (!showUsername) {
-    return null;
-  }
-
   return (
-    <Link
-      aria-label={`${greeting} profile`}
-      className={`max-w-[9rem] truncate text-xs font-bold normal-case tracking-[0.02em] text-zinc-200 transition hover:text-white ${className}`}
-      href={href}
-    >
+    <Link aria-label={`${greeting} profile`} className={className} href={href}>
       {greeting}
     </Link>
   );

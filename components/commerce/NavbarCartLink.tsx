@@ -29,10 +29,10 @@ export function NavbarCartLink() {
       animate={
         pulse
           ? {
-              scale: [1, 1.12, 1],
+              scale: [1, 1.08, 1],
               boxShadow: [
                 "0 0 0 rgba(255,16,16,0)",
-                "0 0 24px rgba(255,16,16,0.45)",
+                "0 0 24px rgba(255,16,16,0.4)",
                 "0 0 0 rgba(255,16,16,0)",
               ],
             }
@@ -43,18 +43,16 @@ export function NavbarCartLink() {
     >
       <button
         aria-label={`Open cart${cartCount > 0 ? `, ${cartCount} items, ${formatCurrency(totals.subtotal)} subtotal` : ""}`}
-        className={`relative rounded-full border p-2.5 text-white transition duration-300 ${
-          pulse ? "border-[#FF1010]/60 bg-[#FF1010]/10" : "border-white/10 bg-white/5 hover:border-red-500/40"
-        }`}
+        className={`nav-cart-button ${pulse ? "border-[#FF1010]/60 bg-[#FF1010]/10" : ""}`}
         onClick={openCartDrawer}
         type="button"
       >
-        <ShoppingCart size={18} aria-hidden />
+        <ShoppingCart aria-hidden size={18} />
         <AnimatePresence mode="popLayout">
           {cartCount > 0 ? (
             <motion.span
-              animate={{ scale: pulse ? [1, 1.35, 1] : 1, opacity: 1 }}
-              className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FF1010] px-1 text-[0.6rem] font-black text-white"
+              animate={{ scale: pulse ? [1, 1.3, 1] : 1, opacity: 1 }}
+              className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FF1010] px-1 text-[0.6rem] font-black text-white shadow-[0_0_12px_rgba(255,16,16,0.45)]"
               exit={{ scale: 0, opacity: 0 }}
               initial={{ scale: 0, opacity: 0 }}
               key={cartCount}

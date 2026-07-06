@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { CheckCircle2, Wifi } from "lucide-react";
 import { AdminProfileHeroCard } from "@/components/profile/dashboard/AdminProfileHeroCard";
+import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import type { LicenseApplication } from "@/data/license-applications";
 import type { MemberRecord } from "@/lib/profile/member-record";
 import type { UserProfile } from "@/lib/auth/types";
@@ -58,7 +59,15 @@ export function ProfileMissionHero({
 
       <div className="relative space-y-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div className="space-y-4">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+            {onPortraitUpload ? (
+              <ProfileAvatarButton
+                displayName={user.fullName}
+                onSave={onPortraitUpload}
+                portraitImage={portraitImage}
+              />
+            ) : null}
+            <div className="space-y-4">
             <p className={`text-[0.62rem] font-black uppercase tracking-[0.32em] ${role.accentClass}`}>
               Digital Martial Arts Passport
             </p>
@@ -87,6 +96,7 @@ export function ProfileMissionHero({
             <p className="text-[0.58rem] font-black uppercase tracking-[0.18em] text-zinc-500">
               Last login · {lastLogin}
             </p>
+            </div>
           </div>
         </div>
 

@@ -1,8 +1,7 @@
 "use client";
 
 import { Camera, Loader2, Trash2 } from "lucide-react";
-import { useRef, useState } from "react";
-import { readUploadAsDataUrl } from "@/lib/licenses/file-upload";
+import { useProfilePhotoUpload } from "@/lib/profile/use-profile-photo-upload";
 
 export function ProfilePortraitUpload({
   portraitImage,
@@ -15,43 +14,15 @@ export function ProfilePortraitUpload({
   onRemove?: () => Promise<void> | void;
   compact?: boolean;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleFile(file: File) {
-    setUploading(true);
-    setError(null);
-
-    try {
-      const dataUrl = await readUploadAsDataUrl(file);
-      await onSave(dataUrl);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unable to upload photo.");
-    } finally {
-      setUploading(false);
-    }
-  }
+  const { cropModal, uploading, error, openFilePicker } = useProfilePhotoUpload(onSave);
 
   return (
     <div className={compact ? "space-y-3" : "space-y-4"}>
-      <input
-        accept="image/*"
-        className="hidden"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) {
-            void handleFile(file);
-          }
-          event.target.value = "";
-        }}
-        ref={inputRef}
-        type="file"
-      />
+      {cropModal}
 
       {portraitImage ? (
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative h-24 w-20 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+          <div className="relative h-24 w-24 overflow-hidden rounded-full border border-white/10 bg-black/40">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img alt="Your profile portrait" className="h-full w-full object-cover object-top" src={portraitImage} />
           </div>
@@ -59,7 +30,7 @@ export function ProfilePortraitUpload({
             <button
               className="inline-flex min-h-10 items-center gap-2 rounded-full border border-white/15 px-4 text-[0.62rem] font-black uppercase tracking-[0.14em] text-white transition hover:border-red-500/40"
               disabled={uploading}
-              onClick={() => inputRef.current?.click()}
+              onClick={openFilePicker}
               type="button"
             >
               {uploading ? <Loader2 className="animate-spin" size={14} aria-hidden /> : <Camera size={14} aria-hidden />}
@@ -82,7 +53,7 @@ export function ProfilePortraitUpload({
         <button
           className="flex w-full flex-col items-center justify-center rounded-[1.25rem] border border-dashed border-white/15 bg-white/[0.02] px-6 py-8 text-center transition hover:border-red-500/35 hover:bg-red-500/5"
           disabled={uploading}
-          onClick={() => inputRef.current?.click()}
+          onClick={openFilePicker}
           type="button"
         >
           {uploading ? (
@@ -92,7 +63,7 @@ export function ProfilePortraitUpload({
           )}
           <p className="mt-4 text-sm font-black uppercase tracking-[0.14em] text-white">Add Profile Photo</p>
           <p className="mt-2 max-w-sm text-sm text-zinc-400">
-            Upload a waist-up promotional photo. PNG or JPG, up to 2MB.
+            Upload a photo, then crop it to fit your circular profile avatar. PNG or JPG, up to 2MB.
           </p>
         </button>
       )}

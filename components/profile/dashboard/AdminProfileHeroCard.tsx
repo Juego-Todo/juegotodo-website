@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Camera, Loader2, Pencil, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { Loader2, Pencil, X } from "lucide-react";
+import { useState } from "react";
+import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import { formatLicenseDate, type LicenseApplication } from "@/data/license-applications";
 import { adminUpdateMemberProfile } from "@/lib/admin/member-directory";
 import { useAuth } from "@/lib/auth/context";
@@ -14,99 +15,10 @@ import {
   resolveProfileDateOfBirth,
   saveProfileDateOfBirth,
 } from "@/lib/profile/profile-details-storage";
-import { readUploadAsDataUrl } from "@/lib/licenses/file-upload";
 
 const accountTypes = Object.keys(accountTypeLabels) as AccountType[];
 const fieldClassName =
   "mt-1 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none ring-amber-500/30 focus:ring-4";
-
-function buildInitials(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
-}
-
-function AdminProfileAvatar({
-  displayName,
-  portraitImage,
-  onUpload,
-}: {
-  displayName: string;
-  portraitImage?: string;
-  onUpload?: (dataUrl: string) => Promise<void> | void;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
-  const initials = buildInitials(displayName);
-
-  async function handleFile(file: File) {
-    if (!onUpload) {
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const dataUrl = await readUploadAsDataUrl(file);
-      await onUpload(dataUrl);
-    } finally {
-      setUploading(false);
-    }
-  }
-
-  const avatarBody = portraitImage ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img alt={`${displayName} profile photo`} className="h-full w-full object-cover object-top" src={portraitImage} />
-  ) : (
-    <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_35%_18%,rgba(245,158,11,0.35),transparent_38%),linear-gradient(145deg,#27272a,#050505)] font-display text-3xl text-white sm:text-4xl">
-      {initials}
-    </div>
-  );
-
-  if (!onUpload) {
-    return (
-      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-amber-500/40 bg-black/50 shadow-[0_0_32px_rgba(245,158,11,0.18)] sm:h-28 sm:w-28">
-        {avatarBody}
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative shrink-0">
-      <input
-        accept="image/*"
-        className="hidden"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) {
-            void handleFile(file);
-          }
-          event.target.value = "";
-        }}
-        ref={inputRef}
-        type="file"
-      />
-      <button
-        aria-label={portraitImage ? "Change profile photo" : "Add profile photo"}
-        className="group relative h-24 w-24 overflow-hidden rounded-full border-4 border-amber-500/40 bg-black/50 shadow-[0_0_32px_rgba(245,158,11,0.18)] transition hover:border-amber-300/60 sm:h-28 sm:w-28"
-        disabled={uploading}
-        onClick={() => inputRef.current?.click()}
-        type="button"
-      >
-        {avatarBody}
-        <span className="absolute inset-0 flex items-center justify-center bg-black/55 opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
-          {uploading ? (
-            <Loader2 className="animate-spin text-amber-100" size={22} aria-hidden />
-          ) : (
-            <Camera className="text-amber-100" size={22} aria-hidden />
-          )}
-        </span>
-      </button>
-    </div>
-  );
-}
 
 function AdminUserInfoRow({ label, value }: { label: string; value: string }) {
   return (
@@ -231,9 +143,10 @@ export function AdminProfileHeroCard({
 
         <form onSubmit={(event) => void handleSave(event)}>
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-            <AdminProfileAvatar
+            <ProfileAvatarButton
+              accent="amber"
               displayName={editing ? form.fullName : user.fullName}
-              onUpload={onPortraitUpload}
+              onSave={onPortraitUpload}
               portraitImage={portraitImage}
             />
             <div className="min-w-0 flex-1 space-y-2 pr-12 sm:pr-14">

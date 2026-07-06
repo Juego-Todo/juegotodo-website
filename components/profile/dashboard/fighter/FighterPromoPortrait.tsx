@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Camera, Loader2 } from "lucide-react";
-import { useRef, useState } from "react";
-import { readUploadAsDataUrl } from "@/lib/licenses/file-upload";
+import { useState } from "react";
+import { useProfilePhotoUpload } from "@/lib/profile/use-profile-photo-upload";
 
 function PortraitImage({
   portraitImage,
@@ -49,10 +49,8 @@ export function FighterPromoPortrait({
   onUpload?: (dataUrl: string) => Promise<void> | void;
   allowUpload?: boolean;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const { cropModal, uploading, error, openFilePicker } = useProfilePhotoUpload(onUpload ?? (async () => {}));
   const [hovering, setHovering] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useSpring(useTransform(y, [-100, 100], [4, -4]), { stiffness: 160, damping: 22 });
@@ -60,22 +58,6 @@ export function FighterPromoPortrait({
   const glow = useSpring(hovering ? 1 : 0.35, { stiffness: 120, damping: 18 });
   const heightClass = size === "hero" ? "min-h-[28rem] sm:min-h-[34rem] xl:min-h-[38rem]" : "min-h-[18rem]";
   const showUpload = allowUpload && onUpload;
-
-  async function handleFile(file: File) {
-    if (!onUpload) return;
-
-    setUploading(true);
-    setUploadError(null);
-
-    try {
-      const dataUrl = await readUploadAsDataUrl(file);
-      await onUpload(dataUrl);
-    } catch (caught) {
-      setUploadError(caught instanceof Error ? caught.message : "Unable to upload photo.");
-    } finally {
-      setUploading(false);
-    }
-  }
 
   return (
     <motion.div
@@ -93,19 +75,7 @@ export function FighterPromoPortrait({
       }}
       style={{ rotateX, rotateY, transformPerspective: 1400 }}
     >
-      <input
-        accept="image/*"
-        className="hidden"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) {
-            void handleFile(file);
-          }
-          event.target.value = "";
-        }}
-        ref={inputRef}
-        type="file"
-      />
+      {cropModal}
 
       <motion.div
         animate={{ opacity: hovering ? 1 : 0.55 }}
@@ -121,7 +91,7 @@ export function FighterPromoPortrait({
               <button
                 className="absolute bottom-8 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/15 bg-black/70 px-4 py-2 text-[0.58rem] font-black uppercase tracking-[0.14em] text-white opacity-0 transition hover:border-red-500/40 group-hover:opacity-100"
                 disabled={uploading}
-                onClick={() => inputRef.current?.click()}
+                onClick={openFilePicker}
                 type="button"
               >
                 {uploading ? <Loader2 className="animate-spin" size={14} aria-hidden /> : <Camera size={14} aria-hidden />}
@@ -133,7 +103,7 @@ export function FighterPromoPortrait({
           <button
             className="group relative flex h-full w-full flex-col items-center justify-center rounded-[1.75rem] border border-dashed border-white/15 bg-[radial-gradient(circle_at_50%_0%,rgba(255,16,16,0.12),transparent_42%),linear-gradient(180deg,#121214_0%,#050506_55%,#000_100%)] transition hover:border-red-500/35 hover:bg-red-500/5"
             disabled={uploading}
-            onClick={() => inputRef.current?.click()}
+            onClick={openFilePicker}
             type="button"
           >
             {uploading ? (
@@ -190,7 +160,7 @@ export function FighterPromoPortrait({
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent" />
       </div>
 
-      {uploadError ? <p className="mt-3 text-center text-xs text-red-300">{uploadError}</p> : null}
+      {error ? <p className="mt-3 text-center text-xs text-red-300">{error}</p> : null}
     </motion.div>
   );
 }

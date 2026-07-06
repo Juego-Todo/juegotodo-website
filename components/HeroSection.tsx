@@ -7,10 +7,6 @@ import { CountdownTimer } from "@/components/CountdownTimer";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { EnergyParticles } from "@/components/EnergyParticles";
 import { MagneticButton } from "@/components/MagneticButton";
-import { MediaPartnerLogo } from "@/components/MediaPartnerLogo";
-import { MediaPartnerMarquee } from "@/components/MediaPartnerMarquee";
-import { mediaPartners } from "@/data/site";
-
 import { barrioBrawlsTicketSlug } from "@/data/shop-tickets";
 
 const heroFeaturedEvent = {
@@ -29,36 +25,34 @@ export function HeroSection() {
   const heroScale = useTransform(scrollYProgress, [0, 0.35], [1, 1.06]);
 
   return (
-    <section className="relative flex flex-col overflow-x-hidden">
-      <motion.div className="absolute inset-0" style={{ y: heroY, scale: heroScale }}>
-        <Image
-          alt="Juego Todo FMA athletes in weaponized competition"
-          className="h-full w-full object-cover object-[center_30%]"
-          fill
-          loading="eager"
-          priority
-          sizes="100vw"
-          src="/juego-todo-event-background.png"
-        />
-      </motion.div>
+    <section className="relative flex flex-col overflow-x-clip">
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <motion.div className="absolute inset-0" style={{ y: heroY, scale: heroScale }}>
+          <Image
+            alt="Juego Todo FMA athletes in weaponized competition"
+            className="h-full w-full object-cover object-[center_30%]"
+            fill
+            loading="eager"
+            priority
+            sizes="100vw"
+            src="/juego-todo-event-background.png"
+          />
+        </motion.div>
 
-      <div className="absolute inset-0 bg-gradient-to-br from-black/88 via-[#990000]/12 to-black/72" aria-hidden />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,5,5,0.96)_0%,rgba(5,5,5,0.78)_42%,rgba(5,5,5,0.32)_68%,rgba(5,5,5,0.82)_100%)]" aria-hidden />
-      <div className="absolute inset-0 bg-[linear-gradient(0deg,#050505_0%,rgba(5,5,5,0.4)_28%,rgba(5,5,5,0)_55%)]" aria-hidden />
-      <div
-        className="absolute inset-0 bg-[radial-gradient(circle_at_72%_22%,rgba(255,16,16,0.12),transparent_32rem),radial-gradient(circle_at_16%_80%,rgba(255,16,16,0.1),transparent_24rem)]"
-        aria-hidden
-      />
-      <div className="cinematic-grid absolute inset-0 opacity-[0.08]" aria-hidden />
-      <div className="pointer-events-none absolute inset-0 opacity-35" aria-hidden>
-        <EnergyParticles count={10} />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/88 via-[#990000]/12 to-black/72" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,5,5,0.96)_0%,rgba(5,5,5,0.78)_42%,rgba(5,5,5,0.32)_68%,rgba(5,5,5,0.82)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,#050505_0%,rgba(5,5,5,0.4)_28%,rgba(5,5,5,0)_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_22%,rgba(255,16,16,0.12),transparent_32rem),radial-gradient(circle_at_16%_80%,rgba(255,16,16,0.1),transparent_24rem)]" />
+        <div className="cinematic-grid absolute inset-0 opacity-[0.08]" />
+        <div className="absolute inset-0 opacity-35">
+          <EnergyParticles count={10} />
+        </div>
+        <motion.div
+          className="hero-rings absolute -right-40 top-28 h-[38rem] w-[38rem] rounded-full opacity-[0.35] blur-sm"
+          style={{ y: heroY }}
+        />
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/85 to-transparent" />
       </div>
-      <motion.div
-        aria-hidden
-        className="hero-rings absolute -right-40 top-28 h-[38rem] w-[38rem] rounded-full opacity-[0.35] blur-sm"
-        style={{ y: heroY }}
-      />
-      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/85 to-transparent" aria-hidden />
 
       <div className="relative z-10 flex min-h-[calc(100svh-4.5rem)] flex-col">
         <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-7 px-4 pb-6 pt-20 sm:px-6 sm:pt-20 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 lg:px-8 lg:pb-6 lg:pt-24">
@@ -129,29 +123,6 @@ export function HeroSection() {
               </div>
             </div>
           </motion.div>
-        </div>
-
-        <div className="mt-auto w-full shrink-0 border-t border-white/[0.08] bg-[#050505] py-6 sm:py-8">
-          <p className="text-center text-[0.62rem] font-medium uppercase tracking-[0.32em] text-zinc-500">
-            As Seen On
-          </p>
-
-          <div className="relative mt-5 min-h-[3.25rem] w-full sm:mt-6 sm:min-h-[3.75rem]">
-              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#050505] to-transparent sm:w-24" aria-hidden />
-              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#050505] to-transparent sm:w-24" aria-hidden />
-
-              <div className="hidden lg:block">
-                <MediaPartnerMarquee />
-              </div>
-
-              <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-6 px-4 pb-2 sm:grid-cols-3 sm:px-6 lg:hidden">
-                {mediaPartners.map((partner) => (
-                  <div className="flex items-center justify-center" key={partner.name}>
-                    <MediaPartnerLogo partner={partner} />
-                  </div>
-                ))}
-              </div>
-          </div>
         </div>
       </div>
     </section>

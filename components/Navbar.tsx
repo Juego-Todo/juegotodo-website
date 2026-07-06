@@ -26,7 +26,7 @@ const aboutUsPaths = [
 const latayanologyPaths = ["/latayanology", "/fighters", "/fma-lineage", "/calendar"];
 
 const desktopNavLinkClassName =
-  "nav-link-underline px-4 py-2.5 text-[0.78rem] font-bold uppercase tracking-[0.15em] text-zinc-400";
+  "nav-link-underline shrink-0 whitespace-nowrap px-3 py-2 text-[0.78rem] font-bold uppercase leading-none tracking-[0.15em] text-zinc-400 2xl:px-4";
 
 const accountLinks = [
   { label: "Profile", href: "/profile", icon: User },
@@ -140,15 +140,15 @@ export function Navbar() {
     <header className={`glass-nav fixed inset-x-0 top-0 z-50 ${scrolled ? "glass-nav-scrolled" : ""}`}>
       <nav
         aria-label="Primary navigation"
-        className={`relative mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 transition-[min-height,padding] duration-300 ease-out sm:px-6 lg:px-8 ${
+        className={`relative mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 transition-[min-height,padding] duration-300 ease-out sm:px-6 lg:px-8 xl:grid xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:items-center ${
           scrolled ? "min-h-[4rem] py-2.5" : "min-h-[4.75rem] py-3.5"
         }`}
       >
-        <div className="relative z-10 flex shrink-0 items-center">
+        <div className="relative z-10 flex shrink-0 items-center xl:justify-self-start">
           <BrandLogo />
         </div>
 
-        <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 xl:flex 2xl:gap-12">
+        <div className="hidden items-center gap-6 xl:flex xl:justify-self-center 2xl:gap-10">
           {centerLinks.map((item) => {
             const active = isNavActive(pathname, item.href, item.label);
 
@@ -157,7 +157,7 @@ export function Navbar() {
 
               return (
                 <div
-                  className="relative"
+                  className="relative flex items-center"
                   key={item.href}
                   onBlur={(event) => closeDropdownIfBlurred(event.currentTarget, event.relatedTarget)}
                   onFocus={() => setOpenDropdown(item.label)}
@@ -222,10 +222,10 @@ export function Navbar() {
           })}
         </div>
 
-        <div className="relative z-10 flex items-center gap-2.5 sm:gap-3">
+        <div className="relative z-10 flex items-center gap-2 sm:gap-2.5 xl:col-start-3 xl:justify-self-end">
           <NavbarCartLink />
 
-          <div className="hidden items-center gap-2.5 xl:flex">
+          <div className="hidden items-center gap-2.5 xl:flex xl:items-center">
             {!loading && !user ? (
               <>
                 <Link className="nav-auth-outline" href={loginHref}>
@@ -245,7 +245,7 @@ export function Navbar() {
             aria-controls="mobile-primary-nav"
             aria-expanded={isOpen}
             aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
-            className="nav-menu-toggle xl:hidden"
+            className="nav-menu-toggle nav-menu-toggle--header inline-flex"
             onClick={() => setIsOpen((value) => !value)}
             type="button"
           >
@@ -280,7 +280,7 @@ export function Navbar() {
                 <BrandLogo />
                 <button
                   aria-label="Close navigation menu"
-                  className="nav-menu-toggle"
+                  className="nav-menu-toggle inline-flex"
                   onClick={() => setIsOpen(false)}
                   type="button"
                 >

@@ -6,6 +6,25 @@ export function buildFullName(input: {
   return [input.firstName, input.middleName, input.lastName].filter(Boolean).join(" ").trim();
 }
 
+export function getFirstName(fullName: string, fallback = "there") {
+  const first = fullName.trim().split(/\s+/)[0];
+  return first || fallback;
+}
+
+export function getProfileFirstName(input: { fullName: string; username: string }) {
+  const fromFullName = getFirstName(input.fullName, "");
+  if (fromFullName) {
+    return fromFullName;
+  }
+
+  const fromUsername = input.username.trim().split(/[._-]/)[0] ?? "";
+  if (!fromUsername) {
+    return "there";
+  }
+
+  return fromUsername.charAt(0).toUpperCase() + fromUsername.slice(1);
+}
+
 export const registerGenderOptions = ["Male", "Female", "Prefer not to say"] as const;
 
 export function validateDateOfBirth(value: string) {

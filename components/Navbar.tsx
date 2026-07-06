@@ -76,6 +76,10 @@ export function Navbar() {
 
   const loginHref = user ? "/profile" : loginItem?.href ?? "/login";
   const registerHref = registerItem?.href ?? "/login?mode=register";
+  const authButtonClassName =
+    "inline-flex min-h-10 items-center justify-center rounded-full px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] transition";
+  const loginButtonClassName = `${authButtonClassName} border border-white/15 text-white hover:border-white/30 hover:bg-white/5`;
+  const registerButtonClassName = `${authButtonClassName} bg-[#FF1010] text-white shadow-[0_0_28px_rgba(255,16,16,0.4)] hover:-translate-y-0.5 hover:bg-[#ff2828]`;
 
   useEffect(() => {
     function handleScroll() {
@@ -160,19 +164,23 @@ export function Navbar() {
           <NavbarCartLink />
 
           <div className="hidden items-center gap-2 lg:flex">
-            <NavbarProfileLink
-              className="nav-link-underline px-3 py-2 transition hover:text-white"
-              href={loginHref}
-              loading={loading}
-              user={user}
-            />
-            {!user ? (
-              <Link
-                className="inline-flex items-center rounded-full bg-[#FF1010] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_0_28px_rgba(255,16,16,0.4)] transition hover:-translate-y-0.5 hover:bg-[#ff2828]"
-                href={registerHref}
-              >
-                Register
-              </Link>
+            {!loading && !user ? (
+              <>
+                <Link className={loginButtonClassName} href={loginHref}>
+                  Login
+                </Link>
+                <Link className={registerButtonClassName} href={registerHref}>
+                  Register
+                </Link>
+              </>
+            ) : null}
+            {user ? (
+              <NavbarProfileLink
+                className="px-1 py-2 transition hover:text-white"
+                href={loginHref}
+                loading={loading}
+                user={user}
+              />
             ) : null}
           </div>
 
@@ -255,32 +263,37 @@ export function Navbar() {
               })}
 
               <div className="mt-2 grid grid-cols-2 gap-2 border-t border-white/[0.08] pt-4">
-                <NavbarProfileLink
-                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/[0.08] px-4 text-sm font-black uppercase tracking-[0.16em] text-white"
-                  href={loginHref}
-                  loading={loading}
-                  user={user}
-                />
-                {!user ? (
-                  <Link
-                    className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-4 text-sm font-black uppercase tracking-[0.16em] text-white"
-                    href={registerHref}
-                  >
-                    Register
-                  </Link>
-                ) : (
-                  <button
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/[0.08] px-4 text-sm font-black uppercase tracking-[0.16em] text-white"
-                    onClick={() => {
-                      setIsOpen(false);
-                      openCartDrawer();
-                    }}
-                    type="button"
-                  >
-                    <ShoppingCart aria-hidden size={16} />
-                    Cart {cartCount > 0 ? `(${cartCount})` : ""}
-                  </button>
-                )}
+                {!loading && !user ? (
+                  <>
+                    <Link className={`${loginButtonClassName} min-h-12`} href={loginHref}>
+                      Login
+                    </Link>
+                    <Link className={`${registerButtonClassName} min-h-12`} href={registerHref}>
+                      Register
+                    </Link>
+                  </>
+                ) : null}
+                {user ? (
+                  <>
+                    <NavbarProfileLink
+                      className="col-span-2 inline-flex min-h-12 items-center justify-center rounded-full border border-white/[0.08] px-4 text-sm font-black uppercase tracking-[0.16em] text-white"
+                      href={loginHref}
+                      loading={loading}
+                      user={user}
+                    />
+                    <button
+                      className="col-span-2 inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/[0.08] px-4 text-sm font-black uppercase tracking-[0.16em] text-white"
+                      onClick={() => {
+                        setIsOpen(false);
+                        openCartDrawer();
+                      }}
+                      type="button"
+                    >
+                      <ShoppingCart aria-hidden size={16} />
+                      Cart {cartCount > 0 ? `(${cartCount})` : ""}
+                    </button>
+                  </>
+                ) : null}
               </div>
             </div>
           </motion.div>

@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { NavbarCartLink } from "@/components/commerce/NavbarCartLink";
+import { NavbarProfileLink } from "@/components/NavbarProfileLink";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import { navItems } from "@/data/site";
@@ -74,7 +75,6 @@ export function Navbar() {
   const registerItem = navItems.find((item) => item.cta);
 
   const loginHref = user ? "/profile" : loginItem?.href ?? "/login";
-  const loginLabel = user ? "Profile" : "Login";
   const registerHref = registerItem?.href ?? "/login?mode=register";
 
   useEffect(() => {
@@ -160,12 +160,12 @@ export function Navbar() {
           <NavbarCartLink />
 
           <div className="hidden items-center gap-2 lg:flex">
-            <Link
-              className="nav-link-underline px-3 py-2 text-xs font-bold uppercase tracking-[0.16em] text-zinc-300 transition hover:text-white"
+            <NavbarProfileLink
+              className="nav-link-underline px-3 py-2 transition hover:text-white"
               href={loginHref}
-            >
-              {loading ? "Login" : loginLabel}
-            </Link>
+              loading={loading}
+              user={user}
+            />
             {!user ? (
               <Link
                 className="inline-flex items-center rounded-full bg-[#FF1010] px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_0_28px_rgba(255,16,16,0.4)] transition hover:-translate-y-0.5 hover:bg-[#ff2828]"
@@ -255,12 +255,12 @@ export function Navbar() {
               })}
 
               <div className="mt-2 grid grid-cols-2 gap-2 border-t border-white/[0.08] pt-4">
-                <Link
+                <NavbarProfileLink
                   className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/[0.08] px-4 text-sm font-black uppercase tracking-[0.16em] text-white"
                   href={loginHref}
-                >
-                  {loading ? "Login" : loginLabel}
-                </Link>
+                  loading={loading}
+                  user={user}
+                />
                 {!user ? (
                   <Link
                     className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-4 text-sm font-black uppercase tracking-[0.16em] text-white"

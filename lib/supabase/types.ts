@@ -92,6 +92,22 @@ type OrderRow = {
   updated_at: string;
 };
 
+type LicenseApplicationRow = {
+  id: string;
+  user_id: string;
+  user_email: string;
+  status: string;
+  application_program: string;
+  restriction_code: string;
+  full_name: string;
+  id_number: string;
+  submitted_at: string;
+  reviewed_at: string | null;
+  payload: Json;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -144,6 +160,12 @@ export type Database = {
         Update: Partial<Omit<OrderRow, "id">>;
         Relationships: [];
       };
+      license_applications: {
+        Row: LicenseApplicationRow;
+        Insert: Partial<LicenseApplicationRow> & Pick<LicenseApplicationRow, "user_id" | "payload">;
+        Update: Partial<Omit<LicenseApplicationRow, "id">>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -157,4 +179,4 @@ export type Database = {
   };
 };
 
-export type { OrderRow, ProfileRow };
+export type { LicenseApplicationRow, OrderRow, ProfileRow };

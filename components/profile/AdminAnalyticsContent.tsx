@@ -6,76 +6,94 @@ import {
   AdminMembershipAnalyticsPanel,
   AdminShopAnalyticsPanel,
 } from "@/components/profile/AdminAnalyticsPanels";
+import { fetchAdminMemberRecords } from "@/lib/admin/member-directory";
+import { getAllOrders } from "@/lib/commerce/storage";
+import { fetchAllLicenseApplications } from "@/lib/licenses/storage";
 import {
   buildAdminLicenseAnalytics,
   buildAdminMembershipAnalytics,
   buildAdminShopAnalytics,
+  computeLicenseAnalytics,
+  computeMembershipAnalytics,
+  type LicenseAnalyticsSnapshot,
+  type MembershipAnalyticsSnapshot,
 } from "@/lib/profile/admin-analytics";
-import { fetchAdminMemberRecords } from "@/lib/admin/member-directory";
-import { getAllOrders } from "@/lib/commerce/storage";
-import { fetchAllLicenseApplications } from "@/lib/licenses/storage";
+
+const emptyMembershipSnapshot: MembershipAnalyticsSnapshot = {
+  totalMembers: 0,
+  officials: 0,
+  activeEvents: 0,
+  newSignups: 0,
+  verifiedMembers: 0,
+};
+
+const emptyLicenseSnapshot: LicenseAnalyticsSnapshot = {
+  pendingCount: 0,
+  pendingCards: 0,
+  needsInfoCount: 0,
+  approvedCount: 0,
+  approvalRate: null,
+};
 
 export function AdminMembershipAnalyticsContent() {
-  const [memberCount, setMemberCount] = useState<number | undefined>();
+  const [snapshot, setSnapshot] = useState<MembershipAnalyticsSnapshot>(emptyMembershipSnapshot);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     void getAllOrders().then((orders) => {
       void fetchAdminMemberRecords(orders).then((records) => {
-        setMemberCount(records.length);
+        setSnapshot(computeMembershipAnalytics(records));
+        setLoaded(true);
       });
     });
   }, []);
 
-  const statistics = useMemo(() => buildAdminMembershipAnalytics(memberCount), [memberCount]);
+  const statistics = useMemo(
+    () => buildAdminMembershipAnalytics(loaded ? snapshot : emptyMembershipSnapshot),
+    [loaded, snapshot],
+  );
 
   return <AdminMembershipAnalyticsPanel statistics={statistics} />;
 }
 
-export function AdminLicenseAnalyticsContent({ pendingLicenseCount }: { pendingLicenseCount: number }) {
-  const [needsInfoCount, setNeedsInfoCount] = useState(0);
-  const [approvedCount, setApprovedCount] = useState(0);
+export function AdminLicenseAnalyticsContent() {
+  const [snapshot, setSnapshot] = useState<LicenseAnalyticsSnapshot>(emptyLicenseSnapshot);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     void fetchAllLicenseApplications().then((applications) => {
-      setNeedsInfoCount(applications.filter((application) => application.status === "needs_info").length);
-      setApprovedCount(applications.filter((application) => application.status === "approved").length);
+      setSnapshot(computeLicenseAnalytics(applications));
+      setLoaded(true);
     });
   }, []);
 
   const statistics = useMemo(
-    () =>
-      buildAdminLicenseAnalytics({
-        pendingCount: pendingLicenseCount,
-        needsInfoCount,
-        approvedCount,
-      }),
-    [pendingLicenseCount, needsInfoCount, approvedCount],
+    () => buildAdminLicenseAnalytics(loaded ? snapshot : emptyLicenseSnapshot),
+    [loaded, snapshot],
   );
 
   return <AdminLicenseAnalyticsPanel statistics={statistics} />;
 }
 
-export function AdminMembershipLicenseAnalyticsContent({
-  pendingLicenseCount,
-}: {
-  pendingLicenseCount: number;
-}) {
+export function AdminMembershipLicenseAnalyticsContent() {
   return (
     <div className="space-y-10">
       <AdminMembershipAnalyticsContent />
-      <AdminLicenseAnalyticsContent pendingLicenseCount={pendingLicenseCount} />
+      <AdminLicenseAnalyticsContent />
     </div>
   );
 }
 
 export function AdminShopAnalyticsContent() {
-  const [statistics, setStatistics] = useState(() => buildAdminShopAnalytics({
-    totalOrders: 0,
-    pendingPayment: 0,
-    processing: 0,
-    delivered: 0,
-    revenue: 0,
-  }));
+  const [statistics, setStatistics] = useState(() =>
+    buildAdminShopAnalytics({
+      totalOrders: 0,
+      pendingPayment: 0,
+      processing: 0,
+      delivered: 0,
+      revenue: 0,
+    }),
+  );
 
   useEffect(() => {
     void getAllOrders().then((orders) => {

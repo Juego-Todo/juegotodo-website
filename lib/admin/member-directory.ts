@@ -19,7 +19,7 @@ import {
   saveUserCommerceData,
 } from "@/lib/commerce/storage";
 import type { Order, UserCommerceData } from "@/lib/commerce/types";
-import { deleteLicenseApplicationsByUserId, getLicenseApplicationByUserId } from "@/lib/licenses/storage";
+import { deleteLicenseApplicationsByUserId, fetchLicenseApplicationByUserId } from "@/lib/licenses/storage";
 import { clearAdminAssignedTags, getAdminAssignedTags } from "@/lib/profile/account-tags";
 
 export type AdminMemberRecord = {
@@ -135,7 +135,7 @@ export async function fetchAdminMemberRecords(orders: Order[]): Promise<AdminMem
   const records = await Promise.all(
     users.map(async (user) => {
       const commerce = await getUserCommerceData(user.id);
-      const license = getLicenseApplicationByUserId(user.id);
+      const license = await fetchLicenseApplicationByUserId(user.id);
       return buildAdminMemberRecord(user, commerce, license, orders);
     }),
   );

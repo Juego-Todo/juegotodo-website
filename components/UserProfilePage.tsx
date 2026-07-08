@@ -46,7 +46,7 @@ import {
   type MembershipTier,
 } from "@/lib/commerce/types";
 import type { LicenseApplication } from "@/data/license-applications";
-import { fetchLicenseApplicationByUserId, getPendingLicenseApplicationCount } from "@/lib/licenses/storage";
+import { fetchLicenseApplicationByUserId, fetchPendingLicenseApplicationCount } from "@/lib/licenses/storage";
 import { buildProfileIdentity, getJtgcTierLabel } from "@/lib/profile/identity";
 import {
   getProfileRolePreviewLabel,
@@ -162,10 +162,16 @@ export function UserProfilePage() {
     () => (user ? getAdminAssignedTags(user.id) : []),
     [user],
   );
-  const pendingLicenseCount = useMemo(
-    () => (user ? getPendingLicenseApplicationCount() : 0),
-    [user],
-  );
+  const [pendingLicenseCount, setPendingLicenseCount] = useState(0);
+
+  useEffect(() => {
+    if (!user || !isAdminProfile(user)) {
+      setPendingLicenseCount(0);
+      return;
+    }
+
+    void fetchPendingLicenseApplicationCount().then(setPendingLicenseCount);
+  }, [user]);
 
   useEffect(() => {
     const tab = searchParams.get("tab");
@@ -382,7 +388,7 @@ export function UserProfilePage() {
   const membershipContent = memberRecord.isAdmin ? <AdminMembershipPanel /> : null;
 
   const membershipAnalyticsContent = memberRecord.isAdmin ? (
-    <AdminMembershipLicenseAnalyticsContent pendingLicenseCount={pendingLicenseCount} />
+    <AdminMembershipLicenseAnalyticsContent />
   ) : null;
   const shopAnalyticsContent = memberRecord.isAdmin ? <AdminShopAnalyticsContent /> : null;
 

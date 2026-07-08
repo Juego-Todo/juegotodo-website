@@ -1,6 +1,7 @@
 import { buildFullName, validateDateOfBirth } from "@/lib/auth/name";
 import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
+import { mapProfileRow } from "@/lib/auth/profile-sync";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ProfileRow } from "@/lib/supabase/types";
 import {
@@ -12,20 +13,22 @@ import {
 } from "@/lib/auth/types";
 
 function mapProfile(row: ProfileRow): UserProfile {
-  return {
-    id: row.id,
-    email: row.email,
-    fullName: row.full_name,
-    username: row.username?.trim() || deriveUsernameSeed(row.email, row.full_name),
-    accountType: migrateAccountType(row.account_type),
-    role: row.role === "admin" ? "admin" : "user",
-    gender: row.gender ?? "",
-    dateOfBirth: row.date_of_birth ?? "",
-    gym: row.gym,
-    city: row.city,
-    bio: row.bio,
-    createdAt: row.created_at,
-  };
+  return mapProfileRow(row);
+}
+
+async function syncRegistrationProfile(input: RegisterInput) {
+  const response = await fetch("/api/auth/sync-profile", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(payload?.error ?? "Unable to save registration profile.");
+  }
 }
 
 export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
@@ -71,6 +74,21 @@ export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
 }
 
 export async function getAllStoredUsersSupabase(): Promise<UserProfile[]> {
+  const response = await fetch("/api/admin/members", {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  if (response.ok) {
+    const payload = (await response.json()) as { members?: UserProfile[] };
+    return payload.members ?? [];
+  }
+
+  if (response.status !== 503) {
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(payload?.error ?? "Unable to load member directory.");
+  }
+
   const supabase = createSupabaseBrowserClient();
   const { data, error } = await supabase
     .from("profiles")
@@ -118,25 +136,7 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
   }
 
   if (data.session) {
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({
-        full_name: fullName,
-        username,
-        gender: input.gender.trim(),
-        date_of_birth: dateOfBirth,
-        account_type: input.accountType,
-        city: input.city?.trim() ?? "",
-        bio: input.bio?.trim() ?? "",
-        phone: input.phone?.trim() ?? "",
-        country: input.country?.trim() ?? "Philippines",
-      })
-      .eq("id", data.user.id);
-
-    if (profileError) {
-      throw new Error(profileError.message);
-    }
-
+    await syncRegistrationProfile(input);
     const profile = await getSupabaseSessionUser();
     if (profile) {
       return profile;

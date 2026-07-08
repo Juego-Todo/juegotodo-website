@@ -163,7 +163,17 @@ begin
     coalesce(new.raw_user_meta_data ->> 'phone', ''),
     coalesce(nullif(new.raw_user_meta_data ->> 'country', ''), 'Philippines')
   )
-  on conflict (id) do nothing;
+  on conflict (id) do update set
+    email = excluded.email,
+    full_name = excluded.full_name,
+    username = excluded.username,
+    gender = excluded.gender,
+    date_of_birth = excluded.date_of_birth,
+    account_type = excluded.account_type,
+    city = excluded.city,
+    phone = excluded.phone,
+    country = excluded.country,
+    updated_at = now();
   return new;
 end;
 $$;

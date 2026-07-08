@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { upsertProfileFromAuthUser } from "@/lib/auth/profile-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -23,6 +24,14 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createSupabaseServerClient();
     await supabase.auth.exchangeCodeForSession(code);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      await upsertProfileFromAuthUser(user);
+    }
   }
 
   return NextResponse.redirect(new URL(next, request.url));

@@ -56,6 +56,22 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
     refreshMembers();
   }, [refreshMembers]);
 
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        refreshMembers();
+      }
+    }
+
+    window.addEventListener("focus", refreshMembers);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", refreshMembers);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [refreshMembers]);
+
   const filteredMembers = useMemo(() => {
     const query = search.trim().toLowerCase();
     if (!query) {

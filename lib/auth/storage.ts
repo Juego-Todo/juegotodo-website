@@ -309,7 +309,15 @@ export function getAllStoredUsersLocal(): UserProfile[] {
 
 export async function getAllStoredUsers(): Promise<UserProfile[]> {
   if (isSupabaseConfigured()) {
-    return getAllStoredUsersSupabase();
+    const remoteUsers = await getAllStoredUsersSupabase();
+    const remoteEmails = new Set(remoteUsers.map((user) => user.email.toLowerCase()));
+    const localOnlyUsers = getAllStoredUsersLocal().filter(
+      (user) => !remoteEmails.has(user.email.toLowerCase()),
+    );
+
+    return [...remoteUsers, ...localOnlyUsers].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
   }
   return getAllStoredUsersLocal();
 }

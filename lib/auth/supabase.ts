@@ -199,6 +199,11 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
   });
 
   if (error) {
+    if (error.message.toLowerCase().includes("database error saving new user")) {
+      throw new Error(
+        "Account setup failed in the database. Ask an admin to run the latest Supabase migrations, then try again.",
+      );
+    }
     throw new Error(error.message);
   }
 

@@ -19,7 +19,7 @@ export async function GET(request: Request) {
       const { data, error } = await serviceClient
         .from("profiles")
         .select("id")
-        .eq("username", normalized)
+        .ilike("username", normalized)
         .maybeSingle();
 
       if (error) {

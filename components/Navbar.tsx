@@ -237,7 +237,13 @@ export function Navbar() {
               </>
             ) : null}
             {user ? (
-              <NavbarProfileLink className="nav-profile-greeting" href={loginHref} loading={loading} user={user} />
+              <NavbarProfileLink
+                className="nav-profile-greeting"
+                href={loginHref}
+                loading={loading}
+                showMenu
+                user={user}
+              />
             ) : null}
           </div>
 

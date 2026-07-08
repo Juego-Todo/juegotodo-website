@@ -75,14 +75,47 @@ export function buildProfileUpsertFromAuthUser(user: User) {
   };
 }
 
-export async function upsertProfileFromAuthUser(user: User) {
+export async function upsertProfileFromAuthUser(
+  user: User,
+  authenticatedClient?: Awaited<ReturnType<typeof import("@/lib/supabase/server").createSupabaseServerClient>>,
+) {
+  const payload = buildProfileUpsertFromAuthUser(user);
   const { createSupabaseServiceClient } = await import("@/lib/supabase/service");
   const serviceClient = createSupabaseServiceClient();
 
-  if (!serviceClient) {
+  if (serviceClient) {
+    await serviceClient.from("profiles").upsert(payload, { onConflict: "id" });
     return;
   }
 
-  const payload = buildProfileUpsertFromAuthUser(user);
-  await serviceClient.from("profiles").upsert(payload, { onConflict: "id" });
+  if (authenticatedClient) {
+    const { error } = await authenticatedClient.from("profiles").upsert(payload, { onConflict: "id" });
+    if (error) {
+      throw new Error(error.message);
+    }
+    return;
+  }
+
+  const { createSupabaseBrowserClient } = await import("@/lib/supabase/client");
+  const supabase = createSupabaseBrowserClient();
+  const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function upsertProfileFromRegisterInputClient(
+  userId: string,
+  email: string,
+  input: RegisterInput,
+) {
+  const { createSupabaseBrowserClient } = await import("@/lib/supabase/client");
+  const supabase = createSupabaseBrowserClient();
+  const payload = buildProfileUpsertFromRegisterInput(userId, email, input);
+  const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }

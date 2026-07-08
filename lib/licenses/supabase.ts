@@ -42,6 +42,21 @@ function toLicenseApplicationRow(application: LicenseApplication) {
 }
 
 export async function fetchAllLicenseApplicationsSupabase(): Promise<LicenseApplication[]> {
+  const response = await fetch("/api/admin/licenses", {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  if (response.ok) {
+    const payload = (await response.json()) as { applications?: LicenseApplication[] };
+    return payload.applications ?? [];
+  }
+
+  if (response.status !== 503) {
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(payload?.error ?? "Unable to load license applications.");
+  }
+
   const supabase = createSupabaseBrowserClient();
   const { data, error } = await supabase
     .from("license_applications")
@@ -132,15 +147,6 @@ export async function deleteLicenseApplicationsByUserIdSupabase(userId: string) 
 }
 
 export async function fetchPendingLicenseApplicationCountSupabase() {
-  const supabase = createSupabaseBrowserClient();
-  const { count, error } = await supabase
-    .from("license_applications")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "pending");
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return count ?? 0;
+  const applications = await fetchAllLicenseApplicationsSupabase();
+  return applications.filter((application) => application.status === "pending").length;
 }

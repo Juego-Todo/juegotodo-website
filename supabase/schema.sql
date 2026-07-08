@@ -194,7 +194,10 @@ as $$
     select 1
     from public.profiles
     where id = auth.uid()
-      and role = 'admin'
+      and (
+        role = 'admin'
+        or lower(email) in ('admin@juegotodo.com', 'kiran.aames@gmail.com')
+      )
   );
 $$;
 
@@ -236,6 +239,10 @@ create policy "profiles_update_admin"
 on public.profiles for update
 using (public.is_admin())
 with check (public.is_admin());
+
+create policy "profiles_insert_own"
+on public.profiles for insert
+with check (auth.uid() = id);
 
 create policy "addresses_all_own"
 on public.addresses for all
@@ -319,6 +326,11 @@ create policy "license_applications_update_admin"
 on public.license_applications for update
 using (public.is_admin())
 with check (public.is_admin());
+
+create policy "license_applications_update_own"
+on public.license_applications for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
 
 create policy "license_applications_delete_admin"
 on public.license_applications for delete

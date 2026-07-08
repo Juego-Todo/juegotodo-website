@@ -1,7 +1,7 @@
 import { buildFullName, validateDateOfBirth } from "@/lib/auth/name";
 import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
-import { mapProfileRow } from "@/lib/auth/profile-sync";
+import { mapProfileRow, upsertProfileFromRegisterInputClient } from "@/lib/auth/profile-sync";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ProfileRow } from "@/lib/supabase/types";
 import {
@@ -25,10 +25,65 @@ async function syncRegistrationProfile(input: RegisterInput) {
     body: JSON.stringify(input),
   });
 
-  if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(payload?.error ?? "Unable to save registration profile.");
+  if (response.ok) {
+    return;
   }
+
+  if (response.status === 503) {
+    const supabase = createSupabaseBrowserClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("Authentication required to save registration profile.");
+    }
+
+    await upsertProfileFromRegisterInputClient(user.id, user.email ?? input.email, input);
+    return;
+  }
+
+  const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+  throw new Error(payload?.error ?? "Unable to save registration profile.");
+}
+
+async function ensureSupabaseProfileRow() {
+  const supabase = createSupabaseBrowserClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return;
+  }
+
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (profile) {
+    return;
+  }
+
+  const syncResponse = await fetch("/api/auth/sync-profile", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (syncResponse.ok) {
+    return;
+  }
+
+  const { upsertProfileFromAuthUser } = await import("@/lib/auth/profile-sync");
+  await upsertProfileFromAuthUser(user);
 }
 
 export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
@@ -52,6 +107,22 @@ export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
   }
 
   if (!profile) {
+    await ensureSupabaseProfileRow();
+
+    const { data: refreshedProfile, error: refreshError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (refreshError) {
+      throw new Error(refreshError.message);
+    }
+
+    if (refreshedProfile) {
+      return mapProfile(refreshedProfile);
+    }
+
     return {
       id: user.id,
       email: user.email ?? "",

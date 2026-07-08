@@ -20,12 +20,7 @@ export async function POST(request: Request) {
   }
 
   const serviceClient = createSupabaseServiceClient();
-  if (!serviceClient) {
-    return NextResponse.json(
-      { error: "Profile sync requires SUPABASE_SERVICE_ROLE_KEY in the server environment." },
-      { status: 503 },
-    );
-  }
+  const upsertClient = serviceClient ?? supabase;
 
   let payload = buildProfileUpsertFromAuthUser(user);
 
@@ -38,7 +33,7 @@ export async function POST(request: Request) {
     // No registration payload supplied; metadata sync is enough.
   }
 
-  const { error } = await serviceClient.from("profiles").upsert(payload, { onConflict: "id" });
+  const { error } = await upsertClient.from("profiles").upsert(payload, { onConflict: "id" });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

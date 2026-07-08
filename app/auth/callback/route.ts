@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (user) {
-      await upsertProfileFromAuthUser(user);
+      await upsertProfileFromAuthUser(user, supabase);
     }
   }
 

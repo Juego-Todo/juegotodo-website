@@ -1,9 +1,36 @@
 import { NextResponse } from "next/server";
 import { isServerAdminUser } from "@/lib/auth/admin-access";
-import { mapProfileRow } from "@/lib/auth/profile-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import type { LicenseApplicationRow } from "@/lib/supabase/types";
+import {
+  normalizeLicenseApplication,
+  type LicenseApplication,
+  type LicenseApplicationStatus,
+} from "@/data/license-applications";
+
+function mapLicenseApplication(row: LicenseApplicationRow): LicenseApplication {
+  const payload = (row.payload ?? {}) as LicenseApplication;
+
+  return normalizeLicenseApplication({
+    ...payload,
+    id: row.id,
+    userId: row.user_id,
+    userEmail: row.user_email,
+    status: row.status as LicenseApplicationStatus,
+    applicationProgram: (row.application_program ||
+      payload.applicationProgram ||
+      "jt1_member") as LicenseApplication["applicationProgram"],
+    restrictionCode: (row.restriction_code ||
+      payload.restrictionCode ||
+      "JT1") as LicenseApplication["restrictionCode"],
+    fullName: row.full_name || payload.fullName || "",
+    idNumber: row.id_number || payload.idNumber || "",
+    submittedAt: row.submitted_at || payload.submittedAt,
+    reviewedAt: row.reviewed_at ?? payload.reviewedAt ?? null,
+  });
+}
 
 export async function GET() {
   if (!isSupabaseConfigured()) {
@@ -37,15 +64,15 @@ export async function GET() {
   const queryClient = serviceClient ?? supabase;
 
   const { data, error } = await queryClient
-    .from("profiles")
+    .from("license_applications")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order("submitted_at", { ascending: false });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   return NextResponse.json({
-    members: (data ?? []).map(mapProfileRow),
+    applications: (data ?? []).map(mapLicenseApplication),
   });
 }

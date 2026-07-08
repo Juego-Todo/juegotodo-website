@@ -14,7 +14,9 @@ import { initializeNewUserCommerceData } from "@/lib/commerce/storage";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import {
+  adminUpdateSupabaseUser,
   checkUsernameAvailabilitySupabase,
+  getAllStoredUsersSupabase,
   getSupabaseSessionUser,
   loginSupabaseUser,
   logoutSupabaseUser,
@@ -307,14 +309,14 @@ export function getAllStoredUsersLocal(): UserProfile[] {
 
 export async function getAllStoredUsers(): Promise<UserProfile[]> {
   if (isSupabaseConfigured()) {
-    return getAllStoredUsersLocal();
+    return getAllStoredUsersSupabase();
   }
   return getAllStoredUsersLocal();
 }
 
 export async function adminUpdateStoredUser(userId: string, input: AdminUserUpdateInput): Promise<UserProfile> {
   if (isSupabaseConfigured()) {
-    return adminUpdateStoredUserLocal(userId, input);
+    return adminUpdateSupabaseUser(userId, input);
   }
   return adminUpdateStoredUserLocal(userId, input);
 }

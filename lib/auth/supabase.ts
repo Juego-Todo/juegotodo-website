@@ -3,7 +3,13 @@ import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { ProfileRow } from "@/lib/supabase/types";
-import { migrateAccountType, type ProfileUpdateInput, type RegisterInput, type UserProfile } from "@/lib/auth/types";
+import {
+  migrateAccountType,
+  type AdminUserUpdateInput,
+  type ProfileUpdateInput,
+  type RegisterInput,
+  type UserProfile,
+} from "@/lib/auth/types";
 
 function mapProfile(row: ProfileRow): UserProfile {
   return {
@@ -64,6 +70,20 @@ export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
   return mapProfile(profile);
 }
 
+export async function getAllStoredUsersSupabase(): Promise<UserProfile[]> {
+  const supabase = createSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []).map(mapProfile);
+}
+
 export async function registerSupabaseUser(input: RegisterInput): Promise<UserProfile> {
   const supabase = createSupabaseBrowserClient();
   const email = input.email.trim().toLowerCase();
@@ -79,6 +99,11 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
         full_name: fullName,
         username,
         gender: input.gender.trim(),
+        date_of_birth: dateOfBirth,
+        account_type: input.accountType,
+        city: input.city?.trim() ?? "",
+        phone: input.phone?.trim() ?? "",
+        country: input.country?.trim() ?? "Philippines",
       },
       emailRedirectTo: `${window.location.origin}/auth/callback?next=/profile`,
     },
@@ -93,19 +118,25 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
   }
 
   if (data.session) {
-    await supabase
+    const { error: profileError } = await supabase
       .from("profiles")
       .update({
         full_name: fullName,
         username,
         gender: input.gender.trim(),
         date_of_birth: dateOfBirth,
+        account_type: input.accountType,
         city: input.city?.trim() ?? "",
         bio: input.bio?.trim() ?? "",
         phone: input.phone?.trim() ?? "",
         country: input.country?.trim() ?? "Philippines",
       })
       .eq("id", data.user.id);
+
+    if (profileError) {
+      throw new Error(profileError.message);
+    }
+
     const profile = await getSupabaseSessionUser();
     if (profile) {
       return profile;
@@ -165,6 +196,35 @@ export async function updateSupabaseProfile(userId: string, input: ProfileUpdate
       gym: input.gym.trim(),
       city: input.city.trim(),
       bio: input.bio.trim(),
+    })
+    .eq("id", userId)
+    .select("*")
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return mapProfile(data);
+}
+
+export async function adminUpdateSupabaseUser(userId: string, input: AdminUserUpdateInput): Promise<UserProfile> {
+  const supabase = createSupabaseBrowserClient();
+  const email = input.email.trim().toLowerCase();
+  const username = validateUsername(input.username);
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: input.fullName.trim(),
+      username,
+      email,
+      account_type: input.accountType,
+      role: input.role,
+      gym: input.gym.trim(),
+      city: input.city.trim(),
+      bio: input.bio.trim(),
+      phone: input.phone?.trim() ?? "",
+      country: input.country?.trim() || "Philippines",
     })
     .eq("id", userId)
     .select("*")

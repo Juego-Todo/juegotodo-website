@@ -131,7 +131,19 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name, username, role)
+  insert into public.profiles (
+    id,
+    email,
+    full_name,
+    username,
+    role,
+    gender,
+    date_of_birth,
+    account_type,
+    city,
+    phone,
+    country
+  )
   values (
     new.id,
     coalesce(new.email, ''),
@@ -143,7 +155,13 @@ begin
     case
       when lower(coalesce(new.email, '')) in ('admin@juegotodo.com', 'kiran.aames@gmail.com') then 'admin'
       else 'user'
-    end
+    end,
+    coalesce(new.raw_user_meta_data ->> 'gender', ''),
+    coalesce(new.raw_user_meta_data ->> 'date_of_birth', ''),
+    coalesce(nullif(new.raw_user_meta_data ->> 'account_type', ''), 'fan'),
+    coalesce(new.raw_user_meta_data ->> 'city', ''),
+    coalesce(new.raw_user_meta_data ->> 'phone', ''),
+    coalesce(nullif(new.raw_user_meta_data ->> 'country', ''), 'Philippines')
   )
   on conflict (id) do nothing;
   return new;
@@ -203,6 +221,11 @@ create policy "profiles_update_own"
 on public.profiles for update
 using (auth.uid() = id)
 with check (auth.uid() = id);
+
+create policy "profiles_update_admin"
+on public.profiles for update
+using (public.is_admin())
+with check (public.is_admin());
 
 create policy "addresses_all_own"
 on public.addresses for all

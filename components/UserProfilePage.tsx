@@ -166,12 +166,12 @@ export function UserProfilePage() {
 
   useEffect(() => {
     if (!user || !isAdminProfile(user)) {
-      setPendingLicenseCount(0);
       return;
     }
 
     void fetchPendingLicenseApplicationCount().then(setPendingLicenseCount);
   }, [user]);
+  const effectivePendingLicenseCount = user && isAdminProfile(user) ? pendingLicenseCount : 0;
 
   useEffect(() => {
     const tab = searchParams.get("tab");
@@ -240,10 +240,10 @@ export function UserProfilePage() {
       adminAssignedTags,
       isAdmin: isAdminProfile(user),
       ordersCount: orders.length,
-      pendingLicenseCount,
+      pendingLicenseCount: effectivePendingLicenseCount,
       previewRoleKind,
     });
-  }, [user, userData, identity, licenseApplication, adminAssignedTags, orders.length, pendingLicenseCount, previewRoleKind]);
+  }, [user, userData, identity, licenseApplication, adminAssignedTags, orders.length, effectivePendingLicenseCount, previewRoleKind]);
 
   if (loading || !user || !identity || !memberRecord) {
     return (

@@ -1,5 +1,4 @@
 import { buildFullName, validateDateOfBirth } from "@/lib/auth/name";
-import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
 import { mapProfileRow, upsertProfileFromRegisterInputClient } from "@/lib/auth/profile-sync";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -219,20 +218,7 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
     }
   }
 
-  return {
-    id: data.user.id,
-    email,
-    fullName,
-    username,
-    accountType: input.accountType,
-    role: resolveRoleForEmail(email),
-    gender: input.gender.trim(),
-    dateOfBirth,
-    gym: "",
-    city: input.city?.trim() ?? "",
-    bio: input.bio?.trim() ?? "",
-    createdAt: data.user.created_at,
-  };
+  throw new Error("Account created. Check your email to confirm your account before logging in.");
 }
 
 export async function loginSupabaseUser(email: string, password: string): Promise<UserProfile> {
@@ -285,32 +271,50 @@ export async function updateSupabaseProfile(userId: string, input: ProfileUpdate
 }
 
 export async function adminUpdateSupabaseUser(userId: string, input: AdminUserUpdateInput): Promise<UserProfile> {
-  const supabase = createSupabaseBrowserClient();
-  const email = input.email.trim().toLowerCase();
-  const username = validateUsername(input.username);
-  const { data, error } = await supabase
-    .from("profiles")
-    .update({
-      full_name: input.fullName.trim(),
-      username,
-      email,
-      account_type: input.accountType,
-      role: input.role,
-      gym: input.gym.trim(),
-      city: input.city.trim(),
-      bio: input.bio.trim(),
-      phone: input.phone?.trim() ?? "",
-      country: input.country?.trim() || "Philippines",
-    })
-    .eq("id", userId)
-    .select("*")
-    .single();
+  const response = await fetch(`/api/admin/members/${encodeURIComponent(userId)}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
 
-  if (error) {
-    throw new Error(error.message);
+  const payload = (await response.json().catch(() => null)) as { member?: UserProfile; error?: string } | null;
+  if (!response.ok) {
+    throw new Error(payload?.error ?? "Unable to update member profile.");
   }
 
-  return mapProfile(data);
+  if (!payload?.member) {
+    throw new Error("Unable to update member profile.");
+  }
+
+  return payload.member;
+}
+
+export async function adminResetSupabaseUserPassword(userId: string, password: string) {
+  const response = await fetch(`/api/admin/members/${encodeURIComponent(userId)}/password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ password }),
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(payload?.error ?? "Unable to reset password.");
+  }
+}
+
+export async function adminDeleteSupabaseUser(userId: string) {
+  const response = await fetch(`/api/admin/members/${encodeURIComponent(userId)}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(payload?.error ?? "Unable to delete member account.");
+  }
 }
 
 export async function requestSupabasePasswordReset(email: string) {

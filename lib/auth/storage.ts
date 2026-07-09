@@ -14,6 +14,8 @@ import { initializeNewUserCommerceData } from "@/lib/commerce/storage";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import {
+  adminDeleteSupabaseUser,
+  adminResetSupabaseUserPassword,
   adminUpdateSupabaseUser,
   checkUsernameAvailabilitySupabase,
   getAllStoredUsersSupabase,
@@ -309,13 +311,7 @@ export function getAllStoredUsersLocal(): UserProfile[] {
 
 export async function getAllStoredUsers(): Promise<UserProfile[]> {
   if (isSupabaseConfigured()) {
-    const remoteUsers = await getAllStoredUsersSupabase();
-    const remoteEmails = new Set(remoteUsers.map((user) => user.email.toLowerCase()));
-    const localOnlyUsers = getAllStoredUsersLocal().filter(
-      (user) => !remoteEmails.has(user.email.toLowerCase()),
-    );
-
-    return [...remoteUsers, ...localOnlyUsers].sort(
+    return (await getAllStoredUsersSupabase()).sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }
@@ -331,7 +327,7 @@ export async function adminUpdateStoredUser(userId: string, input: AdminUserUpda
 
 export async function adminResetStoredUserPassword(userId: string, password: string) {
   if (isSupabaseConfigured()) {
-    adminResetStoredUserPasswordLocal(userId, password);
+    await adminResetSupabaseUserPassword(userId, password);
     return;
   }
   adminResetStoredUserPasswordLocal(userId, password);
@@ -339,7 +335,7 @@ export async function adminResetStoredUserPassword(userId: string, password: str
 
 export async function adminDeleteStoredUser(userId: string) {
   if (isSupabaseConfigured()) {
-    adminDeleteStoredUserLocal(userId);
+    await adminDeleteSupabaseUser(userId);
     return;
   }
   adminDeleteStoredUserLocal(userId);

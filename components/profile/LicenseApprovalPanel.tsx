@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronRight, Paperclip } from "lucide-react";
 import Link from "next/link";
 import { formatLicenseDate, getRestrictionLabel, listLicenseUploadAttachments, type LicenseApplication } from "@/data/license-applications";
@@ -16,14 +16,41 @@ type ReviewFilter = "pending" | "needs_info" | "all";
 export function LicenseApprovalPanel() {
   const [applications, setApplications] = useState<LicenseApplication[]>([]);
   const [filter, setFilter] = useState<ReviewFilter>("pending");
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState("");
 
-  function refreshApplications() {
-    void fetchAllLicenseApplications().then(setApplications);
-  }
+  const refreshApplications = useCallback(() => {
+    void fetchAllLicenseApplications()
+      .then((records) => {
+        setApplications(records);
+        setError("");
+        setLoaded(true);
+      })
+      .catch((caught) => {
+        setError(caught instanceof Error ? caught.message : "Unable to load license applications.");
+        setLoaded(true);
+      });
+  }, []);
 
   useEffect(() => {
-    void fetchAllLicenseApplications().then(setApplications);
-  }, []);
+    refreshApplications();
+  }, [refreshApplications]);
+
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        refreshApplications();
+      }
+    }
+
+    window.addEventListener("focus", refreshApplications);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", refreshApplications);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [refreshApplications]);
 
   const filteredApplications = useMemo(() => {
     if (filter === "all") {
@@ -65,7 +92,23 @@ export function LicenseApprovalPanel() {
         </div>
       </div>
 
-      {filteredApplications.length === 0 ? (
+      {error ? (
+        <div className="glass-panel rounded-[1.75rem] border border-red-500/30 bg-red-500/10 p-8 text-red-100">
+          <p className="font-bold">License applications failed to load.</p>
+          <p className="mt-2 text-sm text-red-100/80">{error}</p>
+          <button
+            className="mt-5 rounded-full border border-red-300/30 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-red-50"
+            onClick={refreshApplications}
+            type="button"
+          >
+            Retry
+          </button>
+        </div>
+      ) : !loaded ? (
+        <div className="glass-panel rounded-[1.75rem] p-8 text-center text-zinc-400">
+          Loading license applications...
+        </div>
+      ) : filteredApplications.length === 0 ? (
         <div className="glass-panel rounded-[1.75rem] p-8 text-center text-zinc-400">
           No license applications in this queue.
         </div>

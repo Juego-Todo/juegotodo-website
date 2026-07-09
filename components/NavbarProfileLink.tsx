@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth/context";
 import { getProfileFirstName } from "@/lib/auth/name";
@@ -27,14 +27,9 @@ export function NavbarProfileLink({
   showMenu = false,
 }: NavbarProfileLinkProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const { logout } = useAuth();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     if (!open) {

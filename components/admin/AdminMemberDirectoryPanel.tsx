@@ -38,18 +38,24 @@ function DetailField({ label, value }: { label: string; value: string }) {
 export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boolean }) {
   const [members, setMembers] = useState<AdminMemberRecord[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   const [manageMember, setManageMember] = useState<AdminMemberRecord | null>(null);
   const [manageMode, setManageMode] = useState<ManageMode | null>(null);
 
   const refreshMembers = useCallback(() => {
-    void getAllOrders().then((orders) => {
-      void fetchAdminMemberRecords(orders).then((records) => {
+    void getAllOrders()
+      .then((orders) => fetchAdminMemberRecords(orders))
+      .then((records) => {
         setMembers(records);
+        setError("");
+        setLoaded(true);
+      })
+      .catch((caught) => {
+        setError(caught instanceof Error ? caught.message : "Unable to load member directory.");
         setLoaded(true);
       });
-    });
   }, []);
 
   useEffect(() => {
@@ -136,7 +142,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
       <div className="glass-panel rounded-[1.75rem] p-4 sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-zinc-400">
-            {loaded ? `${filteredMembers.length} of ${members.length} profiles` : "Loading profiles..."}
+            {error ? "Unable to load profiles" : loaded ? `${filteredMembers.length} of ${members.length} profiles` : "Loading profiles..."}
           </p>
           <input
             className="w-full max-w-md rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm text-white outline-none ring-red-500/40 focus:ring-4"
@@ -146,7 +152,19 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
           />
         </div>
 
-        {!loaded ? (
+        {error ? (
+          <div className="mt-5 rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-100">
+            <p className="font-bold">Member directory failed to load.</p>
+            <p className="mt-2 text-red-100/80">{error}</p>
+            <button
+              className="mt-4 rounded-full border border-red-300/30 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-red-50"
+              onClick={refreshMembers}
+              type="button"
+            >
+              Retry
+            </button>
+          </div>
+        ) : !loaded ? (
           <div className="py-16 text-center text-zinc-400">Loading member directory...</div>
         ) : filteredMembers.length === 0 ? (
           <div className="py-16 text-center text-zinc-400">No members match your search.</div>

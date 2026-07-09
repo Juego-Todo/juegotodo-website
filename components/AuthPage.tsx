@@ -297,7 +297,13 @@ export function AuthPage() {
 
       router.push(nextPath);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Something went wrong.");
+      const message = caught instanceof Error ? caught.message : "Something went wrong.";
+      if (message.startsWith("Account created.")) {
+        switchMode("login");
+        setSuccess(message);
+        return;
+      }
+      setError(message);
     } finally {
       setSubmitting(false);
     }

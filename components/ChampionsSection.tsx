@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, Trophy } from "lucide-react";
+import Image from "next/image";
 import { MagneticButton } from "@/components/MagneticButton";
 import { champions } from "@/data/site";
 
@@ -46,13 +47,31 @@ export function ChampionsSection() {
 
               <div className="p-5 sm:p-6">
                 <div className="relative mx-auto aspect-[4/5] max-w-[220px] overflow-hidden rounded-[1.25rem] border border-[#FF1010]/25 bg-[radial-gradient(circle_at_35%_18%,rgba(255,16,16,0.45),transparent_38%),linear-gradient(160deg,#1a1a1d,#050505)]">
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(0,0,0,0.85))]" />
-                  <div className="flex h-full flex-col items-center justify-end p-5 text-center">
-                    <span className="font-display text-6xl uppercase leading-none text-white/90 transition group-hover:scale-105">
-                      {champion.initials}
-                    </span>
-                    <p className="mt-3 text-[0.65rem] font-black uppercase tracking-[0.22em] text-[#FF1010]">Champion</p>
-                  </div>
+                  {champion.imageSrc ? (
+                    <>
+                      <Image
+                        alt={champion.imageAlt ?? `${champion.name}, ${champion.title}`}
+                        className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+                        fill
+                        sizes="(max-width: 640px) 45vw, 220px"
+                        src={champion.imageSrc}
+                      />
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_52%,rgba(0,0,0,0.88))]" />
+                      <div className="absolute inset-x-0 bottom-0 p-4 text-center">
+                        <p className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-[#FF1010]">Champion</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(0,0,0,0.85))]" />
+                      <div className="flex h-full flex-col items-center justify-end p-5 text-center">
+                        <span className="font-display text-6xl uppercase leading-none text-white/90 transition group-hover:scale-105">
+                          {champion.initials}
+                        </span>
+                        <p className="mt-3 text-[0.65rem] font-black uppercase tracking-[0.22em] text-[#FF1010]">Champion</p>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="mt-5 text-center">

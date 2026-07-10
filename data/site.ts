@@ -29,6 +29,8 @@ export type Champion = {
   name: string;
   crownedDate: string;
   initials: string;
+  imageSrc?: string;
+  imageAlt?: string;
 };
 
 export type FighterProfile = {
@@ -146,6 +148,8 @@ export const champions: Champion[] = [
     name: "Genil Francisco",
     crownedDate: "December 20, 2019",
     initials: "GF",
+    imageSrc: "/champions/genil-francisco.png",
+    imageAlt: "Genil Francisco, Juego Todo Inaugural Champion, holding the championship belt and arnis sticks",
   },
   {
     title: "Hari ng Latayan",

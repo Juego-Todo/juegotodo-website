@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Ticket } from "lucide-react";
 import Image from "next/image";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { AsSeenOnCarousel } from "@/components/AsSeenOnCarousel";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { EnergyParticles } from "@/components/EnergyParticles";
 import { MagneticButton } from "@/components/MagneticButton";
@@ -55,7 +56,7 @@ export function HeroSection() {
       </div>
 
       <div className="relative z-10 flex min-h-[calc(100svh-4.5rem)] flex-col">
-        <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-7 px-4 pb-6 pt-20 sm:px-6 sm:pt-20 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 lg:px-8 lg:pb-6 lg:pt-24">
+        <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-7 px-4 pb-4 pt-20 sm:px-6 sm:pt-20 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 lg:px-8 lg:pb-4 lg:pt-24">
           <motion.div
             animate={{ opacity: 1, y: 0 }}
             className="relative z-10"
@@ -124,6 +125,8 @@ export function HeroSection() {
             </div>
           </motion.div>
         </div>
+
+        <AsSeenOnCarousel embedded />
       </div>
     </section>
   );

@@ -1,4 +1,3 @@
-import { AsSeenOnCarousel } from "@/components/AsSeenOnCarousel";
 import { ChampionsSection } from "@/components/ChampionsSection";
 import { CompetitionStructureSection } from "@/components/CompetitionStructureSection";
 import { HeritageSection } from "@/components/HeritageSection";
@@ -14,8 +13,6 @@ export function HomePage() {
   return (
     <main>
       <HeroSection />
-
-      <AsSeenOnCarousel />
 
       <SignatureSystemSection />
 

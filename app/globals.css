@@ -796,6 +796,11 @@ a {
   filter: grayscale(0%);
 }
 
+.as-seen-on-wordmark {
+  opacity: 1;
+  filter: none;
+}
+
 .premium-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.2), transparent);

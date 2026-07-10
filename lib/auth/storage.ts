@@ -435,7 +435,16 @@ export async function checkUsernameAvailability(username: string) {
 
 export async function getStoredSessionUser(): Promise<UserProfile | null> {
   if (isSupabaseConfigured()) {
-    return getSupabaseSessionUser();
+    try {
+      return await Promise.race([
+        getSupabaseSessionUser(),
+        new Promise<UserProfile | null>((resolve) => {
+          setTimeout(() => resolve(null), 8000);
+        }),
+      ]);
+    } catch {
+      return null;
+    }
   }
   return getStoredSessionUserLocal();
 }

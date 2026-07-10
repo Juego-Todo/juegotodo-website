@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { PageNavigation } from "@/components/PageNavigation";
+import { AuthGateFallback } from "@/components/auth/AuthGateFallback";
 import { shopProducts } from "@/data/shop";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
@@ -94,11 +95,14 @@ export function AdminDashboard() {
     });
   }
 
-  if (loading || !user || !isAdmin) {
+  if (!user || !isAdmin) {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center px-4 pt-24">
-        <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">Loading admin...</p>
-      </main>
+      <AuthGateFallback
+        loading={loading}
+        loadingLabel="Loading admin..."
+        redirectHref="/login?next=/admin"
+        user={user && isAdmin ? user : null}
+      />
     );
   }
 

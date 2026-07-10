@@ -51,20 +51,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(profile);
         }
       })
+      .catch(() => {
+        if (active) {
+          setUser(null);
+        }
+      })
       .finally(() => {
         if (active) {
           setLoading(false);
         }
       });
 
+    const loadingTimeout = window.setTimeout(() => {
+      if (active) {
+        setLoading(false);
+      }
+    }, 4000);
+
     const unsubscribe = subscribeAuthChanges((profile) => {
       if (active) {
         setUser(profile);
+        setLoading(false);
       }
     });
 
     return () => {
       active = false;
+      window.clearTimeout(loadingTimeout);
       unsubscribe();
     };
   }, []);

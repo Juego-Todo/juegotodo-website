@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { CheckoutSteps } from "@/components/commerce/CheckoutSteps";
 import { OrderSummary } from "@/components/commerce/OrderSummary";
 import { PageNavigation } from "@/components/PageNavigation";
+import { AuthGateFallback } from "@/components/auth/AuthGateFallback";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
@@ -45,7 +46,18 @@ export function CheckoutPaymentPage() {
     router.push("/checkout/review");
   }
 
-  if (loading || !user || cart.length === 0) {
+  if (!user) {
+    return (
+      <AuthGateFallback
+        loading={loading}
+        loadingLabel="Loading checkout..."
+        redirectHref={getCheckoutAuthHref("/checkout/payment")}
+        user={user}
+      />
+    );
+  }
+
+  if (cart.length === 0) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center px-4 pt-24">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">Loading checkout...</p>

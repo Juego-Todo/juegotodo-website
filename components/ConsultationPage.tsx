@@ -468,7 +468,7 @@ export function ConsultationBookingPage() {
                 <SummaryRow label="Total Due" value={formatCurrency(selectedService.price)} highlight />
               </div>
 
-              {!loading && !user ? (
+              {!user ? (
                 <div className="mt-6 rounded-[1.25rem] border border-amber-500/30 bg-amber-500/10 p-4">
                   <p className="text-sm text-amber-100">
                     Sign in to reserve this slot and submit payment.

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { PageNavigation } from "@/components/PageNavigation";
+import { AuthGateFallback } from "@/components/auth/AuthGateFallback";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import { formatCurrency } from "@/lib/commerce/pricing";
@@ -20,11 +21,14 @@ export function OrdersPage() {
     }
   }, [loading, user, router]);
 
-  if (loading || !user) {
+  if (!user) {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center px-4 pt-24">
-        <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">Loading orders...</p>
-      </main>
+      <AuthGateFallback
+        loading={loading}
+        loadingLabel="Loading orders..."
+        redirectHref="/login?next=/orders"
+        user={user}
+      />
     );
   }
 

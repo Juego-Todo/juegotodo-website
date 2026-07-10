@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { BackButton } from "@/components/BackButton";
+import { AuthGateFallback } from "@/components/auth/AuthGateFallback";
 import { MotionSection } from "@/components/MotionSection";
 import {
   AchievementsSection,
@@ -245,7 +246,18 @@ export function UserProfilePage() {
     });
   }, [user, userData, identity, licenseApplication, adminAssignedTags, orders.length, effectivePendingLicenseCount, previewRoleKind]);
 
-  if (loading || !user || !identity || !memberRecord) {
+  if (!user) {
+    return (
+      <AuthGateFallback
+        loading={loading}
+        loadingLabel="Loading profile..."
+        redirectHref="/login?next=/profile"
+        user={user}
+      />
+    );
+  }
+
+  if (!identity || !memberRecord) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center px-4 pt-8">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">Loading profile...</p>

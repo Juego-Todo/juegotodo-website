@@ -21,7 +21,7 @@ import { shopCategoryLabels } from "@/lib/commerce/types";
 
 export function CartPage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const {
     cart,
     totals,
@@ -71,14 +71,6 @@ export function CartPage() {
     setPromoError(null);
     setPromoSuccess(true);
     setCheckoutDraft({ ...checkoutDraft, promoCode: code });
-  }
-
-  if (loading) {
-    return (
-      <main className="flex min-h-[60vh] items-center justify-center px-4 pt-24">
-        <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">Loading cart...</p>
-      </main>
-    );
   }
 
   return (

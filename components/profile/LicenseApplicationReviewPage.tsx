@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { AdminPortalShell } from "@/components/admin/AdminPortalShell";
+import { AuthGateFallback } from "@/components/auth/AuthGateFallback";
 import { LicenseApplicationReviewCard } from "@/components/profile/LicenseApplicationReviewCard";
 import type { LicenseApplication } from "@/data/license-applications";
 import { fetchLicenseApplicationById } from "@/lib/licenses/storage";
@@ -26,7 +27,18 @@ export function LicenseApplicationReviewPage({ applicationId }: { applicationId:
     void fetchLicenseApplicationById(applicationId).then(setApplication);
   }
 
-  if (loading || !user || !isAdmin || application === undefined) {
+  if (!user || !isAdmin) {
+    return (
+      <AuthGateFallback
+        loading={loading}
+        loadingLabel="Loading application..."
+        redirectHref={`/login?next=${encodeURIComponent(`/admin/license-approvals/${applicationId}`)}`}
+        user={user && isAdmin ? user : null}
+      />
+    );
+  }
+
+  if (application === undefined) {
     return (
       <AdminPortalShell
         backHref="/profile?tab=membership&view=approvals"

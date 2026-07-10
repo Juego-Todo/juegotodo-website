@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UnifiedLicenseApplicationForm } from "@/components/profile/UnifiedLicenseApplicationForm";
+import { AuthGateFallback } from "@/components/auth/AuthGateFallback";
 import type { LicenseProgramPresetKey } from "@/data/license-program-presets";
 import { LICENSE_PROGRAM_PRESETS } from "@/data/license-program-presets";
 import { resolveLicenseApplicationHref, type LicenseApplication } from "@/data/license-applications";
@@ -71,7 +72,18 @@ export function LicenseApplicationPageShell({ presetKey }: { presetKey: LicenseP
     };
   }, [loading, user, router, preset]);
 
-  if (loading || !user || !applicationLoaded) {
+  if (!user) {
+    return (
+      <AuthGateFallback
+        loading={loading}
+        loadingLabel={preset.loadingLabel}
+        redirectHref={`/login?next=${encodeURIComponent(preset.href)}`}
+        user={user}
+      />
+    );
+  }
+
+  if (!applicationLoaded) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center px-4 pt-24">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">{preset.loadingLabel}</p>

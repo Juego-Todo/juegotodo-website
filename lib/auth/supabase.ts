@@ -366,8 +366,12 @@ export function subscribeSupabaseAuth(onChange: (user: UserProfile | null) => vo
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange(async () => {
-    const profile = await getSupabaseSessionUser();
-    onChange(profile);
+    try {
+      const profile = await getSupabaseSessionUser();
+      onChange(profile);
+    } catch {
+      onChange(null);
+    }
   });
 
   return () => subscription.unsubscribe();

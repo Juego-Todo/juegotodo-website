@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { BackButton } from "@/components/BackButton";
+import { AuthGateFallback } from "@/components/auth/AuthGateFallback";
 import { useAuth } from "@/lib/auth/context";
 import { isAdminProfile } from "@/lib/commerce/storage";
 
@@ -30,11 +31,14 @@ export function AdminPortalShell({
     }
   }, [loading, user, isAdmin, router, nextPath]);
 
-  if (loading || !user || !isAdmin) {
+  if (!user || !isAdmin) {
     return (
-      <main className="flex min-h-[60vh] items-center justify-center px-4 pt-24">
-        <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">{loadingLabel}</p>
-      </main>
+      <AuthGateFallback
+        loading={loading}
+        loadingLabel={loadingLabel}
+        redirectHref={`/login?next=${encodeURIComponent(nextPath)}`}
+        user={user && isAdmin ? user : null}
+      />
     );
   }
 

@@ -57,7 +57,7 @@ export function NavbarProfileLink({
     };
   }, [open]);
 
-  if (loading || !user || !showUsername) {
+  if (!user || !showUsername) {
     return null;
   }
 

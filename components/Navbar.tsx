@@ -225,18 +225,17 @@ export function Navbar() {
         <div className="relative z-10 flex items-center gap-2 sm:gap-2.5 xl:col-start-3 xl:justify-self-end">
           <NavbarCartLink />
 
-          <div className="hidden items-center gap-2.5 xl:flex xl:items-center">
-            {!loading && !user ? (
+          <div className="hidden items-center gap-2 sm:flex sm:items-center lg:gap-2.5">
+            {!user ? (
               <>
                 <Link className="nav-auth-outline" href={loginHref}>
                   Login
                 </Link>
                 <Link className="nav-auth-primary" href={registerHref}>
-                  Register
+                  Sign Up
                 </Link>
               </>
-            ) : null}
-            {user ? (
+            ) : (
               <NavbarProfileLink
                 className="nav-profile-greeting"
                 href={loginHref}
@@ -244,7 +243,7 @@ export function Navbar() {
                 showMenu
                 user={user}
               />
-            ) : null}
+            )}
           </div>
 
           <button
@@ -371,17 +370,16 @@ export function Navbar() {
                 </div>
 
                 <div className="mt-5 border-t border-white/[0.08] pt-5">
-                  {!loading && !user ? (
+                  {!user ? (
                     <div className="grid grid-cols-2 gap-2.5">
                       <Link className="nav-auth-outline min-h-12" href={loginHref} onClick={() => setIsOpen(false)}>
                         Login
                       </Link>
                       <Link className="nav-auth-primary min-h-12" href={registerHref} onClick={() => setIsOpen(false)}>
-                        Register
+                        Sign Up
                       </Link>
                     </div>
-                  ) : null}
-                  {user ? (
+                  ) : (
                     <div className="space-y-3">
                       <p className="px-1 text-[0.68rem] font-black uppercase tracking-[0.18em] text-zinc-500">Account</p>
                       <NavbarProfileLink
@@ -408,7 +406,7 @@ export function Navbar() {
                         })}
                       </div>
                     </div>
-                  ) : null}
+                  )}
                 </div>
 
                 <div className="mt-5 border-t border-white/[0.08] pt-5">

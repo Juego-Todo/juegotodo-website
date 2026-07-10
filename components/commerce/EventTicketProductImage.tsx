@@ -19,7 +19,7 @@ export function EventTicketProductImage({
     return null;
   }
 
-  const compact = size === "sm";
+  const compact = size === "sm" || size === "md";
 
   return (
     <EventCardBackdrop

@@ -326,6 +326,15 @@ export function UserProfilePage() {
     }
   }
 
+  function handleTabChange(tab: WorkspaceTabId) {
+    setActiveTab(tab);
+
+    if ((memberRecord?.isAdmin || (user && isAdminProfile(user))) && tab === "activity") {
+      setActiveSection("membership");
+      router.replace("/profile?tab=membership", { scroll: false });
+    }
+  }
+
   function handleBackToWorkspace() {
     setActiveSection("overview");
     setActiveTab("overview");
@@ -806,7 +815,7 @@ export function UserProfilePage() {
             onNavigateSection={handleSectionChange}
             onPortraitRemove={removePortrait}
             onPortraitUpload={savePortrait}
-            onTabChange={setActiveTab}
+            onTabChange={handleTabChange}
             portraitImage={portraitImage}
             previewRoleKind={previewRoleKind}
             settingsContent={settingsContent}

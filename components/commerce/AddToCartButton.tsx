@@ -11,6 +11,7 @@ type AddToCartButtonProps = {
   product: ShopProduct;
   className?: string;
   compact?: boolean;
+  micro?: boolean;
   variant?: "solid" | "outline";
   quantity?: number;
   variantSelections?: Record<string, string>;
@@ -22,6 +23,7 @@ export function AddToCartButton({
   product,
   className = "",
   compact = false,
+  micro = false,
   variant = "solid",
   quantity = 1,
   variantSelections,
@@ -84,7 +86,13 @@ export function AddToCartButton({
             : variant === "outline"
               ? "border border-white/15 bg-white/[0.03] text-white hover:border-[#FF1010]/45 hover:bg-[#FF1010]/10 hover:text-[#FF1010]"
               : "bg-[#FF1010] text-white hover:bg-[#ff2828] hover:shadow-[0_0_24px_rgba(255,16,16,0.35)]"
-      } ${compact ? "min-h-9 px-4 text-[0.58rem]" : "min-h-11 px-5 text-xs"} ${
+      } ${
+        micro
+          ? "min-h-8 px-3 text-[0.5rem] tracking-[0.12em]"
+          : compact
+            ? "min-h-9 px-4 text-[0.58rem]"
+            : "min-h-11 px-5 text-xs"
+      } ${
         fullWidth ? "w-full" : ""
       } ${isDisabled && state === "idle" ? "cursor-not-allowed opacity-50" : ""} ${className}`}
       disabled={isDisabled}
@@ -93,12 +101,21 @@ export function AddToCartButton({
     >
       {state === "loading" ? (
         <>
-          <Loader2 className={`animate-spin ${compact ? "mr-1.5" : "mr-2"}`} size={compact ? 12 : 14} aria-hidden />
+          <Loader2
+            className={`animate-spin ${micro ? "mr-1" : compact ? "mr-1.5" : "mr-2"}`}
+            size={micro ? 11 : compact ? 12 : 14}
+            aria-hidden
+          />
           Adding...
         </>
       ) : state === "added" ? (
         <>
-          <Check className={compact ? "mr-1.5" : "mr-2"} size={compact ? 12 : 14} aria-hidden strokeWidth={3} />
+          <Check
+            className={micro ? "mr-1" : compact ? "mr-1.5" : "mr-2"}
+            size={micro ? 11 : compact ? 12 : 14}
+            aria-hidden
+            strokeWidth={3}
+          />
           Added
         </>
       ) : state === "continue" ? (
@@ -107,7 +124,11 @@ export function AddToCartButton({
         "Out Of Stock"
       ) : (
         <>
-          <ShoppingBag className={compact ? "mr-1.5" : "mr-2"} size={compact ? 12 : 14} aria-hidden />
+          <ShoppingBag
+            className={micro ? "mr-1" : compact ? "mr-1.5" : "mr-2"}
+            size={micro ? 11 : compact ? 12 : 14}
+            aria-hidden
+          />
           {label}
         </>
       )}

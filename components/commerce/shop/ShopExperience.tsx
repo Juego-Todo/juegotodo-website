@@ -176,7 +176,7 @@ export function ShopHero() {
       }}
     >
       <div className="relative w-full overflow-hidden bg-black">
-        <div className="relative min-h-[28rem] w-full sm:min-h-[32rem] lg:min-h-[40rem]">
+        <div className="relative min-h-[20rem] w-full sm:min-h-[26rem] lg:min-h-[32rem]">
           <AnimatePresence mode="wait">
             <motion.div
               animate={{ opacity: 1, scale: 1 }}
@@ -190,7 +190,7 @@ export function ShopHero() {
             </motion.div>
           </AnimatePresence>
 
-          <div className="relative z-10 mx-auto grid h-full min-h-[inherit] w-full max-w-7xl items-center px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:px-8 lg:py-14">
+          <div className="relative z-10 mx-auto grid h-full min-h-[inherit] w-full max-w-7xl items-center px-4 py-7 sm:px-6 sm:py-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:px-8 lg:py-10">
             <AnimatePresence mode="wait">
               <motion.div
                 animate={{ opacity: 1, x: 0 }}
@@ -200,20 +200,20 @@ export function ShopHero() {
                 key={activeSlide.id}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
-                <h1 className="font-display text-[clamp(2.35rem,6.5vw,4.75rem)] font-normal uppercase leading-[0.9] text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
+                <h1 className="font-display text-[clamp(1.75rem,5.5vw,4rem)] font-normal uppercase leading-[0.9] text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
                   {activeSlide.title}
                 </h1>
-                <p className="mt-5 max-w-lg text-base leading-8 text-zinc-300 sm:text-lg">{activeSlide.description}</p>
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <p className="mt-3 max-w-lg text-sm leading-7 text-zinc-300 sm:mt-4 sm:text-base">{activeSlide.description}</p>
+                <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:gap-3">
                   <Link
-                    className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-8 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-[0_0_28px_rgba(255,16,16,0.35)] transition hover:bg-[#ff2828]"
+                    className="inline-flex min-h-10 items-center justify-center rounded-full bg-[#FF1010] px-6 text-[0.58rem] font-bold uppercase tracking-[0.14em] text-white shadow-[0_0_24px_rgba(255,16,16,0.35)] transition hover:bg-[#ff2828] sm:min-h-11 sm:px-7 sm:text-xs"
                     href={activeSlide.href}
                   >
                     {activeSlide.cta}
-                    <ArrowRight className="ml-2" size={16} aria-hidden />
+                    <ArrowRight className="ml-1.5" size={14} aria-hidden />
                   </Link>
                   <Link
-                    className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] px-8 text-xs font-bold uppercase tracking-[0.16em] text-white backdrop-blur-sm transition hover:bg-white/10"
+                    className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] px-6 text-[0.58rem] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm transition hover:bg-white/10 sm:min-h-11 sm:px-7 sm:text-xs"
                     href="#full-catalog"
                   >
                     Browse All

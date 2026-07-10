@@ -16,5 +16,13 @@ export function getProductFrameClassName(size: ProductImageSize, variant: Produc
     return "aspect-[4/5] w-full min-h-[24rem] sm:min-h-[30rem] lg:min-h-[36rem]";
   }
 
+  if (size === "sm") {
+    return "aspect-square w-full";
+  }
+
+  if (size === "md") {
+    return "aspect-[5/6] w-full";
+  }
+
   return productCatalogAspectClass;
 }

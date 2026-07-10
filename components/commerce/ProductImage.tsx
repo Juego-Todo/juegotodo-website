@@ -43,14 +43,14 @@ export function ProductImage({
         alt={alt}
         className={`relative z-[1] h-full w-full object-contain ${
           isCatalog || isHero
-            ? "p-4 sm:p-5 drop-shadow-[0_28px_48px_rgba(0,0,0,0.55)]"
+            ? "p-2.5 sm:p-3.5 drop-shadow-[0_28px_48px_rgba(0,0,0,0.55)]"
             : "p-3 sm:p-4"
         }`}
         fill
         priority={priority}
         sizes={
           isCatalog
-            ? "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            ? "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             : isHero
               ? "(max-width: 768px) 100vw, 50vw"
               : "(max-width: 768px) 100vw, 50vw"

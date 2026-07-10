@@ -68,7 +68,6 @@ export const navItems: NavItem[] = [
       { label: "Grand Council", href: "/grand-council" },
       { label: "Rules & Regulations", href: "/rules-regulations" },
       { label: "Partners", href: "/partners" },
-      { label: "Seminars", href: "/juego-todo-seminars" },
     ],
   },
   {
@@ -78,7 +77,6 @@ export const navItems: NavItem[] = [
       { label: "Search Fighter", href: "/latayanology" },
       { label: "Lineage Finder", href: "/fma-lineage" },
       { label: "JT Seminars", href: "/juego-todo-seminars" },
-      { label: "Calendar", href: "/calendar" },
     ],
   },
   {

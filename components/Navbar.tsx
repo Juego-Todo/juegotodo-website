@@ -16,14 +16,13 @@ const aboutUsPaths = [
   "/about-juego-todo",
   "/calendar",
   "/events",
-  "/juego-todo-seminars",
   "/rules-regulations",
   "/partners",
   "/partnerships",
   "/grand-council",
 ];
 
-const latayanologyPaths = ["/latayanology", "/fighters", "/fma-lineage", "/calendar"];
+const latayanologyPaths = ["/latayanology", "/fighters", "/fma-lineage", "/juego-todo-seminars"];
 
 const desktopNavLinkClassName =
   "nav-link-underline shrink-0 whitespace-nowrap px-3 py-2 text-[0.78rem] font-bold uppercase leading-none tracking-[0.15em] text-zinc-400 2xl:px-4";
@@ -42,7 +41,6 @@ function isNavActive(pathname: string, href: string, label: string) {
   if (label === "About Us") {
     return (
       aboutUsPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`)) ||
-      pathname.startsWith("/juego-todo-seminars/") ||
       pathname.startsWith("/rules-regulations/")
     );
   }

@@ -42,7 +42,7 @@ export function VideoCarousel() {
           </div>
         </div>
 
-        <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:thin] sm:mx-0 sm:mt-8 sm:px-0 lg:grid lg:grid-cols-6 lg:overflow-visible lg:pb-0">
+        <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:thin] sm:mx-0 sm:mt-8 sm:px-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:pb-0">
           {featuredVideos.map((video, index) => {
             const isActive = video.id === activeId;
 

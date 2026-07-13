@@ -9,7 +9,7 @@ export const eventTicketProducts: ShopProduct[] = [
     category: "digital-products",
     price: "₱1,500",
     priceAmount: 1500,
-    description: "Digital general admission for Juego Todo: Barrio Brawls on August 29, 2026.",
+    description: "Digital general admission for Juego Todo: Barrio Brawls on August 28, 2026.",
     summary:
       "Flagship hybrid FMA card with professional weaponized competition and championship stakes. Instant digital QR delivery to your account.",
     features: [
@@ -19,7 +19,7 @@ export const eventTicketProducts: ShopProduct[] = [
     ],
     specs: [
       { label: "Event", value: "Juego Todo: Barrio Brawls" },
-      { label: "Date", value: "August 29, 2026" },
+      { label: "Date", value: "August 28, 2026" },
       { label: "Time", value: "1:00 PM" },
       { label: "Delivery", value: "Digital QR ticket" },
     ],
@@ -35,10 +35,10 @@ export const eventTicketProducts: ShopProduct[] = [
     eventTicket: {
       series: "Juego Todo",
       title: "Barrio Brawls",
-      dateLabel: "August 29, 2026",
+      dateLabel: "August 28, 2026",
       timeLabel: "1:00 PM",
       venue: "TBA",
-      target: "2026-08-29T13:00:00+08:00",
+      target: "2026-08-28T13:00:00+08:00",
     },
   },
 ];

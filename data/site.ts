@@ -429,7 +429,7 @@ export const events: Event[] = [
   {
     slug: "barrio-brawls",
     title: "Juego Todo: Barrio Brawls",
-    date: "2026-08-29T13:00:00+08:00",
+    date: "2026-08-28T13:00:00+08:00",
     venue: "TBA",
     city: "Philippines",
     status: "Upcoming",

@@ -13,10 +13,10 @@ import { barrioBrawlsTicketSlug } from "@/data/shop-tickets";
 const heroFeaturedEvent = {
   title: "Barrio Brawls",
   series: "Juego Todo",
-  dateLabel: "August 29, 2026",
+  dateLabel: "August 28, 2026",
   timeLabel: "1:00 PM",
   venue: "TBA",
-  target: "2026-08-29T13:00:00+08:00",
+  target: "2026-08-28T13:00:00+08:00",
   ticketProductSlug: barrioBrawlsTicketSlug,
 };
 

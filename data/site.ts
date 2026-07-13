@@ -156,6 +156,8 @@ export const champions: Champion[] = [
     name: "Alfredo Melendres Jr.",
     crownedDate: "Dec 12, 2025",
     initials: "AM",
+    imageSrc: "/champions/alfredo-melendres.png",
+    imageAlt: "Alfredo Melendres Jr., Hari ng Latayan, holding the Juego Todo championship belt",
   },
 ];
 

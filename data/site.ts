@@ -1,3 +1,5 @@
+import { barrioBrawlsEvent } from "@/data/shop-tickets";
+
 export type Fighter = {
   slug: string;
   name: string;
@@ -429,8 +431,8 @@ export const events: Event[] = [
   {
     slug: "barrio-brawls",
     title: "Juego Todo: Barrio Brawls",
-    date: "2026-08-28T13:00:00+08:00",
-    venue: "TBA",
+    date: barrioBrawlsEvent.target,
+    venue: barrioBrawlsEvent.venue,
     city: "Philippines",
     status: "Upcoming",
     mainEvent: "Flagship hybrid FMA card",

@@ -8,15 +8,10 @@ import { AsSeenOnCarousel } from "@/components/AsSeenOnCarousel";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { EnergyParticles } from "@/components/EnergyParticles";
 import { MagneticButton } from "@/components/MagneticButton";
-import { barrioBrawlsTicketSlug } from "@/data/shop-tickets";
+import { barrioBrawlsEvent, barrioBrawlsTicketSlug } from "@/data/shop-tickets";
 
 const heroFeaturedEvent = {
-  title: "Barrio Brawls",
-  series: "Juego Todo",
-  dateLabel: "August 28, 2026",
-  timeLabel: "1:00 PM",
-  venue: "TBA",
-  target: "2026-08-28T13:00:00+08:00",
+  ...barrioBrawlsEvent,
   ticketProductSlug: barrioBrawlsTicketSlug,
 };
 

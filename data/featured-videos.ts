@@ -44,7 +44,16 @@ export const featuredVideos: FeaturedVideo[] = [
   },
 ];
 
-export function getYouTubeThumbnail(youtubeId: string, quality: "hq" | "max" = "hq") {
-  const file = quality === "max" ? "maxresdefault.jpg" : "hqdefault.jpg";
+export function getYouTubeThumbnail(youtubeId: string, quality: "hq" | "sd" | "max" = "sd") {
+  const file =
+    quality === "max" ? "maxresdefault.jpg" : quality === "sd" ? "sddefault.jpg" : "hqdefault.jpg";
   return `https://img.youtube.com/vi/${youtubeId}/${file}`;
+}
+
+export function getYouTubeThumbnailFallbacks(youtubeId: string) {
+  return [
+    getYouTubeThumbnail(youtubeId, "max"),
+    getYouTubeThumbnail(youtubeId, "sd"),
+    getYouTubeThumbnail(youtubeId, "hq"),
+  ];
 }

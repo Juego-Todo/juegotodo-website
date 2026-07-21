@@ -84,6 +84,8 @@ export type MemberRecord = {
   region: string;
   club: string;
   isAdmin: boolean;
+  /** Administrator or Staff — ops tabs (Calendar, Tickets, Orders, Licenses). */
+  canAccessOpsTabs: boolean;
   credentialChips: MemberCredentialChip[];
   officialRecord: MemberOfficialRecord;
   requirements: MemberRequirement[];
@@ -424,6 +426,10 @@ export function buildMemberRecord(input: {
     overrideKind: previewRoleKind ?? undefined,
   });
 
+  const canAccessOpsTabs = previewRoleKind
+    ? previewRoleKind === "admin" || previewRoleKind === "staff"
+    : isAdmin || tagIds.includes("staff") || roleModule.kind === "staff";
+
   return {
     tagIds,
     accountTypeLabel,
@@ -442,6 +448,7 @@ export function buildMemberRecord(input: {
     region: officialRecord.region,
     club: officialRecord.club,
     isAdmin,
+    canAccessOpsTabs,
     credentialChips: buildCredentialChips(officialRecord, tagIds, isAdmin),
     officialRecord,
     requirements,

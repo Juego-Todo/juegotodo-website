@@ -12,6 +12,7 @@ import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/a
 import { legacyTestLoginEmails, testLoginAccount, testLoginStoredUser } from "@/data/test-account";
 import { initializeNewUserCommerceData } from "@/lib/commerce/storage";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { withTimeout } from "@/lib/auth/timeout";
 import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import {
   adminDeleteSupabaseUser,
@@ -32,15 +33,31 @@ import {
 const USERS_KEY = "juego-todo.users";
 const SESSION_KEY = "juego-todo.session";
 const REMEMBER_EMAIL_KEY = "juego-todo.remember-email";
+const LEGACY_REMEMBER_PASSWORD_KEY = "juego-todo.remember-password";
 const RESET_EMAIL_KEY = "juego-todo.reset-email";
 
 function resolveRole(email: string): UserRole {
   return resolveRoleForEmail(email);
 }
 
+function isLocalAuthEnabled() {
+  return process.env.NODE_ENV !== "production";
+}
+
+function assertAuthBackendAvailable() {
+  if (!isSupabaseConfigured() && !isLocalAuthEnabled()) {
+    throw new Error("Authentication is not configured. Please contact the site administrator.");
+  }
+}
+
 function ensureLocalTestAccount(users: StoredUser[]) {
   const legacyEmails = new Set<string>(legacyTestLoginEmails);
   const filteredUsers = users.filter((entry) => !legacyEmails.has(entry.email));
+
+  if (!isLocalAuthEnabled()) {
+    return filteredUsers;
+  }
+
   const existingIndex = filteredUsers.findIndex((entry) => entry.email === testLoginAccount.email);
 
   if (existingIndex >= 0) {
@@ -315,6 +332,7 @@ export async function getAllStoredUsers(): Promise<UserProfile[]> {
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }
+  assertAuthBackendAvailable();
   return getAllStoredUsersLocal();
 }
 
@@ -322,6 +340,7 @@ export async function adminUpdateStoredUser(userId: string, input: AdminUserUpda
   if (isSupabaseConfigured()) {
     return adminUpdateSupabaseUser(userId, input);
   }
+  assertAuthBackendAvailable();
   return adminUpdateStoredUserLocal(userId, input);
 }
 
@@ -330,6 +349,7 @@ export async function adminResetStoredUserPassword(userId: string, password: str
     await adminResetSupabaseUserPassword(userId, password);
     return;
   }
+  assertAuthBackendAvailable();
   adminResetStoredUserPasswordLocal(userId, password);
 }
 
@@ -338,6 +358,7 @@ export async function adminDeleteStoredUser(userId: string) {
     await adminDeleteSupabaseUser(userId);
     return;
   }
+  assertAuthBackendAvailable();
   adminDeleteStoredUserLocal(userId);
 }
 
@@ -370,20 +391,30 @@ export function clearPendingPasswordResetEmail() {
 
 export async function requestPasswordReset(email: string) {
   if (isSupabaseConfigured()) {
-    await requestSupabasePasswordReset(email);
+    await withTimeout(
+      requestSupabasePasswordReset(email),
+      12000,
+      "Password reset request timed out. Check your connection and try again.",
+    );
     return { delivery: "email" as const };
   }
 
+  assertAuthBackendAvailable();
   requestPasswordResetLocal(email);
   return { delivery: "demo" as const };
 }
 
 export async function updateStoredPassword(email: string, password: string) {
   if (isSupabaseConfigured()) {
-    await updateSupabasePassword(password);
+    await withTimeout(
+      updateSupabasePassword(password),
+      12000,
+      "Password update timed out. Check your connection and try again.",
+    );
     return;
   }
 
+  assertAuthBackendAvailable();
   updateStoredPasswordLocal(email, password);
 }
 
@@ -417,7 +448,11 @@ export async function checkUsernameAvailability(username: string) {
   const normalized = validateUsername(username);
 
   if (isSupabaseConfigured()) {
-    const available = await checkUsernameAvailabilitySupabase(normalized);
+    const available = await withTimeout(
+      checkUsernameAvailabilitySupabase(normalized),
+      15000,
+      "Username check timed out. Check your connection and try again.",
+    );
     return {
       available,
       username: normalized,
@@ -425,6 +460,7 @@ export async function checkUsernameAvailability(username: string) {
     };
   }
 
+  assertAuthBackendAvailable();
   const available = isUsernameAvailableLocal(normalized);
   return {
     available,
@@ -436,45 +472,66 @@ export async function checkUsernameAvailability(username: string) {
 export async function getStoredSessionUser(): Promise<UserProfile | null> {
   if (isSupabaseConfigured()) {
     try {
-      return await Promise.race([
+      return await withTimeout(
         getSupabaseSessionUser(),
-        new Promise<UserProfile | null>((resolve) => {
-          setTimeout(() => resolve(null), 8000);
-        }),
-      ]);
+        8000,
+        "Session restore timed out.",
+      );
     } catch {
       return null;
     }
+  }
+
+  if (!isLocalAuthEnabled()) {
+    return null;
   }
   return getStoredSessionUserLocal();
 }
 
 export async function registerStoredUser(input: RegisterInput): Promise<UserProfile> {
   if (isSupabaseConfigured()) {
-    return registerSupabaseUser(input);
+    return withTimeout(
+      registerSupabaseUser(input),
+      20000,
+      "Account creation timed out. Check your connection and try again.",
+    );
   }
+  assertAuthBackendAvailable();
   return registerStoredUserLocal(input);
 }
 
 export async function loginStoredUser(email: string, password: string): Promise<UserProfile> {
-  if (isSupabaseConfigured()) {
-    return loginSupabaseUser(email, password);
+  if (!isSupabaseConfigured()) {
+    assertAuthBackendAvailable();
+    return loginStoredUserLocal(email, password);
   }
-  return loginStoredUserLocal(email, password);
+
+  return withTimeout(
+    loginSupabaseUser(email, password),
+    15000,
+    "Sign in timed out. Check your connection and try again.",
+  );
 }
 
 export async function logoutStoredUser() {
   if (isSupabaseConfigured()) {
-    await logoutSupabaseUser();
+    await withTimeout(logoutSupabaseUser(), 8000, "Sign out timed out. Please try again.");
     return;
   }
+
+  assertAuthBackendAvailable();
   logoutStoredUserLocal();
 }
 
 export async function updateStoredProfile(userId: string, input: ProfileUpdateInput): Promise<UserProfile> {
   if (isSupabaseConfigured()) {
-    return updateSupabaseProfile(userId, input);
+    return withTimeout(
+      updateSupabaseProfile(userId, input),
+      12000,
+      "Profile update timed out. Check your connection and try again.",
+    );
   }
+  assertAuthBackendAvailable();
   return updateStoredProfileLocal(userId, input);
 }
 
@@ -490,15 +547,34 @@ export function getRememberedEmail(): string {
     return "";
   }
 
-  return window.localStorage.getItem(REMEMBER_EMAIL_KEY) ?? "";
+  return window.localStorage.getItem(REMEMBER_EMAIL_KEY)?.trim() ?? "";
+}
+
+export function migrateLegacyRememberedCredentials() {
+  if (typeof window !== "undefined") {
+    window.localStorage.removeItem(LEGACY_REMEMBER_PASSWORD_KEY);
+  }
 }
 
 export function setRememberedEmail(email: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
   window.localStorage.setItem(REMEMBER_EMAIL_KEY, normalizeEmail(email));
 }
 
 export function clearRememberedEmail() {
+  clearRememberedCredentials();
+}
+
+export function clearRememberedCredentials() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
   window.localStorage.removeItem(REMEMBER_EMAIL_KEY);
+  window.localStorage.removeItem(LEGACY_REMEMBER_PASSWORD_KEY);
 }
 
 export { migrateAccountType } from "@/lib/auth/types";

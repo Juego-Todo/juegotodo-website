@@ -8,7 +8,7 @@ import { BackButton } from "@/components/BackButton";
 import { LicenseApprovalPanel } from "@/components/profile/LicenseApprovalPanel";
 
 function MembershipBackLink() {
-  return <BackButton href="/profile?tab=membership" label="Back to Administration" />;
+  return <BackButton href="/profile?tab=licenses" label="Back to Licenses" />;
 }
 
 function HubCard({
@@ -52,7 +52,7 @@ function AdminMembershipHub() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="font-display text-3xl uppercase text-white sm:text-4xl">Administration</h2>
+        <h2 className="font-display text-3xl uppercase text-white sm:text-4xl">Licenses</h2>
         <p className="mt-2 max-w-3xl text-sm text-zinc-400">
           Choose a workspace to manage registered members or review license applications awaiting approval.
         </p>
@@ -61,13 +61,13 @@ function AdminMembershipHub() {
       <div className="grid gap-4 lg:grid-cols-2">
         <HubCard
           description="Full directory of users who have signed up. Search profiles, review standing, manage account tags, and edit member records."
-          href="/profile?tab=membership&view=members"
+          href="/profile?tab=licenses&view=members"
           icon={Users}
           title="Members Directory"
         />
         <HubCard
           description="Review membership and license applications submitted through Register For License. Inspect submissions, attachments, and approval actions."
-          href="/profile?tab=membership&view=approvals"
+          href="/profile?tab=licenses&view=approvals"
           icon={FileBadge2}
           title="License Approvals"
         />

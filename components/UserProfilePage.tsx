@@ -23,6 +23,7 @@ import {
 } from "@/components/profile/AdminAnalyticsContent";
 import { AdminPageAccessPanel } from "@/components/profile/AdminPageAccessPanel";
 import { AdminCalendarPanel } from "@/components/admin/AdminCalendarPanel";
+import { AdminStoreOrdersPanel } from "@/components/admin/AdminStoreOrdersPanel";
 import { ProfileDashboard } from "@/components/profile/dashboard/ProfileDashboard";
 import { LicenseApplicationProfileSection } from "@/components/profile/LicenseApplicationProfileSection";
 import {
@@ -32,6 +33,7 @@ import {
 } from "@/components/profile/MemberPortalPanels";
 import type { ProfileSectionId } from "@/components/profile/ProfileSidebarNav";
 import type { WorkspaceTabId } from "@/lib/profile/mission-control";
+import { canAccessOpsWorkspaceTab } from "@/lib/profile/mission-control";
 import { events, fighters, getShopProduct } from "@/data/site";
 import { getAdminAssignedTags } from "@/lib/profile/account-tags";
 import { buildMemberRecord } from "@/lib/profile/member-record";
@@ -198,22 +200,30 @@ export function UserProfilePage() {
   }, [searchParams, user, router]);
 
   const adminTabDirective =
-    user && isAdminProfile(user)
-      ? searchParams.get("tab") === "membership" || searchParams.get("tab") === "admin-licenses"
-        ? "membership-activity"
-        : searchParams.get("tab") === "calendar"
-          ? "calendar"
-          : null
-      : null;
+    searchParams.get("tab") === "membership" ||
+    searchParams.get("tab") === "admin-licenses" ||
+    searchParams.get("tab") === "licenses"
+      ? "licenses"
+      : searchParams.get("tab") === "calendar"
+        ? "calendar"
+        : searchParams.get("tab") === "tickets"
+          ? "tickets"
+          : searchParams.get("tab") === "orders"
+            ? "orders"
+            : null;
   const [lastAdminTabDirective, setLastAdminTabDirective] = useState<string | null>(null);
 
   if (adminTabDirective && adminTabDirective !== lastAdminTabDirective) {
     setLastAdminTabDirective(adminTabDirective);
-    if (adminTabDirective === "membership-activity") {
+    if (adminTabDirective === "licenses") {
       setActiveSection("membership");
-      setActiveTab("activity");
+      setActiveTab("licenses");
     } else if (adminTabDirective === "calendar") {
       setActiveTab("calendar");
+    } else if (adminTabDirective === "tickets") {
+      setActiveTab("tickets");
+    } else if (adminTabDirective === "orders") {
+      setActiveTab("orders");
     }
   }
 
@@ -265,6 +275,10 @@ export function UserProfilePage() {
     );
   }
 
+  if (!memberRecord.canAccessOpsTabs && !canAccessOpsWorkspaceTab(activeTab, false)) {
+    setActiveTab("overview");
+  }
+
   const savedFighters = fighters.filter((fighter) => userData.savedFighters.includes(fighter.slug));
   const savedTeamsList = teams.filter((team) => userData.savedTeams.includes(team.slug));
   const savedEvents = events.filter((event) => userData.savedEvents.includes(event.slug));
@@ -298,7 +312,7 @@ export function UserProfilePage() {
 
   function handleSectionChange(section: ProfileSectionId) {
     if (section === "calendar") {
-      if (memberRecord!.isAdmin) {
+      if (memberRecord!.canAccessOpsTabs) {
         setActiveSection(section);
         setActiveTab("calendar");
         return;
@@ -311,24 +325,26 @@ export function UserProfilePage() {
     setActiveSection(section);
 
     const isFighterContext = previewRoleKind === "fighter" || memberRecord!.roleModule.kind === "fighter";
+    const ops = memberRecord!.canAccessOpsTabs;
 
     const tabBySection: Partial<Record<ProfileSectionId, WorkspaceTabId>> = {
       overview: "overview",
       profile: "overview",
       dashboard: isFighterContext ? "camp" : "overview",
-      membership: memberRecord!.isAdmin ? "activity" : "overview",
-      "admin-licenses": memberRecord!.isAdmin ? "activity" : "overview",
+      membership: ops ? "licenses" : "overview",
+      "admin-licenses": ops ? "licenses" : "overview",
       settings: "settings",
-      licenses: isFighterContext ? "camp" : memberRecord!.isAdmin ? "overview" : "documents",
-      "important-documents": memberRecord!.isAdmin ? "overview" : "documents",
-      "digital-id": memberRecord!.isAdmin ? "overview" : "documents",
-      achievements: memberRecord!.isAdmin ? "settings" : "achievements",
-      record: isFighterContext ? "overview" : memberRecord!.isAdmin ? "membership-analytics" : "analytics",
+      licenses: isFighterContext ? "camp" : ops ? "licenses" : "documents",
+      "important-documents": ops ? "overview" : "documents",
+      "digital-id": ops ? "overview" : "documents",
+      achievements: ops ? "settings" : "achievements",
+      record: isFighterContext ? "overview" : ops ? "orders" : "analytics",
       fighter: isFighterContext ? "camp" : "analytics",
-      "admin-reports": memberRecord!.isAdmin ? "shop-analytics" : "overview",
-      calendar: memberRecord!.isAdmin ? "calendar" : "overview",
-      events: memberRecord!.isAdmin ? "calendar" : "overview",
-      "competition-entries": memberRecord!.isAdmin ? "calendar" : "overview",
+      "admin-reports": ops ? "orders" : "overview",
+      orders: ops ? "orders" : "overview",
+      calendar: ops ? "calendar" : "overview",
+      events: ops ? "calendar" : "overview",
+      "competition-entries": ops ? "tickets" : "overview",
       medical: isFighterContext ? "camp" : "documents",
       history: "activity",
     };
@@ -339,11 +355,31 @@ export function UserProfilePage() {
   }
 
   function handleTabChange(tab: WorkspaceTabId) {
+    if (!canAccessOpsWorkspaceTab(tab, memberRecord?.canAccessOpsTabs ?? false)) {
+      setActiveTab("overview");
+      return;
+    }
+
     setActiveTab(tab);
 
-    if ((memberRecord?.isAdmin || (user && isAdminProfile(user))) && tab === "activity") {
+    if (memberRecord?.canAccessOpsTabs && (tab === "licenses" || tab === "activity")) {
       setActiveSection("membership");
-      router.replace("/profile?tab=membership", { scroll: false });
+      router.replace("/profile?tab=licenses", { scroll: false });
+      return;
+    }
+
+    if (memberRecord?.canAccessOpsTabs && tab === "calendar") {
+      router.replace("/profile?tab=calendar", { scroll: false });
+      return;
+    }
+
+    if (memberRecord?.canAccessOpsTabs && tab === "tickets") {
+      router.replace("/profile?tab=tickets", { scroll: false });
+      return;
+    }
+
+    if (memberRecord?.canAccessOpsTabs && tab === "orders") {
+      router.replace("/profile?tab=orders", { scroll: false });
     }
   }
 
@@ -377,7 +413,7 @@ export function UserProfilePage() {
   const hubSections: ProfileSectionId[] = ["overview", "profile", "dashboard", "membership"];
   const isDeepSection = !hubSections.includes(activeSection);
 
-  const documentsContent = memberRecord.isAdmin ? null : (
+  const documentsContent = memberRecord.canAccessOpsTabs ? null : (
     <div className="space-y-6">
       <RequirementsPanel percent={memberRecord.requirementsPercent} requirements={memberRecord.requirements} />
       <LicenseProgressPanel steps={memberRecord.progressSteps} />
@@ -406,15 +442,20 @@ export function UserProfilePage() {
     </section>
   );
 
-  const membershipContent = memberRecord.isAdmin ? <AdminMembershipPanel /> : null;
+  const membershipContent = memberRecord.canAccessOpsTabs ? <AdminMembershipPanel /> : null;
 
-  const membershipAnalyticsContent = memberRecord.isAdmin ? (
+  const membershipAnalyticsContent = memberRecord.canAccessOpsTabs ? (
     <AdminMembershipLicenseAnalyticsContent />
   ) : null;
-  const shopAnalyticsContent = memberRecord.isAdmin ? <AdminShopAnalyticsContent /> : null;
+  const shopAnalyticsContent = memberRecord.canAccessOpsTabs ? <AdminShopAnalyticsContent /> : null;
 
-  const pageAccessContent = memberRecord.isAdmin ? <AdminPageAccessPanel memberRecord={memberRecord} /> : null;
-  const calendarContent = memberRecord.isAdmin ? <AdminCalendarPanel /> : null;
+  const pageAccessContent = memberRecord.canAccessOpsTabs ? (
+    <AdminPageAccessPanel memberRecord={memberRecord} />
+  ) : null;
+  const calendarContent = memberRecord.canAccessOpsTabs ? <AdminCalendarPanel /> : null;
+  const ticketsContent = memberRecord.canAccessOpsTabs ? <AdminStoreOrdersPanel mode="tickets" /> : null;
+  const ordersContent = memberRecord.canAccessOpsTabs ? <AdminStoreOrdersPanel mode="all" /> : null;
+  const licensesContent = membershipContent;
 
   const settingsContent = (
     <MotionSection>
@@ -812,10 +853,13 @@ export function UserProfilePage() {
           <ProfileDashboard
             achievementsContent={achievementsContent}
             calendarContent={calendarContent}
+            licensesContent={licensesContent}
             membershipAnalyticsContent={membershipAnalyticsContent}
             membershipContent={membershipContent}
+            ordersContent={ordersContent}
             pageAccessContent={pageAccessContent}
             shopAnalyticsContent={shopAnalyticsContent}
+            ticketsContent={ticketsContent}
             activeTab={activeTab}
             allowPortraitUpload
             deepSectionContent={deepSectionContent}

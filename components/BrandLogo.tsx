@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export function BrandLogo({ variant = "default" }: { variant?: "default" | "footer" }) {
+export function BrandLogo({ variant = "default" }: { variant?: "default" | "footer" | "header" }) {
   const isFooter = variant === "footer";
+  const isHeader = variant === "header";
 
   return (
     <Link
@@ -12,7 +13,11 @@ export function BrandLogo({ variant = "default" }: { variant?: "default" | "foot
     >
       <span
         className={`relative grid place-items-center overflow-hidden rounded-[1.25rem] border border-[#FF1010]/35 bg-black shadow-[0_0_32px_rgba(255,16,16,0.35)] transition group-hover:border-[#FF1010]/70 ${
-          isFooter ? "h-20 w-20 sm:h-24 sm:w-24" : "h-12 w-12 sm:h-16 sm:w-16"
+          isFooter
+            ? "h-20 w-20 sm:h-24 sm:w-24"
+            : isHeader
+              ? "h-10 w-10 sm:h-11 sm:w-11"
+              : "h-12 w-12 sm:h-16 sm:w-16"
         }`}
       >
         <Image

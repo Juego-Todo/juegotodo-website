@@ -18,7 +18,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` enables server-side username availability checks during registration without extra SQL setup.
+`SUPABASE_SERVICE_ROLE_KEY` is required for admin mutations and reliable server-side profile repair. Never expose it to browser code.
 
 Add the same variables in **Vercel → Project Settings → Environment Variables**.
 
@@ -28,6 +28,12 @@ Open **Supabase → SQL Editor** and run the full script in:
 
 `supabase/schema.sql`
 
+For an existing project, apply every file in `supabase/migrations` in filename order. The latest required auth repair is:
+
+`supabase/migrations/20260711000000_repair_auth_signup_trigger.sql`
+
+Do not apply only selected auth migrations: the signup trigger, profile columns, RLS policies, and backfill depend on the complete ordered chain.
+
 This creates:
 
 - `profiles` (extends auth users)
@@ -36,10 +42,7 @@ This creates:
 - Row Level Security policies
 - Auto profile creation on signup
 
-For username availability during sign-up, either:
-
-- Add `SUPABASE_SERVICE_ROLE_KEY` to `.env.local` (recommended), or
-- Run `supabase/migrations/20260705000000_is_username_available.sql` in the SQL Editor
+Username availability requires `supabase/migrations/20260705000000_is_username_available.sql`. The service role provides a server-side fallback.
 
 ## 4. Auth redirect URLs
 
@@ -56,4 +59,4 @@ Set a user's `profiles.role` to `admin` in the database, or register with a plat
 
 ## Fallback mode
 
-If Supabase env vars are missing, the app falls back to browser localStorage for development previews.
+If Supabase env vars are missing, browser-local demo auth is available only in development. Production fails closed instead of exposing test accounts.

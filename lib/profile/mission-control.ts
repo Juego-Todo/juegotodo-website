@@ -11,6 +11,9 @@ export type WorkspaceTabId =
   | "membership-analytics"
   | "shop-analytics"
   | "calendar"
+  | "tickets"
+  | "orders"
+  | "licenses"
   | "achievements"
   | "page-access"
   | "settings";
@@ -54,15 +57,37 @@ export const workspaceTabs: { id: WorkspaceTabId; label: string }[] = [
   { id: "settings", label: "Settings" },
 ];
 
+/** Ops workspace tabs — Administrator and Staff accounts only. */
 export const adminWorkspaceTabs: { id: WorkspaceTabId; label: string }[] = [
   { id: "overview", label: "Overview" },
-  { id: "activity", label: "Administration" },
-  { id: "membership-analytics", label: "Analytics" },
-  { id: "shop-analytics", label: "Shop Orders" },
   { id: "calendar", label: "Calendar" },
-  { id: "page-access", label: "Page Access" },
+  { id: "tickets", label: "Tickets" },
+  { id: "orders", label: "Orders" },
+  { id: "licenses", label: "Licenses" },
   { id: "settings", label: "Settings" },
 ];
+
+/** Tabs reserved for Administrator or Staff accounts. */
+export const opsRestrictedTabIds: WorkspaceTabId[] = [
+  "calendar",
+  "tickets",
+  "orders",
+  "licenses",
+  "activity",
+  "membership-analytics",
+  "shop-analytics",
+  "page-access",
+];
+
+export function canAccessOpsWorkspaceTab(
+  tab: WorkspaceTabId,
+  canAccessOpsTabs: boolean,
+): boolean {
+  if (!opsRestrictedTabIds.includes(tab)) {
+    return true;
+  }
+  return canAccessOpsTabs;
+}
 
 export const fighterWorkspaceTabs: { id: WorkspaceTabId; label: string }[] = [
   { id: "overview", label: "Profile" },
@@ -106,7 +131,7 @@ export function buildMissionItems(role: ProfileRoleModule, memberRecord: MemberR
           headline: pending,
           detail: "3 waiting today",
           actionLabel: "View Queue",
-          href: "/profile?tab=membership&view=approvals",
+          href: "/profile?tab=licenses&view=approvals",
           urgent: Number.parseInt(pending.replace(/\D/g, ""), 10) > 0,
         },
         {
@@ -115,7 +140,7 @@ export function buildMissionItems(role: ProfileRoleModule, memberRecord: MemberR
           headline: "12",
           detail: "Ready for issuance",
           actionLabel: "Issue Cards",
-          href: "/profile?tab=membership&view=approvals",
+          href: "/profile?tab=licenses&view=approvals",
         },
         {
           id: "events",
@@ -233,8 +258,8 @@ export function buildCommandActions(role: ProfileRoleModule, isAdmin: boolean): 
   const base: CommandAction[] = [
     { id: "search-member", label: "Search Member", keywords: ["member", "directory", "find"], href: "/admin/members" },
     { id: "open-reports", label: "Open Reports", keywords: ["reports", "analytics"], href: "/admin/reports" },
-    { id: "view-pending", label: "View Pending Licenses", keywords: ["license", "approve", "pending"], href: "/profile?tab=membership&view=approvals" },
-    { id: "issue-card", label: "Issue Card", keywords: ["card", "credential", "id"], href: "/profile?tab=membership&view=approvals" },
+    { id: "view-pending", label: "View Pending Licenses", keywords: ["license", "approve", "pending"], href: "/profile?tab=licenses&view=approvals" },
+    { id: "issue-card", label: "Issue Card", keywords: ["card", "credential", "id"], href: "/profile?tab=licenses&view=approvals" },
     { id: "calendar", label: "Open Calendar", keywords: ["calendar", "events"], href: "/calendar" },
     { id: "shop", label: "Browse Shop", keywords: ["shop", "gear", "merch"], href: "/shop" },
     { id: "settings", label: "Open Settings", keywords: ["settings", "account"], tab: "settings" },
@@ -251,7 +276,7 @@ export function buildCommandActions(role: ProfileRoleModule, isAdmin: boolean): 
 
   if (isAdmin) {
     return [
-      { id: "approve", label: "Approve Licenses", keywords: ["approve", "license"], href: "/profile?tab=membership&view=approvals" },
+      { id: "approve", label: "Approve Licenses", keywords: ["approve", "license"], href: "/profile?tab=licenses&view=approvals" },
       { id: "create-event", label: "Create Event", keywords: ["event", "calendar", "schedule"], tab: "calendar" },
       { id: "create-seminar", label: "Create Seminar", keywords: ["seminar", "clinic", "training"], tab: "calendar" },
       ...base.map((action) =>

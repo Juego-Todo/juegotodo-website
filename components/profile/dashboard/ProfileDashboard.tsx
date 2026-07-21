@@ -22,6 +22,7 @@ import type { UserProfile } from "@/lib/auth/types";
 import { buildFighterProfileView } from "@/lib/profile/fighter-profile-view";
 import {
   adminWorkspaceTabs,
+  canAccessOpsWorkspaceTab,
   fighterWorkspaceTabs,
   mobileTabToWorkspace,
   workspaceTabs,
@@ -46,6 +47,9 @@ export function ProfileDashboard({
   membershipContent,
   pageAccessContent,
   calendarContent,
+  ticketsContent,
+  ordersContent,
+  licensesContent,
   shopAnalyticsContent,
   previewRoleKind = null,
   onExitViewAs,
@@ -70,6 +74,9 @@ export function ProfileDashboard({
   membershipContent?: React.ReactNode;
   pageAccessContent?: React.ReactNode;
   calendarContent?: React.ReactNode;
+  ticketsContent?: React.ReactNode;
+  ordersContent?: React.ReactNode;
+  licensesContent?: React.ReactNode;
   previewRoleKind?: ProfileRoleKind | null;
   onExitViewAs?: () => void;
   portraitImage?: string;
@@ -79,6 +86,7 @@ export function ProfileDashboard({
 }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTabId>("dashboard");
+  const canAccessOpsTabs = memberRecord.canAccessOpsTabs;
 
   function handleMobileTab(tab: MobileTabId) {
     setMobileTab(tab);
@@ -96,7 +104,7 @@ export function ProfileDashboard({
     if (section) onNavigateSection(section);
   }
 
-  const showCredentials = !memberRecord.isAdmin;
+  const showCredentials = !canAccessOpsTabs;
   const credentialPinned = showCredentials && mobileTab === "credential";
   const isFighterRole = memberRecord.roleModule.kind === "fighter";
   const athlete =
@@ -137,6 +145,13 @@ export function ProfileDashboard({
     : showCredentials
       ? workspaceTabs
       : adminWorkspaceTabs;
+
+  function handleTabClick(tab: WorkspaceTabId) {
+    if (!canAccessOpsWorkspaceTab(tab, canAccessOpsTabs)) {
+      return;
+    }
+    onTabChange(tab);
+  }
 
   return (
     <>
@@ -209,7 +224,7 @@ export function ProfileDashboard({
                             : "text-zinc-400 hover:text-white"
                         }`}
                         key={tab.id}
-                        onClick={() => onTabChange(tab.id)}
+                        onClick={() => handleTabClick(tab.id)}
                         type="button"
                       >
                         {tab.label}
@@ -249,8 +264,8 @@ export function ProfileDashboard({
                     ) : null}
 
                     {activeTab === "activity" && !fighterView ? (
-                      memberRecord.isAdmin ? (
-                        <div>{membershipContent}</div>
+                      canAccessOpsTabs ? (
+                        <div>{licensesContent ?? membershipContent}</div>
                       ) : (
                         <>
                           <div className="lg:hidden">
@@ -272,33 +287,41 @@ export function ProfileDashboard({
                       <div>{documentsContent}</div>
                     ) : null}
 
-                    {activeTab === "analytics" && !fighterView && !memberRecord.isAdmin ? (
-                        <section className="space-y-5">
-                          <div>
-                            <p className="text-[0.62rem] font-black uppercase tracking-[0.28em] text-red-200">Analytics</p>
-                            <h2 className="font-display mt-2 text-3xl uppercase text-white sm:text-4xl">Performance</h2>
-                          </div>
-                          <MemberStatisticsRow statistics={memberRecord.statistics} />
+                    {activeTab === "analytics" && !fighterView && !canAccessOpsTabs ? (
+                      <section className="space-y-5">
+                        <div>
+                          <p className="text-[0.62rem] font-black uppercase tracking-[0.28em] text-red-200">Analytics</p>
+                          <h2 className="font-display mt-2 text-3xl uppercase text-white sm:text-4xl">Performance</h2>
+                        </div>
+                        <MemberStatisticsRow statistics={memberRecord.statistics} />
                       </section>
                     ) : null}
 
-                    {activeTab === "membership-analytics" && memberRecord.isAdmin ? (
+                    {activeTab === "membership-analytics" && canAccessOpsTabs ? (
                       <div>{membershipAnalyticsContent}</div>
                     ) : null}
 
-                    {activeTab === "shop-analytics" && memberRecord.isAdmin ? (
+                    {activeTab === "shop-analytics" && canAccessOpsTabs ? (
                       <div>{shopAnalyticsContent}</div>
                     ) : null}
 
-                    {activeTab === "calendar" && memberRecord.isAdmin ? (
+                    {activeTab === "calendar" && canAccessOpsTabs ? (
                       <div>{calendarContent}</div>
                     ) : null}
 
-                    {activeTab === "achievements" && !fighterView && !memberRecord.isAdmin ? (
+                    {activeTab === "tickets" && canAccessOpsTabs ? <div>{ticketsContent}</div> : null}
+
+                    {activeTab === "orders" && canAccessOpsTabs ? <div>{ordersContent}</div> : null}
+
+                    {activeTab === "licenses" && canAccessOpsTabs ? (
+                      <div>{licensesContent ?? membershipContent}</div>
+                    ) : null}
+
+                    {activeTab === "achievements" && !fighterView && !canAccessOpsTabs ? (
                       <div>{achievementsContent}</div>
                     ) : null}
 
-                    {activeTab === "page-access" && memberRecord.isAdmin ? (
+                    {activeTab === "page-access" && canAccessOpsTabs ? (
                       <div>{pageAccessContent}</div>
                     ) : null}
 
@@ -315,14 +338,14 @@ export function ProfileDashboard({
 
       <ProfileMobileNav
         active={mobileTab}
-        adminMode={memberRecord.isAdmin}
+        adminMode={canAccessOpsTabs}
         fighterMode={Boolean(fighterView)}
         hideCredentials={!showCredentials}
         onChange={handleMobileTab}
       />
 
       <ProfileCommandPalette
-        isAdmin={memberRecord.isAdmin}
+        isAdmin={canAccessOpsTabs}
         onClose={() => setPaletteOpen(false)}
         onNavigateSection={handleNavigateSection}
         onNavigateTab={onTabChange}

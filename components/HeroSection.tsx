@@ -8,11 +8,11 @@ import { AsSeenOnCarousel } from "@/components/AsSeenOnCarousel";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { EnergyParticles } from "@/components/EnergyParticles";
 import { MagneticButton } from "@/components/MagneticButton";
-import { barrioBrawlsEvent, barrioBrawlsTicketSlug } from "@/data/shop-tickets";
+import { barrioBrawlsEvent, barrioBrawlsTicketCheckoutUrl } from "@/data/shop-tickets";
 
 const heroFeaturedEvent = {
   ...barrioBrawlsEvent,
-  ticketProductSlug: barrioBrawlsTicketSlug,
+  checkoutUrl: barrioBrawlsTicketCheckoutUrl,
 };
 
 export function HeroSection() {
@@ -77,9 +77,9 @@ export function HeroSection() {
                 Register Now
                 <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
               </MagneticButton>
-              <MagneticButton href={`/shop/${heroFeaturedEvent.ticketProductSlug}`} variant="secondary">
+              <MagneticButton href={heroFeaturedEvent.checkoutUrl} variant="secondary">
                 <Ticket className="mr-2" size={16} aria-hidden />
-                Buy Tickets
+                Buy Now
               </MagneticButton>
             </div>
           </motion.div>
@@ -103,7 +103,7 @@ export function HeroSection() {
                     <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-red-100/80 sm:text-xs">
                       {heroFeaturedEvent.series}
                     </p>
-                    <h2 className="font-display mt-2 text-[2.2rem] uppercase leading-none text-white sm:text-4xl">
+                    <h2 className="font-display mt-2 text-[1.45rem] uppercase leading-[0.95] text-white sm:text-[1.65rem]">
                       {heroFeaturedEvent.title}
                     </h2>
                     <div className="mt-2.5 space-y-0.5 text-xs font-semibold text-zinc-300 sm:mt-3 sm:text-sm">

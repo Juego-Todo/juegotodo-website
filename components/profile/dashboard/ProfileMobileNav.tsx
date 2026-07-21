@@ -42,7 +42,7 @@ export function ProfileMobileNav({
           dashboard: "Home",
           career: "Career",
           credential: "Credential",
-          activity: "Administration",
+          activity: "Licenses",
           settings: "Settings",
         }
       : {

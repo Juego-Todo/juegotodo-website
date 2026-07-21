@@ -183,7 +183,7 @@ export function resolveBackNavigation(pathname: string) {
   }
 
   if (segments[0] === "admin" && segments[1] === "license-approvals" && segments.length === 3) {
-    return { label: "Back to Applications", href: "/profile?tab=membership&view=approvals" };
+    return { label: "Back to Applications", href: "/profile?tab=licenses&view=approvals" };
   }
 
   if (segments[0] === "admin" && segments.length === 2 && segments[1] !== "license-approvals") {

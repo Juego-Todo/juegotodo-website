@@ -84,7 +84,10 @@ export async function upsertProfileFromAuthUser(
   const serviceClient = createSupabaseServiceClient();
 
   if (serviceClient) {
-    await serviceClient.from("profiles").upsert(payload, { onConflict: "id" });
+    const { error } = await serviceClient.from("profiles").upsert(payload, { onConflict: "id" });
+    if (error) {
+      throw new Error(error.message);
+    }
     return;
   }
 

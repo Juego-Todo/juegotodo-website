@@ -55,8 +55,8 @@ const memberCoreNav: PortalNavItem[] = [
 
 const adminPortalNav: PortalNavItem[] = [
   { id: "overview", label: "Dashboard", icon: LayoutDashboard },
-  { id: "admin-members", label: "Member Directory", icon: Users, href: "/profile?tab=membership&view=members" },
-  { id: "admin-licenses", label: "License Approvals", icon: FileBadge2, href: "/profile?tab=membership&view=approvals" },
+  { id: "admin-members", label: "Member Directory", icon: Users, href: "/profile?tab=licenses&view=members" },
+  { id: "admin-licenses", label: "License Approvals", icon: FileBadge2, href: "/profile?tab=licenses&view=approvals" },
   { id: "important-documents", label: "Documents", icon: FileText, href: "/admin/documents" },
   { id: "calendar", label: "Calendar", icon: CalendarDays, href: "/admin/calendar" },
   { id: "official-tools", label: "Officials", icon: Flag, href: "/admin/officials" },
@@ -115,7 +115,7 @@ const councilNav: PortalNavItem[] = [
   { id: "council-tools", label: "Council Members", icon: Shield },
   { id: "club", label: "Regions", icon: Building2 },
   { id: "certificates", label: "Committees", icon: Award },
-  { id: "admin-licenses", label: "Approvals", icon: FileBadge2, href: "/profile?tab=membership&view=approvals" },
+  { id: "admin-licenses", label: "Approvals", icon: FileBadge2, href: "/profile?tab=licenses&view=approvals" },
   { id: "admin-reports", label: "Reports", icon: BarChart3, href: "/admin" },
 ];
 

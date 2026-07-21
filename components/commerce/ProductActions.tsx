@@ -22,6 +22,11 @@ export function ProductActions({ product, variantSelections }: ProductActionsPro
   const athleteDiscount = user?.accountType === "athlete";
 
   function handleBuyNow() {
+    if (product.externalCheckoutUrl) {
+      window.open(product.externalCheckoutUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     addToCart(product.slug, 1, { variantSelections });
     if (!user) {
       router.push(getCheckoutAuthHref("/checkout/shipping"));

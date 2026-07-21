@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { getSupabaseUrl, isSupabaseConfigured } from "@/lib/supabase/env";
+import { fetchSupabaseWithTimeout } from "@/lib/supabase/fetch";
 import type { Database } from "@/lib/supabase/types";
 
 export function createSupabaseServiceClient() {
@@ -13,6 +14,9 @@ export function createSupabaseServiceClient() {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
+    },
+    global: {
+      fetch: fetchSupabaseWithTimeout,
     },
   });
 }

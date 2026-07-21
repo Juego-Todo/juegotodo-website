@@ -2,9 +2,27 @@
 
 import { motion } from "framer-motion";
 import { Play } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
-import { featuredVideos, getYouTubeThumbnail } from "@/data/featured-videos";
+import { featuredVideos, getYouTubeThumbnailFallbacks } from "@/data/featured-videos";
+
+function VideoThumbnail({ youtubeId, title }: { youtubeId: string; title: string }) {
+  const fallbacks = getYouTubeThumbnailFallbacks(youtubeId);
+  const [srcIndex, setSrcIndex] = useState(0);
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- YouTube CDN thumbnails bypass Next image optimization, which fails locally on TLS.
+    <img
+      alt=""
+      aria-hidden
+      className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+      onError={() => {
+        setSrcIndex((current) => (current < fallbacks.length - 1 ? current + 1 : current));
+      }}
+      src={fallbacks[srcIndex]}
+      title={title}
+    />
+  );
+}
 
 export function VideoCarousel() {
   const [activeId, setActiveId] = useState(featuredVideos[0].id);
@@ -62,14 +80,7 @@ export function VideoCarousel() {
                 whileInView={{ opacity: 1, y: 0 }}
               >
                 <div className="relative aspect-video overflow-hidden bg-zinc-900">
-                  <Image
-                    alt=""
-                    aria-hidden
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    fill
-                    sizes="(max-width: 1024px) 16rem, 20vw"
-                    src={getYouTubeThumbnail(video.youtubeId)}
-                  />
+                  <VideoThumbnail title={video.title} youtubeId={video.youtubeId} />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(0,0,0,0.88))]" />
                   <div
                     className={`absolute inset-0 transition ${isActive ? "bg-[#FF1010]/15" : "bg-black/20 group-hover:bg-black/10"}`}

@@ -18,6 +18,7 @@ import {
 import { getPhoneDialCode, getPhonePlaceholder, validateRegistrationPhone } from "@/lib/auth/phone";
 import {
   checkUsernameAvailability,
+  clearPendingPasswordResetEmail,
   clearRememberedEmail,
   getPendingPasswordResetEmail,
   getRememberedEmail,
@@ -46,10 +47,17 @@ function resolveAuthMode(value: string | null): AuthMode {
   return "login";
 }
 
+function resolveSafeNextPath(value: string | null) {
+  const next = value ?? "/profile";
+  return next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")
+    ? next
+    : "/profile";
+}
+
 export function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/profile";
+  const nextPath = resolveSafeNextPath(searchParams.get("next"));
   const mode = resolveAuthMode(searchParams.get("mode"));
   const { user, login, register, requestPasswordReset, updatePassword, usesSupabase } = useAuth();
 
@@ -69,7 +77,7 @@ export function AuthPage() {
     if (pendingResetEmail) {
       return pendingResetEmail;
     }
-    return getRememberedEmail() ?? "";
+    return getRememberedEmail();
   });
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -85,7 +93,7 @@ export function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedAccountTerms, setAcceptedAccountTerms] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => searchParams.get("authError"));
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const resolvedEmail = mode === "reset" && user?.email ? user.email : email;
@@ -119,7 +127,9 @@ export function AuthPage() {
 
       setUsernameAvailabilityStatus("error");
       setUsernameAvailabilityMessage(
-        caught instanceof Error ? caught.message : "Unable to check username.",
+        `${
+          caught instanceof Error ? caught.message : "Unable to check username."
+        } You can still submit; availability will be validated during account creation.`,
       );
     }
   }, []);
@@ -226,7 +236,7 @@ export function AuthPage() {
         const normalizedDateOfBirth = validateDateOfBirth(dateOfBirth);
         const normalizedPhone = validateRegistrationPhone(country, phone);
 
-        if (usernameCheckStatus !== "available") {
+        if (usernameCheckStatus !== "available" && usernameCheckStatus !== "error") {
           const result = await checkUsernameAvailability(username);
           if (!result.available) {
             throw new Error(result.message);
@@ -261,8 +271,8 @@ export function AuthPage() {
 
         const pendingResetEmail = getPendingPasswordResetEmail();
         if (pendingResetEmail) {
-          setSuccess("Demo mode: account found. Set your new password below.");
           switchMode("reset");
+          setSuccess("If an account exists for that email, you can set a new password below.");
           return;
         }
 
@@ -276,6 +286,7 @@ export function AuthPage() {
         }
 
         await updatePassword(resolvedEmail, password);
+        clearPendingPasswordResetEmail();
 
         if (usesSupabase) {
           router.push("/profile");
@@ -342,7 +353,6 @@ export function AuthPage() {
     (usernameCheckStatus === "checking" ||
       usernameCheckStatus === "taken" ||
       usernameCheckStatus === "invalid" ||
-      usernameCheckStatus === "error" ||
       !username.trim());
 
   return (
@@ -508,10 +518,16 @@ export function AuthPage() {
                       <input
                         checked={rememberMe}
                         className="h-4 w-4 rounded border-white/20 bg-transparent accent-[#FF1010] focus:ring-red-500/40"
-                        onChange={(event) => setRememberMe(event.target.checked)}
+                        onChange={(event) => {
+                          const checked = event.target.checked;
+                          setRememberMe(checked);
+                          if (!checked) {
+                            clearRememberedEmail();
+                          }
+                        }}
                         type="checkbox"
                       />
-                      <span className="text-sm text-zinc-400">Remember me</span>
+                      <span className="text-sm text-zinc-400">Remember my email on this device</span>
                     </label>
                     <button
                       className="text-left text-sm font-semibold text-red-300 transition hover:text-white sm:text-right"

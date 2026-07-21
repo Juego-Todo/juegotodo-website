@@ -25,7 +25,7 @@ const aboutUsPaths = [
 const latayanologyPaths = ["/latayanology", "/fighters", "/fma-lineage", "/juego-todo-seminars"];
 
 const desktopNavLinkClassName =
-  "nav-link-underline shrink-0 whitespace-nowrap px-3 py-2 text-[0.78rem] font-bold uppercase leading-none tracking-[0.15em] text-zinc-400 2xl:px-4";
+  "nav-link-underline shrink-0 whitespace-nowrap px-3 text-[0.78rem] font-bold uppercase leading-none tracking-[0.15em] text-zinc-400 2xl:px-4";
 
 const accountLinks = [
   { label: "Profile", href: "/profile", icon: User },
@@ -138,15 +138,15 @@ export function Navbar() {
     <header className={`glass-nav fixed inset-x-0 top-0 z-50 ${scrolled ? "glass-nav-scrolled" : ""}`}>
       <nav
         aria-label="Primary navigation"
-        className={`relative mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 transition-[min-height,padding] duration-300 ease-out sm:px-6 lg:px-8 xl:grid xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:items-center ${
-          scrolled ? "min-h-[4rem] py-2.5" : "min-h-[4.75rem] py-3.5"
+        className={`relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-5 transition-[min-height,padding] duration-300 ease-out sm:gap-4 sm:px-6 lg:px-8 xl:grid xl:grid-cols-[auto_1fr_auto] xl:items-center xl:gap-6 ${
+          scrolled ? "min-h-[4rem] py-2.5" : "min-h-[4.75rem] py-3"
         }`}
       >
         <div className="relative z-10 flex shrink-0 items-center xl:justify-self-start">
-          <BrandLogo />
+          <BrandLogo variant="header" />
         </div>
 
-        <div className="hidden items-center gap-6 xl:flex xl:justify-self-center 2xl:gap-10">
+        <div className="hidden min-w-0 items-center justify-center gap-4 xl:flex 2xl:gap-8">
           {centerLinks.map((item) => {
             const active = isNavActive(pathname, item.href, item.label);
 
@@ -220,10 +220,10 @@ export function Navbar() {
           })}
         </div>
 
-        <div className="relative z-10 flex items-center gap-2 sm:gap-2.5 xl:col-start-3 xl:justify-self-end">
+        <div className="relative z-10 flex shrink-0 items-center gap-2.5 sm:gap-3 xl:col-start-3 xl:justify-self-end">
           <NavbarCartLink />
 
-          <div className="hidden items-center gap-2 sm:flex sm:items-center lg:gap-2.5">
+          <div className="hidden shrink-0 items-center gap-2 sm:flex sm:items-center lg:gap-2.5">
             {!user ? (
               <>
                 <Link className="nav-auth-outline" href={loginHref}>

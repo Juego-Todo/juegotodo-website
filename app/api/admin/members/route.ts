@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { backfillMissingProfiles } from "@/lib/auth/backfill-profiles";
 import { isServerAdminUser } from "@/lib/auth/admin-access";
 import { mapProfileRow } from "@/lib/auth/profile-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -37,17 +36,6 @@ export async function GET() {
   const serviceClient = createSupabaseServiceClient();
   const queryClient = serviceClient ?? supabase;
 
-  let backfilled = 0;
-
-  if (serviceClient) {
-    try {
-      backfilled = await backfillMissingProfiles(serviceClient);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to backfill member profiles.";
-      return NextResponse.json({ error: message }, { status: 500 });
-    }
-  }
-
   const { data, error } = await queryClient
     .from("profiles")
     .select("*")
@@ -59,6 +47,5 @@ export async function GET() {
 
   return NextResponse.json({
     members: (data ?? []).map(mapProfileRow),
-    backfilled,
   });
 }

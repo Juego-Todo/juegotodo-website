@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AdminPortalHeader } from "@/components/admin/AdminPortalShell";
 import { useCommerce } from "@/lib/commerce/context";
+import { getShopProduct } from "@/data/shop";
 import { getAllOrders } from "@/lib/commerce/storage";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import {
@@ -22,7 +23,15 @@ const statusFlow: OrderStatus[] = [
   "delivered",
 ];
 
-export function AdminStoreOrdersPanel() {
+function isEventTicketOrder(order: Order) {
+  return order.items.some((item) => Boolean(getShopProduct(item.productSlug)?.eventTicket));
+}
+
+export function AdminStoreOrdersPanel({
+  mode = "all",
+}: {
+  mode?: "all" | "tickets";
+}) {
   const { adminApprovePayment, adminUpdateOrderStatus } = useCommerce();
   const [orders, setOrders] = useState<Order[]>([]);
   const [trackingDraft, setTrackingDraft] = useState<Record<string, string>>({});
@@ -37,19 +46,27 @@ export function AdminStoreOrdersPanel() {
     refreshOrders();
   }, []);
 
+  const visibleOrders = useMemo(
+    () => (mode === "tickets" ? orders.filter(isEventTicketOrder) : orders),
+    [mode, orders],
+  );
+
+  const title = mode === "tickets" ? "Event Tickets" : "Store Orders";
+  const description =
+    mode === "tickets"
+      ? "Review digital event ticket purchases, payment verification, and delivery status."
+      : "Review shop orders, approve payments, and update fulfillment status.";
+  const emptyLabel = mode === "tickets" ? "No ticket orders yet." : "No orders yet.";
+
   return (
     <div className="space-y-6">
-      <AdminPortalHeader
-        description="Review shop orders, approve payments, and update fulfillment status."
-        tag="Commerce"
-        title="Store Orders"
-      />
+      <AdminPortalHeader description={description} tag="Commerce" title={title} />
 
-      {orders.length === 0 ? (
-        <div className="glass-panel rounded-[1.75rem] p-8 text-center text-zinc-400">No orders yet.</div>
+      {visibleOrders.length === 0 ? (
+        <div className="glass-panel rounded-[1.75rem] p-8 text-center text-zinc-400">{emptyLabel}</div>
       ) : (
         <div className="space-y-4">
-          {orders.map((order) => (
+          {visibleOrders.map((order) => (
             <div className="glass-panel rounded-[1.5rem] p-5 sm:p-6" key={order.id}>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>

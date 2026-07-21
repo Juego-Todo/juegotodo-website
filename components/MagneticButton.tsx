@@ -49,6 +49,9 @@ export function MagneticButton({
         href={href}
         onMouseLeave={handleLeave}
         onMouseMove={handleMove}
+        {...(href.startsWith("http")
+          ? { target: "_blank", rel: "noopener noreferrer" }
+          : {})}
         ref={ref}
       >
         {children}

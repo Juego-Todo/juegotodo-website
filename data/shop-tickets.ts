@@ -2,10 +2,16 @@ import type { ShopProduct } from "@/data/shop";
 
 export const barrioBrawlsTicketSlug = "barrio-brawls-tickets";
 
-/** Single source of truth for Barrio Brawls featured event date/time. */
+export const barrioBrawlsEventFullName =
+  "UGB46 and JUEGO TODO 1st Proclamation Anniversary";
+
+export const barrioBrawlsTicketCheckoutUrl =
+  "https://paymongo.page/l/ugb46andjuegotodo1stproclamationanniversary";
+
+/** Single source of truth for the featured event date/time and display copy. */
 export const barrioBrawlsEvent = {
-  series: "Juego Todo",
-  title: "Barrio Brawls",
+  series: "UGB46",
+  title: "JUEGO TODO 1st Proclamation Anniversary",
   dateLabel: "August 28, 2026",
   timeLabel: "1:00 PM",
   venue: "TBA",
@@ -15,33 +21,43 @@ export const barrioBrawlsEvent = {
 export const eventTicketProducts: ShopProduct[] = [
   {
     slug: barrioBrawlsTicketSlug,
-    name: "Juego Todo: Barrio Brawls — Digital Ticket",
+    name: `${barrioBrawlsEventFullName} — Digital Ticket`,
     category: "digital-products",
-    price: "₱1,500",
-    priceAmount: 1500,
-    description: `Digital general admission for Juego Todo: Barrio Brawls on ${barrioBrawlsEvent.dateLabel}.`,
+    price: "₱1,999",
+    priceAmount: 1999,
+    description: `Digital general admission for ${barrioBrawlsEventFullName} on ${barrioBrawlsEvent.dateLabel}.`,
     summary:
-      "Flagship hybrid FMA card with professional weaponized competition and championship stakes. Instant digital QR delivery to your account.",
+      "AUGUST 28, 2026 | UGB 46 x BLAZE FC 10 x Juego Todo 1st Proclamation Anniversary. Two championships. Four warriors. One unforgettable night.",
     features: [
       "QR ticket delivered to your account instantly",
       "General admission seating",
       "Venue details sent before event day",
     ],
     specs: [
-      { label: "Event", value: "Juego Todo: Barrio Brawls" },
+      { label: "Event", value: barrioBrawlsEventFullName },
       { label: "Date", value: barrioBrawlsEvent.dateLabel },
       { label: "Time", value: barrioBrawlsEvent.timeLabel },
+      { label: "Price", value: "₱1,999" },
       { label: "Delivery", value: "Digital QR ticket" },
     ],
-    competitionUse: "Spectator admission for the flagship JTGC Barrio Brawls card.",
+    competitionUse: `Spectator admission for ${barrioBrawlsEventFullName}.`,
     tone: "from-red-950 via-black to-zinc-950",
     badge: "On Sale",
     digital: true,
     stock: 500,
     rating: 4.9,
     reviewCount: 86,
-    searchTags: ["tickets", "barrio brawls", "event", "admission", "digital ticket"],
+    searchTags: [
+      "tickets",
+      "ugb46",
+      "juego todo",
+      "proclamation anniversary",
+      "event",
+      "admission",
+      "digital ticket",
+    ],
     imageSrc: "/juego-todo-event-background.png",
+    externalCheckoutUrl: barrioBrawlsTicketCheckoutUrl,
     eventTicket: barrioBrawlsEvent,
   },
 ];

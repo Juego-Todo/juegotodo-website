@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withTimeout } from "@/lib/auth/timeout";
 import { normalizeUsername, validateUsername } from "@/lib/auth/username";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -10,20 +11,38 @@ export async function GET(request: Request) {
   }
 
   const usernameParam = new URL(request.url).searchParams.get("username") ?? "";
+  let normalized: string;
 
   try {
-    const normalized = validateUsername(usernameParam);
+    normalized = validateUsername(usernameParam);
+  } catch (caught) {
+    return NextResponse.json(
+      {
+        available: false,
+        username: normalizeUsername(usernameParam),
+        message: caught instanceof Error ? caught.message : "Invalid username.",
+      },
+      { status: 400 },
+    );
+  }
 
+  try {
     const serviceClient = createSupabaseServiceClient();
     if (serviceClient) {
-      const { data, error } = await serviceClient
-        .from("profiles")
-        .select("id")
-        .ilike("username", normalized)
-        .maybeSingle();
+      const { data, error } = await withTimeout(
+        Promise.resolve(
+          serviceClient
+            .from("profiles")
+            .select("id")
+            .ilike("username", normalized)
+            .maybeSingle(),
+        ),
+        8000,
+        "Username check timed out.",
+      );
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: error.message }, { status: 503 });
       }
 
       const available = !data;
@@ -35,9 +54,15 @@ export async function GET(request: Request) {
     }
 
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase.rpc("is_username_available", {
-      check_username: normalized,
-    });
+    const { data, error } = await withTimeout(
+      Promise.resolve(
+        supabase.rpc("is_username_available", {
+          check_username: normalized,
+        }),
+      ),
+      8000,
+      "Username check timed out.",
+    );
 
     if (error) {
       return NextResponse.json(
@@ -55,14 +80,12 @@ export async function GET(request: Request) {
       username: normalized,
       message: available ? "Username is available." : "That username is already taken.",
     });
-  } catch (caught) {
+  } catch {
     return NextResponse.json(
       {
-        available: false,
-        username: normalizeUsername(usernameParam),
-        message: caught instanceof Error ? caught.message : "Invalid username.",
+        error: "Username availability is temporarily unavailable. You can still submit the registration form.",
       },
-      { status: 400 },
+      { status: 503 },
     );
   }
 }

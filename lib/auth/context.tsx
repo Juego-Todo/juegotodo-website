@@ -13,6 +13,7 @@ import {
   getStoredSessionUser,
   loginStoredUser,
   logoutStoredUser,
+  migrateLegacyRememberedCredentials,
   registerStoredUser,
   requestPasswordReset,
   subscribeAuthChanges,
@@ -44,15 +45,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    let authEventReceived = false;
+
+    migrateLegacyRememberedCredentials();
 
     getStoredSessionUser()
       .then((profile) => {
-        if (active) {
+        if (active && !authEventReceived) {
           setUser(profile);
         }
       })
       .catch(() => {
-        if (active) {
+        if (active && !authEventReceived) {
           setUser(null);
         }
       })
@@ -62,14 +66,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       });
 
-    const loadingTimeout = window.setTimeout(() => {
-      if (active) {
-        setLoading(false);
-      }
-    }, 4000);
-
     const unsubscribe = subscribeAuthChanges((profile) => {
       if (active) {
+        authEventReceived = true;
         setUser(profile);
         setLoading(false);
       }
@@ -77,7 +76,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       active = false;
-      window.clearTimeout(loadingTimeout);
       unsubscribe();
     };
   }, []);

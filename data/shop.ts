@@ -43,6 +43,8 @@ export type ShopProduct = {
   rating?: number;
   reviewCount?: number;
   imageSrc?: string;
+  /** Opens an external checkout (e.g. PayMongo) instead of the in-app cart flow. */
+  externalCheckoutUrl?: string;
   eventTicket?: ShopEventTicket;
   variantGroups?: ProductVariantGroup[];
 };

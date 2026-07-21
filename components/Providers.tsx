@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { SiteLoadingScreen } from "@/components/SiteLoadingScreen";
 import { AuthProvider } from "@/lib/auth/context";
 import { CartAddedToast } from "@/components/commerce/CartAddedToast";
 import { CartDrawer } from "@/components/commerce/CartDrawer";
@@ -12,6 +13,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
       <CommerceProvider>
+        <SiteLoadingScreen />
         {children}
         <CartAddedToast />
         <FloatingCartBar />

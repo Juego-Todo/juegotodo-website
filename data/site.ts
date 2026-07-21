@@ -432,12 +432,12 @@ export const fighters: Fighter[] = [
 export const events: Event[] = [
   {
     slug: "barrio-brawls",
-    title: "Juego Todo: Barrio Brawls",
+    title: "UGB46 and JUEGO TODO 1st Proclamation Anniversary",
     date: barrioBrawlsEvent.target,
     venue: barrioBrawlsEvent.venue,
     city: "Philippines",
     status: "Upcoming",
-    mainEvent: "Flagship hybrid FMA card",
+    mainEvent: "UGB46 and JUEGO TODO 1st Proclamation Anniversary",
     posterTone: "from-red-950 via-black to-zinc-950",
     bouts: ["Main card TBA", "Regional qualifiers", "Amateur showcase"],
     isChampionship: true,

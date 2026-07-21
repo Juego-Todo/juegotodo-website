@@ -55,6 +55,7 @@ export default async function EventPage({ params }: PageProps) {
         <section className="mx-auto grid max-w-7xl gap-8 pb-8 lg:grid-cols-[1.05fr_0.95fr]">
           <EventCardBackdrop
             className="min-h-[26rem] rounded-[1.5rem] border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.46)] sm:min-h-[38rem] sm:rounded-[2rem]"
+            imageSrc={event.imageSrc}
             sizes="(max-width: 1024px) 100vw, 50vw"
           >
             <div className="p-5 sm:p-8">
@@ -90,12 +91,31 @@ export default async function EventPage({ params }: PageProps) {
                 ))}
               </ul>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <Link
-                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-[#ff2828]"
-                  href="/registration"
-                >
-                  Register Interest
-                </Link>
+                {event.ticketCheckoutUrl ? (
+                  <a
+                    className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-[#ff2828]"
+                    href={event.ticketCheckoutUrl}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Buy Tickets
+                  </a>
+                ) : (
+                  <Link
+                    className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-[#ff2828]"
+                    href="/registration"
+                  >
+                    Register Interest
+                  </Link>
+                )}
+                {event.ticketProductSlug ? (
+                  <Link
+                    className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-white/10"
+                    href={`/shop/${event.ticketProductSlug}`}
+                  >
+                    Ticket Details
+                  </Link>
+                ) : null}
                 <SaveEntityButton slug={event.slug} type="event" />
               </div>
             </div>

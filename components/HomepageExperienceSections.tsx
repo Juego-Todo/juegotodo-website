@@ -118,7 +118,7 @@ export function SignatureSystemSection() {
                         </h4>
                         {format.showRules ? (
                           <Link
-                            className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#FF1010] transition hover:text-red-300"
+                            className="inline-flex min-h-10 items-center rounded-full px-2 text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#FF1010] transition hover:text-red-300"
                             href={format.rulesHref}
                           >
                             Rules
@@ -142,7 +142,7 @@ export function SignatureSystemSection() {
             {heroMainStats.map((stat) => (
               <div className="text-center xl:text-left" key={stat.label}>
                 <p className="font-display text-2xl text-white sm:text-3xl xl:text-[2rem]">{stat.value}</p>
-                <p className="mt-1.5 text-[0.55rem] font-medium uppercase tracking-[0.16em] text-zinc-500 sm:text-[0.58rem] sm:tracking-[0.18em]">
+                <p className="mt-1.5 text-[0.65rem] font-medium uppercase leading-snug tracking-[0.12em] text-zinc-500 sm:text-[0.62rem] sm:tracking-[0.16em]">
                   {stat.label}
                 </p>
               </div>

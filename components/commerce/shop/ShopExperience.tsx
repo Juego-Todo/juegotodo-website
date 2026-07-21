@@ -206,14 +206,14 @@ export function ShopHero() {
                 <p className="mt-3 max-w-lg text-sm leading-7 text-zinc-300 sm:mt-4 sm:text-base">{activeSlide.description}</p>
                 <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:gap-3">
                   <Link
-                    className="inline-flex min-h-10 items-center justify-center rounded-full bg-[#FF1010] px-6 text-[0.58rem] font-bold uppercase tracking-[0.14em] text-white shadow-[0_0_24px_rgba(255,16,16,0.35)] transition hover:bg-[#ff2828] sm:min-h-11 sm:px-7 sm:text-xs"
+                    className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-[0_0_24px_rgba(255,16,16,0.35)] transition hover:bg-[#ff2828] sm:min-h-11 sm:px-7"
                     href={activeSlide.href}
                   >
                     {activeSlide.cta}
                     <ArrowRight className="ml-1.5" size={14} aria-hidden />
                   </Link>
                   <Link
-                    className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] px-6 text-[0.58rem] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm transition hover:bg-white/10 sm:min-h-11 sm:px-7 sm:text-xs"
+                    className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] px-6 text-xs font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm transition hover:bg-white/10 sm:min-h-11 sm:px-7"
                     href="#full-catalog"
                   >
                     Browse All
@@ -249,20 +249,25 @@ export function ShopHero() {
               aria-hidden
             />
             <div className="mx-auto flex max-w-7xl items-center px-4 py-3 sm:px-6 lg:px-8">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 {shopHeroSlides.map((slide, index) => (
                   <button
                     aria-current={index === activeIndex ? "true" : undefined}
                     aria-label={`Go to slide ${index + 1}: ${slide.title}`}
-                    className={`rounded-full transition-all ${
-                      index === activeIndex
-                        ? "h-2 w-8 bg-[#FF1010]"
-                        : "h-2 w-2 bg-white/30 hover:bg-white/55"
-                    }`}
+                    className="inline-flex min-h-11 min-w-11 items-center justify-center"
                     key={slide.id}
                     onClick={() => goToSlide(index)}
                     type="button"
-                  />
+                  >
+                    <span
+                      className={`rounded-full transition-all ${
+                        index === activeIndex
+                          ? "h-2 w-8 bg-[#FF1010]"
+                          : "h-2 w-2 bg-white/30"
+                      }`}
+                      aria-hidden
+                    />
+                  </button>
                 ))}
               </div>
             </div>

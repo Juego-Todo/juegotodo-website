@@ -27,7 +27,7 @@ export function EventCardsSection() {
               className="card-3d glass-panel animated-border group overflow-hidden rounded-[1.75rem] border-white/[0.08] bg-[#0D0D0D]/75"
               key={event.slug}
             >
-              <EventCardBackdrop className="min-h-52 p-5">
+              <EventCardBackdrop className="min-h-52 p-5" imageSrc={event.imageSrc}>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.18em]">
                     {event.status}
@@ -68,13 +68,29 @@ export function EventCardsSection() {
                 ) : null}
 
                 <div className="mt-5 flex gap-3">
-                  <Link
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-3 text-[0.65rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"
-                    href={`/events/${event.slug}`}
-                  >
-                    <Ticket size={14} aria-hidden />
-                    Tickets
-                  </Link>
+                  {event.ticketCheckoutUrl ? (
+                    <a
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-3 text-[0.65rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"
+                      href={event.ticketCheckoutUrl}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      <Ticket size={14} aria-hidden />
+                      Buy Tickets
+                    </a>
+                  ) : (
+                    <Link
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-3 text-[0.65rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"
+                      href={
+                        event.ticketProductSlug
+                          ? `/shop/${event.ticketProductSlug}`
+                          : `/events/${event.slug}`
+                      }
+                    >
+                      <Ticket size={14} aria-hidden />
+                      Tickets
+                    </Link>
+                  )}
                   <Link
                     className="inline-flex flex-1 items-center justify-center rounded-full border border-white/[0.08] px-4 py-3 text-[0.65rem] font-black uppercase tracking-[0.16em] text-zinc-300 transition hover:bg-white/5"
                     href={`/events/${event.slug}`}

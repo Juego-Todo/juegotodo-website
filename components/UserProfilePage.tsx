@@ -637,7 +637,7 @@ export function UserProfilePage() {
                         {order.payment.referenceNumber}
                       </p>
                       <p className="mt-1 text-sm text-zinc-400">
-                        {new Date(order.createdAt).toLocaleDateString()} â€¢ {paymentMethodLabels[order.payment.method]}
+                        {new Date(order.createdAt).toLocaleDateString()} • {paymentMethodLabels[order.payment.method]}
                       </p>
                     </div>
                     <div className="text-right">
@@ -647,7 +647,7 @@ export function UserProfilePage() {
                   </div>
                   <ul className="mt-4 space-y-1 text-sm text-zinc-400">
                     {order.items.map((item) => (
-                      <li key={item.productSlug}>{item.name} Ã— {item.quantity}</li>
+                      <li key={item.productSlug}>{item.name} × {item.quantity}</li>
                     ))}
                   </ul>
                   <div className="mt-3 flex gap-2">
@@ -752,7 +752,7 @@ export function UserProfilePage() {
                     <Link className="font-display text-2xl uppercase text-white" href={`/fighters/${fighter.slug}`}>
                       {fighter.name}
                     </Link>
-                    <p className="mt-2 text-sm text-zinc-400">{fighter.division} â€¢ {fighter.record}</p>
+                    <p className="mt-2 text-sm text-zinc-400">{fighter.division} • {fighter.record}</p>
                     <button
                       className="mt-4 text-xs font-black uppercase tracking-[0.16em] text-red-300"
                       onClick={() => toggleSavedFighter(fighter.slug)}
@@ -778,7 +778,7 @@ export function UserProfilePage() {
                     <Link className="font-display text-2xl uppercase text-white" href={`/teams/${team.slug}`}>
                       {team.name}
                     </Link>
-                    <p className="mt-2 text-sm text-zinc-400">{team.region} â€¢ {team.record}</p>
+                    <p className="mt-2 text-sm text-zinc-400">{team.region} • {team.record}</p>
                     <button
                       className="mt-4 text-xs font-black uppercase tracking-[0.16em] text-red-300"
                       onClick={() => toggleSavedTeam(team.slug)}
@@ -804,7 +804,7 @@ export function UserProfilePage() {
                     <Link className="font-display text-2xl uppercase text-white" href={`/events/${event.slug}`}>
                       {event.title}
                     </Link>
-                    <p className="mt-2 text-sm text-zinc-400">{event.date} â€¢ {event.city}</p>
+                    <p className="mt-2 text-sm text-zinc-400">{event.date} • {event.city}</p>
                     <button
                       className="mt-4 text-xs font-black uppercase tracking-[0.16em] text-red-300"
                       onClick={() => toggleSavedEvent(event.slug)}
@@ -903,7 +903,7 @@ function PortalPlaceholderSection({
           className="mt-6 inline-flex min-h-11 items-center rounded-full bg-red-600 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white"
           href={ctaHref}
         >
-          {ctaLabel ?? "Open"} â†’
+          {ctaLabel ?? "Open"} →
         </Link>
       ) : null}
     </div>
@@ -920,7 +920,7 @@ function IdentityToolsSection({ title, description }: { title: string; descripti
         className="mt-6 inline-flex min-h-11 items-center rounded-full bg-red-600 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white"
         href="/register-for-license"
       >
-        Manage License â†’
+        Manage License →
       </Link>
     </div>
   );

@@ -223,7 +223,7 @@ export function Navbar() {
         <div className="relative z-10 flex shrink-0 items-center gap-2.5 sm:gap-3 xl:col-start-3 xl:justify-self-end">
           <NavbarCartLink />
 
-          <div className="hidden shrink-0 items-center gap-2 sm:flex sm:items-center lg:gap-2.5">
+          <div className="hidden shrink-0 items-center gap-2 lg:flex lg:items-center lg:gap-2.5">
             {!user ? (
               <>
                 <Link className="nav-auth-outline" href={loginHref}>
@@ -273,14 +273,14 @@ export function Navbar() {
             <motion.aside
               animate={{ opacity: 1, x: 0 }}
               aria-label="Mobile navigation"
-              className="nav-mobile-drawer fixed right-0 top-0 z-50 flex h-dvh w-[min(420px,calc(100vw-1rem))] flex-col overflow-hidden xl:hidden"
+              className="nav-mobile-drawer fixed right-0 top-0 z-50 flex h-dvh w-[min(420px,calc(100vw-1rem))] flex-col overflow-hidden pt-[env(safe-area-inset-top)] xl:hidden"
               exit={{ opacity: 0, x: "100%" }}
               id="mobile-primary-nav"
               initial={{ opacity: 0, x: "100%" }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="flex min-h-[4.75rem] shrink-0 items-center justify-between border-b border-white/[0.08] px-5">
-                <BrandLogo />
+                <BrandLogo variant="header" />
                 <button
                   aria-label="Close navigation menu"
                   className="nav-menu-toggle inline-flex"
@@ -291,7 +291,7 @@ export function Navbar() {
                 </button>
               </div>
 
-              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
                 <div className="grid gap-1.5">
                 {centerLinks.map((item) => {
                   const active = isNavActive(pathname, item.href, item.label);

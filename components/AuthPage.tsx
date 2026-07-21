@@ -514,7 +514,7 @@ export function AuthPage() {
 
                 {mode === "login" ? (
                   <div className="flex flex-col gap-3 border-t border-white/[0.06] pt-1 sm:flex-row sm:items-center sm:justify-between">
-                    <label className="flex cursor-pointer items-center gap-2.5">
+                    <label className="flex min-h-11 cursor-pointer items-center gap-2.5">
                       <input
                         checked={rememberMe}
                         className="h-4 w-4 rounded border-white/20 bg-transparent accent-[#FF1010] focus:ring-red-500/40"
@@ -530,7 +530,7 @@ export function AuthPage() {
                       <span className="text-sm text-zinc-400">Remember my email on this device</span>
                     </label>
                     <button
-                      className="text-left text-sm font-semibold text-red-300 transition hover:text-white sm:text-right"
+                      className="inline-flex min-h-11 items-center text-left text-sm font-semibold text-red-300 transition hover:text-white sm:text-right"
                       onClick={() => switchMode("forgot")}
                       type="button"
                     >
@@ -780,14 +780,14 @@ function AuthGenderChoiceField({
   return (
     <fieldset className="block">
       <legend className={authLabelClassName}>{label}</legend>
-      <div aria-label={label} className="grid grid-cols-3 gap-2 sm:gap-2.5" role="radiogroup">
+      <div aria-label={label} className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-2.5" role="radiogroup">
         {options.map((option) => {
           const selected = value === option;
 
           return (
             <button
               aria-checked={selected}
-              className={`rounded-2xl border px-2 py-3.5 text-center text-[0.72rem] font-semibold leading-snug transition sm:px-3 sm:text-sm ${
+              className={`min-h-11 rounded-2xl border px-3 py-3.5 text-center text-sm font-semibold leading-snug transition ${
                 selected
                   ? "border-red-500/45 bg-red-500/10 text-white shadow-[0_0_18px_rgba(229,9,20,0.12)]"
                   : "border-white/10 bg-black/50 text-zinc-300 hover:border-white/20 hover:bg-white/[0.04] hover:text-white"

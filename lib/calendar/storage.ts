@@ -221,7 +221,7 @@ function mapSiteEventToCalendarEntry(event: Event): CalendarEntry {
         gabSanctionComplete: event.isChampionship ?? false,
       },
       media: { posterTone: event.posterTone, gallery: [], trailerUrl: "", streamEmbedUrl: "" },
-      shopProductSlug: event.slug,
+      shopProductSlug: event.ticketProductSlug ?? event.slug,
     },
     createdAt: event.date,
     updatedAt: event.date,

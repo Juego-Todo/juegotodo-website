@@ -43,7 +43,7 @@ export function MagneticButton({
   }
 
   return (
-    <motion.div style={{ x: springX, y: springY }}>
+    <motion.div className={className.includes("w-full") ? "w-full" : undefined} style={{ x: springX, y: springY }}>
       <Link
         className={`group inline-flex min-h-12 items-center justify-center rounded-full px-6 py-3.5 text-xs font-black uppercase tracking-[0.2em] transition sm:text-sm ${baseClass} ${className}`}
         href={href}

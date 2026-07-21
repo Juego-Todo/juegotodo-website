@@ -175,7 +175,7 @@ export function buildProfileRoleModule(input: {
         quickLinks: [
           { label: "Admin Console", href: "/admin" },
           { label: "License Queue", href: "/admin?tab=licenses" },
-          { label: "Reports", href: "/admin" },
+          { label: "Reports", href: "/admin/reports" },
           { label: "Moderation", section: "notifications" },
         ],
         careerSnapshot: [
@@ -437,7 +437,7 @@ export function buildProfileRoleModule(input: {
           { label: "Council Members", section: "council-tools" },
           { label: "Regions", section: "club" },
           { label: "Approvals", href: "/admin?tab=licenses" },
-          { label: "Reports", href: "/admin" },
+          { label: "Reports", href: "/admin/reports" },
         ],
         careerSnapshot: [
           { icon: "🏛️", label: "Committee", value: answers.councilPosition ?? "Competition Rules" },

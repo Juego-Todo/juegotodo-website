@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Loader2, ShoppingBag } from "lucide-react";
+import { Check, ExternalLink, Loader2, ShoppingBag } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useCommerce } from "@/lib/commerce/context";
 import type { ShopProduct } from "@/data/shop";
@@ -27,13 +27,15 @@ export function AddToCartButton({
   variant = "solid",
   quantity = 1,
   variantSelections,
-  label = "Add To Cart",
+  label,
   fullWidth = false,
 }: AddToCartButtonProps) {
   const { addToCart } = useCommerce();
   const [state, setState] = useState<ButtonState>("idle");
   const resetTimer = useRef<number | undefined>(undefined);
   const continueTimer = useRef<number | undefined>(undefined);
+  const isExternal = Boolean(product.externalCheckoutUrl);
+  const resolvedLabel = label ?? (isExternal ? "Buy Now" : "Add To Cart");
 
   const resetToIdle = useCallback(() => {
     window.clearTimeout(resetTimer.current);
@@ -51,6 +53,11 @@ export function AddToCartButton({
   async function handleClick(event: React.MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
+
+    if (product.externalCheckoutUrl) {
+      window.open(product.externalCheckoutUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
 
     if (state === "continue") {
       window.clearTimeout(resetTimer.current);
@@ -70,7 +77,7 @@ export function AddToCartButton({
     resetToIdle();
   }
 
-  const isDisabled = product.stock <= 0 || state === "loading";
+  const isDisabled = !isExternal && (product.stock <= 0 || state === "loading");
 
   return (
     <button
@@ -99,7 +106,16 @@ export function AddToCartButton({
       onClick={handleClick}
       type="button"
     >
-      {state === "loading" ? (
+      {isExternal ? (
+        <>
+          <ExternalLink
+            className={micro ? "mr-1" : compact ? "mr-1.5" : "mr-2"}
+            size={micro ? 11 : compact ? 12 : 14}
+            aria-hidden
+          />
+          {resolvedLabel}
+        </>
+      ) : state === "loading" ? (
         <>
           <Loader2
             className={`animate-spin ${micro ? "mr-1" : compact ? "mr-1.5" : "mr-2"}`}
@@ -129,7 +145,7 @@ export function AddToCartButton({
             size={micro ? 11 : compact ? 12 : 14}
             aria-hidden
           />
-          {label}
+          {resolvedLabel}
         </>
       )}
     </button>

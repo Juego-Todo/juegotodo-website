@@ -23,7 +23,7 @@ html {
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   overflow-x: clip;
   background:
@@ -107,6 +107,7 @@ a {
   background: linear-gradient(180deg, rgba(14, 14, 16, 0.78) 0%, rgba(5, 5, 5, 0.62) 100%);
   backdrop-filter: blur(22px) saturate(160%);
   -webkit-backdrop-filter: blur(22px) saturate(160%);
+  padding-top: env(safe-area-inset-top);
   transition:
     background 0.28s ease,
     border-color 0.28s ease,
@@ -455,8 +456,8 @@ a {
 .nav-cart-button {
   position: relative;
   display: inline-flex;
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2.75rem;
+  width: 2.75rem;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -485,8 +486,8 @@ a {
 }
 
 .nav-menu-toggle {
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2.75rem;
+  width: 2.75rem;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;

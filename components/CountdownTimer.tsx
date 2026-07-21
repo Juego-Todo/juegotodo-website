@@ -54,13 +54,13 @@ export function CountdownTimer({ target }: { target: string }) {
   );
 
   return (
-    <div className="grid grid-cols-4 gap-2" aria-label="Event countdown">
+    <div className="grid grid-cols-4 gap-1.5 sm:gap-2" aria-label="Event countdown">
       {entries.map(([label, value]) => (
-        <div className="rounded-2xl border border-white/10 bg-black/40 p-3 text-center" key={label}>
-          <div className="font-display text-2xl text-white sm:text-3xl">
+        <div className="rounded-xl border border-white/10 bg-black/40 p-2 text-center sm:rounded-2xl sm:p-3" key={label}>
+          <div className="font-display text-xl text-white sm:text-3xl">
             {typeof value === "number" ? String(value).padStart(2, "0") : "--"}
           </div>
-          <div className="text-[0.58rem] font-black uppercase tracking-[0.2em] text-red-300 sm:text-[0.62rem] sm:tracking-[0.24em]">
+          <div className="text-[0.5rem] font-black uppercase tracking-[0.12em] text-red-300 sm:text-[0.62rem] sm:tracking-[0.24em]">
             {label}
           </div>
         </div>

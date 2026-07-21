@@ -116,7 +116,7 @@ const councilNav: PortalNavItem[] = [
   { id: "club", label: "Regions", icon: Building2 },
   { id: "certificates", label: "Committees", icon: Award },
   { id: "admin-licenses", label: "Approvals", icon: FileBadge2, href: "/profile?tab=licenses&view=approvals" },
-  { id: "admin-reports", label: "Reports", icon: BarChart3, href: "/admin" },
+  { id: "admin-reports", label: "Reports", icon: BarChart3, href: "/admin/reports" },
 ];
 
 const fanExtras: PortalNavItem[] = [

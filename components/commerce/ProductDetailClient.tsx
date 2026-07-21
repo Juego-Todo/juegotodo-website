@@ -111,7 +111,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
     <>
       <StickyPurchaseBar observeId="purchase-anchor" product={product} variantSelections={variantSelections} />
 
-      <section className="mx-auto max-w-7xl pb-24">
+      <section className="mx-auto max-w-7xl pb-28 sm:pb-24">
         {/* Hero — photography first */}
         <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:items-start">
           <div className="space-y-3">

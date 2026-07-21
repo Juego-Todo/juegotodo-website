@@ -40,12 +40,12 @@ export function StickyPurchaseBar({ product, observeId, variantSelections }: Sti
         visible ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:gap-4 sm:px-6 lg:px-8">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-white">{product.name}</p>
           <p className="font-display text-xl text-white">{formatCurrency(displayPrice)}</p>
         </div>
-        <AddToCartButton compact product={product} variantSelections={variantSelections} />
+        <AddToCartButton product={product} variantSelections={variantSelections} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { barrioBrawlsEvent } from "@/data/shop-tickets";
+import { barrioBrawlsEvent, barrioBrawlsEventPosterSrc, barrioBrawlsTicketCheckoutUrl, barrioBrawlsTicketSlug } from "@/data/shop-tickets";
 
 export type Fighter = {
   slug: string;
@@ -24,6 +24,9 @@ export type Event = {
   bouts: string[];
   isChampionship?: boolean;
   isLive?: boolean;
+  imageSrc?: string;
+  ticketCheckoutUrl?: string;
+  ticketProductSlug?: string;
 };
 
 export type Champion = {
@@ -441,6 +444,9 @@ export const events: Event[] = [
     posterTone: "from-red-950 via-black to-zinc-950",
     bouts: ["Main card TBA", "Regional qualifiers", "Amateur showcase"],
     isChampionship: true,
+    imageSrc: barrioBrawlsEventPosterSrc,
+    ticketCheckoutUrl: barrioBrawlsTicketCheckoutUrl,
+    ticketProductSlug: barrioBrawlsTicketSlug,
   },
   {
     slug: "jt-ascension-manila",
@@ -453,7 +459,6 @@ export const events: Event[] = [
     posterTone: "from-red-700 via-zinc-950 to-yellow-900",
     bouts: ["Santos vs Mendoza", "Dela Torre vs Bautista", "Lim vs Navarro"],
     isChampionship: true,
-    isLive: true,
   },
   {
     slug: "jt-proving-ground-cebu",

@@ -50,15 +50,28 @@ export function ProductActions({ product, variantSelections }: ProductActionsPro
       ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <AddToCartButton fullWidth product={product} variantSelections={variantSelections} />
-        <button
-          className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-white/[0.06] px-6 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-white/10"
-          onClick={handleBuyNow}
-          type="button"
-        >
-          <Zap className="mr-2" size={16} aria-hidden />
-          Buy Now
-        </button>
+        {product.externalCheckoutUrl ? (
+          <button
+            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-[#FF1010] px-6 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2828]"
+            onClick={handleBuyNow}
+            type="button"
+          >
+            <Zap className="mr-2" size={16} aria-hidden />
+            Buy Now
+          </button>
+        ) : (
+          <>
+            <AddToCartButton fullWidth product={product} variantSelections={variantSelections} />
+            <button
+              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-white/[0.06] px-6 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-white/10"
+              onClick={handleBuyNow}
+              type="button"
+            >
+              <Zap className="mr-2" size={16} aria-hidden />
+              Buy Now
+            </button>
+          </>
+        )}
         <button
           aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
           className={`inline-flex min-h-12 items-center justify-center rounded-full px-5 transition ${

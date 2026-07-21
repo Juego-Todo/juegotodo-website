@@ -232,7 +232,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
             </dl>
           </div>
 
-          {bundleItems.length > 1 ? (
+          {bundleItems.length > 1 && !product.digital && !product.eventTicket ? (
             <>
               <SectionRule />
               <div>

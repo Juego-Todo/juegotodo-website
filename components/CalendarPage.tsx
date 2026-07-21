@@ -11,9 +11,10 @@ import {
   calendarEntryKindLabels,
   type CalendarEntry,
 } from "@/data/calendar-entries";
+import { events } from "@/data/site";
 import { useAuth } from "@/lib/auth/context";
 import { isAdminProfile } from "@/lib/commerce/storage";
-import { getAllCalendarEntries, splitCalendarEntries } from "@/lib/calendar/storage";
+import { getPublicCalendarEntries, splitCalendarEntries } from "@/lib/calendar/storage";
 
 type CalendarViewMode = "grid" | "linear";
 
@@ -46,6 +47,10 @@ function formatTime(iso: string) {
     minute: "2-digit",
     timeZone: "Asia/Manila",
   }).format(new Date(iso));
+}
+
+function getSiteEventMeta(slug: string) {
+  return events.find((event) => event.slug === slug);
 }
 
 function EntryBadges({ entry }: { entry: CalendarEntry }) {
@@ -120,11 +125,13 @@ function CalendarViewToggle({
 
 function CalendarEntryCard({ entry }: { entry: CalendarEntry }) {
   const eventTitle = entry.title.replace("Juego Todo: ", "");
-  const hasEventPage = entry.source === "static" && entry.kind === "event";
+  const siteEvent = entry.source === "static" ? getSiteEventMeta(entry.slug) : undefined;
+  const hasEventPage = Boolean(siteEvent && entry.kind === "event");
+  const posterSrc = siteEvent?.imageSrc ?? entry.operations.media.gallery[0];
 
   return (
     <article className="card-3d glass-panel overflow-hidden rounded-[1.75rem] border-white/[0.08] bg-[#0D0D0D]/75">
-      <EventCardBackdrop className="min-h-52 p-5">
+      <EventCardBackdrop className="min-h-52 p-5" imageSrc={posterSrc}>
         <EntryBadges entry={entry} />
         <h2 className="font-display mt-12 text-4xl uppercase leading-none text-white sm:text-5xl">
           {eventTitle}
@@ -175,13 +182,25 @@ function CalendarEntryCard({ entry }: { entry: CalendarEntry }) {
         <div className="flex gap-3">
           {hasEventPage ? (
             <>
-              <Link
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-3 text-[0.65rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"
-                href={`/events/${entry.slug}`}
-              >
-                <Ticket size={14} aria-hidden />
-                Event Details
-              </Link>
+              {siteEvent?.ticketCheckoutUrl ? (
+                <a
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-3 text-[0.65rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"
+                  href={siteEvent.ticketCheckoutUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Ticket size={14} aria-hidden />
+                  Buy Tickets
+                </a>
+              ) : (
+                <Link
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-3 text-[0.65rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"
+                  href={`/events/${entry.slug}`}
+                >
+                  <Ticket size={14} aria-hidden />
+                  Event Details
+                </Link>
+              )}
               <Link
                 className="inline-flex flex-1 items-center justify-center rounded-full border border-white/[0.08] px-4 py-3 text-[0.65rem] font-black uppercase tracking-[0.16em] text-zinc-300 transition hover:bg-white/5"
                 href={`/events/${entry.slug}`}
@@ -202,7 +221,8 @@ function CalendarEntryCard({ entry }: { entry: CalendarEntry }) {
 
 function CalendarEntryLinearRow({ entry }: { entry: CalendarEntry }) {
   const eventTitle = entry.title.replace("Juego Todo: ", "");
-  const hasEventPage = entry.source === "static" && entry.kind === "event";
+  const siteEvent = entry.source === "static" ? getSiteEventMeta(entry.slug) : undefined;
+  const hasEventPage = Boolean(siteEvent && entry.kind === "event");
   const detailItems =
     entry.kind === "event"
       ? entry.bouts.slice(0, 2)
@@ -257,13 +277,25 @@ function CalendarEntryLinearRow({ entry }: { entry: CalendarEntry }) {
 
           {hasEventPage ? (
             <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-              <Link
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-2.5 text-[0.62rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"
-                href={`/events/${entry.slug}`}
-              >
-                <Ticket size={14} aria-hidden />
-                Event Details
-              </Link>
+              {siteEvent?.ticketCheckoutUrl ? (
+                <a
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-2.5 text-[0.62rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"
+                  href={siteEvent.ticketCheckoutUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Ticket size={14} aria-hidden />
+                  Buy Tickets
+                </a>
+              ) : (
+                <Link
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FF1010] px-4 py-2.5 text-[0.62rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"
+                  href={`/events/${entry.slug}`}
+                >
+                  <Ticket size={14} aria-hidden />
+                  Event Details
+                </Link>
+              )}
               <Link
                 className="inline-flex items-center justify-center rounded-full border border-white/[0.08] px-4 py-2.5 text-[0.62rem] font-black uppercase tracking-[0.16em] text-zinc-300 transition hover:bg-white/5"
                 href={`/events/${entry.slug}`}
@@ -304,7 +336,7 @@ function CalendarEntryList({
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-3">
+    <div className={entries.length === 1 ? "max-w-xl" : "grid gap-5 lg:grid-cols-3"}>
       {entries.map((entry) => (
         <CalendarEntryCard entry={entry} key={entry.id} />
       ))}
@@ -312,9 +344,45 @@ function CalendarEntryList({
   );
 }
 
+function NextEntryActions({ entry }: { entry: CalendarEntry }) {
+  const siteEvent = getSiteEventMeta(entry.slug);
+
+  if (siteEvent?.ticketCheckoutUrl) {
+    return (
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <a
+          className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#ff2828] sm:text-sm"
+          href={siteEvent.ticketCheckoutUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Buy Tickets
+          <ArrowRight className="ml-2" size={16} aria-hidden />
+        </a>
+        <Link
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-white/10 sm:text-sm"
+          href={`/events/${entry.slug}`}
+        >
+          Event Details
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#ff2828] sm:text-sm"
+      href={`/events/${entry.slug}`}
+    >
+      View Event
+      <ArrowRight className="ml-2" size={16} aria-hidden />
+    </Link>
+  );
+}
+
 export function CalendarPage() {
   const { user } = useAuth();
-  const [entries, setEntries] = useState<CalendarEntry[]>(() => getAllCalendarEntries(false));
+  const entries = useMemo(() => getPublicCalendarEntries(), []);
   const [view, setView] = useState<CalendarViewMode>(() => {
     if (typeof window === "undefined") {
       return "grid";
@@ -383,17 +451,26 @@ export function CalendarPage() {
                   {nextEntry.venue} · {nextEntry.city}
                 </p>
                 {nextEntry.source === "static" && nextEntry.kind === "event" ? (
-                  <Link
-                    className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#ff2828] sm:text-sm"
-                    href={`/events/${nextEntry.slug}`}
-                  >
-                    View Event
-                    <ArrowRight className="ml-2" size={16} aria-hidden />
-                  </Link>
+                  <NextEntryActions entry={nextEntry} />
                 ) : null}
               </div>
-              <div className="rounded-[1.5rem] border border-white/[0.08] bg-black/35 p-4 sm:p-5">
-                <CountdownTimer target={nextEntry.date} />
+              <div className="space-y-4">
+                {(() => {
+                  const siteEvent = getSiteEventMeta(nextEntry.slug);
+                  const posterSrc = siteEvent?.imageSrc ?? nextEntry.operations.media.gallery[0];
+                  return posterSrc ? (
+                    <EventCardBackdrop
+                      className="min-h-48 rounded-[1.5rem] border border-white/[0.08]"
+                      imageSrc={posterSrc}
+                      sizes="(max-width: 1024px) 100vw, 40vw"
+                    >
+                      <span aria-hidden className="sr-only" />
+                    </EventCardBackdrop>
+                  ) : null;
+                })()}
+                <div className="rounded-[1.5rem] border border-white/[0.08] bg-black/35 p-4 sm:p-5">
+                  <CountdownTimer target={nextEntry.date} />
+                </div>
               </div>
             </div>
           </div>

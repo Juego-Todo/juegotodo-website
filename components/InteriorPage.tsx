@@ -120,10 +120,10 @@ function EventsSection() {
         </div>
       </Link>
 
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div className={`grid gap-5 ${events.length === 1 ? "max-w-xl" : "lg:grid-cols-3"}`}>
       {events.map((event) => (
         <Link className="glass-panel group overflow-hidden rounded-[1.75rem] transition hover:-translate-y-2 hover:border-red-500/40" href={`/events/${event.slug}`} key={event.slug}>
-          <EventCardBackdrop className="min-h-56 p-5 sm:min-h-72 sm:p-6">
+          <EventCardBackdrop className="min-h-56 p-5 sm:min-h-72 sm:p-6" imageSrc={event.imageSrc}>
             <span className="rounded-full border border-white/20 bg-black/35 px-3 py-1 text-xs font-black uppercase tracking-[0.22em]">
               {event.status}
             </span>

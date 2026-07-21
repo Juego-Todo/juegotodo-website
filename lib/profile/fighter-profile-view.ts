@@ -247,7 +247,7 @@ function parseFightMethod(method: string) {
 function enrichAccolades(athlete: AthleteCredentialProfile): AccoladeCard[] {
   return [
     { icon: "🏆", title: "Regional Champion", subtitle: "2026 JT Regional Series", tier: "gold" },
-    { icon: "🌙", title: "Fight of the Night", subtitle: "JT Ascension Manila", tier: "silver" },
+    { icon: "🌙", title: "Fight of the Night", subtitle: "UGB46 Proclamation Anniversary", tier: "silver" },
     { icon: "⚡", title: "Fastest KO", subtitle: "Round 1 · 2:14", tier: "bronze" },
     { icon: "💰", title: "Performance Bonus", subtitle: `${athlete.wins} career wins`, tier: "silver" },
   ];

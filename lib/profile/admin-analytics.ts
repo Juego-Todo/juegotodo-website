@@ -2,7 +2,6 @@ import type { LicenseApplication } from "@/data/license-applications";
 import { events } from "@/data/site";
 import type { UserTypeTagId } from "@/data/user-type-tags";
 import type { AdminMemberRecord } from "@/lib/admin/member-directory";
-import { getAllCalendarEntries } from "@/lib/calendar/storage";
 import type { MemberStatistic } from "@/lib/profile/member-record";
 
 export type AdminAnalyticsCategory = "membership" | "license" | "shop";
@@ -61,9 +60,7 @@ export function computeMembershipAnalytics(members: AdminMemberRecord[]): Member
 
   const verifiedMembers = members.filter((member) => member.licenseStatus === "Approved").length;
 
-  const calendarUpcoming = getAllCalendarEntries(false).filter((entry) => entry.status === "Upcoming").length;
-  const siteUpcoming = events.filter((event) => event.status === "Upcoming").length;
-  const activeEvents = Math.max(calendarUpcoming, siteUpcoming);
+  const activeEvents = events.filter((event) => event.status === "Upcoming").length;
 
   return {
     totalMembers: members.length,

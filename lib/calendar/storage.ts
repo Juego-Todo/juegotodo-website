@@ -220,7 +220,12 @@ function mapSiteEventToCalendarEntry(event: Event): CalendarEntry {
         livestreamConfigured: event.isLive ?? false,
         gabSanctionComplete: event.isChampionship ?? false,
       },
-      media: { posterTone: event.posterTone, gallery: [], trailerUrl: "", streamEmbedUrl: "" },
+      media: {
+        posterTone: event.posterTone,
+        gallery: event.imageSrc ? [event.imageSrc] : [],
+        trailerUrl: "",
+        streamEmbedUrl: "",
+      },
       shopProductSlug: event.ticketProductSlug ?? event.slug,
     },
     createdAt: event.date,
@@ -253,13 +258,13 @@ function sortByDate(entries: CalendarEntry[]) {
 
 function mergeCalendarEntries(stored: CalendarEntry[], includeDrafts: boolean) {
   const staticEntries = events.map(mapSiteEventToCalendarEntry);
-  const exampleEntries = calendarExampleEventInputs.map(mapExampleEventToCalendarEntry);
   const reservedSlugs = new Set([...stored.map((entry) => entry.slug), ...staticEntries.map((entry) => entry.slug)]);
-  const merged = [
-    ...staticEntries,
-    ...exampleEntries.filter((entry) => !reservedSlugs.has(entry.slug)),
-    ...stored.map(normalizeCalendarEntry),
-  ];
+  const exampleEntries = includeDrafts
+    ? calendarExampleEventInputs
+        .map(mapExampleEventToCalendarEntry)
+        .filter((entry) => !reservedSlugs.has(entry.slug))
+    : [];
+  const merged = [...staticEntries, ...exampleEntries, ...stored.map(normalizeCalendarEntry)];
   return sortByDate(includeDrafts ? merged : merged.filter((entry) => entry.published && entry.operationalStatus !== "draft"));
 }
 
@@ -269,6 +274,10 @@ export function getStoredCalendarEntries() {
 
 export function getAllCalendarEntries(includeDrafts = false) {
   return mergeCalendarEntries(readStoredEntries(), includeDrafts);
+}
+
+export function getPublicCalendarEntries() {
+  return sortByDate(events.map(mapSiteEventToCalendarEntry));
 }
 
 export function getCalendarEntryById(id: string) {

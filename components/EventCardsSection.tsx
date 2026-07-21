@@ -21,7 +21,9 @@ export function EventCardsSection() {
           <SeeCalendarButton label="View Full Calendar" variant="hero" />
         </div>
 
-        <div className="mt-10 grid gap-5 lg:grid-cols-3">
+        <div
+          className={`mt-10 grid gap-5 ${events.length === 1 ? "max-w-xl" : "lg:grid-cols-3"}`}
+        >
           {events.map((event) => (
             <article
               className="card-3d glass-panel animated-border group overflow-hidden rounded-[1.75rem] border-white/[0.08] bg-[#0D0D0D]/75"

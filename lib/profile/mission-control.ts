@@ -1,4 +1,5 @@
 import type { ProfileSectionId } from "@/components/profile/ProfileSidebarNav";
+import { barrioBrawlsEvent } from "@/data/shop-tickets";
 import type { MemberRecord } from "@/lib/profile/member-record";
 import type { ProfileRoleKind, ProfileRoleModule } from "@/lib/profile/role-modules";
 
@@ -152,13 +153,19 @@ export function buildMissionItems(role: ProfileRoleModule, memberRecord: MemberR
         },
       ];
     case "fighter":
-      return [
+      {
+        const daysUntilEvent = Math.max(
+          0,
+          Math.ceil((new Date(barrioBrawlsEvent.target).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+        );
+        return [
         {
           id: "fight",
           label: "Next Fight",
-          headline: "7 Days",
-          detail: "Ascension Manila · Aug 22",
-          actionLabel: "View Bout",
+          headline: daysUntilEvent === 1 ? "1 Day" : `${daysUntilEvent} Days`,
+          detail: `Barrio Brawls · ${barrioBrawlsEvent.dateLabel.split(",")[0]}`,
+          actionLabel: "View Event",
+          href: "/events/barrio-brawls",
           section: "fighter",
           urgent: true,
         },
@@ -179,6 +186,7 @@ export function buildMissionItems(role: ProfileRoleModule, memberRecord: MemberR
           section: "medical",
         },
       ];
+      }
     case "coach":
       return [
         {

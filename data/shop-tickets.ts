@@ -8,6 +8,9 @@ export const barrioBrawlsEventFullName =
 export const barrioBrawlsTicketCheckoutUrl =
   "https://paymongo.page/l/ugb46andjuegotodo1stproclamationanniversary";
 
+export const barrioBrawlsEventPosterSrc =
+  "/events/ugb46-juego-todo-proclamation-anniversary.png";
+
 /** Single source of truth for the featured event date/time and display copy. */
 export const barrioBrawlsEvent = {
   series: "UGB46",
@@ -56,7 +59,7 @@ export const eventTicketProducts: ShopProduct[] = [
       "admission",
       "digital ticket",
     ],
-    imageSrc: "/juego-todo-event-background.png",
+    imageSrc: barrioBrawlsEventPosterSrc,
     externalCheckoutUrl: barrioBrawlsTicketCheckoutUrl,
     eventTicket: barrioBrawlsEvent,
   },

@@ -7,6 +7,7 @@ type EventCardBackdropProps = {
   children: ReactNode;
   className?: string;
   imageClassName?: string;
+  imageSrc?: string;
   sizes?: string;
 };
 
@@ -14,6 +15,7 @@ export function EventCardBackdrop({
   children,
   className = "min-h-52",
   imageClassName = "object-cover object-center",
+  imageSrc = EVENT_CARD_BACKGROUND,
   sizes = "(max-width: 768px) 100vw, 33vw",
 }: EventCardBackdropProps) {
   return (
@@ -24,7 +26,7 @@ export function EventCardBackdrop({
         className={imageClassName}
         fill
         sizes={sizes}
-        src={EVENT_CARD_BACKGROUND}
+        src={imageSrc}
       />
       <div
         className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.25)_0%,rgba(0,0,0,0.55)_45%,rgba(0,0,0,0.88)_100%)]"

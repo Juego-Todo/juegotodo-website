@@ -24,7 +24,8 @@ export function EventTicketProductImage({
   return (
     <EventCardBackdrop
       className={`${getProductFrameClassName(size)} ${className}`}
-      imageClassName="object-cover object-[center_30%]"
+      imageClassName="object-cover object-[center_20%]"
+      imageSrc={product.imageSrc ?? undefined}
       sizes={size === "hero" ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"}
     >
       <div

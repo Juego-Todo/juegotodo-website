@@ -21,41 +21,10 @@ import {
   getAthletesUsingProduct,
   getProductBadges,
   getProductRating,
-  getProductSocialProof,
   getStockLabel,
 } from "@/lib/commerce/product-visuals";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import { shopCategoryLabels } from "@/lib/commerce/types";
-
-const galleryAngles = ["Front", "Side", "Usage", "Close-up", "In Action"] as const;
-
-const editorialSections = [
-  {
-    id: "why-athletes",
-    eyebrow: "Why Athletes Use It",
-    title: "Built for the transition.",
-    body: (product: ShopProduct) => product.competitionUse,
-  },
-  {
-    id: "competition-approved",
-    eyebrow: "Competition Approved",
-    title: "JTGC certified equipment.",
-    body: () =>
-      "Every piece in the official armory passes league inspection standards for weapon rounds, Mano y Mano exchanges, and championship events nationwide.",
-  },
-  {
-    id: "used-in-events",
-    eyebrow: "Used In JTGC Events",
-    title: "Trusted on fight night.",
-    body: (product: ShopProduct) => getProductSocialProof(product),
-  },
-  {
-    id: "built-for-competition",
-    eyebrow: "Built For Competition",
-    title: "Engineered for Filipino martial arts.",
-    body: (product: ShopProduct) => product.summary,
-  },
-] as const;
 
 function SectionRule() {
   return <hr className="border-white/[0.06]" />;
@@ -84,7 +53,24 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
   const { addToCart, trackProductView } = useCommerce();
   const [activeImage, setActiveImage] = useState(0);
   const [variantSelections, setVariantSelections] = useState(() => getDefaultVariantSelections(product));
-  const displayImage = getSelectedVariantImage(product, variantSelections);
+  const galleryImages = useMemo(() => {
+    const images: string[] = [];
+    if (product.imageSrc) {
+      images.push(product.imageSrc);
+    }
+    for (const group of product.variantGroups ?? []) {
+      for (const option of group.options) {
+        if (option.imageSrc && !images.includes(option.imageSrc)) {
+          images.push(option.imageSrc);
+        }
+      }
+    }
+    return images;
+  }, [product]);
+  const displayImage =
+    galleryImages.length > 1 && galleryImages[activeImage]
+      ? galleryImages[activeImage]
+      : getSelectedVariantImage(product, variantSelections);
   const displayPrice = useMemo(
     () => getSelectedVariantPrice(product, variantSelections),
     [product, variantSelections],
@@ -139,30 +125,31 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                 size="hero"
               />
             </div>
+            {galleryImages.length > 1 && !product.digital && !product.eventTicket ? (
             <div className="grid grid-cols-5 gap-2">
-              {galleryAngles.map((angle, index) => (
+              {galleryImages.map((imageSrc, index) => (
                 <button
                   className={`overflow-hidden rounded-lg bg-white/[0.02] p-1.5 text-[0.5rem] font-medium uppercase tracking-[0.08em] transition ${
                     activeImage === index ? "ring-1 ring-[#FF1010]/60 text-white" : "text-zinc-600 hover:text-zinc-300"
                   }`}
-                  key={angle}
+                  key={imageSrc}
                   onClick={() => setActiveImage(index)}
                   type="button"
                 >
                   <div className="aspect-square w-full overflow-hidden rounded-md">
                     <ProductDisplayImage
-                      alt={`${product.name} ${angle}`}
+                      alt={`${product.name} view ${index + 1}`}
                       className="rounded-none"
-                      imageSrc={displayImage}
+                      imageSrc={imageSrc}
                       product={product}
                       size="sm"
                       variant="thumb"
                     />
                   </div>
-                  <span className="mt-1.5 block">{angle}</span>
                 </button>
               ))}
             </div>
+            ) : null}
           </div>
 
           {/* Purchase column — typography, no cards */}
@@ -230,53 +217,9 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
           </div>
         </div>
 
-        {/* Editorial rhythm — whitespace, not boxes */}
+        {/* Specs, bundles, and related products */}
         <div className="mt-24 space-y-24">
-          {editorialSections.map((section, index) => (
-            <div key={section.id}>
-              {index > 0 ? <SectionRule /> : null}
-              <div className={`grid items-center gap-10 lg:grid-cols-2 lg:gap-16 ${index > 0 ? "pt-24" : ""}`}>
-                <div className={index % 2 === 1 ? "lg:order-2" : ""}>
-                  <div className="overflow-hidden rounded-lg bg-white/[0.02]">
-                    <ProductDisplayImage
-                      alt={product.name}
-                      className="rounded-lg"
-                      product={product}
-                      size="lg"
-                      stage="catalog"
-                    />
-                  </div>
-                </div>
-                <div className={index % 2 === 1 ? "lg:order-1" : ""}>
-                  <p className="text-[0.65rem] font-medium uppercase tracking-[0.2em] text-[#FF1010]">{section.eyebrow}</p>
-                  <h2 className="font-display mt-3 text-3xl font-normal uppercase leading-tight text-white sm:text-4xl">
-                    {section.title}
-                  </h2>
-                  <p className="mt-5 max-w-lg text-base leading-7 text-zinc-400">{section.body(product)}</p>
-                  {section.id === "why-athletes" ? (
-                    <ul className="mt-6 space-y-2">
-                      {product.features.slice(0, 4).map((feature) => (
-                        <li className="flex items-start gap-2 text-sm text-zinc-400" key={feature}>
-                          <Check className="mt-0.5 shrink-0 text-[#FF1010]" size={14} aria-hidden />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                  {section.id === "used-in-events" && athletesUsing.length > 0 ? (
-                    <p className="mt-6 text-sm text-zinc-500">
-                      {athletesUsing.join(" · ")}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-          ))}
-
-          <SectionRule />
-
-          {/* Specs — typography only */}
-          <div className="pt-24">
+          <div>
             <p className="text-[0.65rem] font-medium uppercase tracking-[0.2em] text-zinc-500">Technical Specs</p>
             <h2 className="font-display mt-3 text-3xl font-normal uppercase text-white">Specifications</h2>
             <dl className="mt-10 grid gap-x-12 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -292,7 +235,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
           {bundleItems.length > 1 ? (
             <>
               <SectionRule />
-              <div className="pt-24">
+              <div>
                 <p className="text-[0.65rem] font-medium uppercase tracking-[0.2em] text-zinc-500">Complete The Setup</p>
                 <h2 className="font-display mt-3 text-3xl font-normal uppercase text-white">Frequently Bought Together</h2>
 
@@ -346,7 +289,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
           {relatedProducts.length > 0 ? (
             <>
               <SectionRule />
-              <div className="pt-24">
+              <div>
                 <p className="text-[0.65rem] font-medium uppercase tracking-[0.2em] text-zinc-500">You May Also Like</p>
                 <h2 className="font-display mt-3 text-3xl font-normal uppercase text-white">More From The Armory</h2>
                 <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">

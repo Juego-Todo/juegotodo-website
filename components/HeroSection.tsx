@@ -5,7 +5,6 @@ import { ArrowRight, Ticket } from "lucide-react";
 import Image from "next/image";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { AsSeenOnCarousel } from "@/components/AsSeenOnCarousel";
-import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { EnergyParticles } from "@/components/EnergyParticles";
 import { MagneticButton } from "@/components/MagneticButton";
 import { barrioBrawlsEvent, barrioBrawlsEventPosterSrc, barrioBrawlsTicketCheckoutUrl } from "@/data/shop-tickets";
@@ -94,34 +93,19 @@ export function HeroSection() {
             <div className="mx-auto w-[85%] max-w-[27rem] lg:ml-auto lg:mr-0">
               <div className="featured-event-poster glass-panel card-3d relative overflow-hidden rounded-[1.35rem] border border-[#FF1010]/15 bg-[#0D0D0D]/75 p-2.5 backdrop-blur-md sm:rounded-[1.5rem] sm:p-3">
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF1010]/60 to-transparent" />
-                <EventCardBackdrop
-                  className="rounded-[1rem] sm:rounded-[1.15rem]"
-                  imageClassName="object-cover object-[center_20%]"
-                  imageSrc={heroFeaturedEvent.posterSrc}
-                  sizes="(max-width: 1024px) 85vw, 27rem"
-                >
-                  <div className="p-3.5 sm:p-4">
-                    <div className="mb-5 sm:mb-6">
-                      <span className="rounded-full border border-white/15 bg-black/50 px-2.5 py-1 text-[0.58rem] font-black uppercase tracking-[0.24em] text-zinc-300">
-                        Featured Event
-                      </span>
-                    </div>
-                    <p className="text-[0.65rem] font-bold uppercase tracking-[0.22em] text-red-100/80 sm:text-xs">
-                      {heroFeaturedEvent.series}
-                    </p>
-                    <h2 className="font-display mt-2 text-[1.45rem] uppercase leading-[0.95] text-white sm:text-[1.65rem]">
-                      {heroFeaturedEvent.title}
-                    </h2>
-                    <div className="mt-2.5 space-y-0.5 text-xs font-semibold text-zinc-300 sm:mt-3 sm:text-sm">
-                      <p>{heroFeaturedEvent.dateLabel}</p>
-                      <p>{heroFeaturedEvent.timeLabel}</p>
-                      <p>Venue — {heroFeaturedEvent.venue}</p>
-                    </div>
-                    <div className="mt-4 sm:mt-5">
-                      <CountdownTimer target={heroFeaturedEvent.target} />
-                    </div>
-                  </div>
-                </EventCardBackdrop>
+                <div className="relative aspect-[3/4] overflow-hidden rounded-[1rem] sm:rounded-[1.15rem]">
+                  <Image
+                    alt={`${heroFeaturedEvent.series} ${heroFeaturedEvent.title} official event poster`}
+                    className="object-cover object-center"
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 85vw, 27rem"
+                    src={heroFeaturedEvent.posterSrc}
+                  />
+                </div>
+                <div className="mt-3 px-1 pb-1 sm:mt-3.5 sm:px-1.5 sm:pb-1.5">
+                  <CountdownTimer target={heroFeaturedEvent.target} />
+                </div>
               </div>
             </div>
           </motion.div>

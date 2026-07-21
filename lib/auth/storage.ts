@@ -472,14 +472,24 @@ export async function checkUsernameAvailability(username: string) {
 export async function getStoredSessionUser(): Promise<UserProfile | null> {
   if (isSupabaseConfigured()) {
     try {
-      return await withTimeout(
+      const profile = await withTimeout(
         getSupabaseSessionUser(),
         8000,
         "Session restore timed out.",
       );
+
+      if (profile) {
+        return profile;
+      }
     } catch {
-      return null;
+      // Fall through to local auth in development when Supabase is unreachable.
     }
+
+    if (isLocalAuthEnabled()) {
+      return getStoredSessionUserLocal();
+    }
+
+    return null;
   }
 
   if (!isLocalAuthEnabled()) {

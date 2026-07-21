@@ -150,39 +150,18 @@ async function ensureSupabaseProfileRow() {
 }
 
 export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
-  const supabase = createSupabaseBrowserClient();
-  const {
-    data: { user },
-  } = await withTimeout(supabase.auth.getUser(), 8000, "Session restore timed out.");
+  try {
+    const supabase = createSupabaseBrowserClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await withTimeout(supabase.auth.getUser(), 8000, "Session restore timed out.");
 
-  if (!user) {
-    return null;
-  }
-
-  const { data: profile, error } = await withTimeout(
-    Promise.resolve(
-      supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle(),
-    ),
-    8000,
-    "Profile load timed out.",
-  );
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!profile) {
-    try {
-      await ensureSupabaseProfileRow();
-    } catch {
-      // Profile sync can fail when server-side Supabase is unreachable locally.
+    if (authError || !user) {
+      return null;
     }
 
-    const { data: refreshedProfile, error: refreshError } = await withTimeout(
+    const { data: profile, error } = await withTimeout(
       Promise.resolve(
         supabase
           .from("profiles")
@@ -191,21 +170,43 @@ export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
           .maybeSingle(),
       ),
       8000,
-      "Profile refresh timed out.",
+      "Profile load timed out.",
     );
 
-    if (refreshError) {
-      throw new Error(refreshError.message);
+    if (error) {
+      return buildProfileFromAuthUser(user);
     }
 
-    if (refreshedProfile) {
+    if (!profile) {
+      try {
+        await ensureSupabaseProfileRow();
+      } catch {
+        // Profile sync can fail when server-side Supabase is unreachable locally.
+      }
+
+      const { data: refreshedProfile, error: refreshError } = await withTimeout(
+        Promise.resolve(
+          supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .maybeSingle(),
+        ),
+        8000,
+        "Profile refresh timed out.",
+      );
+
+      if (refreshError || !refreshedProfile) {
+        return buildProfileFromAuthUser(user);
+      }
+
       return mapProfile(refreshedProfile);
     }
 
-    return buildProfileFromAuthUser(user);
+    return mapProfile(profile);
+  } catch {
+    return null;
   }
-
-  return mapProfile(profile);
 }
 
 export async function getAllStoredUsersSupabase(): Promise<UserProfile[]> {
@@ -479,29 +480,33 @@ export async function checkUsernameAvailabilitySupabase(username: string): Promi
 }
 
 export function subscribeSupabaseAuth(onChange: (user: UserProfile | null) => void) {
-  const supabase = createSupabaseBrowserClient();
+  try {
+    const supabase = createSupabaseBrowserClient();
 
-  const {
-    data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, session) => {
-    const user = session?.user;
-    if (!user) {
-      onChange(null);
-      return;
-    }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      if (!user) {
+        onChange(null);
+        return;
+      }
 
-    // Publish the authenticated identity immediately. Fetching the profile is
-    // an enhancement and must not make a successful login appear to fail.
-    onChange(buildProfileFromAuthUser(user));
+      // Publish the authenticated identity immediately. Fetching the profile is
+      // an enhancement and must not make a successful login appear to fail.
+      onChange(buildProfileFromAuthUser(user));
 
-    void withTimeout(getSupabaseSessionUser(), 8000, "Profile refresh timed out.")
-      .then((profile) => {
-        if (profile) {
-          onChange(profile);
-        }
-      })
-      .catch(() => undefined);
-  });
+      void withTimeout(getSupabaseSessionUser(), 8000, "Profile refresh timed out.")
+        .then((profile) => {
+          if (profile) {
+            onChange(profile);
+          }
+        })
+        .catch(() => undefined);
+    });
 
-  return () => subscription.unsubscribe();
+    return () => subscription.unsubscribe();
+  } catch {
+    return () => undefined;
+  }
 }

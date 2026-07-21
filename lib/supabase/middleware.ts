@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isServerAdminUser } from "@/lib/auth/admin-access";
 import { withTimeout } from "@/lib/auth/timeout";
 import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/supabase/env";
+import { fetchSupabaseWithTimeout } from "@/lib/supabase/fetch";
 import type { Database } from "@/lib/supabase/types";
 
 function redirectWithCookies(request: NextRequest, response: NextResponse, pathname: string) {
@@ -18,6 +19,9 @@ export async function updateSupabaseSession(request: NextRequest) {
 
   try {
     const supabase = createServerClient<Database>(getSupabaseUrl(), getSupabaseAnonKey(), {
+      global: {
+        fetch: fetchSupabaseWithTimeout,
+      },
       cookies: {
         getAll() {
           return request.cookies.getAll();

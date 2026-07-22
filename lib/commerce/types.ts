@@ -82,6 +82,12 @@ export type OrderPayment = {
   amount: number;
   createdAt: string;
   verifiedAt?: string;
+  /** "paymongo" when paid through PayMongo checkout; "manual" (or unset) for admin-verified payments. */
+  provider?: "paymongo" | "manual";
+  paymongoCheckoutSessionId?: string;
+  paymongoPaymentId?: string;
+  /** Hosted PayMongo checkout URL — lets the buyer resume an unpaid checkout. */
+  checkoutUrl?: string;
 };
 
 export type Order = {

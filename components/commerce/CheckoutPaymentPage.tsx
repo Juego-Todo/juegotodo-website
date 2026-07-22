@@ -13,10 +13,10 @@ import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
 import { paymentMethodLabels, type PaymentMethod } from "@/lib/commerce/types";
 
 const paymentOptions: { method: PaymentMethod; icon: React.ReactNode; description: string }[] = [
-  { method: "gcash", icon: <Smartphone size={20} aria-hidden />, description: "Pay via GCash and upload reference for verification." },
-  { method: "maya", icon: <Smartphone size={20} aria-hidden />, description: "Pay via Maya wallet. Reference generated at review." },
-  { method: "credit_card", icon: <CreditCard size={20} aria-hidden />, description: "Dummy card flow for MVP testing." },
-  { method: "bank_transfer", icon: <Banknote size={20} aria-hidden />, description: "Manual bank transfer with JT reference number." },
+  { method: "gcash", icon: <Smartphone size={20} aria-hidden />, description: "Pay instantly with GCash via PayMongo secure checkout." },
+  { method: "maya", icon: <Smartphone size={20} aria-hidden />, description: "Pay instantly with Maya via PayMongo secure checkout." },
+  { method: "credit_card", icon: <CreditCard size={20} aria-hidden />, description: "Visa / Mastercard, processed securely by PayMongo." },
+  { method: "bank_transfer", icon: <Banknote size={20} aria-hidden />, description: "Direct online banking (BPI / UnionBank) via PayMongo." },
   { method: "cash_pickup", icon: <Banknote size={20} aria-hidden />, description: "Pay cash when picking up at JT office or event." },
 ];
 
@@ -71,7 +71,8 @@ export function CheckoutPaymentPage() {
         <PageNavigation currentLabel="Checkout — Payment" />
         <h1 className="font-display mt-3 text-5xl uppercase text-white sm:text-6xl">Payment Method</h1>
         <p className="mt-3 max-w-2xl text-sm text-zinc-400">
-          MVP dummy payment system. A reference number will be generated for admin verification.
+          Online payments are processed securely through PayMongo. Cash on pickup is verified manually by
+          the JT team.
         </p>
         <CheckoutSteps />
 

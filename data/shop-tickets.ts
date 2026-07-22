@@ -17,7 +17,7 @@ export const barrioBrawlsEvent = {
   title: "JUEGO TODO 1st Proclamation Anniversary",
   dateLabel: "August 28, 2026",
   timeLabel: "1:00 PM",
-  venue: "TBA",
+  venue: "Sta. Lucia East Grand Mall, Philippines",
   target: "2026-08-28T13:00:00+08:00",
 } as const;
 

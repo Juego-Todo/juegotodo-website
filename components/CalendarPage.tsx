@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowRight, CalendarDays, LayoutGrid, List, Radio, Settings2, Ticket, Trophy } from "lucide-react";
+import { ArrowRight, CalendarDays, LayoutGrid, List, MapPin, Radio, Settings2, Ticket, Trophy } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -11,6 +12,7 @@ import {
   calendarEntryKindLabels,
   type CalendarEntry,
 } from "@/data/calendar-entries";
+import { barrioBrawlsEvent } from "@/data/shop-tickets";
 import { events } from "@/data/site";
 import { useAuth } from "@/lib/auth/context";
 import { isAdminProfile } from "@/lib/commerce/storage";
@@ -53,12 +55,14 @@ function getSiteEventMeta(slug: string) {
   return events.find((event) => event.slug === slug);
 }
 
-function EntryBadges({ entry }: { entry: CalendarEntry }) {
+function EntryBadges({ entry, hideKind = false }: { entry: CalendarEntry; hideKind?: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.18em]">
-        {calendarEntryKindLabels[entry.kind]}
-      </span>
+      {!hideKind ? (
+        <span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.18em]">
+          {calendarEntryKindLabels[entry.kind]}
+        </span>
+      ) : null}
       <span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.18em]">
         {entry.status}
       </span>
@@ -344,39 +348,144 @@ function CalendarEntryList({
   );
 }
 
-function NextEntryActions({ entry }: { entry: CalendarEntry }) {
-  const siteEvent = getSiteEventMeta(entry.slug);
-
-  if (siteEvent?.ticketCheckoutUrl) {
-    return (
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-        <a
-          className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#ff2828] sm:text-sm"
-          href={siteEvent.ticketCheckoutUrl}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          Buy Tickets
-          <ArrowRight className="ml-2" size={16} aria-hidden />
-        </a>
-        <Link
-          className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-white/10 sm:text-sm"
-          href={`/events/${entry.slug}`}
-        >
-          Event Details
-        </Link>
-      </div>
-    );
+function getBannerCopy(entry: CalendarEntry) {
+  if (entry.slug === "barrio-brawls") {
+    return {
+      eyebrow: `${barrioBrawlsEvent.series} × Juego Todo`,
+      headline: barrioBrawlsEvent.title,
+      subtitle: "Sta. Lucia Barrio Brawls",
+      venue: barrioBrawlsEvent.venue,
+    };
   }
 
+  const eventTitle = entry.title.replace("Juego Todo: ", "");
+  return {
+    eyebrow: "Featured Event",
+    headline: eventTitle,
+    subtitle: entry.mainEvent && entry.mainEvent !== eventTitle ? entry.mainEvent : undefined,
+    venue: `${entry.venue} · ${entry.city}`,
+  };
+}
+
+function NextCalendarBanner({ entry }: { entry: CalendarEntry }) {
+  const siteEvent = getSiteEventMeta(entry.slug);
+  const posterSrc = siteEvent?.imageSrc ?? entry.operations.media.gallery[0];
+  const copy = getBannerCopy(entry);
+  const showActions = entry.source === "static" && entry.kind === "event";
+
   return (
-    <Link
-      className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#ff2828] sm:text-sm"
-      href={`/events/${entry.slug}`}
-    >
-      View Event
-      <ArrowRight className="ml-2" size={16} aria-hidden />
-    </Link>
+    <article className="relative isolate overflow-hidden rounded-[1.75rem] border border-white/10 bg-black shadow-[0_28px_90px_rgba(0,0,0,0.55)] sm:rounded-[2rem]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-[#FF1010]/55 to-transparent"
+      />
+
+      <div className="relative min-h-[32rem] sm:min-h-[28rem] lg:min-h-[26rem]">
+        {posterSrc ? (
+          <Image
+            alt={`${copy.headline} official event poster`}
+            className="object-cover object-[72%_center] sm:object-[78%_center]"
+            fill
+            priority
+            sizes="100vw"
+            src={posterSrc}
+          />
+        ) : (
+          <EventCardBackdrop className="absolute inset-0 min-h-full" imageSrc={posterSrc}>
+            <span aria-hidden className="sr-only" />
+          </EventCardBackdrop>
+        )}
+
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.97)_0%,rgba(0,0,0,0.92)_38%,rgba(0,0,0,0.55)_68%,rgba(0,0,0,0.28)_100%)]"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.18)_42%,rgba(0,0,0,0.55)_100%)]"
+        />
+
+        <div className="relative z-10 flex min-h-[32rem] flex-col sm:min-h-[28rem] lg:min-h-[26rem]">
+          <div className="flex flex-1 flex-col justify-end px-6 pb-6 pt-8 sm:px-8 sm:pb-8 lg:max-w-2xl lg:justify-center lg:px-10 lg:pb-10 lg:pt-10">
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FF1010]/30 bg-[#FF1010]/15 px-3 py-1 text-[0.58rem] font-black uppercase tracking-[0.16em] text-red-100">
+                <CalendarDays size={12} aria-hidden />
+                Next Event
+              </span>
+              {entry.isChampionship ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-3 py-1 text-[0.58rem] font-black uppercase tracking-[0.16em] text-yellow-200">
+                  <Trophy size={12} aria-hidden />
+                  Title Fight
+                </span>
+              ) : null}
+            </div>
+
+            <p className="text-[0.68rem] font-black uppercase tracking-[0.28em] text-red-300 sm:text-xs">
+              {copy.eyebrow}
+            </p>
+            <h2 className="font-display mt-3 max-w-xl text-[clamp(1.85rem,5vw,3.15rem)] uppercase leading-[0.92] tracking-wide text-white">
+              {copy.headline}
+            </h2>
+            {copy.subtitle ? (
+              <p className="mt-3 text-sm font-semibold uppercase tracking-[0.12em] text-zinc-300 sm:text-base">
+                {copy.subtitle}
+              </p>
+            ) : null}
+
+            <div className="mt-5 space-y-2 text-sm sm:text-[0.95rem]">
+              <p className="font-medium text-zinc-100">{formatEventDate(entry.date)}</p>
+              <p className="inline-flex items-start gap-2 text-zinc-300">
+                <MapPin className="mt-0.5 shrink-0 text-[#FF1010]" size={14} aria-hidden />
+                <span>{copy.venue}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="relative z-10 border-t border-white/10 bg-black/55 px-6 py-5 backdrop-blur-md sm:px-8 sm:py-6">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="w-full max-w-md">
+                <p className="mb-3 text-[0.58rem] font-black uppercase tracking-[0.2em] text-zinc-500">
+                  Event Countdown
+                </p>
+                <CountdownTimer target={entry.date} />
+              </div>
+
+              {showActions ? (
+                <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto lg:min-w-[22rem]">
+                  {siteEvent?.ticketCheckoutUrl ? (
+                    <>
+                      <a
+                        className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full bg-[#FF1010] px-6 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2828] sm:text-sm"
+                        href={siteEvent.ticketCheckoutUrl}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        <Ticket size={16} aria-hidden />
+                        Buy Tickets
+                      </a>
+                      <Link
+                        className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-white/10 sm:text-sm"
+                        href={`/events/${entry.slug}`}
+                      >
+                        Event Details
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#FF1010] px-6 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2828] sm:text-sm"
+                      href={`/events/${entry.slug}`}
+                    >
+                      View Event
+                      <ArrowRight size={16} aria-hidden />
+                    </Link>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -399,6 +508,7 @@ export function CalendarPage() {
 
   const { upcoming, past } = useMemo(() => splitCalendarEntries(entries), [entries]);
   const nextEntry = upcoming[0];
+  const remainingUpcoming = upcoming.slice(1);
   const isAdmin = user ? isAdminProfile(user) : false;
 
   return (
@@ -433,64 +543,22 @@ export function CalendarPage() {
 
       {nextEntry ? (
         <MotionSection className="mx-auto max-w-7xl pb-10 sm:pb-12">
-          <div className="glass-panel overflow-hidden rounded-[2rem] border border-[#FF1010]/20 bg-[#0D0D0D]/80">
-            <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-              <div>
-                <p className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.24em] text-red-200">
-                  <CalendarDays size={14} aria-hidden />
-                  Next On The Calendar
-                </p>
-                <p className="mt-3 text-[0.62rem] font-black uppercase tracking-[0.18em] text-zinc-400">
-                  {calendarEntryKindLabels[nextEntry.kind]}
-                </p>
-                <h2 className="font-display mt-4 text-5xl uppercase leading-none text-white sm:text-6xl">
-                  {nextEntry.title.replace("Juego Todo: ", "")}
-                </h2>
-                <p className="mt-4 text-sm text-zinc-300 sm:text-base">{formatEventDate(nextEntry.date)}</p>
-                <p className="mt-2 text-sm font-semibold text-zinc-400">
-                  {nextEntry.venue} · {nextEntry.city}
-                </p>
-                {nextEntry.source === "static" && nextEntry.kind === "event" ? (
-                  <NextEntryActions entry={nextEntry} />
-                ) : null}
-              </div>
-              <div className="space-y-4">
-                {(() => {
-                  const siteEvent = getSiteEventMeta(nextEntry.slug);
-                  const posterSrc = siteEvent?.imageSrc ?? nextEntry.operations.media.gallery[0];
-                  return posterSrc ? (
-                    <EventCardBackdrop
-                      className="min-h-48 rounded-[1.5rem] border border-white/[0.08]"
-                      imageSrc={posterSrc}
-                      sizes="(max-width: 1024px) 100vw, 40vw"
-                    >
-                      <span aria-hidden className="sr-only" />
-                    </EventCardBackdrop>
-                  ) : null;
-                })()}
-                <div className="rounded-[1.5rem] border border-white/[0.08] bg-black/35 p-4 sm:p-5">
-                  <CountdownTimer target={nextEntry.date} />
-                </div>
-              </div>
-            </div>
-          </div>
+          <NextCalendarBanner entry={nextEntry} />
         </MotionSection>
       ) : null}
 
-      <MotionSection className="mx-auto max-w-7xl space-y-8 pb-10 sm:pb-12">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-[#FF1010]">Upcoming</p>
-            <h2 className="font-display mt-3 text-4xl uppercase text-white sm:text-5xl">Events & Competitions</h2>
+      {remainingUpcoming.length > 0 ? (
+        <MotionSection className="mx-auto max-w-7xl space-y-8 pb-10 sm:pb-12">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-[#FF1010]">Upcoming</p>
+              <h2 className="font-display mt-3 text-4xl uppercase text-white sm:text-5xl">Events & Competitions</h2>
+            </div>
+            <CalendarViewToggle onChange={handleViewChange} view={view} />
           </div>
-          <CalendarViewToggle onChange={handleViewChange} view={view} />
-        </div>
-        {upcoming.length > 0 ? (
-          <CalendarEntryList entries={upcoming} view={view} />
-        ) : (
-          <p className="text-sm text-zinc-400">No upcoming events or competitions are scheduled right now.</p>
-        )}
-      </MotionSection>
+          <CalendarEntryList entries={remainingUpcoming} view={view} />
+        </MotionSection>
+      ) : null}
 
       {past.length > 0 ? (
         <MotionSection className="mx-auto max-w-7xl space-y-8">

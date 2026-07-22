@@ -108,14 +108,6 @@ export default async function EventPage({ params }: PageProps) {
                     Register Interest
                   </Link>
                 )}
-                {event.ticketProductSlug ? (
-                  <Link
-                    className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-white/10"
-                    href={`/shop/${event.ticketProductSlug}`}
-                  >
-                    Ticket Details
-                  </Link>
-                ) : null}
                 <SaveEntityButton slug={event.slug} type="event" />
               </div>
             </div>

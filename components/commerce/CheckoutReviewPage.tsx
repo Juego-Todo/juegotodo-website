@@ -11,7 +11,11 @@ import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
 import { formatCurrency } from "@/lib/commerce/pricing";
-import { paymentMethodLabels } from "@/lib/commerce/types";
+import { clearCheckoutDraft, saveCart } from "@/lib/commerce/storage";
+import { paymentMethodLabels, type PaymentMethod } from "@/lib/commerce/types";
+
+/** Methods paid online through PayMongo hosted checkout (when configured). */
+const PAYMONGO_METHODS: PaymentMethod[] = ["gcash", "maya", "credit_card", "bank_transfer"];
 
 export function CheckoutReviewPage() {
   const router = useRouter();
@@ -51,6 +55,40 @@ export function CheckoutReviewPage() {
     setError(null);
 
     try {
+      // Online methods go through PayMongo hosted checkout when the server is
+      // configured; otherwise we fall back to the manual verification flow.
+      if (PAYMONGO_METHODS.includes(checkoutDraft.paymentMethod)) {
+        const response = await fetch("/api/checkout/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cart,
+            address,
+            paymentMethod: checkoutDraft.paymentMethod,
+            promoCode: checkoutDraft.promoCode,
+          }),
+        });
+        const payload = (await response.json()) as {
+          configured?: boolean;
+          checkoutUrl?: string;
+          error?: string;
+        };
+
+        if (!response.ok) {
+          throw new Error(payload.error ?? "Unable to start checkout.");
+        }
+
+        if (payload.configured !== false && payload.checkoutUrl) {
+          // Order is created server-side; clear the local cart and hand the
+          // user off to PayMongo's secure checkout page.
+          saveCart([]);
+          clearCheckoutDraft();
+          window.location.assign(payload.checkoutUrl);
+          return;
+        }
+        // configured === false → PayMongo/Supabase not set up, use manual flow.
+      }
+
       const order = await placeOrder(checkoutDraft.paymentMethod, address, checkoutDraft.promoCode);
       router.push(`/checkout/confirmation/${order.id}`);
     } catch (caught) {
@@ -127,7 +165,9 @@ export function CheckoutReviewPage() {
                 {paymentMethodLabels[checkoutDraft.paymentMethod]}
               </p>
               <p className="mt-2 text-sm text-zinc-400">
-                Status will be set to Awaiting Verification until admin approves your payment.
+                {PAYMONGO_METHODS.includes(checkoutDraft.paymentMethod)
+                  ? "You'll be redirected to PayMongo's secure checkout to complete payment."
+                  : "Status will be set to Awaiting Verification until admin approves your payment."}
               </p>
             </div>
 

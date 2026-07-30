@@ -313,11 +313,11 @@ export function MediaHub() {
       <p className="mt-10 text-center text-xs text-zinc-600">
         <a
           className="font-medium text-zinc-500 transition hover:text-zinc-300"
-          href="https://www.youtube.com/@JuegoTodo"
+          href="https://www.youtube.com/@juegotodoph"
           rel="noopener noreferrer"
           target="_blank"
         >
-          Follow @JuegoTodo on YouTube
+          Follow @juegotodoph on YouTube
         </a>
       </p>
     </MotionSection>

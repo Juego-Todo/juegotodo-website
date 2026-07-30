@@ -27,7 +27,7 @@ export function organizationJsonLd() {
       name: "Philippines",
     },
     sport: "Filipino Martial Arts",
-    sameAs: [SITE_SOCIAL.youtube],
+    sameAs: Object.values(SITE_SOCIAL),
   };
 }
 

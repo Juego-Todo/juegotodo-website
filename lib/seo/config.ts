@@ -20,7 +20,11 @@ export const SITE_LOGO = "/juego-todo-logo.png";
 export const SITE_LOCALE = "en_PH";
 
 export const SITE_SOCIAL = {
-  youtube: "https://www.youtube.com/@JuegoTodo",
+  facebook: "https://www.facebook.com/JuegoTodoPH",
+  facebookPh: "https://www.facebook.com/profile.php?id=61583785331326",
+  instagram: "https://www.instagram.com/juegotodophilippines",
+  tiktok: "https://www.tiktok.com/@juegotodoofficial",
+  youtube: "https://www.youtube.com/@juegotodoph",
 } as const;
 
 export const SITE_KEYWORDS = [

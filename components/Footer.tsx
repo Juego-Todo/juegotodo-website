@@ -21,29 +21,29 @@ const mobileQuickLinks = [
 /** Columns with enough links to warrant an accordion on mobile. */
 const mobileAccordionColumns = footerColumns.filter((column) => column.links.length > 1);
 
-function SocialIcon({ label }: { label: string }) {
+function SocialIcon({ icon }: { icon: (typeof socialLinks)[number]["icon"] }) {
   const className = "h-4 w-4";
 
-  switch (label) {
-    case "Instagram":
+  switch (icon) {
+    case "instagram":
       return (
         <svg aria-hidden className={className} fill="currentColor" viewBox="0 0 24 24">
           <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />
         </svg>
       );
-    case "Facebook":
+    case "facebook":
       return (
         <svg aria-hidden className={className} fill="currentColor" viewBox="0 0 24 24">
           <path d="M22 12a10 10 0 1 0-11.6 9.9v-7h-2.3V12h2.3V9.8c0-2.3 1.3-3.5 3.4-3.5 1 0 2 .2 2 .2v2.2h-1.1c-1.1 0-1.4.7-1.4 1.4V12h2.4l-.4 2.9h-2v7A10 10 0 0 0 22 12" />
         </svg>
       );
-    case "YouTube":
+    case "youtube":
       return (
         <svg aria-hidden className={className} fill="currentColor" viewBox="0 0 24 24">
           <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1 31.5 31.5 0 0 0 .5-5.8 31.5 31.5 0 0 0-.5-5.8M9.75 15.02V8.98L15.5 12l-5.75 3.02z" />
         </svg>
       );
-    case "TikTok":
+    case "tiktok":
       return (
         <svg aria-hidden className={className} fill="currentColor" viewBox="0 0 24 24">
           <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.75a8.18 8.18 0 0 0 4.77 1.52V6.87a4.85 4.85 0 0 1-1-.18z" />
@@ -71,11 +71,11 @@ export function Footer() {
                   aria-label={social.label}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.1] text-zinc-400 transition hover:border-[#FF1010]/40 hover:text-white"
                   href={social.href}
-                  key={social.label}
+                  key={social.href}
                   rel="noreferrer"
                   target="_blank"
                 >
-                  <SocialIcon label={social.label} />
+                  <SocialIcon icon={social.icon} />
                 </a>
               ))}
             </div>
@@ -142,17 +142,19 @@ export function Footer() {
 
             <div>
               <h3 className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-white">Follow The League</h3>
-              <div className="mt-2.5 flex flex-wrap gap-2">
+              <div className="mt-2.5 grid gap-1">
                 {socialLinks.map((social) => (
                   <a
-                    aria-label={social.label}
-                    className="group/social inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.1] text-zinc-400 transition hover:border-[#FF1010]/40 hover:text-white"
+                    className="group/social inline-flex min-h-9 items-center gap-2.5 text-xs font-medium text-zinc-500 transition hover:text-white"
                     href={social.href}
-                    key={social.label}
+                    key={social.href}
                     rel="noreferrer"
                     target="_blank"
                   >
-                    <SocialIcon label={social.label} />
+                    <span className="text-zinc-400 transition group-hover/social:text-[#FF1010]">
+                      <SocialIcon icon={social.icon} />
+                    </span>
+                    {social.label}
                   </a>
                 ))}
               </div>

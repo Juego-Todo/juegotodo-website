@@ -139,11 +139,32 @@ export const broadcastPartners = [
 ];
 
 export const socialLinks = [
-  { label: "Instagram", href: "https://instagram.com" },
-  { label: "Facebook", href: "https://facebook.com" },
-  { label: "TikTok", href: "https://tiktok.com" },
-  { label: "YouTube", href: "https://youtube.com" },
-];
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/JuegoTodoPH",
+    icon: "facebook" as const,
+  },
+  {
+    label: "Facebook PH",
+    href: "https://www.facebook.com/profile.php?id=61583785331326",
+    icon: "facebook" as const,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/juegotodophilippines",
+    icon: "instagram" as const,
+  },
+  {
+    label: "TikTok",
+    href: "https://www.tiktok.com/@juegotodoofficial",
+    icon: "tiktok" as const,
+  },
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/@juegotodoph",
+    icon: "youtube" as const,
+  },
+] as const;
 
 export const champions: Champion[] = [
   {

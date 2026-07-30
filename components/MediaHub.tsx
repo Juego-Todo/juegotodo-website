@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { JsonLd } from "@/components/JsonLd";
+import { YouTubeVideoPopup } from "@/components/YouTubeVideoPopup";
 import { newsArticles, mediaClips, podcastEpisodes } from "@/data/media-assets";
 import { getYouTubeThumbnailFallbacks } from "@/data/featured-videos";
 import { mediaHubJsonLd } from "@/lib/seo/json-ld";
@@ -96,19 +97,16 @@ function ListRow({
   subtitle,
   onClick,
   href,
-  isActive,
   leading,
 }: {
   title: string;
   subtitle?: string;
   onClick?: () => void;
   href?: string;
-  isActive?: boolean;
   leading: ReactNode;
 }) {
-  const className = `flex w-full items-center gap-3 border-b border-white/[0.06] py-3.5 text-left transition active:scale-[0.99] ${
-    isActive ? "bg-white/[0.04]" : "hover:bg-white/[0.03]"
-  }`;
+  const className =
+    "flex w-full items-center gap-3 border-b border-white/[0.06] py-3.5 text-left transition hover:bg-white/[0.03] active:scale-[0.99]";
 
   const content = (
     <>
@@ -189,88 +187,62 @@ function VideoChannel({
   videos: VideoItem[];
   emptyLabel: string;
 }) {
-  const [activeId, setActiveId] = useState(videos[0]?.id ?? "");
+  const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
 
-  const activeVideo = videos.find((video) => video.id === activeId) ?? videos[0];
   const visibleVideos = useMemo(() => videos.slice(0, visibleCount), [videos, visibleCount]);
   const hasMore = visibleCount < videos.length;
+  const closePopup = useCallback(() => setActiveVideo(null), []);
 
-  if (!activeVideo) {
+  if (videos.length === 0) {
     return null;
   }
 
   return (
-    <div className="space-y-5" id={id} role="tabpanel">
-      <div className="overflow-hidden rounded-2xl bg-black">
-        <div className="relative aspect-video w-full bg-zinc-950">
-          <iframe
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            className="absolute inset-0 h-full w-full"
-            loading="lazy"
-            src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?rel=0&modestbranding=1&playsinline=1`}
-            title={activeVideo.title}
-          />
-        </div>
-        <div className="border-t border-white/[0.06] px-4 py-4 sm:px-5">
-          <p className="line-clamp-2 text-base font-semibold leading-snug text-white">{activeVideo.title}</p>
-          <a
-            className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-[#007AFF]"
-            href={activeVideo.href}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Open in YouTube
-            <ChevronRight size={14} aria-hidden />
-          </a>
-        </div>
+    <div className="space-y-4" id={id} role="tabpanel">
+      <div className="flex items-center justify-between px-1">
+        <h3 className="text-sm font-semibold text-zinc-400">{emptyLabel}</h3>
+        <span className="text-xs text-zinc-600">{videos.length} total</span>
       </div>
 
-      <div>
-        <div className="mb-2 flex items-center justify-between px-1">
-          <h3 className="text-sm font-semibold text-zinc-400">{emptyLabel}</h3>
-          <span className="text-xs text-zinc-600">{videos.length} total</span>
-        </div>
-        <div className="overflow-hidden rounded-2xl bg-white/[0.03] px-4">
-          {visibleVideos.map((video) => {
-            const isActive = video.id === activeId;
-            return (
-              <ListRow
-                isActive={isActive}
-                key={video.id}
-                leading={
-                  <div className="relative h-full w-full">
-                    <YouTubeThumbnail title={video.title} youtubeId={video.youtubeId} />
-                    {!isActive ? (
-                      <span className="absolute inset-0 flex items-center justify-center bg-black/25">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-black">
-                          <Play size={14} fill="currentColor" aria-hidden />
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="absolute inset-0 ring-2 ring-inset ring-[#FF1010]/80" aria-hidden />
-                    )}
-                  </div>
-                }
-                onClick={() => setActiveId(video.id)}
-                subtitle={isActive ? "Now playing" : undefined}
-                title={video.title}
-              />
-            );
-          })}
-        </div>
-
-        {hasMore ? (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {visibleVideos.map((video) => (
           <button
-            className="mt-4 w-full rounded-2xl bg-white/[0.06] py-3.5 text-sm font-semibold text-white transition hover:bg-white/[0.1] active:scale-[0.99]"
-            onClick={() => setVisibleCount((count) => count + INITIAL_VISIBLE)}
+            className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] text-left transition hover:border-[#FF1010]/35 hover:bg-white/[0.05] active:scale-[0.99]"
+            key={video.id}
+            onClick={() => setActiveVideo(video)}
             type="button"
           >
-            Show more
+            <div className="relative aspect-video overflow-hidden bg-zinc-950">
+              <YouTubeThumbnail
+                className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                title={video.title}
+                youtubeId={video.youtubeId}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+              <span className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-black shadow-lg transition group-hover:scale-105">
+                <Play size={20} fill="currentColor" aria-hidden />
+              </span>
+            </div>
+            <div className="px-3.5 py-3">
+              <p className="line-clamp-2 text-sm font-semibold leading-snug text-white">{video.title}</p>
+              <p className="mt-1 text-xs font-medium text-zinc-500">Tap to play</p>
+            </div>
           </button>
-        ) : null}
+        ))}
       </div>
+
+      {hasMore ? (
+        <button
+          className="w-full rounded-2xl bg-white/[0.06] py-3.5 text-sm font-semibold text-white transition hover:bg-white/[0.1] active:scale-[0.99]"
+          onClick={() => setVisibleCount((count) => count + INITIAL_VISIBLE)}
+          type="button"
+        >
+          Show more
+        </button>
+      ) : null}
+
+      <YouTubeVideoPopup onClose={closePopup} video={activeVideo} />
     </div>
   );
 }

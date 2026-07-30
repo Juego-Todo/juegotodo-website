@@ -1,4 +1,4 @@
-import { absoluteUrl, SITE_DEFAULT_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/seo/config";
+import { absoluteUrl, SITE_DEFAULT_DESCRIPTION, SITE_NAME, SITE_SOCIAL, SITE_TAGLINE } from "@/lib/seo/config";
 
 export type JsonLdValue = Record<string, unknown> | Record<string, unknown>[];
 
@@ -19,7 +19,7 @@ export function organizationJsonLd() {
       name: "Philippines",
     },
     sport: "Filipino Martial Arts",
-    sameAs: [],
+    sameAs: [SITE_SOCIAL.youtube],
   };
 }
 
@@ -207,5 +207,178 @@ export function sportsTeamJsonLd(input: {
           },
         }
       : {}),
+  };
+}
+
+export function videoObjectJsonLd(input: {
+  name: string;
+  description: string;
+  url: string;
+  youtubeId: string;
+  uploadDate?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: input.name,
+    description: input.description,
+    thumbnailUrl: `https://img.youtube.com/vi/${input.youtubeId}/hqdefault.jpg`,
+    embedUrl: `https://www.youtube.com/embed/${input.youtubeId}`,
+    contentUrl: input.url,
+    uploadDate: input.uploadDate,
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: absoluteUrl("/"),
+    },
+  };
+}
+
+export function newsArticleJsonLd(input: {
+  headline: string;
+  url: string;
+  datePublished: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: input.headline,
+    url: input.url,
+    datePublished: input.datePublished,
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: absoluteUrl("/"),
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/gab-sanctioned.png"),
+      },
+    },
+  };
+}
+
+export function educationEventJsonLd(input: {
+  name: string;
+  description: string;
+  startDate: string;
+  venue: string;
+  city: string;
+  url: string;
+  isFree?: boolean;
+  price?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "EducationEvent",
+    name: input.name,
+    description: input.description,
+    startDate: input.startDate,
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    eventStatus: "https://schema.org/EventScheduled",
+    location: {
+      "@type": "Place",
+      name: input.venue,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: input.city,
+        addressCountry: "PH",
+      },
+    },
+    url: absoluteUrl(input.url),
+    organizer: {
+      "@type": "SportsOrganization",
+      name: SITE_NAME,
+      url: absoluteUrl("/"),
+    },
+    ...(input.isFree
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: 0,
+            priceCurrency: "PHP",
+            availability: "https://schema.org/InStock",
+            url: absoluteUrl(input.url),
+          },
+        }
+      : input.price
+        ? {
+            offers: {
+              "@type": "Offer",
+              price: input.price.replace(/[^\d.]/g, "") || undefined,
+              priceCurrency: "PHP",
+              availability: "https://schema.org/InStock",
+              url: absoluteUrl(input.url),
+            },
+          }
+        : {}),
+  };
+}
+
+export function mediaHubJsonLd(input: {
+  articles: { title: string; href: string; publishedAt: string }[];
+  clips: { title: string; href: string; youtubeId: string }[];
+  podcasts: { title: string; href: string; youtubeId: string }[];
+}) {
+  const latestArticle = input.articles[0];
+  const latestClip = input.clips[0];
+  const latestPodcast = input.podcasts[0];
+
+  const nodes = [
+    {
+      "@type": "CollectionPage",
+      name: "Juego Todo Media Hub",
+      description:
+        "Official news, YouTube fight clips, and Goatism podcast episodes from Juego Todo.",
+      url: absoluteUrl("/media"),
+      isPartOf: {
+        "@type": "WebSite",
+        name: SITE_NAME,
+        url: absoluteUrl("/"),
+      },
+    },
+    ...(latestArticle
+      ? [
+          {
+            "@type": "NewsArticle",
+            headline: latestArticle.title,
+            url: latestArticle.href,
+            datePublished: latestArticle.publishedAt,
+            publisher: {
+              "@type": "Organization",
+              name: SITE_NAME,
+              url: absoluteUrl("/"),
+            },
+          },
+        ]
+      : []),
+    ...(latestClip
+      ? [
+          {
+            "@type": "VideoObject",
+            name: latestClip.title,
+            description: latestClip.title,
+            thumbnailUrl: `https://img.youtube.com/vi/${latestClip.youtubeId}/hqdefault.jpg`,
+            embedUrl: `https://www.youtube.com/embed/${latestClip.youtubeId}`,
+            contentUrl: latestClip.href,
+          },
+        ]
+      : []),
+    ...(latestPodcast
+      ? [
+          {
+            "@type": "VideoObject",
+            name: latestPodcast.title,
+            description: `Goatism podcast — ${latestPodcast.title}`,
+            thumbnailUrl: `https://img.youtube.com/vi/${latestPodcast.youtubeId}/hqdefault.jpg`,
+            embedUrl: `https://www.youtube.com/embed/${latestPodcast.youtubeId}`,
+            contentUrl: latestPodcast.href,
+          },
+        ]
+      : []),
+  ];
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": nodes,
   };
 }

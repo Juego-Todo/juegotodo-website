@@ -12,6 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/admin",
           "/admin/",
+          "/admin/license-approvals",
           "/api/",
           "/cart",
           "/checkout",

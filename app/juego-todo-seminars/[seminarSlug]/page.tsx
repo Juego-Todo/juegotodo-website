@@ -9,6 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { JsonLd } from "@/components/JsonLd";
 import { PageNavigation } from "@/components/PageNavigation";
 import { PrevNextNav } from "@/components/PrevNextNav";
 import { SeminarRegistrationPanel } from "@/components/SeminarRegistrationPanel";
@@ -21,6 +22,7 @@ import {
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
 import { getSeminarNeighbors } from "@/lib/navigation/prev-next";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { educationEventJsonLd } from "@/lib/seo/json-ld";
 
 type PageProps = {
   params: Promise<{ seminarSlug: string }>;
@@ -64,6 +66,18 @@ export default async function SeminarDetailPage({ params }: PageProps) {
   return (
     <>
       <BreadcrumbJsonLd items={breadcrumbs} />
+      <JsonLd
+        data={educationEventJsonLd({
+          name: seminar.title,
+          description: seminar.summary,
+          startDate: seminar.date,
+          venue: seminar.venue,
+          city: seminar.city,
+          url: `/juego-todo-seminars/${seminarSlug}`,
+          isFree: seminar.pricing.type === "free",
+          price: seminar.pricing.amount,
+        })}
+      />
       <main className="px-4 pb-0 pt-24 sm:px-6 sm:pt-28 lg:px-8">
         <div className="mx-auto max-w-7xl pb-4">
           <PageNavigation currentLabel={seminar.title} />

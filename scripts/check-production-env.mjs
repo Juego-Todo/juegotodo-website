@@ -1,5 +1,6 @@
 const sites = [
   "https://juegotodo-website.vercel.app",
+  "https://juegotodo.org",
   "https://juegotodo.com",
 ];
 

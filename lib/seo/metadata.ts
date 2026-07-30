@@ -58,6 +58,8 @@ export function buildPageMetadata(input: BuildPageMetadataInput): Metadata {
       images: [
         {
           url: imageUrl,
+          width: 1200,
+          height: 630,
           alt: imageAlt,
         },
       ],
@@ -99,7 +101,11 @@ export function buildRootMetadata(): Metadata {
       siteName: SITE_NAME,
       locale: SITE_LOCALE,
       type: "website",
-      images: [{ url: imageUrl, alt: `${SITE_NAME} — ${SITE_TAGLINE}` }],
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: `${SITE_NAME} — ${SITE_TAGLINE}` }],
+    },
+    icons: {
+      icon: "/gab-sanctioned.png",
+      apple: "/gab-sanctioned.png",
     },
     twitter: {
       card: "summary_large_image",

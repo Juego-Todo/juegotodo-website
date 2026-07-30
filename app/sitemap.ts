@@ -36,8 +36,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const hubRoutes: MetadataRoute.Sitemap = Object.keys(pageContent).map((slug) => ({
     url: `${base}/${slug}`,
     lastModified: now,
-    changeFrequency: slug === "events" || slug === "shop" || slug === "latayanology" ? "daily" : "weekly",
-    priority: slug === "events" || slug === "shop" || slug === "about-juego-todo" ? 0.9 : 0.7,
+    changeFrequency: slug === "events" || slug === "shop" || slug === "media" || slug === "latayanology" ? "daily" : "weekly",
+    priority:
+      slug === "events" || slug === "shop" || slug === "media" || slug === "about-juego-todo" ? 0.9 : 0.7,
   }));
 
   const eventRoutes: MetadataRoute.Sitemap = events.map((event) => ({

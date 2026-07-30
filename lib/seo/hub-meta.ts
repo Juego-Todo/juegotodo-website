@@ -13,10 +13,17 @@ export const hubSeo: Record<
     image: "/events/ugb46-juego-todo-proclamation-anniversary.png",
   },
   media: {
-    title: "Fight Highlights & Media Hub",
+    title: "News, Media Clips & Goatism Podcast",
     description:
-      "Watch Juego Todo highlight reels, camp features, livestream previews, and social-ready combat sports content.",
-    keywords: ["Juego Todo highlights", "FMA videos"],
+      "Official Juego Todo media hub — press articles, YouTube fight highlights, Barrio Brawls clips, and Goatism podcast episodes. Newest coverage first.",
+    keywords: [
+      "Juego Todo news",
+      "fight highlights",
+      "Goatism podcast",
+      "Barrio Brawls",
+      "YouTube clips",
+    ],
+    image: "/juego-todo-event-background.png",
   },
   shop: {
     title: "Official Shop — Gear, Merch & Event Tickets",

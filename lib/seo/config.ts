@@ -9,6 +9,10 @@ export const SITE_DEFAULT_DESCRIPTION =
 export const SITE_DEFAULT_OG_IMAGE = "/hero-background.png";
 export const SITE_LOCALE = "en_PH";
 
+export const SITE_SOCIAL = {
+  youtube: "https://www.youtube.com/@JuegoTodo",
+} as const;
+
 export const SITE_KEYWORDS = [
   "Juego Todo",
   "Filipino Martial Arts",
@@ -29,7 +33,7 @@ export function getCanonicalSiteUrl(): string {
   if (fromEnv) {
     return fromEnv;
   }
-  return "https://juegotodo.com";
+  return "https://juegotodo.org";
 }
 
 /** Resolve a path or absolute URL to an absolute URL. */

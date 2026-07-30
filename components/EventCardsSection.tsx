@@ -29,9 +29,17 @@ export function EventCardsSection() {
               className="card-3d glass-panel animated-border group overflow-hidden rounded-[1.75rem] border-white/[0.08] bg-[#0D0D0D]/75"
               key={event.slug}
             >
-              <EventCardBackdrop className="min-h-52 p-5" imageSrc={event.imageSrc}>
+              <EventCardBackdrop
+                alt={`${event.title} official event poster`}
+                className="aspect-[3/4] w-full"
+                imageClassName="object-cover object-top"
+                imageSrc={event.imageSrc}
+                sizes="(max-width: 768px) 100vw, 420px"
+              />
+
+              <div className="p-5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.18em]">
+                  <span className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[0.62rem] font-black uppercase tracking-[0.18em] text-zinc-200">
                     {event.status}
                   </span>
                   {event.isChampionship ? (
@@ -47,14 +55,12 @@ export function EventCardsSection() {
                     </span>
                   ) : null}
                 </div>
-                <h3 className="font-display mt-12 text-4xl uppercase leading-none text-white sm:text-5xl">
+
+                <h3 className="font-display mt-4 text-3xl uppercase leading-none text-white sm:text-4xl">
                   {event.title.replace("Juego Todo: ", "")}
                 </h3>
-                <p className="mt-2 text-sm font-semibold text-zinc-200">{event.venue}</p>
-              </EventCardBackdrop>
-
-              <div className="p-5">
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#FF1010]">{event.mainEvent}</p>
+                <p className="mt-2 text-sm font-semibold text-zinc-300">{event.venue}</p>
+                <p className="mt-4 text-sm font-bold uppercase tracking-[0.18em] text-[#FF1010]">{event.mainEvent}</p>
                 <ul className="mt-4 space-y-2 text-sm text-zinc-400">
                   {event.bouts.slice(0, 3).map((bout) => (
                     <li className="border-t border-white/[0.08] pt-2" key={bout}>

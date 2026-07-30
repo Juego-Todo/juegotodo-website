@@ -123,15 +123,22 @@ function EventsSection() {
       <div className={`grid gap-5 ${events.length === 1 ? "max-w-xl" : "lg:grid-cols-3"}`}>
       {events.map((event) => (
         <Link className="glass-panel group overflow-hidden rounded-[1.75rem] transition hover:-translate-y-2 hover:border-red-500/40" href={`/events/${event.slug}`} key={event.slug}>
-          <EventCardBackdrop className="min-h-56 p-5 sm:min-h-72 sm:p-6" imageSrc={event.imageSrc}>
-            <span className="rounded-full border border-white/20 bg-black/35 px-3 py-1 text-xs font-black uppercase tracking-[0.22em]">
-              {event.status}
-            </span>
-            <h2 className="font-display mt-16 text-4xl uppercase leading-none text-white sm:mt-24 sm:text-5xl">{event.title}</h2>
-          </EventCardBackdrop>
+          <EventCardBackdrop
+            alt={`${event.title} official event poster`}
+            className="aspect-[3/4] w-full"
+            imageClassName="object-cover object-top"
+            imageSrc={event.imageSrc}
+            sizes="(max-width: 768px) 100vw, 420px"
+          />
           <div className="space-y-5 p-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-white/20 bg-black/35 px-3 py-1 text-xs font-black uppercase tracking-[0.22em] text-zinc-200">
+                {event.status}
+              </span>
+            </div>
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.24em] text-red-300">{event.city}</p>
+              <h2 className="font-display text-3xl uppercase leading-none text-white sm:text-4xl">{event.title}</h2>
+              <p className="mt-3 text-sm font-black uppercase tracking-[0.24em] text-red-300">{event.city}</p>
               <p className="mt-2 text-zinc-300">{event.mainEvent}</p>
             </div>
             {event.status === "Upcoming" ? <CountdownTimer target={event.date} /> : null}

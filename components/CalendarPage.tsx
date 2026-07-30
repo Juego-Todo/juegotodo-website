@@ -135,17 +135,28 @@ function CalendarEntryCard({ entry }: { entry: CalendarEntry }) {
 
   return (
     <article className="card-3d glass-panel overflow-hidden rounded-[1.75rem] border-white/[0.08] bg-[#0D0D0D]/75">
-      <EventCardBackdrop className="min-h-52 p-5" imageSrc={posterSrc}>
-        <EntryBadges entry={entry} />
-        <h2 className="font-display mt-12 text-4xl uppercase leading-none text-white sm:text-5xl">
-          {eventTitle}
-        </h2>
-        <p className="mt-2 text-sm font-semibold text-zinc-200">{entry.venue}</p>
-      </EventCardBackdrop>
+      {posterSrc ? (
+        <EventCardBackdrop
+          alt={`${eventTitle} official event poster`}
+          className="aspect-[3/4] w-full"
+          imageClassName="object-cover object-top"
+          imageSrc={posterSrc}
+          sizes="(max-width: 768px) 100vw, 420px"
+        />
+      ) : (
+        <div className="flex min-h-40 items-end bg-gradient-to-br from-[#1a0505] via-black to-[#0D0D0D] p-5">
+          <EntryBadges entry={entry} />
+        </div>
+      )}
 
       <div className="space-y-5 p-5 sm:p-6">
+        {posterSrc ? <EntryBadges entry={entry} /> : null}
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-[#FF1010]">{entry.city}</p>
+          <h2 className="font-display text-3xl uppercase leading-none text-white sm:text-4xl">
+            {eventTitle}
+          </h2>
+          <p className="mt-2 text-sm font-semibold text-zinc-300">{entry.venue}</p>
+          <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-[#FF1010]">{entry.city}</p>
           <p className="mt-2 text-sm text-zinc-400">{formatEventDate(entry.date)}</p>
           <p className="mt-3 text-sm font-bold uppercase tracking-[0.16em] text-zinc-200">
             {entry.mainEvent || entry.summary}

@@ -84,26 +84,23 @@ export default async function EventPage({ params }: PageProps) {
         </div>
         <section className="mx-auto grid max-w-7xl gap-8 pb-8 lg:grid-cols-[1.05fr_0.95fr]">
           <EventCardBackdrop
-            className="min-h-[26rem] rounded-[1.5rem] border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.46)] sm:min-h-[38rem] sm:rounded-[2rem]"
+            alt={`${event.title} official event poster`}
+            className="aspect-[3/4] w-full rounded-[1.5rem] border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.46)] sm:rounded-[2rem]"
+            imageClassName="object-cover object-top"
             imageSrc={event.imageSrc}
             sizes="(max-width: 1024px) 100vw, 50vw"
-          >
-            <div className="p-5 sm:p-8">
+          />
+          <div className="space-y-6">
+            <div className="glass-panel rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-8">
               <span className="rounded-full border border-white/20 bg-black/35 px-4 py-2 text-xs font-black uppercase tracking-[0.26em] text-white">
                 {event.status}
               </span>
-              <div className="mt-44 sm:mt-72">
-                <p className="text-sm font-black uppercase tracking-[0.32em] text-red-100">{event.city}</p>
-                <h1 className="font-display mt-4 text-6xl uppercase leading-none text-white sm:text-8xl">
-                  {event.title}
-                </h1>
-              </div>
-            </div>
-          </EventCardBackdrop>
-          <div className="space-y-6">
-            <div className="glass-panel rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-8">
-              <p className="text-sm font-black uppercase tracking-[0.32em] text-[#FF1010]">Main Event</p>
-              <h2 className="font-display mt-4 text-4xl uppercase leading-none text-white sm:text-6xl">{event.mainEvent}</h2>
+              <p className="mt-5 text-sm font-black uppercase tracking-[0.32em] text-red-100">{event.city}</p>
+              <h1 className="font-display mt-3 text-[clamp(2.25rem,8vw,3.75rem)] uppercase leading-none text-white sm:text-6xl">
+                {event.title}
+              </h1>
+              <p className="mt-5 text-sm font-black uppercase tracking-[0.32em] text-[#FF1010]">Main Event</p>
+              <h2 className="font-display mt-3 text-3xl uppercase leading-none text-white sm:text-5xl">{event.mainEvent}</h2>
               <p className="mt-5 text-lg text-zinc-300">{event.venue}</p>
               {event.status === "Upcoming" ? (
                 <div className="mt-8">

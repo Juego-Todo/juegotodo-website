@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { Clock3, Download, Lock, QrCode, Share2, Smartphone } from "lucide-react";
+import { Clock3, Download, Lock, QrCode } from "lucide-react";
 import { useState } from "react";
 import { JudgeLicenseIdCard } from "@/components/profile/JudgeLicenseIdCard";
 import { FighterLicenseIdCard } from "@/components/profile/FighterLicenseIdCard";
@@ -115,13 +115,7 @@ export function ProfileInteractiveCredential({
 
       <div className={`flex flex-wrap gap-2 ${compact ? "justify-center" : ""}`}>
         <ActionChip icon={QrCode} label="QR" onClick={() => setQrOpen((value) => !value)} />
-        {!compact ? (
-          <>
-            <ActionChip icon={Download} label="Download" />
-            <ActionChip icon={Share2} label="Share" />
-            <ActionChip icon={Smartphone} label="Wallet" />
-          </>
-        ) : null}
+        {!compact ? <ActionChip icon={Download} label="Download" /> : null}
       </div>
 
       {qrOpen ? (

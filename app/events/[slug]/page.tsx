@@ -130,7 +130,7 @@ export default async function EventPage({ params }: PageProps) {
                 ) : (
                   <Link
                     className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-4 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-[#ff2828]"
-                    href="/registration"
+                    href="/login?mode=register"
                   >
                     Register Interest
                   </Link>

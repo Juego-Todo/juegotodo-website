@@ -15,6 +15,7 @@ type ProfileRow = {
   phone: string;
   country: string;
   membership_tier: string;
+  assigned_tags: string[];
   created_at: string;
   updated_at: string;
 };

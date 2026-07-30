@@ -191,7 +191,7 @@ export function CompetitionStructureSection() {
         </motion.article>
 
         <div className="mt-12 flex justify-center">
-          <MagneticButton href="/login?mode=register">
+          <MagneticButton href="/login?mode=register&next=/register-for-license/fighter">
             Register As A Fighter
             <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={16} aria-hidden />
           </MagneticButton>

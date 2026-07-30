@@ -171,7 +171,7 @@ export default async function RulebookPage({ params }: PageProps) {
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
               <ActionLink href={rulebook.pdfHref} label="Download Rulebook" />
-              <ActionLink href="/registration" label="Register Your Gym" />
+              <ActionLink href="/login?mode=register" label="Register Your Gym" />
               <ActionLink href="/rules-regulations" label="All Rulebooks" />
               <ActionLink href="/contact" label="Fighter Requirements" />
             </div>

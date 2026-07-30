@@ -273,7 +273,10 @@ export function LicenseApplicationReviewCard({
       ) : null}
 
       <div className="mt-6 border-t border-white/10 pt-6">
-        <AdminAccountTagEditor initialTags={getAdminAssignedTags(application.userId)} userId={application.userId} />
+        <AdminAccountTagEditor
+          initialTags={getAdminAssignedTags(application.userId)}
+          userId={application.userId}
+        />
       </div>
     </div>
   );

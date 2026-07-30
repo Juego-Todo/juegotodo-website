@@ -162,7 +162,7 @@ export function UserProfilePage() {
   }, [user]);
 
   const adminAssignedTags = useMemo(
-    () => (user ? getAdminAssignedTags(user.id) : []),
+    () => (user ? getAdminAssignedTags(user.id, user.assignedTags) : []),
     [user],
   );
   const [pendingLicenseCount, setPendingLicenseCount] = useState(0);
@@ -584,7 +584,7 @@ export function UserProfilePage() {
 
         {activeSection === "competition-entries" ? (
           <PortalPlaceholderSection
-            ctaHref="/registration"
+            ctaHref="/register-for-license"
             ctaLabel="Open Registration"
             description="View sanctioned competition entries, bout assignments, and registration status."
             title="Competition Entries"

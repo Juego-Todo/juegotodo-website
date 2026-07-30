@@ -21,5 +21,6 @@ export const testLoginStoredUser: StoredUser = {
   gym: "",
   city: "",
   bio: "",
+  assignedTags: [],
   createdAt: "2026-01-01T00:00:00.000Z",
 };

@@ -172,7 +172,7 @@ export function ProfileIdentityHeader({
 
           <Link
             className="glass-panel mt-6 flex items-center justify-between rounded-[1.25rem] border border-white/10 p-5 transition hover:border-[#FF1010]/40"
-            href="/registration"
+            href="/login?mode=register"
           >
             <span className="font-display text-xl uppercase text-white sm:text-2xl">Competition Registration</span>
             <ArrowRight className="shrink-0 text-[#FF1010]" size={18} aria-hidden />

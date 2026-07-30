@@ -37,6 +37,7 @@ function buildProfileFromAuthUser(user: User, fallbackEmail = ""): UserProfile {
     gym: "",
     city: typeof user.user_metadata?.city === "string" ? user.user_metadata.city : "",
     bio: "",
+    assignedTags: [],
     createdAt: user.created_at,
   };
 }

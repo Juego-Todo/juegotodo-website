@@ -22,6 +22,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   "fma-lineage": "FMA Lineage",
   contact: "Contact",
   login: "Login",
+  welcome: "Welcome",
   profile: "Profile",
   cart: "Cart",
   checkout: "Checkout",

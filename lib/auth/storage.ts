@@ -91,6 +91,7 @@ function readUsers(): StoredUser[] {
           role: user.role ?? resolveRole(user.email),
           gender: user.gender ?? "",
           dateOfBirth: user.dateOfBirth ?? "",
+          assignedTags: Array.isArray(user.assignedTags) ? user.assignedTags : [],
         }))
       : [];
 
@@ -178,6 +179,7 @@ function registerStoredUserLocal(input: RegisterInput): UserProfile {
     gym: "",
     city: input.city?.trim() ?? "",
     bio: input.bio?.trim() ?? "",
+    assignedTags: [],
     createdAt: new Date().toISOString(),
   };
 

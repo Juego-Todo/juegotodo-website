@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { InteriorPage } from "@/components/InteriorPage";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { pageContent, type PageSlug } from "@/data/site";
@@ -24,6 +24,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
+  if (slug === "registration") {
+    return buildPageMetadata({
+      title: "Create Account",
+      description: "Create your Juego Todo account to register as a fighter, member, or official.",
+      path: "/login",
+      noIndex: true,
+    });
+  }
+
   const seo = hubSeo[slug as PageSlug];
   const legalDescription = isLegalPageSlug(slug) ? getLegalPage(slug)?.metaDescription : undefined;
 
@@ -41,6 +50,11 @@ export default async function Page({ params }: PageProps) {
 
   if (!(slug in pageContent)) {
     notFound();
+  }
+
+  // Lead-capture registration page retired — send users to real account signup.
+  if (slug === "registration") {
+    redirect("/login?mode=register");
   }
 
   return (

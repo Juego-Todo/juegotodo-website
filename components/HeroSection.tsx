@@ -79,7 +79,7 @@ export function HeroSection() {
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3 sm:mt-8">
-              <MagneticButton href="/registration" variant="secondary">
+              <MagneticButton href="/login?mode=register" variant="secondary">
                 Register Now
                 <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
               </MagneticButton>

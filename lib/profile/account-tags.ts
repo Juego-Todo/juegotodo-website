@@ -24,6 +24,9 @@ function readJson<T>(key: string, fallback: T): T {
 }
 
 function writeJson(key: string, value: unknown) {
+  if (typeof window === "undefined") {
+    return;
+  }
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
@@ -31,14 +34,34 @@ export function isAssignableUserTypeTag(tagId: string): tagId is UserTypeTagId {
   return tagId in userTypeTags && tagId !== "regular_member";
 }
 
-export function getAdminAssignedTags(userId: string): UserTypeTagId[] {
-  const tags = readJson<UserTypeTagId[]>(assignedTagsKey(userId), []);
-  return tags.filter(isAssignableUserTypeTag);
+export function normalizeAssignedTags(tags: unknown): UserTypeTagId[] {
+  if (!Array.isArray(tags)) {
+    return [];
+  }
+  return [...new Set(tags.filter(isAssignableUserTypeTag))];
 }
 
-export function setAdminAssignedTags(userId: string, tags: UserTypeTagId[]) {
-  const unique = [...new Set(tags.filter(isAssignableUserTypeTag))];
+/** Prefer server tags from the profile; fall back to local cache for offline/local auth. */
+export function getAdminAssignedTags(userId: string, serverTags?: UserTypeTagId[] | null): UserTypeTagId[] {
+  if (serverTags && serverTags.length > 0) {
+    return normalizeAssignedTags(serverTags);
+  }
+  if (serverTags && serverTags.length === 0) {
+    // Explicit empty server list wins over stale localStorage.
+    return [];
+  }
+  return normalizeAssignedTags(readJson<UserTypeTagId[]>(assignedTagsKey(userId), []));
+}
+
+export function setAdminAssignedTagsLocal(userId: string, tags: UserTypeTagId[]) {
+  const unique = normalizeAssignedTags(tags);
   writeJson(assignedTagsKey(userId), unique);
+  return unique;
+}
+
+/** @deprecated Prefer setAdminAssignedTagsLocal or the admin tags API. */
+export function setAdminAssignedTags(userId: string, tags: UserTypeTagId[]) {
+  return setAdminAssignedTagsLocal(userId, tags);
 }
 
 export function addAdminAssignedTag(userId: string, tagId: UserTypeTagId) {
@@ -48,12 +71,11 @@ export function addAdminAssignedTag(userId: string, tagId: UserTypeTagId) {
 
   const next = new Set(getAdminAssignedTags(userId));
   next.add(tagId);
-  setAdminAssignedTags(userId, [...next]);
-  return [...next];
+  return setAdminAssignedTagsLocal(userId, [...next]);
 }
 
 export function removeAdminAssignedTag(userId: string, tagId: UserTypeTagId) {
-  setAdminAssignedTags(
+  return setAdminAssignedTagsLocal(
     userId,
     getAdminAssignedTags(userId).filter((entry) => entry !== tagId),
   );
@@ -69,11 +91,41 @@ export function clearAdminAssignedTags(userId: string) {
 export function toggleAdminAssignedTag(userId: string, tagId: UserTypeTagId) {
   const current = getAdminAssignedTags(userId);
   if (current.includes(tagId)) {
-    removeAdminAssignedTag(userId, tagId);
-    return current.filter((entry) => entry !== tagId);
+    return removeAdminAssignedTag(userId, tagId);
+  }
+  return addAdminAssignedTag(userId, tagId);
+}
+
+export async function saveAdminAssignedTags(userId: string, tags: UserTypeTagId[]) {
+  const unique = normalizeAssignedTags(tags);
+  setAdminAssignedTagsLocal(userId, unique);
+
+  const response = await fetch(`/api/admin/members/${userId}/tags`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tags: unique }),
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(payload?.error ?? "Unable to save account tags.");
   }
 
-  return addAdminAssignedTag(userId, tagId);
+  const payload = (await response.json()) as { tags?: UserTypeTagId[] };
+  const saved = normalizeAssignedTags(payload.tags ?? unique);
+  setAdminAssignedTagsLocal(userId, saved);
+  return saved;
+}
+
+export async function toggleAdminAssignedTagRemote(
+  userId: string,
+  tagId: UserTypeTagId,
+  currentTags: UserTypeTagId[],
+) {
+  const next = currentTags.includes(tagId)
+    ? currentTags.filter((entry) => entry !== tagId)
+    : [...currentTags, tagId];
+  return saveAdminAssignedTags(userId, next);
 }
 
 export const assignableUserTypeTags = Object.keys(userTypeTags).filter(

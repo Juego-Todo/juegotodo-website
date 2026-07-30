@@ -427,8 +427,8 @@ export function buildMemberRecord(input: {
   });
 
   const canAccessOpsTabs = previewRoleKind
-    ? previewRoleKind === "admin" || previewRoleKind === "staff"
-    : isAdmin || tagIds.includes("staff") || roleModule.kind === "staff";
+    ? previewRoleKind === "admin"
+    : isAdmin;
 
   return {
     tagIds,

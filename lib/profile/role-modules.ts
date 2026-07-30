@@ -536,7 +536,7 @@ export function buildProfileRoleModule(input: {
           { label: "Community Rewards", section: "membership" },
           { label: "Exclusive Content", section: "membership" },
           { label: "Discounts", href: "/shop" },
-          { label: "Member Benefits", href: "/registration" },
+          { label: "Member Benefits", href: "/login?mode=register" },
         ],
         careerSnapshot: [
           { icon: "🎟️", label: "Saved Events", value: `${userData.savedEvents.length}` },

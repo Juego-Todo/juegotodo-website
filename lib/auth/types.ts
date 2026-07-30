@@ -1,3 +1,5 @@
+import type { UserTypeTagId } from "@/data/user-type-tags";
+
 export type AccountType = "fan" | "athlete" | "coach" | "gym_owner" | "partner";
 export type UserRole = "user" | "admin";
 
@@ -14,6 +16,8 @@ export type StoredUser = {
   gym: string;
   city: string;
   bio: string;
+  /** Admin-assigned portal tags (fighter, coach, staff, …). */
+  assignedTags: UserTypeTagId[];
   createdAt: string;
 };
 

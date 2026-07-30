@@ -51,19 +51,20 @@ export function resolveProfileRoles(user: UserProfile): ProfileRoleId[] {
       break;
   }
 
-  if (user.email.toLowerCase().includes("kiran") || user.fullName.toLowerCase().includes("kiran")) {
-    roles.add("fighter");
-    roles.add("coach");
-    roles.add("grand_council");
+  // Admin-assigned tags drive specialized identities (not demo email heuristics).
+  for (const tag of user.assignedTags ?? []) {
+    if (tag === "fighter") roles.add("fighter");
+    if (tag === "coach" || tag === "grandmaster") roles.add("coach");
+    if (tag === "referee") roles.add("referee");
+    if (tag === "judge") roles.add("judge");
+    if (tag === "gym_owner") roles.add("gym_owner");
+    if (tag === "media") roles.add("media");
+    if (tag === "grand_council_member") roles.add("grand_council");
+    if (tag === "staff" || tag === "adviser") roles.add("event_official");
   }
 
   if (user.role === "admin" || isPlatformOwnerEmail(user.email)) {
     roles.add("administrator");
-    roles.add("grand_council");
-  }
-
-  if (user.gym.toLowerCase().includes("official") || user.accountType === "coach") {
-    roles.add("event_official");
   }
 
   return [...roles];

@@ -18,6 +18,7 @@ create table if not exists public.profiles (
   phone text not null default '',
   country text not null default 'Philippines',
   membership_tier text not null default 'free',
+  assigned_tags text[] not null default '{}'::text[],
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

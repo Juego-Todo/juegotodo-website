@@ -3,8 +3,16 @@ import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
 import type { RegisterInput, UserProfile } from "@/lib/auth/types";
 import { migrateAccountType } from "@/lib/auth/types";
+import { isAssignableUserTypeTag } from "@/lib/profile/account-tags";
 import type { ProfileRow } from "@/lib/supabase/types";
 import type { User } from "@supabase/supabase-js";
+
+function mapAssignedTags(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [] as UserProfile["assignedTags"];
+  }
+  return value.filter(isAssignableUserTypeTag);
+}
 
 export function mapProfileRow(row: ProfileRow): UserProfile {
   return {
@@ -19,6 +27,7 @@ export function mapProfileRow(row: ProfileRow): UserProfile {
     gym: row.gym,
     city: row.city,
     bio: row.bio,
+    assignedTags: mapAssignedTags(row.assigned_tags),
     createdAt: row.created_at,
   };
 }

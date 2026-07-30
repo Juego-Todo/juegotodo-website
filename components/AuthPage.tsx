@@ -25,6 +25,11 @@ import {
   setRememberedEmail,
 } from "@/lib/auth/storage";
 import { getUsernameValidationError, normalizeUsername, validateUsername } from "@/lib/auth/username";
+import {
+  consumePendingWelcomeChooser,
+  markPendingWelcomeChooser,
+} from "@/lib/auth/welcome";
+import { shouldSkipWelcomeChooser } from "@/data/welcome-paths";
 
 type AuthMode = "login" | "register" | "forgot" | "reset";
 type UsernameCheckStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "error";
@@ -52,6 +57,16 @@ function resolveSafeNextPath(value: string | null) {
   return next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")
     ? next
     : "/profile";
+}
+
+function resolvePostAuthPath(nextPath: string, options?: { preferWelcome?: boolean }) {
+  if (shouldSkipWelcomeChooser(nextPath)) {
+    return nextPath;
+  }
+  if (options?.preferWelcome) {
+    return "/welcome";
+  }
+  return nextPath;
 }
 
 export function AuthPage() {
@@ -257,7 +272,10 @@ export function AuthPage() {
           country,
           city,
         });
-        router.push(nextPath);
+        if (!shouldSkipWelcomeChooser(nextPath)) {
+          markPendingWelcomeChooser();
+        }
+        router.push(resolvePostAuthPath(nextPath, { preferWelcome: true }));
         return;
       }
 
@@ -306,10 +324,14 @@ export function AuthPage() {
         clearRememberedEmail();
       }
 
-      router.push(nextPath);
+      const preferWelcome = consumePendingWelcomeChooser();
+      router.push(resolvePostAuthPath(nextPath, { preferWelcome }));
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "Something went wrong.";
       if (message.startsWith("Account created.")) {
+        if (!shouldSkipWelcomeChooser(nextPath)) {
+          markPendingWelcomeChooser();
+        }
         switchMode("login");
         setSuccess(message);
         return;

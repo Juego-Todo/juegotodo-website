@@ -123,7 +123,7 @@ export function buildAdminMemberRecord(
     memberSince: formatDate(user.createdAt),
     orders: userOrders.length,
     lifetimeSpent: userOrders.reduce((sum, order) => sum + order.total, 0),
-    tags: getAdminAssignedTags(user.id),
+    tags: getAdminAssignedTags(user.id, user.assignedTags),
     licenseStatus: license ? licenseApplicationStatusLabels[license.status] : null,
     fullName: user.fullName,
     createdAt: user.createdAt,

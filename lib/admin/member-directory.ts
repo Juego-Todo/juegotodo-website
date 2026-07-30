@@ -1,5 +1,6 @@
 import { licenseApplicationStatusLabels, type LicenseApplication } from "@/data/license-applications";
 import type { UserTypeTagId } from "@/data/user-type-tags";
+import { userTypeTags } from "@/data/user-type-tags";
 import {
   adminDeleteStoredUser,
   adminResetStoredUserPassword,
@@ -51,6 +52,28 @@ export type AdminMemberRecord = {
   createdAt: string;
 };
 
+const DIRECTORY_TAG_PRIORITY: UserTypeTagId[] = [
+  "fighter",
+  "coach",
+  "grandmaster",
+  "gym_owner",
+  "media",
+  "referee",
+  "judge",
+  "adviser",
+  "staff",
+  "grand_council_member",
+  "admin",
+];
+
+function resolveDirectoryAccountLabel(accountType: AccountType, tags: UserTypeTagId[]) {
+  const primaryTag = DIRECTORY_TAG_PRIORITY.find((tagId) => tags.includes(tagId));
+  if (primaryTag) {
+    return userTypeTags[primaryTag].label;
+  }
+  return accountTypeLabels[accountType];
+}
+
 function splitFullName(fullName: string) {
   const trimmed = fullName.trim();
   const spaceIndex = trimmed.indexOf(" ");
@@ -97,6 +120,7 @@ export function buildAdminMemberRecord(
   const { firstName: splitFirst, lastName: splitLast } = splitFullName(user.fullName);
   const licenseFirst = license?.firstName?.trim();
   const licenseLast = license?.lastName?.trim();
+  const tags = getAdminAssignedTags(user.id, user.assignedTags);
 
   return {
     userId: user.id,
@@ -111,7 +135,7 @@ export function buildAdminMemberRecord(
     nationality: displayValue(license?.nationality || commerce.country),
     civilStatus: displayValue(license?.civilStatus),
     accountType: user.accountType,
-    accountTypeLabel: accountTypeLabels[user.accountType],
+    accountTypeLabel: resolveDirectoryAccountLabel(user.accountType, tags),
     role: user.role,
     city: displayValue(user.city || license?.addressCity),
     gym: displayValue(
@@ -123,7 +147,7 @@ export function buildAdminMemberRecord(
     memberSince: formatDate(user.createdAt),
     orders: userOrders.length,
     lifetimeSpent: userOrders.reduce((sum, order) => sum + order.total, 0),
-    tags: getAdminAssignedTags(user.id, user.assignedTags),
+    tags,
     licenseStatus: license ? licenseApplicationStatusLabels[license.status] : null,
     fullName: user.fullName,
     createdAt: user.createdAt,

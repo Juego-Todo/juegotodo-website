@@ -1,7 +1,35 @@
 import type { UserTypeTagId } from "@/data/user-type-tags";
 import { userTypeTags } from "@/data/user-type-tags";
+import type { AccountType } from "@/lib/auth/types";
 
 const ASSIGNED_TAGS_PREFIX = "juego-todo.profile.assigned-tags.";
+
+/** Highest-priority assigned tag wins when mapping to account_type. */
+const TAG_ACCOUNT_TYPE_PRIORITY: UserTypeTagId[] = [
+  "fighter",
+  "coach",
+  "grandmaster",
+  "gym_owner",
+  "media",
+  "referee",
+  "judge",
+  "adviser",
+  "staff",
+  "grand_council_member",
+];
+
+const TAG_TO_ACCOUNT_TYPE: Partial<Record<UserTypeTagId, AccountType>> = {
+  fighter: "athlete",
+  coach: "coach",
+  grandmaster: "coach",
+  gym_owner: "gym_owner",
+  media: "partner",
+  referee: "coach",
+  judge: "coach",
+  adviser: "coach",
+  staff: "coach",
+  grand_council_member: "coach",
+};
 
 function assignedTagsKey(userId: string) {
   return `${ASSIGNED_TAGS_PREFIX}${userId}`;
@@ -39,6 +67,21 @@ export function normalizeAssignedTags(tags: unknown): UserTypeTagId[] {
     return [];
   }
   return [...new Set(tags.filter(isAssignableUserTypeTag))];
+}
+
+/** Map admin-assigned tags to the profiles.account_type enum used across the app. */
+export function resolveAccountTypeFromAssignedTags(tags: UserTypeTagId[]): AccountType {
+  const normalized = normalizeAssignedTags(tags);
+  for (const tagId of TAG_ACCOUNT_TYPE_PRIORITY) {
+    if (!normalized.includes(tagId)) {
+      continue;
+    }
+    const accountType = TAG_TO_ACCOUNT_TYPE[tagId];
+    if (accountType) {
+      return accountType;
+    }
+  }
+  return "fan";
 }
 
 /** Prefer server tags from the profile; fall back to local cache for offline/local auth. */

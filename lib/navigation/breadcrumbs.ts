@@ -1,3 +1,5 @@
+import { getCanonicalSiteUrl } from "@/lib/seo/config";
+
 export type BreadcrumbItem = {
   label: string;
   href?: string;
@@ -238,7 +240,8 @@ function formatSegment(value: string) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-export function breadcrumbsToJsonLd(items: BreadcrumbItem[], baseUrl = "https://juegotodo.com") {
+export function breadcrumbsToJsonLd(items: BreadcrumbItem[], baseUrl?: string) {
+  const resolvedBase = baseUrl ?? getCanonicalSiteUrl();
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -246,7 +249,7 @@ export function breadcrumbsToJsonLd(items: BreadcrumbItem[], baseUrl = "https://
       "@type": "ListItem",
       position: index + 1,
       name: item.label,
-      ...(item.href ? { item: `${baseUrl}${item.href}` } : {}),
+      ...(item.href ? { item: `${resolvedBase}${item.href}` } : {}),
     })),
   };
 }

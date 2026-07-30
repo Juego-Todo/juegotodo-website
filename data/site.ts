@@ -88,7 +88,7 @@ export const navItems: NavItem[] = [
     label: "Media",
     href: "/media",
     children: [
-      { label: "News", href: "/media" },
+      { label: "News", href: "/media#news" },
       { label: "Media Clips", href: "/media#clips" },
       { label: "Podcast", href: "/media#podcast" },
     ],
@@ -448,13 +448,6 @@ export const events: Event[] = [
     ticketCheckoutUrl: barrioBrawlsTicketCheckoutUrl,
     ticketProductSlug: barrioBrawlsTicketSlug,
   },
-];
-
-export const mediaReels = [
-  "Title fight finishes",
-  "Inside the Mandirigma camp",
-  "Weapon-to-empty-hand breakdown",
-  "Road to Ascension Manila",
 ];
 
 export const heroMainStats = [

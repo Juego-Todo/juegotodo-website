@@ -3,11 +3,9 @@ import { Suspense } from "react";
 import { FighterLicenseApplicationPage } from "@/components/profile/FighterLicenseApplicationPage";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { buildLicenseMetadata } from "@/lib/seo/license-meta";
 
-export const metadata: Metadata = {
-  title: "Fighter License Application",
-  description: "Submit your official Juego Todo Grand Council fighter license application for admin approval.",
-};
+export const metadata: Metadata = buildLicenseMetadata("fighter");
 
 export default function FighterLicenseApplicationRoutePage() {
   return (

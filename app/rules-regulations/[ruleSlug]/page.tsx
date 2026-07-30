@@ -22,6 +22,7 @@ import { PrevNextNav } from "@/components/PrevNextNav";
 import { getRulebook, rulebooks } from "@/data/rules";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
 import { getRulebookNeighbors } from "@/lib/navigation/prev-next";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
   params: Promise<{ ruleSlug: string }>;
@@ -39,10 +40,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  return {
-    title: rulebook.title,
+  return buildPageMetadata({
+    title: `${rulebook.title} | ${rulebook.division}`,
     description: rulebook.summary,
-  };
+    path: `/rules-regulations/${ruleSlug}`,
+    keywords: [rulebook.title, rulebook.division, "Juego Todo rules", "competition format"],
+  });
 }
 
 export default async function RulebookPage({ params }: PageProps) {

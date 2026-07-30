@@ -3,11 +3,9 @@ import { Suspense } from "react";
 import { RegisterForLicensePage } from "@/components/profile/RegisterForLicensePage";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { buildLicenseMetadata } from "@/lib/seo/license-meta";
 
-export const metadata: Metadata = {
-  title: "Register for a License",
-  description: "Submit your official Juego Todo membership license application for admin approval.",
-};
+export const metadata: Metadata = buildLicenseMetadata();
 
 export default function RegisterForLicenseRoutePage() {
   return (

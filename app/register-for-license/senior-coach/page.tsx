@@ -3,11 +3,9 @@ import { Suspense } from "react";
 import { SeniorCoachLicenseApplicationPage } from "@/components/profile/SeniorCoachLicenseApplicationPage";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { buildLicenseMetadata } from "@/lib/seo/license-meta";
 
-export const metadata: Metadata = {
-  title: "Senior Coach License Application",
-  description: "Submit your official Juego Todo Grand Council senior coach license application for admin approval.",
-};
+export const metadata: Metadata = buildLicenseMetadata("senior-coach");
 
 export default function SeniorCoachLicenseApplicationRoutePage() {
   return (

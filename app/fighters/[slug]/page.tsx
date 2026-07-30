@@ -7,6 +7,9 @@ import { PrevNextNav } from "@/components/PrevNextNav";
 import { getEnrichedFighter, getAllFighterSlugs } from "@/lib/fighters/profile";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
 import { getFighterNeighbors } from "@/lib/navigation/prev-next";
+import { personJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { JsonLd } from "@/components/JsonLd";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -24,10 +27,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  return {
-    title: `${fighter.name} "${fighter.nickname}"`,
-    description: fighter.highlight,
-  };
+  return buildPageMetadata({
+    title: `${fighter.name} "${fighter.nickname}" — ${fighter.division}`,
+    description: `${fighter.name} (${fighter.nickname}) is a ${fighter.division} Juego Todo fighter from ${fighter.gym}. Record ${fighter.record}. ${fighter.highlight}`,
+    path: `/fighters/${slug}`,
+    type: "profile",
+    keywords: [fighter.name, fighter.nickname, fighter.division, fighter.style, "LATAYANOLOGY"],
+  });
 }
 
 export default async function FighterPage({ params }: PageProps) {
@@ -44,6 +50,16 @@ export default async function FighterPage({ params }: PageProps) {
   return (
     <>
       <BreadcrumbJsonLd items={breadcrumbs} />
+      <JsonLd
+        data={personJsonLd({
+          name: fighter.name,
+          description: fighter.highlight,
+          url: `/fighters/${slug}`,
+          jobTitle: `${fighter.division} Fighter`,
+          affiliation: fighter.gym,
+          nationality: fighter.country,
+        })}
+      />
       <main className="px-4 pb-0 pt-24 sm:px-6 sm:pt-28 lg:px-8">
         <div className="mx-auto max-w-7xl pb-4">
           <PageNavigation categoryLabel="Latayanology" currentLabel={fighter.name} />

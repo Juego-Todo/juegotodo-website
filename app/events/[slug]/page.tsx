@@ -5,11 +5,15 @@ import { SaveEntityButton } from "@/components/commerce/SaveEntityButton";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
+import { JsonLd } from "@/components/JsonLd";
 import { PageNavigation } from "@/components/PageNavigation";
 import { PrevNextNav } from "@/components/PrevNextNav";
+import { getShopProduct } from "@/data/shop";
 import { events } from "@/data/site";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
 import { getEventNeighbors } from "@/lib/navigation/prev-next";
+import { eventJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -27,10 +31,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  return {
-    title: event.title,
-    description: `${event.mainEvent} at ${event.venue}.`,
-  };
+  const dateLabel = new Date(event.date).toLocaleDateString("en-PH", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "Asia/Manila",
+  });
+
+  return buildPageMetadata({
+    title: `${event.title} Tickets & Fight Card`,
+    description: `${event.mainEvent} on ${dateLabel} at ${event.venue}. Buy official Juego Todo tickets and view the fight card.`,
+    path: `/events/${slug}`,
+    image: event.imageSrc,
+    imageAlt: event.title,
+    keywords: [event.title, event.venue, "fight tickets", "Juego Todo event"],
+  });
 }
 
 export default async function EventPage({ params }: PageProps) {
@@ -44,10 +59,25 @@ export default async function EventPage({ params }: PageProps) {
   const eventTitle = event.title.replace("Juego Todo: ", "");
   const breadcrumbs = resolveBreadcrumbs(`/events/${slug}`, eventTitle);
   const neighbors = getEventNeighbors(slug);
+  const ticketProduct = event.ticketProductSlug ? getShopProduct(event.ticketProductSlug) : undefined;
 
   return (
     <>
       <BreadcrumbJsonLd items={breadcrumbs} />
+      <JsonLd
+        data={eventJsonLd({
+          name: event.title,
+          description: `${event.mainEvent} at ${event.venue}.`,
+          startDate: event.date,
+          venue: event.venue,
+          city: event.city,
+          image: event.imageSrc,
+          url: `/events/${slug}`,
+          ticketUrl: event.ticketCheckoutUrl ?? (event.ticketProductSlug ? `/shop/${event.ticketProductSlug}` : undefined),
+          price: ticketProduct?.priceAmount,
+          status: event.status,
+        })}
+      />
       <main className="px-4 pb-0 pt-24 sm:px-6 sm:pt-28 lg:px-8">
         <div className="mx-auto max-w-7xl pb-4">
           <PageNavigation currentLabel={eventTitle} />

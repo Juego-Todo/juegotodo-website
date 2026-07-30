@@ -20,6 +20,7 @@ import {
 } from "@/data/seminars";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
 import { getSeminarNeighbors } from "@/lib/navigation/prev-next";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
   params: Promise<{ seminarSlug: string }>;
@@ -37,10 +38,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  return {
-    title: seminar.title,
-    description: seminar.summary,
-  };
+  return buildPageMetadata({
+    title: `${seminar.title} | ${seminar.city}`,
+    description: `${seminar.summary} ${formatSeminarDate(seminar.date)} at ${seminar.venue}, ${seminar.city}.`,
+    path: `/juego-todo-seminars/${seminarSlug}`,
+    keywords: [seminar.title, seminar.city, "Juego Todo seminar", seminar.level],
+  });
 }
 
 export default async function SeminarDetailPage({ params }: PageProps) {

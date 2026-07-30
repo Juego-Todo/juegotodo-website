@@ -5,6 +5,8 @@ import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { pageContent, type PageSlug } from "@/data/site";
 import { getLegalPage, isLegalPageSlug } from "@/data/legal-pages";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { hubSeo } from "@/lib/seo/hub-meta";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -22,10 +24,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  return {
-    title: content.title,
-    description: isLegalPageSlug(slug) ? getLegalPage(slug)?.metaDescription ?? content.intro : content.intro,
-  };
+  const seo = hubSeo[slug as PageSlug];
+  const legalDescription = isLegalPageSlug(slug) ? getLegalPage(slug)?.metaDescription : undefined;
+
+  return buildPageMetadata({
+    title: seo?.title ?? content.title,
+    description: seo?.description ?? legalDescription ?? content.intro,
+    path: `/${slug}`,
+    image: seo?.image,
+    keywords: seo?.keywords,
+  });
 }
 
 export default async function Page({ params }: PageProps) {

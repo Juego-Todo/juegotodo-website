@@ -3,11 +3,9 @@ import { Suspense } from "react";
 import { RefereeLicenseApplicationPage } from "@/components/profile/RefereeLicenseApplicationPage";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { buildLicenseMetadata } from "@/lib/seo/license-meta";
 
-export const metadata: Metadata = {
-  title: "Referee License Application",
-  description: "Submit your official Juego Todo Grand Council referee license application for admin approval.",
-};
+export const metadata: Metadata = buildLicenseMetadata("referee");
 
 export default function RefereeLicenseApplicationRoutePage() {
   return (

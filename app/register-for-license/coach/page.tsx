@@ -3,11 +3,9 @@ import { Suspense } from "react";
 import { CoachLicenseApplicationPage } from "@/components/profile/CoachLicenseApplicationPage";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { buildLicenseMetadata } from "@/lib/seo/license-meta";
 
-export const metadata: Metadata = {
-  title: "Coach License Application",
-  description: "Submit your official Juego Todo Grand Council coach license application for admin approval.",
-};
+export const metadata: Metadata = buildLicenseMetadata("coach");
 
 export default function CoachLicenseApplicationRoutePage() {
   return (

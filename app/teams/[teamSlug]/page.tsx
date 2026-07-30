@@ -6,10 +6,13 @@ import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { PageNavigation } from "@/components/PageNavigation";
 import { TeamSaveButton } from "@/components/TeamsHub";
 import { getTeam, teams } from "@/data/teams";
+import { JsonLd } from "@/components/JsonLd";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
 import { getTeamNeighbors } from "@/lib/navigation/prev-next";
 import { PrevNextNav } from "@/components/PrevNextNav";
 import { teamCategoryLabels } from "@/data/teams";
+import { sportsTeamJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
   params: Promise<{ teamSlug: string }>;
@@ -23,7 +26,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { teamSlug } = await params;
   const team = getTeam(teamSlug);
   if (!team) return {};
-  return { title: team.name, description: team.summary };
+  return buildPageMetadata({
+    title: `${team.name} — ${team.region}`,
+    description: `${team.summary} Head coach ${team.headCoach}. Record ${team.record}.`,
+    path: `/teams/${teamSlug}`,
+    keywords: [team.name, team.region, teamCategoryLabels[team.category], "JTGC team"],
+  });
 }
 
 export default async function TeamProfilePage({ params }: PageProps) {
@@ -37,6 +45,15 @@ export default async function TeamProfilePage({ params }: PageProps) {
   return (
     <>
       <BreadcrumbJsonLd items={breadcrumbs} />
+      <JsonLd
+        data={sportsTeamJsonLd({
+          name: team.name,
+          description: team.summary,
+          url: `/teams/${teamSlug}`,
+          location: team.region,
+          coach: team.headCoach,
+        })}
+      />
       <main className="px-4 pb-0 pt-24 sm:px-6 sm:pt-28 lg:px-8">
         <div className="mx-auto max-w-7xl pb-4">
           <PageNavigation currentLabel={team.name} />

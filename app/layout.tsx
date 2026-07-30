@@ -1,9 +1,10 @@
-import type { Metadata, Viewport } from "next";
+import type { Viewport } from "next";
 import { Bebas_Neue, Inter, Space_Grotesk } from "next/font/google";
 import type { ReactNode } from "react";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { Providers } from "@/components/Providers";
+import { buildRootMetadata } from "@/lib/seo/metadata";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,27 +26,7 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Juego Todo | Filipino Combat Sports",
-    template: "%s | Juego Todo",
-  },
-  description:
-    "A cinematic, modern combat sports platform for Juego Todo and Filipino Martial Arts.",
-  metadataBase: new URL("https://juegotodo.com"),
-  openGraph: {
-    title: "Juego Todo | The World's First Weaponized Combat League",
-    description:
-      "Premium Filipino combat sports events, fighters, rankings, media, registration, and partnerships.",
-    siteName: "Juego Todo",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Juego Todo",
-    description: "The World's First Weaponized Combat League.",
-  },
-};
+export const metadata = buildRootMetadata();
 
 export const viewport: Viewport = {
   themeColor: "#050505",

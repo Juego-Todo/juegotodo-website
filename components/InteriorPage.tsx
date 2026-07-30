@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { ArrowRight, Download, Mail, MapPin, Play, ShieldCheck, Trophy, Users } from "lucide-react";
+import { ArrowRight, Download, Mail, MapPin, ShieldCheck, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -17,10 +17,10 @@ import { LegalPageContent } from "@/components/LegalPageContent";
 import { OrganizationalStructureSection } from "@/components/OrganizationalStructureSection";
 import { PageNavigation } from "@/components/PageNavigation";
 import { MotionSection } from "@/components/MotionSection";
+import { MediaHub } from "@/components/MediaHub";
 import { SeminarsHub } from "@/components/SeminarsHub";
 import {
   events,
-  mediaReels,
   pageContent,
   partners,
   type PageSlug,
@@ -68,7 +68,7 @@ export function InteriorPage({ slug }: { slug: PageSlug }) {
 
       {slug === "events" ? <EventsSection /> : null}
       {slug === "latayanology" ? <FighterDatabase /> : null}
-      {slug === "media" ? <MediaSection /> : null}
+      {slug === "media" ? <MediaHub /> : null}
       {slug === "shop" ? (
         <Suspense>
           <ShopPageClient />
@@ -139,34 +139,6 @@ function EventsSection() {
         </Link>
       ))}
       </div>
-    </MotionSection>
-  );
-}
-
-function MediaSection() {
-  return (
-    <MotionSection className="mx-auto max-w-7xl space-y-10 pb-14 sm:pb-20">
-      <section id="clips">
-        <p className="text-xs font-black uppercase tracking-[0.28em] text-[#FF1010]">Media Clips</p>
-        <div className="mt-5 grid gap-5 sm:grid-cols-2">
-          {mediaReels.map((reel) => (
-            <article className="group relative min-h-64 overflow-hidden rounded-[1.75rem] border border-white/10 bg-zinc-950 p-5 sm:min-h-80 sm:p-6" key={reel}>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(229,9,20,0.46),transparent_35%),linear-gradient(145deg,transparent,rgba(0,0,0,0.8))]" />
-              <Play className="relative z-10 rounded-full bg-red-600 p-4 text-white" size={64} aria-hidden />
-              <h2 className="font-display relative z-10 mt-24 text-4xl uppercase leading-none text-white sm:mt-32 sm:text-6xl">{reel}</h2>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="glass-panel rounded-[1.75rem] p-6 sm:p-8" id="podcast">
-        <p className="text-xs font-black uppercase tracking-[0.28em] text-[#FF1010]">Podcast</p>
-        <h2 className="font-display mt-3 text-4xl uppercase text-white sm:text-5xl">JTGC Audio</h2>
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
-          League interviews, fight-week breakdowns, and coach roundtables — podcast episodes publish here as the
-          broadcast library expands.
-        </p>
-      </section>
     </MotionSection>
   );
 }

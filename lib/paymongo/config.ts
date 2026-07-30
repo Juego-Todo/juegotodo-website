@@ -6,6 +6,8 @@
  * - PAYMONGO_WEBHOOK_SECRET  e.g. whsk_xxx (from `POST /v1/webhooks` or the dashboard)
  */
 
+import { getCanonicalSiteUrl } from "@/lib/seo/config";
+
 export function getPayMongoSecretKey(): string {
   return process.env.PAYMONGO_SECRET_KEY ?? "";
 }
@@ -19,8 +21,12 @@ export function isPayMongoConfigured(): boolean {
 }
 
 export function getSiteUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "http://localhost:3000"
-  );
+  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "");
+  if (fromEnv) {
+    return fromEnv;
+  }
+  if (process.env.NODE_ENV === "development") {
+    return "http://localhost:3000";
+  }
+  return getCanonicalSiteUrl();
 }

@@ -2,11 +2,16 @@ import type { Metadata } from "next";
 import { CalendarPage } from "@/components/CalendarPage";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Official Calendar",
-  description: "View the official Juego Todo fight calendar with upcoming cards, countdowns, and event results.",
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: "Official Fight Calendar",
+  description:
+    "View the official Juego Todo fight calendar with upcoming cards, countdowns, venues, and ticket links for Filipino combat sports events.",
+  path: "/calendar",
+  image: "/events/ugb46-juego-todo-proclamation-anniversary.png",
+  keywords: ["Juego Todo calendar", "fight schedule Philippines", "upcoming events"],
+});
 
 export default function CalendarRoutePage() {
   return (

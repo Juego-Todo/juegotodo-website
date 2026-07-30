@@ -3,11 +3,9 @@ import { Suspense } from "react";
 import { JudgeLicenseApplicationPage } from "@/components/profile/JudgeLicenseApplicationPage";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { buildLicenseMetadata } from "@/lib/seo/license-meta";
 
-export const metadata: Metadata = {
-  title: "Judge License Application",
-  description: "Submit your official Juego Todo Grand Council judge license application for admin approval.",
-};
+export const metadata: Metadata = buildLicenseMetadata("judge");
 
 export default function JudgeLicenseApplicationRoutePage() {
   return (

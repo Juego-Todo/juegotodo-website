@@ -3,12 +3,15 @@ import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ConsultationBookingPage } from "@/components/ConsultationPage";
 import { PageNavigation } from "@/components/PageNavigation";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Book Consultation",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Book a Consultation",
   description:
-    "Reserve a consultation slot and complete payment after choosing a calendar appointment.",
-};
+    "Reserve a Feng Shui, BaZi, or destiny consultation slot and complete payment after choosing your appointment.",
+  path: "/consultation/book",
+  keywords: ["book consultation", "Feng Shui appointment"],
+});
 
 export default function ConsultationBookingRoute() {
   return (

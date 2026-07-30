@@ -7,6 +7,7 @@ import { PageNavigation } from "@/components/PageNavigation";
 import { consultationServices, getConsultationService } from "@/data/consultations";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
   params: Promise<{ serviceSlug: string }>;
@@ -24,10 +25,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  return {
-    title: service.name,
-    description: service.description,
-  };
+  return buildPageMetadata({
+    title: `${service.name} Consultation`,
+    description: `${service.description} ${service.duration} session from ${formatCurrency(service.price)}.`,
+    path: `/consultation/${serviceSlug}`,
+    keywords: [service.name, "consultation", "Feng Shui", "BaZi"],
+  });
 }
 
 export default async function ConsultationServicePage({ params }: PageProps) {

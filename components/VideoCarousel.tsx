@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Play } from "lucide-react";
 import { useCallback, useState } from "react";
-import { YouTubeVideoPopup } from "@/components/YouTubeVideoPopup";
+import { YouTubeVideoPopup, YouTubeWatchChooser } from "@/components/YouTubeVideoPopup";
 import { featuredVideos, getYouTubeThumbnailFallbacks } from "@/data/featured-videos";
 
 function VideoThumbnail({ youtubeId, title }: { youtubeId: string; title: string }) {
@@ -27,9 +27,22 @@ function VideoThumbnail({ youtubeId, title }: { youtubeId: string; title: string
   );
 }
 
+type Featured = (typeof featuredVideos)[number];
+
+function toPopupVideo(video: Featured) {
+  return {
+    title: video.title,
+    youtubeId: video.youtubeId,
+    href: `https://www.youtube.com/watch?v=${video.youtubeId}`,
+    subtitle: video.subtitle,
+  };
+}
+
 export function VideoCarousel() {
-  const [activeVideo, setActiveVideo] = useState<(typeof featuredVideos)[number] | null>(null);
-  const closePopup = useCallback(() => setActiveVideo(null), []);
+  const [chooserVideo, setChooserVideo] = useState<Featured | null>(null);
+  const [playingVideo, setPlayingVideo] = useState<Featured | null>(null);
+  const closeChooser = useCallback(() => setChooserVideo(null), []);
+  const closePlayer = useCallback(() => setPlayingVideo(null), []);
 
   return (
     <section className="relative overflow-hidden border-t border-white/[0.08] bg-[#050505] py-16 sm:py-20">
@@ -48,7 +61,7 @@ export function VideoCarousel() {
               className="group relative min-w-[16rem] snap-start overflow-hidden rounded-[1.25rem] border border-white/[0.08] text-left transition hover:border-[#FF1010]/40 sm:min-w-0"
               initial={{ opacity: 0, y: 16 }}
               key={video.id}
-              onClick={() => setActiveVideo(video)}
+              onClick={() => setChooserVideo(video)}
               transition={{ delay: index * 0.05, duration: 0.5 }}
               type="button"
               viewport={{ once: true }}
@@ -67,25 +80,26 @@ export function VideoCarousel() {
                   {video.category}
                 </p>
                 <p className="mt-1 line-clamp-2 text-sm font-semibold leading-5 text-white">{video.title}</p>
-                <p className="mt-1 text-xs text-zinc-500">Tap to play</p>
+                <p className="mt-1 text-xs text-zinc-500">Watch here or on YouTube</p>
               </div>
             </motion.button>
           ))}
         </div>
       </div>
 
+      <YouTubeWatchChooser
+        onClose={closeChooser}
+        onWatchHere={() => {
+          if (chooserVideo) {
+            setPlayingVideo(chooserVideo);
+          }
+          setChooserVideo(null);
+        }}
+        video={chooserVideo ? toPopupVideo(chooserVideo) : null}
+      />
       <YouTubeVideoPopup
-        onClose={closePopup}
-        video={
-          activeVideo
-            ? {
-                title: activeVideo.title,
-                youtubeId: activeVideo.youtubeId,
-                href: `https://www.youtube.com/watch?v=${activeVideo.youtubeId}`,
-                subtitle: activeVideo.subtitle,
-              }
-            : null
-        }
+        onClose={closePlayer}
+        video={playingVideo ? toPopupVideo(playingVideo) : null}
       />
     </section>
   );

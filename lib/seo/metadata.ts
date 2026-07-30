@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import {
   SITE_DEFAULT_DESCRIPTION,
   SITE_DEFAULT_OG_IMAGE,
+  SITE_DEFAULT_TITLE,
   SITE_KEYWORDS,
   SITE_LOCALE,
+  SITE_LOGO,
   SITE_NAME,
   SITE_TAGLINE,
   absoluteUrl,
@@ -22,7 +24,7 @@ export type BuildPageMetadataInput = {
   noIndex?: boolean;
 };
 
-function truncateDescription(value: string, max = 160): string {
+function truncateDescription(value: string, max = 155): string {
   const normalized = value.replace(/\s+/g, " ").trim();
   if (normalized.length <= max) {
     return normalized;
@@ -77,10 +79,11 @@ export function buildRootMetadata(): Metadata {
   const siteUrl = getCanonicalSiteUrl();
   const description = SITE_DEFAULT_DESCRIPTION;
   const imageUrl = absoluteUrl(SITE_DEFAULT_OG_IMAGE);
+  const logoUrl = absoluteUrl(SITE_LOGO);
 
   return {
     title: {
-      default: `${SITE_NAME} | Filipino Combat Sports`,
+      default: SITE_DEFAULT_TITLE,
       template: `%s | ${SITE_NAME}`,
     },
     description,
@@ -95,7 +98,7 @@ export function buildRootMetadata(): Metadata {
       canonical: "/",
     },
     openGraph: {
-      title: `${SITE_NAME} | ${SITE_TAGLINE}`,
+      title: SITE_DEFAULT_TITLE,
       description,
       url: siteUrl,
       siteName: SITE_NAME,
@@ -104,12 +107,19 @@ export function buildRootMetadata(): Metadata {
       images: [{ url: imageUrl, width: 1200, height: 630, alt: `${SITE_NAME} — ${SITE_TAGLINE}` }],
     },
     icons: {
-      icon: "/gab-sanctioned.png",
-      apple: "/gab-sanctioned.png",
+      icon: [
+        { url: "/favicon.png", sizes: "48x48", type: "image/png" },
+        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+        { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+        { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      ],
+      apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+      shortcut: "/favicon-48x48.png",
     },
     twitter: {
       card: "summary_large_image",
-      title: `${SITE_NAME} | ${SITE_TAGLINE}`,
+      title: SITE_DEFAULT_TITLE,
       description,
       images: [imageUrl],
     },
@@ -123,6 +133,9 @@ export function buildRootMetadata(): Metadata {
         "max-snippet": -1,
         "max-video-preview": -1,
       },
+    },
+    other: {
+      "og:logo": logoUrl,
     },
   };
 }

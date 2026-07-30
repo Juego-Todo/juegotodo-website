@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { JsonLd } from "@/components/JsonLd";
-import { YouTubeVideoPopup } from "@/components/YouTubeVideoPopup";
+import { YouTubeVideoPopup, YouTubeWatchChooser } from "@/components/YouTubeVideoPopup";
 import { newsArticles, mediaClips, podcastEpisodes } from "@/data/media-assets";
 import { getYouTubeThumbnailFallbacks } from "@/data/featured-videos";
 import { mediaHubJsonLd } from "@/lib/seo/json-ld";
@@ -187,12 +187,14 @@ function VideoChannel({
   videos: VideoItem[];
   emptyLabel: string;
 }) {
-  const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
+  const [chooserVideo, setChooserVideo] = useState<VideoItem | null>(null);
+  const [playingVideo, setPlayingVideo] = useState<VideoItem | null>(null);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
 
   const visibleVideos = useMemo(() => videos.slice(0, visibleCount), [videos, visibleCount]);
   const hasMore = visibleCount < videos.length;
-  const closePopup = useCallback(() => setActiveVideo(null), []);
+  const closeChooser = useCallback(() => setChooserVideo(null), []);
+  const closePlayer = useCallback(() => setPlayingVideo(null), []);
 
   if (videos.length === 0) {
     return null;
@@ -210,7 +212,7 @@ function VideoChannel({
           <button
             className="group overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] text-left transition hover:border-[#FF1010]/35 hover:bg-white/[0.05] active:scale-[0.99]"
             key={video.id}
-            onClick={() => setActiveVideo(video)}
+            onClick={() => setChooserVideo(video)}
             type="button"
           >
             <div className="relative aspect-video overflow-hidden bg-zinc-950">
@@ -226,7 +228,7 @@ function VideoChannel({
             </div>
             <div className="px-3.5 py-3">
               <p className="line-clamp-2 text-sm font-semibold leading-snug text-white">{video.title}</p>
-              <p className="mt-1 text-xs font-medium text-zinc-500">Tap to play</p>
+              <p className="mt-1 text-xs font-medium text-zinc-500">Watch here or on YouTube</p>
             </div>
           </button>
         ))}
@@ -242,7 +244,17 @@ function VideoChannel({
         </button>
       ) : null}
 
-      <YouTubeVideoPopup onClose={closePopup} video={activeVideo} />
+      <YouTubeWatchChooser
+        onClose={closeChooser}
+        onWatchHere={() => {
+          if (chooserVideo) {
+            setPlayingVideo(chooserVideo);
+          }
+          setChooserVideo(null);
+        }}
+        video={chooserVideo}
+      />
+      <YouTubeVideoPopup onClose={closePlayer} video={playingVideo} />
     </div>
   );
 }

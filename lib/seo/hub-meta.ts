@@ -15,7 +15,7 @@ export const hubSeo: Record<
   media: {
     title: "News, Media Clips & Goatism Podcast",
     description:
-      "Official Juego Todo media hub — press articles, YouTube fight highlights, Barrio Brawls clips, and Goatism podcast episodes. Newest coverage first.",
+      "Official Juego Todo media — fight news, YouTube highlights, Barrio Brawls clips, and Goatism podcast episodes.",
     keywords: [
       "Juego Todo news",
       "fight highlights",

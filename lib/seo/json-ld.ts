@@ -1,17 +1,25 @@
-import { absoluteUrl, SITE_DEFAULT_DESCRIPTION, SITE_NAME, SITE_SOCIAL, SITE_TAGLINE } from "@/lib/seo/config";
+import { absoluteUrl, SITE_DEFAULT_DESCRIPTION, SITE_LOGO, SITE_NAME, SITE_SOCIAL, SITE_TAGLINE } from "@/lib/seo/config";
 
 export type JsonLdValue = Record<string, unknown> | Record<string, unknown>[];
 
 export function organizationJsonLd() {
+  const logoUrl = absoluteUrl(SITE_LOGO);
   return {
     "@context": "https://schema.org",
     "@type": ["SportsOrganization", "Organization"],
     name: SITE_NAME,
-    alternateName: ["JTGC", "Juego Todo Grand Council"],
+    legalName: "Juego Todo",
+    alternateName: ["JTGC", "Juego Todo Grand Council", "juegotodo.org"],
     description: SITE_DEFAULT_DESCRIPTION,
     slogan: SITE_TAGLINE,
     url: absoluteUrl("/"),
-    logo: absoluteUrl("/gab-sanctioned.png"),
+    logo: {
+      "@type": "ImageObject",
+      url: logoUrl,
+      width: 512,
+      height: 512,
+      caption: SITE_NAME,
+    },
     image: absoluteUrl("/hero-background.png"),
     email: "operations@juegotodo.com",
     areaServed: {
@@ -27,13 +35,22 @@ export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${absoluteUrl("/")}/#website`,
     name: SITE_NAME,
+    alternateName: ["Juego Todo Combat Sports", "juegotodo.org"],
     url: absoluteUrl("/"),
     description: SITE_DEFAULT_DESCRIPTION,
+    inLanguage: "en-PH",
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,
       url: absoluteUrl("/"),
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl(SITE_LOGO),
+        width: 512,
+        height: 512,
+      },
     },
     potentialAction: {
       "@type": "SearchAction",

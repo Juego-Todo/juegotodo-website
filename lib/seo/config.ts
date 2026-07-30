@@ -4,9 +4,19 @@
  */
 export const SITE_NAME = "Juego Todo";
 export const SITE_TAGLINE = "The World's First Weaponized Combat League";
+
+/** Homepage / default <title> — keep ~50–60 characters for Google. */
+export const SITE_DEFAULT_TITLE = "Juego Todo | Filipino Combat Sports League";
+
+/**
+ * Meta description — front-load brand + value, keep under ~155 chars so Google
+ * does not truncate mid-sentence or replace it with on-page copy.
+ */
 export const SITE_DEFAULT_DESCRIPTION =
-  "Official Juego Todo platform for Filipino combat sports — live events, tickets, fighter rankings, seminars, official gear, and JTGC licensing.";
+  "Official home of Juego Todo — Filipino weaponized combat sports. Watch events, buy tickets, follow fighters, and shop official JT gear.";
+
 export const SITE_DEFAULT_OG_IMAGE = "/hero-background.png";
+export const SITE_LOGO = "/juego-todo-logo.png";
 export const SITE_LOCALE = "en_PH";
 
 export const SITE_SOCIAL = {
@@ -23,6 +33,7 @@ export const SITE_KEYWORDS = [
   "weaponized combat sports",
   "JTGC",
   "UGB46",
+  "Barrio Brawls",
   "Philippines combat sports",
   "fight tickets Philippines",
 ] as const;

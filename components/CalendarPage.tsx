@@ -520,7 +520,7 @@ export function CalendarPage() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Juego Todo</p>
-              <h1 className="font-display mt-3 text-[clamp(3.25rem,15vw,5.35rem)] uppercase leading-[0.9] text-white sm:text-7xl lg:text-8xl">
+              <h1 className="font-display mt-3 text-[clamp(2.5rem,11vw,5.35rem)] uppercase leading-[0.9] text-white sm:text-7xl lg:text-8xl">
                 Official Calendar
               </h1>
               <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300 sm:mt-7 sm:text-xl sm:leading-8">

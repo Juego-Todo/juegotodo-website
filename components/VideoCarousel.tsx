@@ -15,6 +15,8 @@ function VideoThumbnail({ youtubeId, title }: { youtubeId: string; title: string
       alt=""
       aria-hidden
       className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+      decoding="async"
+      loading="lazy"
       onError={() => {
         setSrcIndex((current) => (current < fallbacks.length - 1 ? current + 1 : current));
       }}
@@ -34,7 +36,7 @@ export function VideoCarousel() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Broadcast Library</p>
-          <h2 className="font-display mt-3 text-5xl uppercase leading-none text-white sm:text-7xl">
+          <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-6xl">
             Featured Videos
           </h2>
         </div>
@@ -45,6 +47,7 @@ export function VideoCarousel() {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
               className="absolute inset-0 h-full w-full"
+              loading="lazy"
               src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?rel=0&modestbranding=1`}
               title={activeVideo.title}
             />

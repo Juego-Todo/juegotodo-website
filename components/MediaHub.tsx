@@ -46,6 +46,8 @@ function YouTubeThumbnail({ youtubeId, title, className }: { youtubeId: string; 
       alt=""
       aria-hidden
       className={className ?? "h-full w-full object-cover"}
+      decoding="async"
+      loading="lazy"
       onError={() => setSrcIndex((current) => (current < fallbacks.length - 1 ? current + 1 : current))}
       src={fallbacks[srcIndex]}
       title={title}
@@ -206,6 +208,7 @@ function VideoChannel({
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             className="absolute inset-0 h-full w-full"
+            loading="lazy"
             src={`https://www.youtube.com/embed/${activeVideo.youtubeId}?rel=0&modestbranding=1&playsinline=1`}
             title={activeVideo.title}
           />

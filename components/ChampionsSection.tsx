@@ -14,7 +14,7 @@ export function ChampionsSection() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Championship Legacy</p>
-            <h2 className="font-display mt-3 text-5xl uppercase leading-none text-white sm:text-7xl lg:text-8xl">
+            <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-6xl lg:text-7xl">
               Juego Todo Champions
             </h2>
             <p className="mt-4 max-w-xl text-base leading-7 text-zinc-400">
@@ -65,7 +65,7 @@ export function ChampionsSection() {
                     <>
                       <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(0,0,0,0.85))]" />
                       <div className="flex h-full flex-col items-center justify-end p-5 text-center">
-                        <span className="font-display text-6xl uppercase leading-none text-white/90 transition group-hover:scale-105">
+                        <span className="font-display text-5xl uppercase leading-none text-white/90 transition group-hover:scale-105 sm:text-6xl">
                           {champion.initials}
                         </span>
                         <p className="mt-3 text-[0.65rem] font-black uppercase tracking-[0.22em] text-[#FF1010]">Champion</p>
@@ -75,7 +75,7 @@ export function ChampionsSection() {
                 </div>
 
                 <div className="mt-5 text-center">
-                  <h3 className="font-display text-4xl uppercase leading-none text-white">{champion.name}</h3>
+                  <h3 className="font-display text-3xl uppercase leading-none text-white sm:text-4xl">{champion.name}</h3>
                   <p className="mt-3 text-sm font-semibold uppercase tracking-[0.14em] text-zinc-400">
                     {champion.crownedDate}
                   </p>

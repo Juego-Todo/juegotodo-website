@@ -18,7 +18,7 @@ export function FighterProfileView({ fighter }: { fighter: EnrichedFighterProfil
           </span>
           <div className="mt-36 sm:mt-56">
             <p className="text-sm font-black uppercase tracking-[0.3em] text-red-200">{fighter.nickname}</p>
-            <h1 className="font-display mt-3 text-6xl uppercase leading-none text-white sm:text-8xl">{fighter.name}</h1>
+            <h1 className="font-display mt-3 text-[clamp(2.5rem,11vw,3.75rem)] uppercase leading-none text-white sm:text-8xl">{fighter.name}</h1>
           </div>
         </div>
 

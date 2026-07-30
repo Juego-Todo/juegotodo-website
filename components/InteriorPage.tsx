@@ -47,8 +47,8 @@ export function InteriorPage({ slug }: { slug: PageSlug }) {
           <PageNavigation />
           <h1 className={`font-display mt-3 uppercase leading-[0.9] text-white sm:mt-4 ${
             isRulesPage || isLegalPage
-              ? "text-[clamp(2.75rem,12vw,4.5rem)] sm:text-6xl lg:text-7xl"
-              : "text-[clamp(3.25rem,15vw,5.35rem)] sm:text-7xl lg:text-8xl"
+              ? "text-[clamp(2.25rem,10vw,4.5rem)] sm:text-6xl lg:text-7xl"
+              : "text-[clamp(2.5rem,11vw,5.35rem)] sm:text-7xl lg:text-8xl"
           }`}>
             {content.title}
           </h1>

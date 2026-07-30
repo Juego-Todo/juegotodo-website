@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { footerLegalLinks, footerNavColumns, socialLinks } from "@/data/site";
 
@@ -12,7 +10,7 @@ const footerColumns = [
 ];
 
 function SocialIcon({ label }: { label: string }) {
-  const className = "h-3.5 w-3.5";
+  const className = "h-4 w-4";
 
   switch (label) {
     case "Instagram":
@@ -56,10 +54,10 @@ export function Footer() {
             {footerColumns.map((column) => (
               <div key={column.title}>
                 <h3 className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-white">{column.title}</h3>
-                <div className="mt-3 grid gap-2">
+                <div className="mt-2 grid gap-0.5">
                   {column.links.map((link) => (
                     <Link
-                      className="text-xs font-medium text-zinc-500 transition hover:translate-x-0.5 hover:text-white"
+                      className="inline-flex min-h-10 items-center text-[0.8125rem] font-medium text-zinc-500 transition hover:translate-x-0.5 hover:text-white sm:min-h-9 sm:text-xs"
                       href={link.href}
                       key={`${column.title}-${link.href}`}
                     >
@@ -72,10 +70,10 @@ export function Footer() {
 
             <div>
               <h3 className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-white">Follow The League</h3>
-              <div className="mt-3 grid gap-2">
+              <div className="mt-2 grid gap-0.5">
                 {socialLinks.map((social) => (
                   <a
-                    className="group/social inline-flex items-center gap-2 text-xs font-medium text-zinc-500 transition hover:text-white"
+                    className="group/social inline-flex min-h-10 items-center gap-2.5 text-[0.8125rem] font-medium text-zinc-500 transition hover:text-white sm:min-h-9 sm:text-xs"
                     href={social.href}
                     key={social.label}
                     rel="noreferrer"

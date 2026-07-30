@@ -66,6 +66,7 @@ export function SignatureSystemSection() {
         alt="Juego Todo arena atmosphere"
         className="absolute inset-0 -z-20 h-full w-full object-cover opacity-35"
         fill
+        quality={55}
         sizes="100vw"
         src="/hero-background.png"
       />

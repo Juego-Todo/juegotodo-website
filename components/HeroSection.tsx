@@ -30,6 +30,7 @@ export function HeroSection() {
             fill
             loading="eager"
             priority
+            quality={65}
             sizes="100vw"
             src="/juego-todo-event-background.png"
           />
@@ -99,7 +100,7 @@ export function HeroSection() {
                     alt={`${heroFeaturedEvent.series} ${heroFeaturedEvent.title} official event poster`}
                     className="object-cover object-center"
                     fill
-                    priority
+                    loading="eager"
                     sizes="(max-width: 640px) 72vw, (max-width: 1024px) 85vw, 27rem"
                     src={heroFeaturedEvent.posterSrc}
                   />

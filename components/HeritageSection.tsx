@@ -18,7 +18,7 @@ export function HeritageSection() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Filipino Heritage</p>
-          <h2 className="font-display mt-3 text-5xl uppercase leading-none text-white sm:text-7xl lg:text-8xl">
+          <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-6xl lg:text-7xl">
             The Legacy of Filipino Martial Arts
           </h2>
           <p className="mt-5 text-base leading-8 text-zinc-400 sm:text-lg">
@@ -45,7 +45,7 @@ export function HeritageSection() {
                   <div className="grid gap-4 p-5 sm:grid-cols-[0.35fr_1fr] sm:p-6">
                     <div>
                       <p className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-zinc-500">{era.period}</p>
-                      <h3 className="font-display mt-2 text-4xl uppercase leading-none text-white">{era.era}</h3>
+                      <h3 className="font-display mt-2 text-3xl uppercase leading-none text-white sm:text-4xl">{era.era}</h3>
                     </div>
                     <p className="text-sm leading-7 text-zinc-400 sm:text-base">{era.description}</p>
                   </div>

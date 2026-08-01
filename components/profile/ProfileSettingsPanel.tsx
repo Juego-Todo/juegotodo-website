@@ -152,7 +152,7 @@ export function ProfileSettingsPanel({
             type="button"
           >
             <LogOut className="mr-2" size={16} aria-hidden />
-            Logout
+            Sign Out
           </button>
         </div>
       </form>

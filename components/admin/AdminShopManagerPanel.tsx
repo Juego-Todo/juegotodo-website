@@ -1,7 +1,10 @@
 "use client";
 
 import {
+  ArrowDown,
   ArrowLeft,
+  ArrowUp,
+  ArrowUpDown,
   ChevronRight,
   Layers,
   Minus,
@@ -28,6 +31,61 @@ import {
 import { shopCategoryLabels, type ShopCategory } from "@/lib/commerce/types";
 
 type ShopView = "products" | "orders";
+type ProductSortKey = "name" | "category" | "price" | "variants" | "stock";
+type SortDirection = "asc" | "desc";
+
+function variantOptionCount(product: ShopProduct) {
+  return product.variantGroups?.reduce((sum, group) => sum + group.options.length, 0) ?? 0;
+}
+
+function compareProducts(a: ShopProduct, b: ShopProduct, key: ProductSortKey) {
+  switch (key) {
+    case "category":
+      return shopCategoryLabels[a.category].localeCompare(shopCategoryLabels[b.category]);
+    case "price":
+      return a.priceAmount - b.priceAmount;
+    case "variants":
+      return variantOptionCount(a) - variantOptionCount(b);
+    case "stock":
+      return a.stock - b.stock;
+    case "name":
+    default:
+      return a.name.localeCompare(b.name);
+  }
+}
+
+function SortHeaderButton({
+  label,
+  sortKey,
+  activeKey,
+  direction,
+  align = "left",
+  onSort,
+}: {
+  label: string;
+  sortKey: ProductSortKey;
+  activeKey: ProductSortKey;
+  direction: SortDirection;
+  align?: "left" | "right";
+  onSort: (key: ProductSortKey) => void;
+}) {
+  const active = activeKey === sortKey;
+  const Icon = !active ? ArrowUpDown : direction === "asc" ? ArrowUp : ArrowDown;
+
+  return (
+    <button
+      aria-label={`Sort by ${label}${active ? `, ${direction === "asc" ? "ascending" : "descending"}` : ""}`}
+      className={`inline-flex items-center gap-1.5 transition hover:text-white ${
+        align === "right" ? "justify-self-end" : ""
+      } ${active ? "text-white" : "text-zinc-500"}`}
+      onClick={() => onSort(sortKey)}
+      type="button"
+    >
+      <span>{label}</span>
+      <Icon size={12} aria-hidden />
+    </button>
+  );
+}
 
 const categories = Object.keys(shopCategoryLabels) as ShopCategory[];
 
@@ -612,6 +670,8 @@ export function AdminShopManagerPanel({ initialView = "orders" }: { initialView?
   const [products, setProducts] = useState<ShopProduct[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ShopCategory | "all">("all");
+  const [sortKey, setSortKey] = useState<ProductSortKey>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [editor, setEditor] = useState<{ slug?: string; form: EditorForm } | null>(null);
 
   function refresh() {
@@ -627,9 +687,18 @@ export function AdminShopManagerPanel({ initialView = "orders" }: { initialView?
     setView(initialView);
   }, [initialView]);
 
+  function handleSort(key: ProductSortKey) {
+    if (sortKey === key) {
+      setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
+      return;
+    }
+    setSortKey(key);
+    setSortDirection(key === "name" || key === "category" ? "asc" : "desc");
+  }
+
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    return products
+    const next = products
       .filter((product) => category === "all" || product.category === category)
       .filter((product) => {
         if (!normalized) return true;
@@ -638,8 +707,12 @@ export function AdminShopManagerPanel({ initialView = "orders" }: { initialView?
           .toLowerCase()
           .includes(normalized);
       })
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [products, query, category]);
+      .sort((a, b) => {
+        const result = compareProducts(a, b, sortKey);
+        return sortDirection === "asc" ? result : -result;
+      });
+    return next;
+  }, [products, query, category, sortKey, sortDirection]);
 
   const lowStock = products.filter((product) => product.stock > 0 && product.stock <= 5).length;
   const outOfStock = products.filter((product) => product.stock <= 0).length;
@@ -738,6 +811,26 @@ export function AdminShopManagerPanel({ initialView = "orders" }: { initialView?
                 </option>
               ))}
             </select>
+            <select
+              aria-label="Sort products"
+              className="rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none ring-red-500/30 focus:ring-2 sm:hidden"
+              onChange={(event) => {
+                const value = event.target.value as `${ProductSortKey}:${SortDirection}`;
+                const [key, direction] = value.split(":") as [ProductSortKey, SortDirection];
+                setSortKey(key);
+                setSortDirection(direction);
+              }}
+              value={`${sortKey}:${sortDirection}`}
+            >
+              <option value="name:asc">Name A–Z</option>
+              <option value="name:desc">Name Z–A</option>
+              <option value="category:asc">Category A–Z</option>
+              <option value="price:asc">Price: low to high</option>
+              <option value="price:desc">Price: high to low</option>
+              <option value="variants:desc">Most variants</option>
+              <option value="stock:asc">Stock: low to high</option>
+              <option value="stock:desc">Stock: high to low</option>
+            </select>
             <button
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FF1010] px-5 py-2.5 text-[0.62rem] font-black uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2a2a]"
               onClick={() => setEditor({ form: emptyForm })}
@@ -749,13 +842,43 @@ export function AdminShopManagerPanel({ initialView = "orders" }: { initialView?
           </div>
 
           <div className="overflow-hidden rounded-[1.5rem] border border-white/10">
-            <div className="hidden grid-cols-[minmax(0,1.6fr)_1fr_0.7fr_0.7fr_0.9fr_auto] gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-3 text-[0.58rem] font-black uppercase tracking-[0.14em] text-zinc-500 sm:grid">
-              <span>Product</span>
-              <span>Category</span>
-              <span>Price</span>
-              <span>Variants</span>
-              <span>Stock</span>
-              <span className="text-right">Actions</span>
+            <div className="hidden grid-cols-[minmax(0,1.6fr)_1fr_0.7fr_0.7fr_0.9fr_auto] gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-3 text-[0.58rem] font-black uppercase tracking-[0.14em] sm:grid">
+              <SortHeaderButton
+                activeKey={sortKey}
+                direction={sortDirection}
+                label="Product"
+                onSort={handleSort}
+                sortKey="name"
+              />
+              <SortHeaderButton
+                activeKey={sortKey}
+                direction={sortDirection}
+                label="Category"
+                onSort={handleSort}
+                sortKey="category"
+              />
+              <SortHeaderButton
+                activeKey={sortKey}
+                direction={sortDirection}
+                label="Price"
+                onSort={handleSort}
+                sortKey="price"
+              />
+              <SortHeaderButton
+                activeKey={sortKey}
+                direction={sortDirection}
+                label="Variants"
+                onSort={handleSort}
+                sortKey="variants"
+              />
+              <SortHeaderButton
+                activeKey={sortKey}
+                direction={sortDirection}
+                label="Stock"
+                onSort={handleSort}
+                sortKey="stock"
+              />
+              <span className="justify-self-end text-zinc-500">Actions</span>
             </div>
 
             {filtered.length === 0 ? (
@@ -763,8 +886,7 @@ export function AdminShopManagerPanel({ initialView = "orders" }: { initialView?
             ) : (
               <ul className="divide-y divide-white/5">
                 {filtered.map((product) => {
-                  const variantCount =
-                    product.variantGroups?.reduce((sum, group) => sum + group.options.length, 0) ?? 0;
+                  const variantCount = variantOptionCount(product);
                   return (
                     <li
                       className="grid gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1.6fr)_1fr_0.7fr_0.7fr_0.9fr_auto] sm:items-center"

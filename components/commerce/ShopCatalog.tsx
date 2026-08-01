@@ -8,15 +8,33 @@ import { ShopProductCard } from "@/components/commerce/ShopProductCard";
 import { productHasPhoto, shopProducts, type ShopProduct } from "@/data/shop";
 import { getPublicShopProducts, subscribeCatalogChanges } from "@/lib/commerce/catalog-store";
 import { bestSellerSlugs } from "@/lib/commerce/product-visuals";
-import { getShopCollection, matchesShopCollection, type ShopCollectionId } from "@/lib/commerce/shop-collections";
+import {
+  getShopCollection,
+  matchesShopCollection,
+  shopCollections,
+  type ShopCollectionId,
+} from "@/lib/commerce/shop-collections";
 import type { ShopCategory } from "@/lib/commerce/types";
 
 type ShopCatalogProps = {
   activeCategory: ShopCategory | "all";
   activeCollection: ShopCollectionId;
+  onCollectionSelect?: (collectionId: ShopCollectionId) => void;
 };
 
-export function ShopCatalog({ activeCategory, activeCollection }: ShopCatalogProps) {
+const mobileChips: { id: ShopCollectionId; label: string }[] = [
+  { id: "all", label: "All" },
+  ...shopCollections.map((collection) => ({
+    id: collection.id,
+    label: collection.displayTitle,
+  })),
+];
+
+export function ShopCatalog({
+  activeCategory,
+  activeCollection,
+  onCollectionSelect,
+}: ShopCatalogProps) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"featured" | "price-asc" | "price-desc">("featured");
   const [catalog, setCatalog] = useState<ShopProduct[]>(() => shopProducts.filter(productHasPhoto));
@@ -62,31 +80,42 @@ export function ShopCatalog({ activeCategory, activeCollection }: ShopCatalogPro
   }, [activeCategory, activeCollection, catalog, query, sort]);
 
   return (
-    <MotionSection className="mt-7 border-t border-white/[0.06] pb-28 pt-7 sm:mt-9 sm:pb-32 sm:pt-9" id="full-catalog">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="font-display text-2xl font-normal uppercase text-white sm:text-3xl">All Products</h2>
+    <MotionSection className="mt-3 pb-28 pt-2 sm:mt-9 sm:border-t sm:border-white/[0.06] sm:pb-32 sm:pt-9" id="full-catalog">
+      <div className="mb-2 flex items-center justify-between gap-2 sm:mb-0 sm:flex-col sm:items-stretch sm:gap-2 md:flex-row md:items-end md:justify-between">
+        <h2 className="text-sm font-bold uppercase tracking-[0.12em] text-zinc-300 sm:font-display sm:text-3xl sm:font-normal sm:tracking-normal sm:text-white">
+          {activeCollectionMeta ? activeCollectionMeta.label : "All Products"}
+          <span className="ml-2 font-semibold normal-case tracking-normal text-zinc-500 sm:hidden">
+            ({filteredProducts.length})
+          </span>
+        </h2>
         {activeCollectionMeta ? (
-          <p className="text-xs text-zinc-400 sm:text-sm">
+          <p className="hidden text-sm text-zinc-400 sm:block">
             Showing <span className="font-semibold text-white">{activeCollectionMeta.label}</span>
           </p>
         ) : null}
       </div>
 
-      <div className="mb-5 mt-5 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5 sm:mb-6 sm:mt-6 sm:p-3">
-        <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:thin]">
-          <label className="relative block min-w-[8rem] flex-1">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500" size={14} aria-hidden />
+      {/* Mobile sticky search + category chips (Lazada-style) */}
+      <div className="sticky top-[4.25rem] z-30 -mx-4 mb-3 border-b border-white/[0.06] bg-[#050505]/95 px-4 py-2.5 backdrop-blur-md sm:static sm:mx-0 sm:mb-6 sm:mt-6 sm:rounded-xl sm:border sm:border-white/[0.06] sm:bg-white/[0.02] sm:p-3 sm:backdrop-blur-none">
+        <div className="flex items-center gap-2">
+          <label className="relative block min-w-0 flex-1">
+            <Search
+              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500"
+              size={14}
+              aria-hidden
+            />
             <input
-              className="w-full rounded-lg border border-white/10 bg-black/40 py-2 pl-8 pr-2.5 text-xs text-white outline-none ring-red-500/40 placeholder:text-zinc-500 focus:ring-2 sm:text-sm"
+              className="w-full rounded-lg border border-white/10 bg-black/50 py-2 pl-8 pr-2.5 text-sm text-white outline-none ring-red-500/40 placeholder:text-zinc-500 focus:ring-2"
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search products..."
+              type="search"
               value={query}
             />
           </label>
 
           <select
             aria-label="Sort products"
-            className="h-9 shrink-0 rounded-lg border border-white/10 bg-black/40 px-2.5 text-xs text-white outline-none ring-red-500/40 focus:ring-2 sm:text-sm"
+            className="h-10 shrink-0 rounded-lg border border-white/10 bg-black/50 px-2.5 text-xs text-white outline-none ring-red-500/40 focus:ring-2 sm:text-sm"
             onChange={(event) => setSort(event.target.value as typeof sort)}
             value={sort}
           >
@@ -95,22 +124,45 @@ export function ShopCatalog({ activeCategory, activeCollection }: ShopCatalogPro
             <option value="price-desc">Price ↓</option>
           </select>
         </div>
+
+        {onCollectionSelect ? (
+          <div className="-mx-1 mt-2.5 flex gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
+            {mobileChips.map((chip) => {
+              const isActive = activeCollection === chip.id;
+              return (
+                <button
+                  aria-current={isActive ? "true" : undefined}
+                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] transition ${
+                    isActive
+                      ? "bg-[#FF1010] text-white"
+                      : "border border-white/10 bg-white/[0.04] text-zinc-300"
+                  }`}
+                  key={chip.id}
+                  onClick={() => onCollectionSelect(chip.id)}
+                  type="button"
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
 
       {filteredProducts.length === 0 ? (
-        <div className="glass-panel rounded-[1.75rem] p-8 text-center">
-          <p className="font-display text-4xl uppercase text-white">No Gear Found</p>
-          <p className="mt-3 text-sm text-zinc-400">Try another search term or collection filter.</p>
+        <div className="rounded-xl border border-white/10 px-5 py-10 text-center sm:rounded-[1.75rem] sm:p-8">
+          <p className="text-base font-semibold text-white sm:font-display sm:text-4xl sm:uppercase">No products found</p>
+          <p className="mt-2 text-sm text-zinc-400">Try another search or category.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-5">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-5">
           {filteredProducts.map((product, index) => (
             <motion.div
               animate={{ opacity: 1, y: 0 }}
               className="h-full"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               key={product.slug}
-              transition={{ delay: index * 0.03, duration: 0.35 }}
+              transition={{ delay: Math.min(index * 0.02, 0.2), duration: 0.3 }}
             >
               <ShopProductCard product={product} />
             </motion.div>

@@ -40,8 +40,15 @@ function ShopCatalogWithParams() {
 
   return (
     <>
-      <ShopCollectionButtons activeCollection={activeCollection} onSelect={handleCollectionSelect} />
-      <ShopCatalog activeCategory={activeCategory} activeCollection={activeCollection} />
+      {/* Desktop/tablet visual collections; mobile chips live in the sticky catalog toolbar */}
+      <div className="hidden md:block">
+        <ShopCollectionButtons activeCollection={activeCollection} onSelect={handleCollectionSelect} />
+      </div>
+      <ShopCatalog
+        activeCategory={activeCategory}
+        activeCollection={activeCollection}
+        onCollectionSelect={handleCollectionSelect}
+      />
     </>
   );
 }
@@ -51,8 +58,8 @@ export function ShopPageClient() {
     <>
       <ShopHero />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Suspense fallback={<div className="mt-10 h-40 animate-pulse rounded-lg bg-white/[0.03]" />}>
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <Suspense fallback={<div className="mt-6 h-40 animate-pulse rounded-lg bg-white/[0.03] sm:mt-10" />}>
           <ShopCatalogWithParams />
         </Suspense>
       </div>

@@ -18,12 +18,14 @@ import {
   type LicenseApplication,
   type LicenseApplicationStatus,
 } from "@/data/license-applications";
+import type { UserTypeTagId } from "@/data/user-type-tags";
 import { getAdminAssignedTags } from "@/lib/profile/account-tags";
 import {
   licenseApprovalStatusTone,
   resolveLicenseProgramTitle,
   resolveLicenseStatusLabel,
 } from "@/lib/profile/license-approval-ui";
+import { promoteMemberRoleFromLicense } from "@/lib/profile/member-promotion";
 import { reviewLicenseApplication } from "@/lib/licenses/storage";
 
 export function LicenseApplicationReviewCard({
@@ -37,6 +39,9 @@ export function LicenseApplicationReviewCard({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [assignedTags, setAssignedTags] = useState<UserTypeTagId[]>(() =>
+    getAdminAssignedTags(application.userId),
+  );
 
   const uploads = listLicenseUploadAttachments(application.uploads);
   const attachedUploads = uploads.filter((upload) => upload.attached);
@@ -78,13 +83,33 @@ export function LicenseApplicationReviewCard({
 
     try {
       await reviewLicenseApplication(application.id, status, trimmedNotes);
-      setMessage(
-        status === "approved"
-          ? "Application approved."
-          : status === "rejected"
+
+      if (status === "approved") {
+        try {
+          const promotion = await promoteMemberRoleFromLicense(
+            application.userId,
+            application.restrictionCode,
+            assignedTags,
+          );
+          if (promotion && !promotion.alreadyAssigned) {
+            setAssignedTags(promotion.tags);
+            setMessage(`Application approved. Account upgraded to ${promotion.tagLabel}.`);
+          } else {
+            setMessage("Application approved.");
+          }
+        } catch {
+          setMessage(
+            "Application approved, but the account tag could not be saved automatically. Assign it below.",
+          );
+        }
+      } else {
+        setMessage(
+          status === "rejected"
             ? "Application rejected."
             : "More information requested from applicant.",
-      );
+        );
+      }
+
       onReviewComplete?.();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to update application.");
@@ -274,7 +299,8 @@ export function LicenseApplicationReviewCard({
 
       <div className="mt-6 border-t border-white/10 pt-6">
         <AdminAccountTagEditor
-          initialTags={getAdminAssignedTags(application.userId)}
+          initialTags={assignedTags}
+          onChange={setAssignedTags}
           userId={application.userId}
         />
       </div>

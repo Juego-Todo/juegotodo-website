@@ -176,7 +176,7 @@ export function ShopHero() {
       }}
     >
       <div className="relative w-full overflow-hidden bg-black">
-        <div className="relative min-h-[20rem] w-full sm:min-h-[26rem] lg:min-h-[32rem]">
+        <div className="relative min-h-[14.5rem] w-full sm:min-h-[26rem] lg:min-h-[32rem]">
           <AnimatePresence mode="wait">
             <motion.div
               animate={{ opacity: 1, scale: 1 }}
@@ -190,7 +190,7 @@ export function ShopHero() {
             </motion.div>
           </AnimatePresence>
 
-          <div className="relative z-10 mx-auto grid h-full min-h-[inherit] w-full max-w-7xl items-center px-4 py-7 sm:px-6 sm:py-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:px-8 lg:py-10">
+          <div className="relative z-10 mx-auto grid h-full min-h-[inherit] w-full max-w-7xl items-end px-4 pb-12 pt-6 sm:items-center sm:px-6 sm:py-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:px-8 lg:py-10">
             <AnimatePresence mode="wait">
               <motion.div
                 animate={{ opacity: 1, x: 0 }}
@@ -200,20 +200,22 @@ export function ShopHero() {
                 key={activeSlide.id}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
-                <h1 className="font-display text-[clamp(1.75rem,5.5vw,4rem)] font-normal uppercase leading-[0.9] text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
+                <h1 className="font-display text-[clamp(1.35rem,5vw,4rem)] font-normal uppercase leading-[0.92] text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
                   {activeSlide.title}
                 </h1>
-                <p className="mt-3 max-w-lg text-sm leading-7 text-zinc-300 sm:mt-4 sm:text-base">{activeSlide.description}</p>
-                <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:gap-3">
+                <p className="mt-2 hidden max-w-lg text-sm leading-7 text-zinc-300 sm:mt-4 sm:block sm:text-base">
+                  {activeSlide.description}
+                </p>
+                <div className="mt-3 flex gap-2 sm:mt-6 sm:flex-row sm:gap-3">
                   <Link
-                    className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-[0_0_24px_rgba(255,16,16,0.35)] transition hover:bg-[#ff2828] sm:min-h-11 sm:px-7"
+                    className="inline-flex min-h-10 flex-1 items-center justify-center rounded-full bg-[#FF1010] px-4 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_0_24px_rgba(255,16,16,0.35)] transition hover:bg-[#ff2828] sm:min-h-11 sm:flex-none sm:px-7 sm:text-xs sm:tracking-[0.14em]"
                     href={activeSlide.href}
                   >
                     {activeSlide.cta}
                     <ArrowRight className="ml-1.5" size={14} aria-hidden />
                   </Link>
                   <Link
-                    className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] px-6 text-xs font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm transition hover:bg-white/10 sm:min-h-11 sm:px-7"
+                    className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] px-4 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:bg-white/10 sm:min-h-11 sm:px-7 sm:text-xs sm:tracking-[0.14em]"
                     href="#full-catalog"
                   >
                     Browse All
@@ -248,13 +250,13 @@ export function ShopHero() {
               style={{ width: `${progress * 100}%` }}
               aria-hidden
             />
-            <div className="mx-auto flex max-w-7xl items-center px-4 py-3 sm:px-6 lg:px-8">
-              <div className="flex items-center gap-1">
+            <div className="mx-auto flex max-w-7xl items-center px-3 py-1.5 sm:px-6 sm:py-3 lg:px-8">
+              <div className="flex items-center gap-0.5 sm:gap-1">
                 {shopHeroSlides.map((slide, index) => (
                   <button
                     aria-current={index === activeIndex ? "true" : undefined}
                     aria-label={`Go to slide ${index + 1}: ${slide.title}`}
-                    className="inline-flex min-h-11 min-w-11 items-center justify-center"
+                    className="inline-flex min-h-8 min-w-8 items-center justify-center sm:min-h-11 sm:min-w-11"
                     key={slide.id}
                     onClick={() => goToSlide(index)}
                     type="button"
@@ -262,8 +264,8 @@ export function ShopHero() {
                     <span
                       className={`rounded-full transition-all ${
                         index === activeIndex
-                          ? "h-2 w-8 bg-[#FF1010]"
-                          : "h-2 w-2 bg-white/30"
+                          ? "h-1.5 w-5 bg-[#FF1010] sm:h-2 sm:w-8"
+                          : "h-1.5 w-1.5 bg-white/30 sm:h-2 sm:w-2"
                       }`}
                       aria-hidden
                     />

@@ -16,17 +16,23 @@ export function ProfileMobileNav({
   onChange,
   fighterMode = false,
   adminMode = false,
+  fanMode = false,
+  coachMode = false,
   hideCredentials = false,
 }: {
   active: MobileTabId;
   onChange: (tab: MobileTabId) => void;
   fighterMode?: boolean;
   adminMode?: boolean;
+  fanMode?: boolean;
+  coachMode?: boolean;
   hideCredentials?: boolean;
 }) {
   const baseTabs: MobileTabId[] = fighterMode
     ? ["dashboard", "career", "credential", "settings"]
-    : ["dashboard", "career", "credential", "activity", "settings"];
+    : fanMode
+      ? ["dashboard", "career", "activity", "settings"]
+      : ["dashboard", "career", "credential", "activity", "settings"];
   const tabs = hideCredentials ? baseTabs.filter((tab) => tab !== "credential") : baseTabs;
 
   const labels: Record<MobileTabId, string> = fighterMode
@@ -45,13 +51,29 @@ export function ProfileMobileNav({
           activity: "Licenses",
           settings: "Settings",
         }
-      : {
-          dashboard: "Home",
-          career: "Career",
-          credential: "Credential",
-          activity: "Activity",
-          settings: "Settings",
-        };
+      : fanMode
+        ? {
+            dashboard: "Home",
+            career: "Events",
+            credential: "Credential",
+            activity: "Orders",
+            settings: "Settings",
+          }
+        : coachMode
+          ? {
+              dashboard: "Home",
+              career: "Roster",
+              credential: "Credential",
+              activity: "Activity",
+              settings: "Settings",
+            }
+          : {
+              dashboard: "Home",
+              career: "Career",
+              credential: "Credential",
+              activity: "Activity",
+              settings: "Settings",
+            };
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/90 px-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 backdrop-blur-xl lg:hidden">

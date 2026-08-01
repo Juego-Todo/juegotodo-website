@@ -1,6 +1,7 @@
 import type { ProfileSectionId } from "@/components/profile/ProfileSidebarNav";
 import { barrioBrawlsEvent } from "@/data/shop-tickets";
 import type { MemberRecord } from "@/lib/profile/member-record";
+import type { PortalExperience } from "@/lib/profile/portal-experience";
 import type { ProfileRoleKind, ProfileRoleModule } from "@/lib/profile/role-modules";
 
 export type WorkspaceTabId =
@@ -113,12 +114,13 @@ export const mobileTabs: { id: MobileTabId; label: string }[] = [
   { id: "settings", label: "Settings" },
 ];
 
-export function mobileTabToWorkspace(tab: MobileTabId): WorkspaceTabId {
+export function mobileTabToWorkspace(tab: MobileTabId, experience?: PortalExperience): WorkspaceTabId {
   switch (tab) {
     case "dashboard":
       return "overview";
     case "career":
-      return "camp";
+      // Only fighter portals have the camp workspace; other roles stay home.
+      return experience && experience !== "fighter" ? "overview" : "camp";
     case "credential":
       return "overview";
     case "activity":

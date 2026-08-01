@@ -2,6 +2,7 @@ import type { FighterFightResult } from "@/data/fighter-details";
 import type { AthleteCredentialProfile } from "@/data/profile-credentials";
 import { events, fighters } from "@/data/site";
 import type { LicenseApplication } from "@/data/license-applications";
+import { getFighterCoach } from "@/lib/profile/coach-roster";
 import type { ProfileIdentity } from "@/lib/profile/identity";
 import type { UserProfile } from "@/lib/auth/types";
 import type { MemberRecord } from "@/lib/profile/member-record";
@@ -459,7 +460,8 @@ export function buildFighterProfileView(input: {
 
   const licenseCode = licenseApplication?.restrictionCode ?? "JT11";
   const upcomingFight = buildUpcomingFight(athlete);
-  const coach = athlete.coach ?? answers.coachName ?? "Head Coach";
+  const coach =
+    athlete.coach ?? answers.coachName ?? getFighterCoach(user.fullName)?.coachName ?? "Head Coach";
 
   const fightTimeline: FightTimelineEntry[] = athlete.fightHistory.map((fight) => {
     const poster = matchEventPoster(fight.event);

@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AdminPendingTasksPanel } from "@/components/profile/AdminPendingTasksPanel";
+import { CoachPortalOverview } from "@/components/profile/dashboard/CoachPortalOverview";
+import { FanPortalOverview } from "@/components/profile/dashboard/FanPortalOverview";
 import { ProfileActivityFeed, ProfileCareerTimeline } from "@/components/profile/dashboard/ProfileCareerTimeline";
 import { ProfileCommandCenter } from "@/components/profile/dashboard/ProfileCommandCenter";
 import { ProfileCommandPalette, ProfileCommandPaletteHotkey } from "@/components/profile/dashboard/ProfileCommandPalette";
@@ -32,6 +34,7 @@ import {
   type MobileTabId,
   type WorkspaceTabId,
 } from "@/lib/profile/mission-control";
+import { coachWorkspaceTabs, fanWorkspaceTabs } from "@/lib/profile/portal-experience";
 import { getProfileRolePreviewLabel, type ProfileRoleKind } from "@/lib/profile/role-modules";
 
 function OpsBrandHeader({ title, subtitle }: { title: string; subtitle: string }) {
@@ -121,6 +124,9 @@ export function ProfileDashboard({
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTabId>("dashboard");
   const canAccessOpsTabs = memberRecord.canAccessOpsTabs;
+  const portalExperience = memberRecord.portalExperience;
+  const isFanPortal = !canAccessOpsTabs && portalExperience === "fan";
+  const isCoachPortal = !canAccessOpsTabs && portalExperience === "coach";
 
   function handleMobileTab(tab: MobileTabId) {
     setMobileTab(tab);
@@ -137,7 +143,18 @@ export function ProfileDashboard({
         return;
       }
     }
-    onTabChange(mobileTabToWorkspace(tab));
+    if (isFanPortal) {
+      // Fan mobile nav: Home · Events · Orders · Settings.
+      if (tab === "career") {
+        onNavigateSection("events");
+        return;
+      }
+      if (tab === "activity") {
+        onNavigateSection("orders");
+        return;
+      }
+    }
+    onTabChange(mobileTabToWorkspace(tab, portalExperience));
   }
 
   function handleNavigateSection(section: ProfileSectionId) {
@@ -192,7 +209,11 @@ export function ProfileDashboard({
       ? fighterWorkspaceTabs
       : fighterWorkspaceTabs.filter((tab) => tab.id !== "documents")
     : showCredentials
-      ? workspaceTabs
+      ? isFanPortal
+        ? fanWorkspaceTabs
+        : isCoachPortal
+          ? coachWorkspaceTabs
+          : workspaceTabs
       : adminWorkspaceTabs;
 
   function handleTabClick(tab: WorkspaceTabId) {
@@ -309,10 +330,18 @@ export function ProfileDashboard({
                         <div className="space-y-10">
                           {canAccessOpsTabs ? (
                             <AdminPendingTasksPanel />
+                          ) : isFanPortal ? (
+                            <FanPortalOverview licenseApplication={licenseApplication} user={user} />
+                          ) : isCoachPortal ? (
+                            <CoachPortalOverview
+                              licenseApplication={licenseApplication}
+                              onOpenDocuments={() => onTabChange("documents")}
+                              user={user}
+                            />
                           ) : (
                             <ProfileCommandCenter memberRecord={memberRecord} onAction={handleAction} />
                           )}
-                          <ProfileRoleWorkspace memberRecord={memberRecord} />
+                          {!isFanPortal ? <ProfileRoleWorkspace memberRecord={memberRecord} /> : null}
                         </div>
                       )
                     ) : null}
@@ -412,6 +441,8 @@ export function ProfileDashboard({
       <ProfileMobileNav
         active={mobileTab}
         adminMode={canAccessOpsTabs}
+        coachMode={isCoachPortal && !fighterView}
+        fanMode={isFanPortal && !fighterView}
         fighterMode={Boolean(fighterView)}
         hideCredentials={!showCredentials}
         onChange={handleMobileTab}

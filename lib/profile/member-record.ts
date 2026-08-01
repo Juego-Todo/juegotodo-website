@@ -7,6 +7,7 @@ import { resolveAccountTypeLabel, resolveUserTypeTagIds, type UserTypeTagId } fr
 import type { UserProfile } from "@/lib/auth/types";
 import type { UserCommerceData } from "@/lib/commerce/types";
 import type { ProfileIdentity } from "@/lib/profile/identity";
+import { resolvePortalExperience, type PortalExperience } from "@/lib/profile/portal-experience";
 import {
   buildProfileRoleModule,
   type ProfileRoleKind,
@@ -86,6 +87,8 @@ export type MemberRecord = {
   isAdmin: boolean;
   /** Administrator or Staff — ops tabs (Calendar, Tickets, Orders, Licenses). */
   canAccessOpsTabs: boolean;
+  /** Which portal workspace this member sees (fan, fighter, coach, official, admin). */
+  portalExperience: PortalExperience;
   credentialChips: MemberCredentialChip[];
   officialRecord: MemberOfficialRecord;
   requirements: MemberRequirement[];
@@ -430,6 +433,12 @@ export function buildMemberRecord(input: {
     ? previewRoleKind === "admin"
     : isAdmin;
 
+  const portalExperience = resolvePortalExperience({
+    tagIds,
+    isAdmin,
+    roleKind: previewRoleKind,
+  });
+
   return {
     tagIds,
     accountTypeLabel,
@@ -449,6 +458,7 @@ export function buildMemberRecord(input: {
     club: officialRecord.club,
     isAdmin,
     canAccessOpsTabs,
+    portalExperience,
     credentialChips: buildCredentialChips(officialRecord, tagIds, isAdmin),
     officialRecord,
     requirements,

@@ -55,18 +55,18 @@ export function HeroSection() {
         <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-6 px-4 pb-6 pt-[max(5.5rem,calc(env(safe-area-inset-top)+4.75rem))] sm:gap-7 sm:px-6 sm:pb-8 sm:pt-24 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 lg:px-8 lg:pb-6 lg:pt-24">
           <motion.div
             animate={{ opacity: 1, y: 0 }}
-            className="relative z-10"
+            className="relative z-10 text-center lg:text-left"
             initial={{ opacity: 0, y: 28 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h1 className="font-display max-w-5xl text-[clamp(2.15rem,9vw,4.5rem)] uppercase leading-[0.92] tracking-wide text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.95)] sm:text-[clamp(3.2rem,7.5vw,6rem)] lg:text-[clamp(3.5rem,6vw,6.5rem)]">
+            <h1 className="font-display mx-auto max-w-5xl text-[clamp(2.15rem,9vw,4.5rem)] uppercase leading-[0.92] tracking-wide text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.95)] sm:text-[clamp(3.2rem,7.5vw,6rem)] lg:mx-0 lg:text-[clamp(3.5rem,6vw,6.5rem)]">
               <span className="block text-white/90">The Evolution of</span>
               <span className="block bg-gradient-to-r from-white via-white to-red-200 bg-clip-text text-transparent">
                 Filipino Combat Sports
               </span>
             </h1>
 
-            <p className="mt-4 max-w-2xl text-[0.95rem] leading-7 text-zinc-300 drop-shadow-[0_3px_16px_rgba(0,0,0,0.9)] sm:mt-6 sm:text-lg sm:leading-8">
+            <p className="mx-auto mt-4 max-w-2xl text-[0.95rem] leading-7 text-zinc-300 drop-shadow-[0_3px_16px_rgba(0,0,0,0.9)] sm:mt-6 sm:text-lg sm:leading-8 lg:mx-0">
               <span className="sm:hidden">
                 Professional Filipino Martial Arts — weaponized competition, verified athletes, and championship
                 legacy in one platform.
@@ -78,7 +78,7 @@ export function HeroSection() {
               </span>
             </p>
 
-            <div className="mt-5 flex flex-wrap gap-3 sm:mt-8">
+            <div className="mt-5 flex flex-wrap justify-center gap-3 sm:mt-8 lg:justify-start">
               <MagneticButton href="/login?mode=register">
                 Register Now
                 <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
@@ -106,16 +106,16 @@ export function HeroSection() {
                   />
                 </div>
                 <div className="mt-2.5 space-y-2.5 px-0.5 pb-0.5 sm:mt-3.5 sm:space-y-3 sm:px-1.5 sm:pb-1.5">
-                  <div className="space-y-1.5 text-left">
-                    <p className="flex items-start gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
+                  <div className="space-y-1.5 text-center">
+                    <p className="flex items-start justify-center gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
                       <CalendarDays className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF1010]" aria-hidden />
                       <span>{heroFeaturedEvent.dateLabel}</span>
                     </p>
-                    <p className="flex items-start gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
+                    <p className="flex items-start justify-center gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
                       <Clock3 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF1010]" aria-hidden />
                       <span>{heroFeaturedEvent.timeLabel}</span>
                     </p>
-                    <p className="flex items-start gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
+                    <p className="flex items-start justify-center gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
                       <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF1010]" aria-hidden />
                       <span>{heroFeaturedEvent.venue}</span>
                     </p>

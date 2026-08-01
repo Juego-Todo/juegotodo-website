@@ -6,7 +6,7 @@ type RouteContext = {
 };
 
 export async function POST(request: Request, context: RouteContext) {
-  const admin = await requireAdminServiceClient();
+  const admin = await requireAdminServiceClient(request);
   if ("response" in admin) {
     return admin.response;
   }

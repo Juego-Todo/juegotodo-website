@@ -720,7 +720,25 @@ export const shopProducts: ShopProduct[] = [
   ...legacyShopProducts,
   ...merchandiseProducts,
   ...eventTicketProducts,
-].filter((product) => Boolean(product.imageSrc));
+];
+
+/** True when the product has a real photo (not a generated placeholder visual). */
+export function productHasPhoto(product: ShopProduct) {
+  if (product.imageSrc?.trim()) {
+    return true;
+  }
+
+  // Event tickets use dedicated poster artwork even without a product imageSrc.
+  if (product.eventTicket) {
+    return true;
+  }
+
+  return Boolean(
+    product.variantGroups?.some((group) =>
+      group.options.some((option) => Boolean(option.imageSrc?.trim())),
+    ),
+  );
+}
 
 export function getShopProduct(slug: string) {
   return shopProducts.find((product) => product.slug === slug);

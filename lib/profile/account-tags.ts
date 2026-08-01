@@ -1,5 +1,6 @@
 import type { UserTypeTagId } from "@/data/user-type-tags";
 import { userTypeTags } from "@/data/user-type-tags";
+import { adminFetch } from "@/lib/auth/admin-fetch";
 import type { AccountType } from "@/lib/auth/types";
 
 const ASSIGNED_TAGS_PREFIX = "juego-todo.profile.assigned-tags.";
@@ -143,9 +144,8 @@ export async function saveAdminAssignedTags(userId: string, tags: UserTypeTagId[
   const unique = normalizeAssignedTags(tags);
   setAdminAssignedTagsLocal(userId, unique);
 
-  const response = await fetch(`/api/admin/members/${userId}/tags`, {
+  const response = await adminFetch(`/api/admin/members/${userId}/tags`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ tags: unique }),
   });
 

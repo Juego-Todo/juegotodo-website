@@ -47,7 +47,7 @@ export function ProfileMissionHero({
   return (
     <motion.section
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-[2rem] px-6 py-8 sm:px-10 sm:py-10"
+      className="relative overflow-hidden rounded-[1.5rem] px-4 py-6 sm:rounded-[2rem] sm:px-10 sm:py-10"
       initial={{ opacity: 0, y: 12 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
@@ -72,7 +72,7 @@ export function ProfileMissionHero({
               Digital Martial Arts Passport
             </p>
             <div>
-              <h1 className="font-display text-5xl uppercase leading-[0.92] text-white sm:text-7xl">
+              <h1 className="font-display text-3xl uppercase leading-[0.92] text-white sm:text-5xl lg:text-7xl">
                 {user.fullName}
               </h1>
               <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-zinc-300">{role.roleTitle}</p>
@@ -109,7 +109,7 @@ export function ProfileMissionHero({
               transition={{ delay: 0.08 * index, duration: 0.35 }}
             >
               <p className="text-[0.58rem] font-black uppercase tracking-[0.18em] text-zinc-500">{kpi.label}</p>
-              <p className="font-display mt-2 text-4xl leading-none text-white">{kpi.value}</p>
+              <p className="font-display mt-2 text-2xl leading-none text-white sm:text-4xl">{kpi.value}</p>
               {kpi.detail ? <p className="mt-2 text-xs text-zinc-400">{kpi.detail}</p> : null}
             </motion.div>
           ))}

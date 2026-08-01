@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Search, TrendingUp, Trophy, Users } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
   filterAthletes,
@@ -246,11 +247,13 @@ function ComparePanel({
 }
 
 export function FighterDatabase() {
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q")?.trim() ?? "";
   const [athletes, setAthletes] = useState<EnrichedFighterProfile[]>([]);
   const [loadingAthletes, setLoadingAthletes] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [activeTab, setActiveTab] = useState<LatayanologyRankingTab>("Pound for Pound");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [weightClass, setWeightClass] = useState("All");
   const [nationality, setNationality] = useState("All");
   const [team, setTeam] = useState("All");
@@ -260,6 +263,13 @@ export function FighterDatabase() {
   const [sortBy, setSortBy] = useState<LatayanologySortId>("ranking");
   const [compareLeft, setCompareLeft] = useState("");
   const [compareRight, setCompareRight] = useState("");
+
+  useEffect(() => {
+    const nextQuery = searchParams.get("q")?.trim() ?? "";
+    if (nextQuery) {
+      setQuery(nextQuery);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     let cancelled = false;

@@ -102,7 +102,7 @@ export function ShopCollectionButtons({ activeCollection, onSelect }: ShopCollec
                     className={`mt-2 flex items-center gap-1 text-[0.58rem] font-black uppercase tracking-[0.12em] text-[#FF1010] transition-all duration-300 ease-out sm:mt-3 sm:text-[0.62rem] ${
                       isActive
                         ? "translate-y-0 opacity-100"
-                        : "translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100"
+                        : "translate-y-0 opacity-100 sm:translate-y-1 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100"
                     }`}
                   >
                     Explore Collection

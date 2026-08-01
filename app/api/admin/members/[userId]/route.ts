@@ -13,7 +13,7 @@ function resolveRole(value: unknown): UserRole {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const admin = await requireAdminServiceClient();
+  const admin = await requireAdminServiceClient(request);
   if ("response" in admin) {
     return admin.response;
   }
@@ -69,8 +69,8 @@ export async function PATCH(request: Request, context: RouteContext) {
   return NextResponse.json({ member: mapProfileRow(data) });
 }
 
-export async function DELETE(_request: Request, context: RouteContext) {
-  const admin = await requireAdminServiceClient();
+export async function DELETE(request: Request, context: RouteContext) {
+  const admin = await requireAdminServiceClient(request);
   if ("response" in admin) {
     return admin.response;
   }

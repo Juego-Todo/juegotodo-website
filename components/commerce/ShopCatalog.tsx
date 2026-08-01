@@ -5,8 +5,8 @@ import { Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { ShopProductCard } from "@/components/commerce/ShopProductCard";
-import { shopProducts, type ShopProduct } from "@/data/shop";
-import { getLiveShopProducts, subscribeCatalogChanges } from "@/lib/commerce/catalog-store";
+import { productHasPhoto, shopProducts, type ShopProduct } from "@/data/shop";
+import { getPublicShopProducts, subscribeCatalogChanges } from "@/lib/commerce/catalog-store";
 import { bestSellerSlugs } from "@/lib/commerce/product-visuals";
 import { getShopCollection, matchesShopCollection, type ShopCollectionId } from "@/lib/commerce/shop-collections";
 import type { ShopCategory } from "@/lib/commerce/types";
@@ -19,11 +19,11 @@ type ShopCatalogProps = {
 export function ShopCatalog({ activeCategory, activeCollection }: ShopCatalogProps) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"featured" | "price-asc" | "price-desc">("featured");
-  const [catalog, setCatalog] = useState<ShopProduct[]>(shopProducts);
+  const [catalog, setCatalog] = useState<ShopProduct[]>(() => shopProducts.filter(productHasPhoto));
   const activeCollectionMeta = getShopCollection(activeCollection);
 
   useEffect(() => {
-    const refresh = () => setCatalog(getLiveShopProducts());
+    const refresh = () => setCatalog(getPublicShopProducts());
     refresh();
     return subscribeCatalogChanges(refresh);
   }, []);
@@ -31,6 +31,9 @@ export function ShopCatalog({ activeCategory, activeCollection }: ShopCatalogPro
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     let results = catalog.filter((product) => {
+      if (!productHasPhoto(product)) {
+        return false;
+      }
       const matchesCategory = activeCategory === "all" || product.category === activeCategory;
       const matchesCollection = matchesShopCollection(product, activeCollection);
       if (!normalized) {
@@ -59,7 +62,7 @@ export function ShopCatalog({ activeCategory, activeCollection }: ShopCatalogPro
   }, [activeCategory, activeCollection, catalog, query, sort]);
 
   return (
-    <MotionSection className="mt-7 border-t border-white/[0.06] pb-10 pt-7 sm:mt-9 sm:pb-14 sm:pt-9" id="full-catalog">
+    <MotionSection className="mt-7 border-t border-white/[0.06] pb-28 pt-7 sm:mt-9 sm:pb-32 sm:pt-9" id="full-catalog">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <h2 className="font-display text-2xl font-normal uppercase text-white sm:text-3xl">All Products</h2>
         {activeCollectionMeta ? (
@@ -100,7 +103,7 @@ export function ShopCatalog({ activeCategory, activeCollection }: ShopCatalogPro
           <p className="mt-3 text-sm text-zinc-400">Try another search term or collection filter.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-5">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 xl:gap-5">
           {filteredProducts.map((product, index) => (
             <motion.div
               animate={{ opacity: 1, y: 0 }}

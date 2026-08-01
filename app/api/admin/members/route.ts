@@ -1,42 +1,19 @@
 import { NextResponse } from "next/server";
-import { isServerAdminUser } from "@/lib/auth/admin-access";
+import { requireAdminServiceClient } from "@/lib/auth/admin-route";
 import { mapProfileRow } from "@/lib/auth/profile-sync";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
-export async function GET() {
+export async function GET(request: Request) {
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ error: "Supabase is not configured." }, { status: 503 });
   }
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  const admin = await requireAdminServiceClient(request);
+  if ("response" in admin) {
+    return admin.response;
   }
 
-  const { data: adminProfile, error: adminError } = await supabase
-    .from("profiles")
-    .select("role, email")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (adminError) {
-    return NextResponse.json({ error: adminError.message }, { status: 500 });
-  }
-
-  if (!isServerAdminUser(user.email, adminProfile)) {
-    return NextResponse.json({ error: "Admin access required." }, { status: 403 });
-  }
-
-  const serviceClient = createSupabaseServiceClient();
-  const queryClient = serviceClient ?? supabase;
-
-  const { data, error } = await queryClient
+  const { data, error } = await admin.serviceClient
     .from("profiles")
     .select("*")
     .order("created_at", { ascending: false });

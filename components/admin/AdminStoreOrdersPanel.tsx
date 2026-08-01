@@ -237,30 +237,30 @@ export function AdminStoreOrdersPanel({
         </div>
       ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-4">
-        <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.02] px-4 py-4">
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
+        <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.02] px-3 py-3 sm:px-4 sm:py-4">
           <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">Total Orders</p>
-          <p className="font-display mt-1 text-3xl text-white">{counts.all}</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">{counts.all}</p>
         </div>
-        <div className="rounded-[1.25rem] border border-amber-500/20 bg-amber-500/[0.06] px-4 py-4">
+        <div className="rounded-[1.25rem] border border-amber-500/20 bg-amber-500/[0.06] px-3 py-3 sm:px-4 sm:py-4">
           <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-amber-200/70">Needs Action</p>
-          <p className="font-display mt-1 text-3xl text-white">{counts.needs_action}</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">{counts.needs_action}</p>
         </div>
-        <div className="rounded-[1.25rem] border border-sky-500/20 bg-sky-500/[0.06] px-4 py-4">
+        <div className="rounded-[1.25rem] border border-sky-500/20 bg-sky-500/[0.06] px-3 py-3 sm:px-4 sm:py-4">
           <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-sky-200/70">In Fulfillment</p>
-          <p className="font-display mt-1 text-3xl text-white">{counts.fulfilling}</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">{counts.fulfilling}</p>
         </div>
-        <div className="rounded-[1.25rem] border border-emerald-500/20 bg-emerald-500/[0.06] px-4 py-4">
+        <div className="rounded-[1.25rem] border border-emerald-500/20 bg-emerald-500/[0.06] px-3 py-3 sm:px-4 sm:py-4">
           <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-emerald-200/70">Delivered</p>
-          <p className="font-display mt-1 text-3xl text-white">{counts.delivered}</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">{counts.delivered}</p>
         </div>
       </div>
 
       <div className="flex flex-col gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible [&::-webkit-scrollbar]:hidden">
           {filters.map((item) => (
             <button
-              className={`rounded-full px-3.5 py-2 text-[0.6rem] font-black uppercase tracking-[0.12em] transition ${
+              className={`shrink-0 rounded-full px-3.5 py-2.5 text-[0.6rem] font-black uppercase tracking-[0.12em] transition sm:py-2 ${
                 filter === item.id
                   ? "bg-[#FF1010] text-white"
                   : "border border-white/10 text-zinc-400 hover:text-white"

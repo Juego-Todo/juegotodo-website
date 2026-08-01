@@ -95,9 +95,9 @@ export function AddToCartButton({
               : "bg-[#FF1010] text-white hover:bg-[#ff2828] hover:shadow-[0_0_24px_rgba(255,16,16,0.35)]"
       } ${
         micro
-          ? "min-h-8 px-3 text-[0.5rem] tracking-[0.12em]"
+          ? "min-h-10 px-3 text-[0.58rem] tracking-[0.12em] sm:min-h-8 sm:text-[0.5rem]"
           : compact
-            ? "min-h-9 px-4 text-[0.58rem]"
+            ? "min-h-11 px-4 text-[0.62rem] sm:min-h-9 sm:text-[0.58rem]"
             : "min-h-11 px-5 text-xs"
       } ${
         fullWidth ? "w-full" : ""

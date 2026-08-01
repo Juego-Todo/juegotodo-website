@@ -39,7 +39,7 @@ export function InteriorPage({ slug }: { slug: PageSlug }) {
   const legalPage = isLegalPage && !isLatayanologyPage ? getLegalPage(slug) : undefined;
 
   return (
-      <main className={`overflow-hidden ${isPartnersPage || isLatayanologyPage || isShopPage ? "" : "px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8"} ${isShopPage || isPartnersPage || isLatayanologyPage ? "pt-20 sm:pt-24" : "pt-24 sm:pt-28 lg:pt-32"} ${isLatayanologyPage || isShopPage ? "pb-14 sm:pb-20" : ""}`}>
+      <main className={`overflow-hidden ${isPartnersPage || isLatayanologyPage || isShopPage ? "" : "px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8"} ${isShopPage || isPartnersPage || isLatayanologyPage ? "pt-20 sm:pt-24" : "pt-24 sm:pt-28 lg:pt-32"} ${isLatayanologyPage ? "pb-14 sm:pb-20" : ""} ${isShopPage ? "pb-28 sm:pb-32" : ""}`}>
       {!isShopPage && !isPartnersPage && !isLatayanologyPage ? (
       <section className={`relative mx-auto max-w-7xl ${isRulesPage || isLegalPage ? "py-6 sm:py-8 lg:py-10" : "py-10 sm:py-14 lg:py-16"}`}>
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
@@ -67,7 +67,11 @@ export function InteriorPage({ slug }: { slug: PageSlug }) {
       {legalPage ? <LegalPageContent page={legalPage} /> : null}
 
       {slug === "events" ? <EventsSection /> : null}
-      {slug === "latayanology" ? <FighterDatabase /> : null}
+      {slug === "latayanology" ? (
+        <Suspense>
+          <FighterDatabase />
+        </Suspense>
+      ) : null}
       {slug === "media" ? <MediaHub /> : null}
       {slug === "shop" ? (
         <Suspense>

@@ -40,7 +40,7 @@ export function ProfileMobileNav({
     : adminMode
       ? {
           dashboard: "Home",
-          career: "Career",
+          career: "Shop",
           credential: "Credential",
           activity: "Licenses",
           settings: "Settings",
@@ -54,15 +54,15 @@ export function ProfileMobileNav({
         };
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/90 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-xl lg:hidden">
-      <div className="mx-auto flex max-w-lg items-center justify-between">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/90 px-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 backdrop-blur-xl lg:hidden">
+      <div className="mx-auto flex max-w-lg items-stretch justify-between gap-0.5">
         {tabs.map((tab) => {
           const Icon = icons[tab];
           const selected = active === tab;
           return (
             <button
               aria-current={selected ? "page" : undefined}
-              className={`flex min-h-14 min-w-[4.2rem] flex-col items-center justify-center gap-1 rounded-2xl px-2 transition ${
+              className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 transition ${
                 selected ? "text-[#FF1010]" : "text-zinc-500"
               }`}
               key={tab}
@@ -70,7 +70,7 @@ export function ProfileMobileNav({
               type="button"
             >
               <Icon size={18} aria-hidden />
-              <span className="text-[0.52rem] font-black uppercase tracking-[0.12em]">{labels[tab]}</span>
+              <span className="text-[0.6rem] font-black uppercase tracking-[0.08em]">{labels[tab]}</span>
             </button>
           );
         })}

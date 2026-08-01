@@ -80,6 +80,7 @@ export function ProfileDashboard({
   shopContent,
   membersContent,
   licensesContent,
+  latayanologyContent,
   shopAnalyticsContent,
   previewRoleKind = null,
   onExitViewAs,
@@ -109,6 +110,7 @@ export function ProfileDashboard({
   shopContent?: React.ReactNode;
   membersContent?: React.ReactNode;
   licensesContent?: React.ReactNode;
+  latayanologyContent?: React.ReactNode;
   previewRoleKind?: ProfileRoleKind | null;
   onExitViewAs?: () => void;
   portraitImage?: string;
@@ -122,9 +124,20 @@ export function ProfileDashboard({
 
   function handleMobileTab(tab: MobileTabId) {
     setMobileTab(tab);
-    if (tab !== "credential") {
-      onTabChange(mobileTabToWorkspace(tab));
+    if (tab === "credential") {
+      return;
     }
+    if (canAccessOpsTabs) {
+      if (tab === "career") {
+        onTabChange("shop");
+        return;
+      }
+      if (tab === "activity") {
+        onTabChange("licenses");
+        return;
+      }
+    }
+    onTabChange(mobileTabToWorkspace(tab));
   }
 
   function handleNavigateSection(section: ProfileSectionId) {
@@ -139,6 +152,7 @@ export function ProfileDashboard({
   const showCredentials = !canAccessOpsTabs;
   const credentialPinned = showCredentials && mobileTab === "credential";
   const isShopWorkspace = activeTab === "shop" || activeTab === "orders";
+  const isTicketsWorkspace = activeTab === "tickets";
   // Ops accounts: keep the profile strip on Overview only — other tabs are tool workspaces.
   const showOpsProfileHero = canAccessOpsTabs && activeTab === "overview";
   const isFighterRole = memberRecord.roleModule.kind === "fighter";
@@ -219,6 +233,8 @@ export function ProfileDashboard({
           <>
             {isShopWorkspace ? (
               <OpsBrandHeader subtitle="Official store operations" title="Juego Todo Shop" />
+            ) : isTicketsWorkspace ? (
+              <OpsBrandHeader subtitle="Event ticket purchases" title="Juego Todo Tickets" />
             ) : fighterView ? (
               <>
                 <div className={`${mobileTab === "dashboard" ? "" : "hidden lg:block"}`}>
@@ -368,6 +384,10 @@ export function ProfileDashboard({
 
                     {activeTab === "licenses" && canAccessOpsTabs ? (
                       <div>{licensesContent ?? membershipContent}</div>
+                    ) : null}
+
+                    {activeTab === "latayanology" && canAccessOpsTabs ? (
+                      <div>{latayanologyContent}</div>
                     ) : null}
 
                     {activeTab === "achievements" && !fighterView && !canAccessOpsTabs ? (

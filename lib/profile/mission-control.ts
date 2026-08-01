@@ -17,6 +17,7 @@ export type WorkspaceTabId =
   | "shop"
   | "members"
   | "licenses"
+  | "latayanology"
   | "achievements"
   | "page-access"
   | "settings";
@@ -68,6 +69,7 @@ export const adminWorkspaceTabs: { id: WorkspaceTabId; label: string }[] = [
   { id: "shop", label: "Shop" },
   { id: "members", label: "Members" },
   { id: "licenses", label: "Licenses" },
+  { id: "latayanology", label: "Latayanology" },
   { id: "settings", label: "Settings" },
 ];
 
@@ -79,6 +81,7 @@ export const opsRestrictedTabIds: WorkspaceTabId[] = [
   "shop",
   "members",
   "licenses",
+  "latayanology",
   "activity",
   "membership-analytics",
   "shop-analytics",
@@ -135,26 +138,34 @@ export function buildMissionItems(role: ProfileRoleModule, memberRecord: MemberR
           id: "licenses",
           label: "Pending Licenses",
           headline: pending,
-          detail: "3 waiting today",
+          detail: "Review license applications awaiting approval",
           actionLabel: "View Queue",
-          href: "/profile?tab=licenses&view=approvals",
+          href: "/profile?tab=licenses",
           urgent: Number.parseInt(pending.replace(/\D/g, ""), 10) > 0,
         },
         {
-          id: "cards",
-          label: "Pending Cards",
-          headline: "12",
-          detail: "Ready for issuance",
-          actionLabel: "Issue Cards",
-          href: "/profile?tab=licenses&view=approvals",
+          id: "shop",
+          label: "Store Orders",
+          headline: "Open",
+          detail: "Approve payments and fulfill shop orders",
+          actionLabel: "Open Shop",
+          href: "/profile?tab=shop",
         },
         {
-          id: "events",
-          label: "Events Today",
-          headline: "5",
-          detail: "2 require final review",
-          actionLabel: "Open Calendar",
-          href: "/profile?tab=calendar",
+          id: "members",
+          label: "Members",
+          headline: "Directory",
+          detail: "Search accounts and manage tags",
+          actionLabel: "Open Members",
+          href: "/profile?tab=members",
+        },
+        {
+          id: "latayanology",
+          label: "Latayanology",
+          headline: "Roster",
+          detail: "Approved fighter licenses in the public Search Fighter database",
+          actionLabel: "Open Roster",
+          href: "/profile?tab=latayanology",
         },
       ];
     case "fighter":
@@ -271,8 +282,15 @@ export function buildCommandActions(role: ProfileRoleModule, isAdmin: boolean): 
   const base: CommandAction[] = [
     { id: "search-member", label: "Search Member", keywords: ["member", "directory", "find"], href: "/admin/members" },
     { id: "open-reports", label: "Open Reports", keywords: ["reports", "analytics"], href: "/admin/reports" },
-    { id: "view-pending", label: "View Pending Licenses", keywords: ["license", "approve", "pending"], href: "/profile?tab=licenses&view=approvals" },
-    { id: "issue-card", label: "Issue Card", keywords: ["card", "credential", "id"], href: "/profile?tab=licenses&view=approvals" },
+    { id: "view-pending", label: "View Pending Licenses", keywords: ["license", "approve", "pending"], href: "/profile?tab=licenses" },
+    {
+      id: "latayanology-roster",
+      label: "Open Latayanology Roster",
+      keywords: ["latayanology", "fighter", "roster", "search fighter", "approved"],
+      href: "/profile?tab=latayanology",
+      tab: "latayanology",
+    },
+    { id: "issue-card", label: "Issue Card", keywords: ["card", "credential", "id"], href: "/profile?tab=licenses" },
     { id: "calendar", label: "Open Calendar", keywords: ["calendar", "events"], href: "/calendar" },
     { id: "shop", label: "Browse Shop", keywords: ["shop", "gear", "merch"], href: "/shop" },
     { id: "settings", label: "Open Settings", keywords: ["settings", "account"], tab: "settings" },
@@ -289,7 +307,7 @@ export function buildCommandActions(role: ProfileRoleModule, isAdmin: boolean): 
 
   if (isAdmin) {
     return [
-      { id: "approve", label: "Approve Licenses", keywords: ["approve", "license"], href: "/profile?tab=licenses&view=approvals" },
+      { id: "approve", label: "Approve Licenses", keywords: ["approve", "license"], href: "/profile?tab=licenses" },
       { id: "create-event", label: "Create Event", keywords: ["event", "calendar", "schedule"], tab: "calendar" },
       { id: "create-seminar", label: "Create Seminar", keywords: ["seminar", "clinic", "training"], tab: "calendar" },
       ...base.map((action) =>

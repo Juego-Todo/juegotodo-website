@@ -9,8 +9,8 @@ type RouteContext = {
   params: Promise<{ userId: string }>;
 };
 
-export async function GET(_request: Request, context: RouteContext) {
-  const admin = await requireAdminServiceClient();
+export async function GET(request: Request, context: RouteContext) {
+  const admin = await requireAdminServiceClient(request);
   if ("response" in admin) {
     return admin.response;
   }
@@ -37,7 +37,7 @@ export async function GET(_request: Request, context: RouteContext) {
 }
 
 export async function PUT(request: Request, context: RouteContext) {
-  const admin = await requireAdminServiceClient();
+  const admin = await requireAdminServiceClient(request);
   if ("response" in admin) {
     return admin.response;
   }

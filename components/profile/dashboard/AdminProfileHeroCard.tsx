@@ -112,7 +112,7 @@ export function AdminProfileHeroCard({
   return (
     <motion.section
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-2xl border border-white/10 px-4 py-3.5 sm:px-5 sm:py-4"
+      className="relative overflow-hidden rounded-2xl border border-white/10 px-4 py-4 sm:px-5 sm:py-4"
       initial={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
     >
@@ -124,10 +124,10 @@ export function AdminProfileHeroCard({
 
       <div className="relative">
         <form onSubmit={(event) => void handleSave(event)}>
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-start gap-3.5 sm:items-center sm:gap-4">
             <ProfileAvatarButton
               accent="amber"
-              className="!h-11 !w-11 !border-2 !text-sm"
+              className="h-14 w-14 border-2 text-base sm:h-12 sm:w-12 sm:text-sm"
               displayName={editing ? form.fullName : user.fullName}
               onSave={onPortraitUpload}
               portraitImage={portraitImage}
@@ -157,41 +157,57 @@ export function AdminProfileHeroCard({
                   </label>
                 </div>
               ) : (
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                    <h1 className="font-display truncate text-xl uppercase leading-none text-white sm:text-2xl">
-                      {user.fullName}
-                    </h1>
-                    <p className="text-xs font-semibold text-zinc-500">{formatUsername(user.username)}</p>
+                <div className="min-w-0 pr-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h1 className="font-display truncate text-lg uppercase leading-none text-white sm:text-2xl">
+                        {user.fullName}
+                      </h1>
+                      <p className="mt-1 truncate text-xs font-semibold text-zinc-500">
+                        {formatUsername(user.username)}
+                      </p>
+                    </div>
+                    <button
+                      aria-label="Edit profile"
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/30 text-zinc-300 transition hover:border-amber-400/40 hover:bg-amber-500/10 hover:text-amber-100 sm:h-9 sm:w-9"
+                      onClick={startEditing}
+                      type="button"
+                    >
+                      <Pencil size={15} aria-hidden />
+                    </button>
                   </div>
-                  <p className="mt-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-amber-200/80">
+                  <p className="mt-1.5 text-[0.62rem] font-black uppercase tracking-[0.14em] text-amber-200/85">
                     {role.roleTitle}
                   </p>
-                  <p className="mt-1.5 hidden truncate text-xs text-zinc-500 sm:block">
-                    {user.email}
-                    <span className="mx-2 text-zinc-700">·</span>
-                    Joined {dateJoined}
-                    <span className="mx-2 text-zinc-700">·</span>
-                    {accountTypeLabel}
-                    {dateOfBirth !== "—" ? (
-                      <>
-                        <span className="mx-2 text-zinc-700">·</span>
-                        DOB {dateOfBirth}
-                      </>
-                    ) : null}
+                  <p className="mt-1.5 text-[0.7rem] leading-5 text-zinc-500 sm:truncate sm:text-xs">
+                    <span className="block truncate sm:inline">{user.email}</span>
+                    <span className="mx-1.5 hidden text-zinc-700 sm:inline">·</span>
+                    <span className="mt-0.5 block sm:mt-0 sm:inline">
+                      Joined {dateJoined}
+                      <span className="mx-1.5 text-zinc-700">·</span>
+                      {accountTypeLabel}
+                      {dateOfBirth !== "—" ? (
+                        <>
+                          <span className="mx-1.5 text-zinc-700">·</span>
+                          DOB {dateOfBirth}
+                        </>
+                      ) : null}
+                    </span>
                   </p>
                 </div>
               )}
             </div>
 
-            <button
-              aria-label={editing ? "Cancel editing profile" : "Edit profile"}
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/30 text-zinc-300 transition hover:border-amber-400/40 hover:bg-amber-500/10 hover:text-amber-100"
-              onClick={() => (editing ? handleCancel() : startEditing())}
-              type="button"
-            >
-              {editing ? <X size={15} aria-hidden /> : <Pencil size={15} aria-hidden />}
-            </button>
+            {editing ? (
+              <button
+                aria-label="Cancel editing profile"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/30 text-zinc-300 transition hover:border-amber-400/40 hover:bg-amber-500/10 hover:text-amber-100 sm:h-9 sm:w-9"
+                onClick={handleCancel}
+                type="button"
+              >
+                <X size={15} aria-hidden />
+              </button>
+            ) : null}
           </div>
 
           {editing ? (

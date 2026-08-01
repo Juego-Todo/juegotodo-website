@@ -166,7 +166,7 @@ export function OrderConfirmationPage({ orderId }: { orderId: string }) {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 className="inline-flex min-h-12 flex-1 items-center justify-center rounded-full bg-red-600 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white"
-                href="/profile?tab=orders"
+                href="/orders"
               >
                 View In Profile
               </Link>

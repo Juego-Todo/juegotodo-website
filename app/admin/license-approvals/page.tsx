@@ -8,5 +8,5 @@ export const metadata: Metadata = buildAdminMetadata(
 );
 
 export default function LicenseApprovalsRoute() {
-  redirect("/profile?tab=licenses&view=approvals");
+  redirect("/profile?tab=licenses");
 }

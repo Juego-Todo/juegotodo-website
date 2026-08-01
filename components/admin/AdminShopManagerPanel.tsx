@@ -199,44 +199,54 @@ function VariantsEditor({
           </div>
 
           <div className="mt-3 space-y-2">
-            <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto] gap-2 text-[0.58rem] font-black uppercase tracking-[0.14em] text-zinc-600">
+            <div className="hidden grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto] gap-2 text-[0.58rem] font-black uppercase tracking-[0.14em] text-zinc-600 sm:grid">
               <span>Value</span>
               <span>Price override (₱)</span>
               <span />
             </div>
             {group.options.map((option, optionIndex) => (
               <div
-                className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto] items-center gap-2"
+                className="grid grid-cols-1 gap-2 rounded-xl border border-white/5 bg-black/20 p-2.5 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto] sm:items-center sm:border-0 sm:bg-transparent sm:p-0"
                 key={option.id}
               >
-                <input
-                  aria-label="Variant value"
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none ring-red-500/30 placeholder:text-zinc-600 focus:ring-2"
-                  onChange={(event) =>
-                    updateOption(groupIndex, optionIndex, {
-                      label: event.target.value,
-                      id: slugifyProductName(event.target.value) || option.id,
-                    })
-                  }
-                  placeholder="Small, Red…"
-                  value={option.label}
-                />
-                <input
-                  aria-label="Variant price override"
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none ring-red-500/30 placeholder:text-zinc-600 focus:ring-2"
-                  min={0}
-                  onChange={(event) =>
-                    updateOption(groupIndex, optionIndex, {
-                      priceAmount: Number(event.target.value) || undefined,
-                    })
-                  }
-                  placeholder={`${basePrice || "base"}`}
-                  type="number"
-                  value={option.priceAmount ?? ""}
-                />
+                <label className="block min-w-0">
+                  <span className="mb-1 block text-[0.55rem] font-black uppercase tracking-[0.14em] text-zinc-600 sm:hidden">
+                    Value
+                  </span>
+                  <input
+                    aria-label="Variant value"
+                    className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none ring-red-500/30 placeholder:text-zinc-600 focus:ring-2 sm:py-2"
+                    onChange={(event) =>
+                      updateOption(groupIndex, optionIndex, {
+                        label: event.target.value,
+                        id: slugifyProductName(event.target.value) || option.id,
+                      })
+                    }
+                    placeholder="Small, Red…"
+                    value={option.label}
+                  />
+                </label>
+                <label className="block min-w-0">
+                  <span className="mb-1 block text-[0.55rem] font-black uppercase tracking-[0.14em] text-zinc-600 sm:hidden">
+                    Price override (₱)
+                  </span>
+                  <input
+                    aria-label="Variant price override"
+                    className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none ring-red-500/30 placeholder:text-zinc-600 focus:ring-2 sm:py-2"
+                    min={0}
+                    onChange={(event) =>
+                      updateOption(groupIndex, optionIndex, {
+                        priceAmount: Number(event.target.value) || undefined,
+                      })
+                    }
+                    placeholder={`${basePrice || "base"}`}
+                    type="number"
+                    value={option.priceAmount ?? ""}
+                  />
+                </label>
                 <button
                   aria-label="Remove value"
-                  className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-zinc-500 transition hover:text-white"
+                  className="grid h-11 w-full place-items-center rounded-lg border border-white/10 text-zinc-500 transition hover:text-white sm:h-9 sm:w-9"
                   onClick={() => removeOption(groupIndex, optionIndex)}
                   type="button"
                 >
@@ -773,42 +783,62 @@ export function AdminShopManagerPanel({ initialView = "orders" }: { initialView?
                           <span className="block truncate text-xs text-zinc-500">{product.slug}</span>
                         </span>
                       </button>
-                      <p className="text-sm text-zinc-400">{shopCategoryLabels[product.category]}</p>
-                      <p className="text-sm font-semibold text-white">{product.price}</p>
-                      <p className="text-sm text-zinc-400">
-                        {variantCount > 0 ? `${variantCount} option${variantCount === 1 ? "" : "s"}` : "—"}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <button
-                          aria-label={`Decrease stock for ${product.name}`}
-                          className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-zinc-400 transition hover:text-white"
-                          onClick={() => {
-                            updateCatalogStock(product.slug, product.stock - 1);
-                            refresh();
-                          }}
-                          type="button"
-                        >
-                          <Minus size={14} />
-                        </button>
-                        <span className={`min-w-8 text-center text-sm font-bold ${stockTone(product.stock)}`}>
-                          {product.stock}
-                        </span>
-                        <button
-                          aria-label={`Increase stock for ${product.name}`}
-                          className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-zinc-400 transition hover:text-white"
-                          onClick={() => {
-                            updateCatalogStock(product.slug, product.stock + 1);
-                            refresh();
-                          }}
-                          type="button"
-                        >
-                          <Plus size={14} />
-                        </button>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-2 sm:contents">
+                        <p className="text-sm text-zinc-400">
+                          <span className="mb-0.5 block text-[0.55rem] font-black uppercase tracking-[0.14em] text-zinc-600 sm:hidden">
+                            Category
+                          </span>
+                          {shopCategoryLabels[product.category]}
+                        </p>
+                        <p className="text-sm font-semibold text-white">
+                          <span className="mb-0.5 block text-[0.55rem] font-black uppercase tracking-[0.14em] text-zinc-600 sm:hidden">
+                            Price
+                          </span>
+                          {product.price}
+                        </p>
+                        <p className="text-sm text-zinc-400">
+                          <span className="mb-0.5 block text-[0.55rem] font-black uppercase tracking-[0.14em] text-zinc-600 sm:hidden">
+                            Variants
+                          </span>
+                          {variantCount > 0 ? `${variantCount} option${variantCount === 1 ? "" : "s"}` : "—"}
+                        </p>
+                        <div>
+                          <span className="mb-0.5 block text-[0.55rem] font-black uppercase tracking-[0.14em] text-zinc-600 sm:hidden">
+                            Stock
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              aria-label={`Decrease stock for ${product.name}`}
+                              className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-zinc-400 transition hover:text-white sm:h-8 sm:w-8"
+                              onClick={() => {
+                                updateCatalogStock(product.slug, product.stock - 1);
+                                refresh();
+                              }}
+                              type="button"
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <span className={`min-w-8 text-center text-sm font-bold ${stockTone(product.stock)}`}>
+                              {product.stock}
+                            </span>
+                            <button
+                              aria-label={`Increase stock for ${product.name}`}
+                              className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 text-zinc-400 transition hover:text-white sm:h-8 sm:w-8"
+                              onClick={() => {
+                                updateCatalogStock(product.slug, product.stock + 1);
+                                refresh();
+                              }}
+                              type="button"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center gap-2 sm:justify-end">
                         <button
                           aria-label={`Edit ${product.name}`}
-                          className="inline-flex items-center gap-1 rounded-full border border-white/10 px-3 py-2 text-[0.6rem] font-black uppercase tracking-[0.12em] text-zinc-300 transition hover:text-white"
+                          className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-full border border-white/10 px-3 py-2 text-[0.6rem] font-black uppercase tracking-[0.12em] text-zinc-300 transition hover:text-white sm:min-h-0 sm:flex-none"
                           onClick={() => setEditor({ slug: product.slug, form: productToForm(product) })}
                           type="button"
                         >
@@ -817,7 +847,7 @@ export function AdminShopManagerPanel({ initialView = "orders" }: { initialView?
                         </button>
                         <button
                           aria-label={`Remove ${product.name}`}
-                          className="grid h-9 w-9 place-items-center rounded-full border border-red-500/20 text-red-300 transition hover:bg-red-500/10"
+                          className="grid h-11 w-11 place-items-center rounded-full border border-red-500/20 text-red-300 transition hover:bg-red-500/10 sm:h-9 sm:w-9"
                           onClick={() => handleDelete(product)}
                           type="button"
                         >

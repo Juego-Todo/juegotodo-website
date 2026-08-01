@@ -63,7 +63,7 @@ export function MemberPortalHero({
               <p className={`text-[0.62rem] font-black uppercase tracking-[0.28em] ${role.accentClass}`}>
                 {role.roleTitle}
               </p>
-              <h1 className="font-display mt-2 text-4xl uppercase leading-none text-white sm:text-6xl">
+              <h1 className="font-display mt-2 text-3xl uppercase leading-none text-white sm:text-5xl lg:text-6xl">
                 {role.displayName}
               </h1>
               <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-zinc-400">{role.subtitle}</p>

@@ -178,7 +178,7 @@ export const champions: Champion[] = [
   {
     title: "Hari ng Latayan",
     name: "Alfredo Melendres Jr.",
-    crownedDate: "Dec 12, 2025",
+    crownedDate: "December 12, 2025",
     initials: "AM",
     imageSrc: "/champions/alfredo-melendres.png",
     imageAlt: "Alfredo Melendres Jr., Hari ng Latayan, holding the Juego Todo championship belt",

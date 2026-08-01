@@ -1,6 +1,7 @@
 "use client";
 
 import { UserTypeBadge } from "@/components/profile/UserTypeBadge";
+import { adminFetch } from "@/lib/auth/admin-fetch";
 import {
   assignableUserTypeTags,
   normalizeAssignedTags,
@@ -35,7 +36,7 @@ export function AdminAccountTagEditor({
   useEffect(() => {
     let cancelled = false;
 
-    void fetch(`/api/admin/members/${userId}/tags`, { cache: "no-store" })
+    void adminFetch(`/api/admin/members/${userId}/tags`)
       .then(async (response) => {
         if (!response.ok) {
           return;

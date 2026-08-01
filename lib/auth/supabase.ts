@@ -1,3 +1,4 @@
+import { adminFetch } from "@/lib/auth/admin-fetch";
 import { buildFullName, validateDateOfBirth } from "@/lib/auth/name";
 import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
@@ -361,11 +362,8 @@ export async function updateSupabaseProfile(userId: string, input: ProfileUpdate
 }
 
 export async function adminUpdateSupabaseUser(userId: string, input: AdminUserUpdateInput): Promise<UserProfile> {
-  const response = await fetch(`/api/admin/members/${encodeURIComponent(userId)}`, {
+  const response = await adminFetch(`/api/admin/members/${encodeURIComponent(userId)}`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(input),
   });
 
@@ -382,11 +380,8 @@ export async function adminUpdateSupabaseUser(userId: string, input: AdminUserUp
 }
 
 export async function adminResetSupabaseUserPassword(userId: string, password: string) {
-  const response = await fetch(`/api/admin/members/${encodeURIComponent(userId)}/password`, {
+  const response = await adminFetch(`/api/admin/members/${encodeURIComponent(userId)}/password`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({ password }),
   });
 
@@ -397,7 +392,7 @@ export async function adminResetSupabaseUserPassword(userId: string, password: s
 }
 
 export async function adminDeleteSupabaseUser(userId: string) {
-  const response = await fetch(`/api/admin/members/${encodeURIComponent(userId)}`, {
+  const response = await adminFetch(`/api/admin/members/${encodeURIComponent(userId)}`, {
     method: "DELETE",
   });
 

@@ -10,10 +10,15 @@ const sizeClasses = {
   lg: "h-28 w-28 text-4xl border-4",
 } as const;
 
-const accentClasses = {
+const accentRingClasses = {
+  amber: "border-amber-500/40 shadow-[0_0_32px_rgba(245,158,11,0.18)] hover:border-amber-300/60",
+  red: "border-white/20 shadow-[0_0_16px_rgba(255,255,255,0.06)] hover:border-red-500/40",
+} as const;
+
+const accentFillClasses = {
   amber:
-    "border-amber-500/40 shadow-[0_0_32px_rgba(245,158,11,0.18)] hover:border-amber-300/60 bg-[radial-gradient(circle_at_35%_18%,rgba(245,158,11,0.35),transparent_38%),linear-gradient(145deg,#27272a,#050505)]",
-  red: "border-white/20 shadow-[0_0_16px_rgba(255,255,255,0.06)] hover:border-red-500/40 bg-[radial-gradient(circle_at_35%_18%,rgba(255,16,16,0.22),transparent_42%),linear-gradient(145deg,#27272a,#050505)]",
+    "bg-[radial-gradient(circle_at_35%_18%,rgba(245,158,11,0.35),transparent_38%),linear-gradient(145deg,#27272a,#050505)]",
+  red: "bg-[radial-gradient(circle_at_35%_18%,rgba(255,16,16,0.22),transparent_42%),linear-gradient(145deg,#27272a,#050505)]",
 } as const;
 
 type ProfileAvatarButtonProps = {
@@ -21,7 +26,7 @@ type ProfileAvatarButtonProps = {
   portraitImage?: string;
   onSave?: (dataUrl: string) => Promise<void> | void;
   size?: keyof typeof sizeClasses;
-  accent?: keyof typeof accentClasses;
+  accent?: keyof typeof accentRingClasses;
   className?: string;
   showCameraHint?: boolean;
 };
@@ -43,7 +48,7 @@ export function ProfileAvatarButton({
     <img alt={`${displayName} profile photo`} className="h-full w-full object-cover object-top" src={portraitImage} />
   ) : (
     <div
-      className={`flex h-full w-full items-center justify-center font-display text-white ${accentClasses[accent]}`}
+      className={`flex h-full w-full items-center justify-center font-display text-white ${accentFillClasses[accent]}`}
     >
       {initials}
     </div>
@@ -52,7 +57,7 @@ export function ProfileAvatarButton({
   if (!onSave) {
     return (
       <div
-        className={`relative shrink-0 overflow-hidden rounded-full bg-black/50 ${sizeClasses[size]} ${accentClasses[accent]} ${className}`}
+        className={`relative shrink-0 overflow-hidden rounded-full bg-black/50 ${sizeClasses[size]} ${accentRingClasses[accent]} ${accentFillClasses[accent]} ${className}`}
       >
         {avatarBody}
       </div>
@@ -60,10 +65,10 @@ export function ProfileAvatarButton({
   }
 
   return (
-    <div className={className}>
+    <div className="relative shrink-0">
       <button
         aria-label={portraitImage ? "Change profile photo" : "Upload profile photo"}
-        className={`group relative shrink-0 overflow-hidden rounded-full bg-black/50 transition ${sizeClasses[size]} ${accentClasses[accent]}`}
+        className={`group relative shrink-0 overflow-hidden rounded-full bg-black/50 transition ${sizeClasses[size]} ${accentRingClasses[accent]} ${accentFillClasses[accent]} ${className}`}
         disabled={uploading}
         onClick={openFilePicker}
         type="button"
@@ -85,7 +90,7 @@ export function ProfileAvatarButton({
         ) : null}
       </button>
       {cropModal}
-      {error ? <p className="mt-2 text-xs text-red-300">{error}</p> : null}
+      {error ? <p className="absolute left-0 top-full mt-1 max-w-[10rem] text-xs text-red-300">{error}</p> : null}
     </div>
   );
 }

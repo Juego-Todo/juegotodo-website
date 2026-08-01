@@ -43,8 +43,8 @@ export function AdminPortalShell({
   }
 
   return (
-    <main className="overflow-hidden px-4 pt-20 sm:px-6 sm:pt-24 lg:px-8 lg:pt-24">
-      <section className="relative mx-auto max-w-[90rem] py-6 sm:py-8">
+    <main className="overflow-hidden px-4 pb-10 pt-20 sm:px-6 sm:pb-12 sm:pt-24 lg:px-8 lg:pt-24">
+      <section className="relative mx-auto max-w-[90rem] py-5 sm:py-8">
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
         <div className="relative">
           <BackButton href={backHref} label={backLabel} />
@@ -67,7 +67,7 @@ export function AdminPortalHeader({
   return (
     <div className="glass-panel rounded-[1.75rem] p-5 sm:p-8">
       <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">{tag}</p>
-      <h1 className="font-display mt-2 text-4xl uppercase text-white sm:text-5xl">{title}</h1>
+      <h1 className="font-display mt-2 text-3xl uppercase text-white sm:text-5xl">{title}</h1>
       <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-400">{description}</p>
     </div>
   );

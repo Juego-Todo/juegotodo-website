@@ -1,4 +1,4 @@
-import { shopProducts, type ProductVariantGroup, type ShopProduct } from "@/data/shop";
+import { productHasPhoto, shopProducts, type ProductVariantGroup, type ShopProduct } from "@/data/shop";
 import type { ShopCategory } from "@/lib/commerce/types";
 
 function formatCatalogPrice(amount: number) {
@@ -119,6 +119,11 @@ export function getCatalogState(): CatalogState {
 
 export function getLiveShopProducts(): ShopProduct[] {
   return mergeCatalogState(shopProducts, getCatalogState());
+}
+
+/** Public shop catalog — hides products that would render placeholder visuals. */
+export function getPublicShopProducts(): ShopProduct[] {
+  return getLiveShopProducts().filter(productHasPhoto);
 }
 
 export function getLiveShopProduct(slug: string): ShopProduct | undefined {

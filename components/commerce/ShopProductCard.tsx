@@ -57,12 +57,12 @@ function StandardProductCardBody({ product }: { product: ShopProduct }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-2.5 sm:p-3">
+      <div className="flex flex-1 flex-col p-3 sm:p-3">
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[0.5rem] font-black uppercase tracking-[0.12em] text-[#FF1010]/90 sm:text-[0.52rem]">
+          <p className="truncate text-[0.52rem] font-black uppercase tracking-[0.12em] text-[#FF1010]/90">
             {ecosystemLine}
           </p>
-          <h3 className="font-display mt-0.5 line-clamp-2 text-[1rem] uppercase leading-[0.95] text-white transition duration-300 group-hover:text-[#FF1010] sm:text-[1.15rem]">
+          <h3 className="font-display mt-0.5 line-clamp-2 text-[1.05rem] uppercase leading-[0.95] text-white transition duration-300 group-hover:text-[#FF1010] sm:text-[1.15rem]">
             {product.name}
           </h3>
 
@@ -111,8 +111,8 @@ function StandardProductCardBody({ product }: { product: ShopProduct }) {
         <div className="mt-2 sm:mt-2.5" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
           <AddToCartButton
             className="transition duration-300 group-hover:scale-[1.01] group-hover:shadow-[0_0_20px_rgba(255,16,16,0.3)]"
+            compact
             fullWidth
-            micro
             product={product}
           />
         </div>

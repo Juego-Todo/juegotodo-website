@@ -19,6 +19,7 @@ import {
 } from "@/components/profile/AdminAnalyticsContent";
 import { AdminPageAccessPanel } from "@/components/profile/AdminPageAccessPanel";
 import { AdminCalendarPanel } from "@/components/admin/AdminCalendarPanel";
+import { AdminLatayanologyPanel } from "@/components/admin/AdminLatayanologyPanel";
 import { AdminMemberDirectoryPanel } from "@/components/admin/AdminMemberDirectoryPanel";
 import { AdminShopManagerPanel } from "@/components/admin/AdminShopManagerPanel";
 import { AdminStoreOrdersPanel } from "@/components/admin/AdminStoreOrdersPanel";
@@ -189,11 +190,16 @@ export function UserProfilePage() {
             ? "shop"
             : searchParams.get("tab") === "members"
               ? "members"
-              : null;
+              : searchParams.get("tab") === "latayanology"
+                ? "latayanology"
+                : null;
   const [lastAdminTabDirective, setLastAdminTabDirective] = useState<string | null>(null);
 
   if (adminTabDirective && adminTabDirective !== lastAdminTabDirective) {
     setLastAdminTabDirective(adminTabDirective);
+    // Keep ops tabs on the hub section so deep-section content (e.g. personal
+    // order history for ?tab=orders) does not cover the admin workspace.
+    setActiveSection("overview");
     if (adminTabDirective === "licenses") {
       setActiveSection("membership");
       setActiveTab("licenses");
@@ -205,6 +211,8 @@ export function UserProfilePage() {
       setActiveTab("shop");
     } else if (adminTabDirective === "members") {
       setActiveTab("members");
+    } else if (adminTabDirective === "latayanology") {
+      setActiveTab("latayanology");
     }
   }
 
@@ -344,6 +352,11 @@ export function UserProfilePage() {
 
     if (memberRecord?.canAccessOpsTabs && tab === "members") {
       router.replace("/profile?tab=members", { scroll: false });
+      return;
+    }
+
+    if (memberRecord?.canAccessOpsTabs && tab === "latayanology") {
+      router.replace("/profile?tab=latayanology", { scroll: false });
     }
   }
 
@@ -389,14 +402,17 @@ export function UserProfilePage() {
     <AdminPageAccessPanel memberRecord={memberRecord} />
   ) : null;
   const calendarContent = memberRecord.canAccessOpsTabs ? <AdminCalendarPanel /> : null;
-  const ticketsContent = memberRecord.canAccessOpsTabs ? <AdminStoreOrdersPanel mode="tickets" /> : null;
+  const ticketsContent = memberRecord.canAccessOpsTabs ? (
+    <AdminStoreOrdersPanel embedded mode="tickets" />
+  ) : null;
   const shopView = searchParams.get("view") === "products" ? "products" : "orders";
   const shopContent = memberRecord.canAccessOpsTabs ? (
     <AdminShopManagerPanel initialView={shopView} />
   ) : null;
   const ordersContent = shopContent;
-  const membersContent = memberRecord.canAccessOpsTabs ? <AdminMemberDirectoryPanel /> : null;
+  const membersContent = memberRecord.canAccessOpsTabs ? <AdminMemberDirectoryPanel embedded /> : null;
   const licensesContent = membershipContent;
+  const latayanologyContent = memberRecord.canAccessOpsTabs ? <AdminLatayanologyPanel embedded /> : null;
 
   const settingsContent = (
     <ProfileSettingsPanel
@@ -696,6 +712,7 @@ export function UserProfilePage() {
             achievementsContent={achievementsContent}
             calendarContent={calendarContent}
             licensesContent={licensesContent}
+            latayanologyContent={latayanologyContent}
             membershipAnalyticsContent={membershipAnalyticsContent}
             membershipContent={membershipContent}
             membersContent={membersContent}

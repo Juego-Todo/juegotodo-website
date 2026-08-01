@@ -175,7 +175,7 @@ export function QuantityControl({
       >
         <button
           aria-label="Decrease quantity"
-          className={`rounded-l-full text-zinc-300 transition hover:bg-white/10 hover:text-white disabled:opacity-40 ${
+          className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-l-full text-zinc-300 transition hover:bg-white/10 hover:text-white disabled:opacity-40 sm:min-h-0 sm:min-w-0 ${
             size === "sm" ? "px-2.5 py-1.5" : "px-3 py-2"
           }`}
           disabled={atMin}
@@ -198,7 +198,7 @@ export function QuantityControl({
         </AnimatePresence>
         <button
           aria-label="Increase quantity"
-          className={`rounded-r-full text-zinc-300 transition hover:bg-white/10 hover:text-white disabled:opacity-40 ${
+          className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-r-full text-zinc-300 transition hover:bg-white/10 hover:text-white disabled:opacity-40 sm:min-h-0 sm:min-w-0 ${
             size === "sm" ? "px-2.5 py-1.5" : "px-3 py-2"
           }`}
           disabled={atMax}

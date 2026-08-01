@@ -22,10 +22,12 @@ export function FloatingCartBar() {
   const shippingProgress = Math.min(100, (eligibleSubtotal / FREE_SHIPPING_THRESHOLD) * 100);
   const freeShippingUnlocked = shippingRemaining <= 0;
 
+  const onProfile = pathname.startsWith("/profile") || pathname.startsWith("/admin");
   const hidden =
     cartCount === 0 ||
     pathname.startsWith("/checkout") ||
-    pathname === "/cart";
+    pathname === "/cart" ||
+    onProfile;
 
   function goCheckout() {
     if (!user) {
@@ -41,7 +43,7 @@ export function FloatingCartBar() {
         <motion.aside
           animate={{ opacity: 1, y: 0, scale: 1 }}
           aria-label="Shopping cart summary"
-          className="fixed bottom-4 right-4 z-[54] w-[min(100vw-2rem,22rem)]"
+          className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-[54] w-[min(100vw-2rem,22rem)]"
           exit={{ opacity: 0, y: 16, scale: 0.96 }}
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           transition={{ type: "spring", damping: 26, stiffness: 320 }}

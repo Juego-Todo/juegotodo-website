@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CompactProductCard } from "@/components/commerce/CompactProductCard";
-import { getShopProduct, shopProducts } from "@/data/shop";
+import { getShopProduct, productHasPhoto, shopProducts } from "@/data/shop";
 import { useCommerce } from "@/lib/commerce/context";
 import { bestSellerSlugs } from "@/lib/commerce/product-visuals";
 
@@ -34,7 +34,7 @@ export function CartRecommendations({
   const products = sourceSlugs
     .map((slug) => getShopProduct(slug))
     .filter((product): product is NonNullable<typeof product> => Boolean(product))
-    .filter((product) => !excludeSlugs.has(product.slug))
+    .filter((product) => productHasPhoto(product) && !excludeSlugs.has(product.slug))
     .slice(0, limit);
 
   if (products.length === 0) {

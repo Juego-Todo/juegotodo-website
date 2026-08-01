@@ -39,7 +39,7 @@ const profileWorkspacePages: AdminPageAccessEntry[] = [
   {
     id: "profile-license-approvals",
     page: "License Approvals",
-    route: "/profile?tab=licenses&view=approvals",
+    route: "/profile?tab=licenses",
     category: "Profile Workspace",
     description: "Pending and submitted license application review queue.",
     requiredPermission: "Can Review Licenses",

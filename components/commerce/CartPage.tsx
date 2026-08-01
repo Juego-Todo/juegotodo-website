@@ -79,7 +79,7 @@ export function CartPage() {
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
         <div className="relative">
           <PageNavigation currentLabel="Cart" />
-          <h1 className="font-display mt-3 text-[clamp(3rem,12vw,5rem)] uppercase leading-[0.9] text-white sm:mt-4">
+          <h1 className="font-display mt-3 text-[clamp(2.25rem,9vw,5rem)] uppercase leading-[0.9] text-white sm:mt-4">
             Your Cart
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base">
@@ -148,7 +148,7 @@ export function CartPage() {
                                 />
                                 <button
                                   aria-label="Remove item"
-                                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:border-red-500/40 hover:text-red-300"
+                                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:border-red-500/40 hover:text-red-300 sm:h-9 sm:w-9"
                                   onClick={() => removeFromCartWithUndo(item.productSlug)}
                                   type="button"
                                 >
@@ -156,7 +156,7 @@ export function CartPage() {
                                 </button>
                                 <button
                                   aria-label="Save for later"
-                                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:text-white"
+                                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:text-white sm:h-9 sm:w-9"
                                   onClick={() => saveForLater(item.productSlug)}
                                   type="button"
                                 >
@@ -164,7 +164,7 @@ export function CartPage() {
                                 </button>
                                 <button
                                   aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-                                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 transition ${
+                                  className={`inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 transition sm:h-9 sm:w-9 ${
                                     inWishlist ? "border-red-500/30 text-red-300" : "text-zinc-400 hover:text-white"
                                   }`}
                                   onClick={() => toggleWishlist(item.productSlug)}

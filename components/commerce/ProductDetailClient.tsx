@@ -9,7 +9,7 @@ import { ProductDisplayImage } from "@/components/commerce/ProductDisplayImage";
 import { ProductVariantSelector } from "@/components/commerce/ProductVariantSelector";
 import { StickyPurchaseBar } from "@/components/commerce/StickyPurchaseBar";
 import type { ShopProduct } from "@/data/shop";
-import { getShopProduct, shopProducts } from "@/data/shop";
+import { getShopProduct, productHasPhoto, shopProducts } from "@/data/shop";
 import { getLiveShopProduct, subscribeCatalogChanges } from "@/lib/commerce/catalog-store";
 import { useCommerce } from "@/lib/commerce/context";
 import {
@@ -114,7 +114,10 @@ export function ProductDetailClient({ product: initialProduct }: { product: Shop
   }
 
   const relatedProducts = shopProducts
-    .filter((item) => item.category === product.category && item.slug !== product.slug)
+    .filter(
+      (item) =>
+        productHasPhoto(item) && item.category === product.category && item.slug !== product.slug,
+    )
     .slice(0, 5);
 
   const bundleItems = [product, ...bundleSlugs.map((slug) => getShopProduct(slug)).filter(Boolean)]

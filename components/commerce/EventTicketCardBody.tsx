@@ -56,7 +56,7 @@ export function EventTicketCardBody({ product }: EventTicketCardBodyProps) {
       </div>
 
       <div className="mt-2" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
-        <AddToCartButton fullWidth micro product={product} />
+        <AddToCartButton compact fullWidth product={product} />
       </div>
     </div>
   );

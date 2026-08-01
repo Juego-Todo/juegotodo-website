@@ -144,10 +144,10 @@ export function ProfileFighterMobileIntro({
         y: scrollProgress * -40,
       }}
     >
-      <div className="relative min-h-[78vh] overflow-hidden rounded-[2rem] border border-white/10">
+      <div className="relative min-h-[20rem] max-h-[70svh] overflow-hidden rounded-[1.5rem] border border-white/10 sm:min-h-[24rem]">
         <Image alt="" aria-hidden className="object-cover opacity-40 blur-[2px]" fill priority sizes="100vw" src={view.actionBackground} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/75 to-black" aria-hidden />
-        <div className="relative flex h-full flex-col items-center justify-end px-6 pb-10 pt-20 text-center">
+        <div className="relative flex h-full flex-col items-center justify-end px-5 pb-8 pt-14 text-center">
           <FighterPromoPortrait
             allowUpload={allowPortraitUpload}
             displayName={view.displayName}
@@ -155,11 +155,11 @@ export function ProfileFighterMobileIntro({
             portraitImage={view.portraitImage}
             size="mobile"
           />
-          <h1 className="font-display mt-4 text-5xl uppercase leading-none text-white">{view.displayName}</h1>
+          <h1 className="font-display mt-3 text-3xl uppercase leading-none text-white sm:text-5xl">{view.displayName}</h1>
           <p className="mt-2 text-[0.62rem] font-black uppercase tracking-[0.18em] text-red-200">
             {rankLabel} National • {athlete.division}
           </p>
-          <p className="mt-4 font-display text-5xl text-[#FF1010]">{recordShort}</p>
+          <p className="mt-3 font-display text-3xl text-[#FF1010] sm:text-5xl">{recordShort}</p>
           <p className="mt-2 text-sm uppercase tracking-[0.14em] text-zinc-500">
             {view.countryFlag} {view.countryLabel}
           </p>

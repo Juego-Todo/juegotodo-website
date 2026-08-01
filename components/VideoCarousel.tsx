@@ -51,7 +51,7 @@ export function VideoCarousel() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Broadcast Library</p>
-          <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-6xl">
+          <h2 className="font-display mt-3 text-3xl uppercase leading-none text-white sm:text-6xl">
             Featured Videos
           </h2>
         </div>
@@ -72,8 +72,8 @@ export function VideoCarousel() {
                 <VideoThumbnail title={video.title} youtubeId={video.youtubeId} />
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(0,0,0,0.88))]" />
                 <div className="absolute inset-0 bg-black/20 transition group-hover:bg-black/10" />
-                <span className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 p-2.5 text-white transition group-hover:bg-[#FF1010]">
-                  <Play size={18} aria-hidden />
+                <span className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white transition group-hover:bg-[#FF1010] sm:h-11 sm:w-11">
+                  <Play size={20} aria-hidden />
                 </span>
               </div>
               <div className="bg-[#0D0D0D] p-3">

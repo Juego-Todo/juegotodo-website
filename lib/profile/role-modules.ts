@@ -432,7 +432,7 @@ export function buildProfileRoleModule(input: {
         quickLinks: [
           { label: "Council Members", section: "council-tools" },
           { label: "Regions", section: "club" },
-          { label: "Approvals", href: "/admin?tab=licenses" },
+          { label: "Approvals", href: "/profile?tab=licenses" },
           { label: "Reports", href: "/admin/reports" },
         ],
         careerSnapshot: [

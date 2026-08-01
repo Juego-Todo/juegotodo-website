@@ -53,7 +53,7 @@ function SocialRow({ className = "" }: { className?: string }) {
       {socialLinks.map((social) => (
         <a
           aria-label={social.label}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-white/[0.06] hover:text-white"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full text-zinc-500 transition hover:bg-white/[0.06] hover:text-white"
           href={social.href}
           key={social.href}
           rel="noreferrer"
@@ -76,9 +76,6 @@ export function Footer() {
           <div className="flex items-center justify-between gap-4 lg:justify-start lg:gap-6">
             <div className="flex min-w-0 items-center gap-3">
               <BrandLogo variant="header" />
-              <p className="text-[0.68rem] font-medium tracking-wide text-zinc-600">
-                Filipino Combat Sports
-              </p>
             </div>
             <SocialRow className="shrink-0 lg:hidden" />
           </div>
@@ -89,7 +86,7 @@ export function Footer() {
           >
             {primaryLinks.map((link) => (
               <Link
-                className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-zinc-500 transition hover:text-white"
+                className="inline-flex min-h-10 items-center text-[0.7rem] font-bold uppercase tracking-[0.14em] text-zinc-500 transition hover:text-white"
                 href={link.href}
                 key={link.href}
               >

@@ -110,16 +110,16 @@ export function SignatureSystemSection() {
                       <Icon className="text-[#FF1010]" size={22} aria-hidden />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <div className="flex flex-col gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1">
                         <p className="text-[0.62rem] font-black uppercase tracking-[0.22em] text-zinc-500">
                           {format.round}
                         </p>
-                        <h4 className="font-display text-3xl uppercase leading-none text-white sm:text-4xl">
+                        <h4 className="font-display text-2xl uppercase leading-none text-white sm:text-3xl lg:text-4xl">
                           {format.title}
                         </h4>
                         {format.showRules ? (
                           <Link
-                            className="inline-flex min-h-10 items-center rounded-full px-2 text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#FF1010] transition hover:text-red-300"
+                            className="inline-flex min-h-10 w-fit items-center rounded-full px-2 text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#FF1010] transition hover:text-red-300"
                             href={format.rulesHref}
                           >
                             Rules
@@ -137,13 +137,13 @@ export function SignatureSystemSection() {
 
         <div
           aria-label="League statistics"
-          className="mt-16 border-t border-white/[0.08] pt-8 sm:pt-10"
+          className="mt-10 border-t border-white/[0.08] pt-6 sm:mt-16 sm:pt-10"
         >
-          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 xl:gap-3">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-7 xl:gap-3">
             {heroMainStats.map((stat) => (
               <div className="text-center xl:text-left" key={stat.label}>
-                <p className="font-display text-2xl text-white sm:text-3xl xl:text-[2rem]">{stat.value}</p>
-                <p className="mt-1.5 text-[0.65rem] font-medium uppercase leading-snug tracking-[0.12em] text-zinc-500 sm:text-[0.62rem] sm:tracking-[0.16em]">
+                <p className="font-display text-xl text-white sm:text-3xl xl:text-[2rem]">{stat.value}</p>
+                <p className="mt-1 text-[0.6rem] font-medium uppercase leading-snug tracking-[0.1em] text-zinc-500 sm:mt-1.5 sm:text-[0.62rem] sm:tracking-[0.16em]">
                   {stat.label}
                 </p>
               </div>
@@ -160,22 +160,22 @@ export function EcosystemUniverseSection() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(255,16,16,0.14),transparent_34rem),radial-gradient(circle_at_100%_80%,rgba(255,255,255,0.08),transparent_30rem)]" aria-hidden />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div className="relative min-h-[34rem] overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0d0d0d] p-5 shadow-[0_35px_120px_rgba(0,0,0,0.55)]">
+          <div className="relative min-h-[26rem] overflow-hidden rounded-[2rem] border border-white/10 bg-[#0d0d0d] p-4 shadow-[0_35px_120px_rgba(0,0,0,0.55)] sm:min-h-[34rem] sm:rounded-[2.5rem] sm:p-5">
             <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,16,16,0.22),transparent_30%),radial-gradient(circle_at_60%_20%,rgba(255,255,255,0.08),transparent_18rem)]" aria-hidden />
             <div className="cinematic-grid absolute inset-0 opacity-[0.1]" aria-hidden />
             <div className="relative flex h-full flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="rounded-full border border-white/10 bg-black/35 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-zinc-300">
+                <span className="rounded-full border border-white/10 bg-black/35 px-3 py-1.5 text-[0.65rem] font-black uppercase tracking-[0.18em] text-zinc-300 sm:px-4 sm:py-2 sm:text-xs">
                   JTGC Ecosystem
                 </span>
-                <Globe2 className="text-[#FF1010]" size={30} aria-hidden />
+                <Globe2 className="text-[#FF1010]" size={26} aria-hidden />
               </div>
 
-              <div className="my-12 grid place-items-center">
-                <div className="relative h-72 w-72 rounded-full border border-[#FF1010]/35 bg-black/30 shadow-[0_0_90px_rgba(255,16,16,0.2)]">
+              <div className="my-8 grid place-items-center sm:my-12">
+                <div className="relative h-56 w-56 rounded-full border border-[#FF1010]/35 bg-black/30 shadow-[0_0_90px_rgba(255,16,16,0.2)] sm:h-72 sm:w-72">
                   <div className="absolute inset-8 rounded-full border border-white/10" />
                   <div className="absolute inset-16 rounded-full border border-[#FF1010]/25" />
-                  <div className="absolute left-1/2 top-1/2 grid h-28 w-28 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#FF1010] text-center font-display text-3xl uppercase leading-none text-white">
+                  <div className="absolute left-1/2 top-1/2 grid h-24 w-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#FF1010] text-center font-display text-2xl uppercase leading-none text-white sm:h-28 sm:w-28 sm:text-3xl">
                     Juego
                     <br />
                     Todo

@@ -13,13 +13,11 @@ import { ProfileSettingsPanel } from "@/components/profile/ProfileSettingsPanel"
 import { resolveAdminPortalSection, type AdminPortalSectionId } from "@/data/admin-portal-sections";
 import { resolveAccountTypeLabel, resolveUserTypeTagIds } from "@/data/user-type-tags";
 import { useAuth } from "@/lib/auth/context";
-import { useCommerce } from "@/lib/commerce/context";
 import { getAdminAssignedTags } from "@/lib/profile/account-tags";
 
 function AdminSettingsContent() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { userData } = useCommerce();
 
   if (!user) {
     return null;
@@ -32,7 +30,6 @@ function AdminSettingsContent() {
   return (
     <ProfileSettingsPanel
       accountTypeLabel={accountTypeLabel}
-      membershipTier={userData.membershipTier}
       onLogout={() => {
         void logout().then(() => {
           router.push("/login");

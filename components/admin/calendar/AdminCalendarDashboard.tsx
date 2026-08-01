@@ -165,13 +165,6 @@ export function AdminCalendarDashboard() {
     }
   }
 
-  function handlePublishChanges() {
-    const drafts = entries.filter((entry) => entry.operationalStatus === "draft" && entry.source === "admin");
-    drafts.forEach((entry) => updateCalendarOperationalStatus(entry.id, "published"));
-    refreshEntries();
-    showToast(drafts.length > 0 ? `${drafts.length} draft events published.` : "All visible changes are already published.");
-  }
-
   function handleReschedule(entryId: string, date: Date) {
     try {
       rescheduleCalendarEntry(entryId, date.toISOString());
@@ -196,7 +189,6 @@ export function AdminCalendarDashboard() {
         onExport={handleExport}
         onImport={handleImport}
         onOpenFilters={openFilterDrawer}
-        onPublish={handlePublishChanges}
         onSearchChange={(value) => setFilters((current) => ({ ...current, search: value }))}
         onViewChange={setView}
         search={filters.search}

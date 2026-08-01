@@ -436,7 +436,6 @@ export function UserProfilePage() {
   const settingsContent = (
     <ProfileSettingsPanel
       accountTypeLabel={memberRecord.accountTypeLabel}
-      membershipTier={userData.membershipTier}
       onLogout={handleLogout}
     />
   );

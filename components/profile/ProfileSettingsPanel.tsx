@@ -5,18 +5,14 @@ import { useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { useAuth } from "@/lib/auth/context";
 import { formatUsername } from "@/lib/auth/username";
-import type { MembershipTier } from "@/lib/commerce/types";
-import { getJtgcTierLabel } from "@/lib/profile/identity";
 
 type ProfileSettingsPanelProps = {
   accountTypeLabel: string;
-  membershipTier: MembershipTier;
   onLogout: () => void | Promise<void>;
 };
 
 export function ProfileSettingsPanel({
   accountTypeLabel,
-  membershipTier,
   onLogout,
 }: ProfileSettingsPanelProps) {
   const { user, updateProfile } = useAuth();
@@ -94,13 +90,9 @@ export function ProfileSettingsPanel({
               {user.username ? formatUsername(user.username) : "—"}
             </dd>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-black/35 p-4">
+          <div className="rounded-2xl border border-white/10 bg-black/35 p-4 sm:col-span-2 sm:max-w-sm">
             <dt className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">Account Type</dt>
             <dd className="mt-2 text-sm font-semibold text-white">{accountTypeLabel}</dd>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-black/35 p-4">
-            <dt className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">Membership</dt>
-            <dd className="mt-2 text-sm font-semibold text-white">{getJtgcTierLabel(membershipTier)}</dd>
           </div>
         </dl>
 

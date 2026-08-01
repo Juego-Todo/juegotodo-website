@@ -21,7 +21,6 @@ import {
   mergeTypeDetails,
   parseAdditionalDivisions,
 } from "@/data/event-type-details";
-import { calendarExampleEventInputs } from "@/data/calendar-example-events";
 import { events, type Event } from "@/data/site";
 
 const CALENDAR_KEY = "juego-todo.calendar.entries";
@@ -233,16 +232,6 @@ function mapSiteEventToCalendarEntry(event: Event): CalendarEntry {
   });
 }
 
-function mapExampleEventToCalendarEntry(input: CalendarEntryInput): CalendarEntry {
-  const normalized = buildNormalizedInput({ ...input, published: true, status: "Upcoming" });
-  return normalizeCalendarEntry({
-    ...normalized,
-    id: `example-${input.slug}`,
-    source: "static",
-    published: true,
-  });
-}
-
 function readStoredEntries(): CalendarEntry[] {
   const parsed = readJson<CalendarEntry[]>(CALENDAR_KEY, []);
   return Array.isArray(parsed) ? parsed.map((entry) => normalizeCalendarEntry(entry)) : [];
@@ -256,16 +245,18 @@ function sortByDate(entries: CalendarEntry[]) {
   return [...entries].sort((left, right) => new Date(left.date).getTime() - new Date(right.date).getTime());
 }
 
+function isExampleTemplateEntry(entry: CalendarEntry) {
+  return entry.id.startsWith("example-") || entry.slug.startsWith("example-");
+}
+
 function mergeCalendarEntries(stored: CalendarEntry[], includeDrafts: boolean) {
+  // Official site events + admin-created events only — never inject example templates.
   const staticEntries = events.map(mapSiteEventToCalendarEntry);
-  const reservedSlugs = new Set([...stored.map((entry) => entry.slug), ...staticEntries.map((entry) => entry.slug)]);
-  const exampleEntries = includeDrafts
-    ? calendarExampleEventInputs
-        .map(mapExampleEventToCalendarEntry)
-        .filter((entry) => !reservedSlugs.has(entry.slug))
-    : [];
-  const merged = [...staticEntries, ...exampleEntries, ...stored.map(normalizeCalendarEntry)];
-  return sortByDate(includeDrafts ? merged : merged.filter((entry) => entry.published && entry.operationalStatus !== "draft"));
+  const adminEntries = stored.map(normalizeCalendarEntry).filter((entry) => !isExampleTemplateEntry(entry));
+  const merged = [...staticEntries, ...adminEntries];
+  return sortByDate(
+    includeDrafts ? merged : merged.filter((entry) => entry.published && entry.operationalStatus !== "draft"),
+  );
 }
 
 export function getStoredCalendarEntries() {

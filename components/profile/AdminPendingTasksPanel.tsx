@@ -161,8 +161,7 @@ export function AdminPendingTasksPanel() {
     <section className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[0.62rem] font-black uppercase tracking-[0.28em] text-amber-200">Operations</p>
-          <h2 className="font-display mt-2 text-3xl uppercase text-white sm:text-4xl">Pending Tasks</h2>
+          <h2 className="font-display text-3xl uppercase text-white sm:text-4xl">Pending Tasks</h2>
           <p className="mt-2 max-w-2xl text-sm text-zinc-400">
             What needs admin attention right now across licenses, orders, and members.
           </p>

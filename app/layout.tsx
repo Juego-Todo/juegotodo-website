@@ -41,9 +41,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </a>
         <div className="noise" aria-hidden />
         <Providers>
-          <Navbar />
-          <div id="main-content">{children}</div>
-          <Footer />
+          <div className="flex min-h-dvh flex-col">
+            <Navbar />
+            <div className="flex min-h-0 flex-1 flex-col" id="main-content">
+              {children}
+            </div>
+            <Footer />
+          </div>
         </Providers>
       </body>
     </html>

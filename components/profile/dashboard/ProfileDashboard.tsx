@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BackButton } from "@/components/BackButton";
 import { AdminPendingTasksPanel } from "@/components/profile/AdminPendingTasksPanel";
 import { CoachPortalOverview } from "@/components/profile/dashboard/CoachPortalOverview";
 import { FanPortalOverview } from "@/components/profile/dashboard/FanPortalOverview";
@@ -335,12 +334,6 @@ export function ProfileDashboard({
                     key={activeTab}
                     transition={{ duration: 0.22 }}
                   >
-                    {isFanPortal && activeTab !== "overview" && activeTab !== "documents" ? (
-                      <div className="mb-5">
-                        <BackButton label="Back to Home" onClick={() => onTabChange("overview")} />
-                      </div>
-                    ) : null}
-
                     {activeTab === "overview" ? (
                       fighterView ? (
                         <ProfileFighterPublicProfile view={fighterView} />

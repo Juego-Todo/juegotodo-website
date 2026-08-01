@@ -68,7 +68,7 @@ function SocialRow({ className = "" }: { className?: string }) {
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-white/[0.08] bg-[#050505]">
+    <footer className="relative mt-auto border-t border-white/[0.08] bg-[#050505]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF1010]/70 to-transparent" aria-hidden />
 
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8">

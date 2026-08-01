@@ -75,7 +75,7 @@ function SlideBackdrop({ slide }: { slide: ShopHeroSlide }) {
           src={slide.imageSrc}
         />
         <div
-          className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,5,5,0.96)_0%,rgba(5,5,5,0.72)_40%,rgba(5,5,5,0.2)_72%,rgba(5,5,5,0.65)_100%)]"
+          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,0.35)_0%,rgba(5,5,5,0.45)_45%,rgba(5,5,5,0.92)_100%)] sm:bg-[linear-gradient(90deg,rgba(5,5,5,0.96)_0%,rgba(5,5,5,0.72)_40%,rgba(5,5,5,0.2)_72%,rgba(5,5,5,0.65)_100%)]"
           aria-hidden
         />
         <div
@@ -93,17 +93,18 @@ function SlideBackdrop({ slide }: { slide: ShopHeroSlide }) {
         className="absolute inset-0 bg-[radial-gradient(circle_at_78%_42%,rgba(255,16,16,0.22),transparent_34rem),radial-gradient(circle_at_18%_80%,rgba(255,16,16,0.08),transparent_24rem)]"
         aria-hidden
       />
+      {/* Mobile: keep product image clear in the upper band; desktop keeps side fade. */}
       <div
-        className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,5,5,0.98)_0%,rgba(5,5,5,0.88)_42%,rgba(5,5,5,0.35)_68%,rgba(5,5,5,0.75)_100%)]"
+        className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,0.15)_0%,rgba(5,5,5,0.2)_42%,rgba(5,5,5,0.92)_78%,rgba(5,5,5,0.98)_100%)] sm:bg-[linear-gradient(90deg,rgba(5,5,5,0.98)_0%,rgba(5,5,5,0.88)_42%,rgba(5,5,5,0.35)_68%,rgba(5,5,5,0.75)_100%)]"
         aria-hidden
       />
-      <div className="cinematic-grid absolute inset-0 opacity-[0.07]" aria-hidden />
+      <div className="cinematic-grid absolute inset-0 hidden opacity-[0.07] sm:block" aria-hidden />
 
-      <div className="absolute inset-y-0 right-0 w-full lg:w-[58%]" aria-hidden>
+      <div className="absolute inset-x-0 top-0 h-[58%] sm:inset-y-0 sm:right-0 sm:left-auto sm:h-auto sm:w-full lg:w-[58%]" aria-hidden>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_50%,rgba(255,16,16,0.14),transparent_42%)]" />
-        <div className="absolute bottom-[8%] left-1/2 h-16 w-[55%] -translate-x-1/2 rounded-[100%] bg-black/70 blur-2xl" />
-        <div className="relative mx-auto h-full w-full max-w-2xl px-6 sm:px-10 lg:max-w-none lg:px-12">
-          <div className="relative h-full min-h-[16rem] sm:min-h-[20rem] lg:min-h-full">
+        <div className="absolute bottom-[8%] left-1/2 hidden h-16 w-[55%] -translate-x-1/2 rounded-[100%] bg-black/70 blur-2xl sm:block" />
+        <div className="relative mx-auto h-full w-full max-w-2xl px-4 sm:px-10 lg:max-w-none lg:px-12">
+          <div className="relative h-full min-h-[9rem] sm:min-h-[20rem] lg:min-h-full">
             <Image
               alt={slide.imageAlt}
               className="object-contain object-center drop-shadow-[0_40px_80px_rgba(0,0,0,0.85)] lg:scale-110 lg:object-right"
@@ -176,7 +177,7 @@ export function ShopHero() {
       }}
     >
       <div className="relative w-full overflow-hidden bg-black">
-        <div className="relative min-h-[14.5rem] w-full sm:min-h-[26rem] lg:min-h-[32rem]">
+        <div className="relative min-h-[18rem] w-full sm:min-h-[26rem] lg:min-h-[32rem]">
           <AnimatePresence mode="wait">
             <motion.div
               animate={{ opacity: 1, scale: 1 }}
@@ -190,32 +191,32 @@ export function ShopHero() {
             </motion.div>
           </AnimatePresence>
 
-          <div className="relative z-10 mx-auto grid h-full min-h-[inherit] w-full max-w-7xl items-end px-4 pb-12 pt-6 sm:items-center sm:px-6 sm:py-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:px-8 lg:py-10">
+          <div className="relative z-10 mx-auto grid h-full min-h-[inherit] w-full max-w-7xl items-end px-4 pb-14 pt-4 sm:items-center sm:px-6 sm:pb-9 sm:pt-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:px-8 lg:py-10">
             <AnimatePresence mode="wait">
               <motion.div
                 animate={{ opacity: 1, x: 0 }}
-                className="max-w-xl lg:max-w-2xl"
+                className="w-full max-w-xl lg:max-w-2xl"
                 exit={{ opacity: 0, x: -20 }}
                 initial={{ opacity: 0, x: 24 }}
                 key={activeSlide.id}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
-                <h1 className="font-display text-[clamp(1.35rem,5vw,4rem)] font-normal uppercase leading-[0.92] text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)]">
+                <h1 className="font-display break-words text-[1.55rem] font-normal uppercase leading-[0.95] text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)] sm:text-[clamp(1.8rem,4.5vw,4rem)] sm:leading-[0.92]">
                   {activeSlide.title}
                 </h1>
                 <p className="mt-2 hidden max-w-lg text-sm leading-7 text-zinc-300 sm:mt-4 sm:block sm:text-base">
                   {activeSlide.description}
                 </p>
-                <div className="mt-3 flex gap-2 sm:mt-6 sm:flex-row sm:gap-3">
+                <div className="mt-3 flex flex-col gap-2 sm:mt-6 sm:flex-row sm:gap-3">
                   <Link
-                    className="inline-flex min-h-10 flex-1 items-center justify-center rounded-full bg-[#FF1010] px-4 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_0_24px_rgba(255,16,16,0.35)] transition hover:bg-[#ff2828] sm:min-h-11 sm:flex-none sm:px-7 sm:text-xs sm:tracking-[0.14em]"
+                    className="inline-flex min-h-10 w-full items-center justify-center rounded-full bg-[#FF1010] px-4 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-white shadow-[0_0_24px_rgba(255,16,16,0.35)] transition hover:bg-[#ff2828] sm:min-h-11 sm:w-auto sm:px-7 sm:text-xs sm:tracking-[0.14em]"
                     href={activeSlide.href}
                   >
                     {activeSlide.cta}
                     <ArrowRight className="ml-1.5" size={14} aria-hidden />
                   </Link>
                   <Link
-                    className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] px-4 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:bg-white/10 sm:min-h-11 sm:px-7 sm:text-xs sm:tracking-[0.14em]"
+                    className="inline-flex min-h-10 w-full items-center justify-center rounded-full border border-white/15 bg-black/40 px-4 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:bg-white/10 sm:min-h-11 sm:w-auto sm:px-7 sm:text-xs sm:tracking-[0.14em]"
                     href="#full-catalog"
                   >
                     Browse All

@@ -83,9 +83,6 @@ export function ShopCollectionButtons({ activeCollection, onSelect }: ShopCollec
                     <h3 className="font-display text-[clamp(1.35rem,2.2vw,1.85rem)] font-normal uppercase leading-[0.92] tracking-[0.03em] text-white">
                       {collection.displayTitle}
                     </h3>
-                    <p className="mt-2 line-clamp-2 max-w-[14rem] text-[0.68rem] leading-snug text-white/72">
-                      {collection.description}
-                    </p>
                     <p className="mt-1.5 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-white/45">
                       {collection.metadata}
                     </p>

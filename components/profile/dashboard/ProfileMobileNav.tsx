@@ -1,13 +1,21 @@
 "use client";
 
-import { Activity, CreditCard, LayoutDashboard, Settings, Trophy } from "lucide-react";
+import { Activity, CalendarDays, CreditCard, LayoutDashboard, Search, Settings, Trophy } from "lucide-react";
 import type { MobileTabId } from "@/lib/profile/mission-control";
 
-const icons: Record<MobileTabId, typeof LayoutDashboard> = {
+const defaultIcons: Record<MobileTabId, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
   career: Trophy,
   credential: CreditCard,
   activity: Activity,
+  settings: Settings,
+};
+
+const fanIcons: Record<MobileTabId, typeof LayoutDashboard> = {
+  dashboard: LayoutDashboard,
+  career: CalendarDays,
+  credential: CreditCard,
+  activity: Search,
   settings: Settings,
 };
 
@@ -54,9 +62,9 @@ export function ProfileMobileNav({
       : fanMode
         ? {
             dashboard: "Home",
-            career: "Events",
+            career: "Calendar",
             credential: "Credential",
-            activity: "Orders",
+            activity: "Latayanology",
             settings: "Settings",
           }
         : coachMode
@@ -74,6 +82,8 @@ export function ProfileMobileNav({
               activity: "Activity",
               settings: "Settings",
             };
+
+  const icons = fanMode ? fanIcons : defaultIcons;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/90 px-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 backdrop-blur-xl lg:hidden">

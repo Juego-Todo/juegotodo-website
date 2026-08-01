@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { BackButton } from "@/components/BackButton";
 import { AdminPendingTasksPanel } from "@/components/profile/AdminPendingTasksPanel";
 import { CoachPortalOverview } from "@/components/profile/dashboard/CoachPortalOverview";
 import { FanPortalOverview } from "@/components/profile/dashboard/FanPortalOverview";
@@ -27,7 +29,7 @@ import type { UserProfile } from "@/lib/auth/types";
 import { buildFighterProfileView } from "@/lib/profile/fighter-profile-view";
 import {
   adminWorkspaceTabs,
-  canAccessOpsWorkspaceTab,
+  canAccessWorkspaceTab,
   fighterWorkspaceTabs,
   mobileTabToWorkspace,
   workspaceTabs,
@@ -121,6 +123,7 @@ export function ProfileDashboard({
   onPortraitRemove?: () => Promise<void> | void;
   allowPortraitUpload?: boolean;
 }) {
+  const router = useRouter();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTabId>("dashboard");
   const canAccessOpsTabs = memberRecord.canAccessOpsTabs;
@@ -144,13 +147,13 @@ export function ProfileDashboard({
       }
     }
     if (isFanPortal) {
-      // Fan mobile nav: Home · Events · Orders · Settings.
+      // Fan mobile nav: Home · Calendar · Latayanology · Settings.
       if (tab === "career") {
-        onNavigateSection("events");
+        router.push("/calendar?from=profile");
         return;
       }
       if (tab === "activity") {
-        onNavigateSection("orders");
+        router.push("/latayanology?from=profile");
         return;
       }
     }
@@ -166,7 +169,8 @@ export function ProfileDashboard({
     if (section) onNavigateSection(section);
   }
 
-  const showCredentials = !canAccessOpsTabs;
+  // Fan accounts use the Licenses tab instead of the hero member-card system.
+  const showCredentials = !canAccessOpsTabs && !isFanPortal;
   const credentialPinned = showCredentials && mobileTab === "credential";
   const isShopWorkspace = activeTab === "shop" || activeTab === "orders";
   const isTicketsWorkspace = activeTab === "tickets";
@@ -204,20 +208,28 @@ export function ProfileDashboard({
 
   const heroSideCard = credentialCard;
 
-  const tabs = fighterView
-    ? showCredentials
-      ? fighterWorkspaceTabs
-      : fighterWorkspaceTabs.filter((tab) => tab.id !== "documents")
-    : showCredentials
-      ? isFanPortal
+  const tabs = canAccessOpsTabs
+    ? adminWorkspaceTabs
+    : fighterView
+      ? showCredentials
+        ? fighterWorkspaceTabs
+        : fighterWorkspaceTabs.filter((tab) => tab.id !== "documents")
+      : isFanPortal
         ? fanWorkspaceTabs
         : isCoachPortal
           ? coachWorkspaceTabs
-          : workspaceTabs
-      : adminWorkspaceTabs;
+          : workspaceTabs;
 
   function handleTabClick(tab: WorkspaceTabId) {
-    if (!canAccessOpsWorkspaceTab(tab, canAccessOpsTabs)) {
+    if (!canAccessWorkspaceTab(tab, canAccessOpsTabs, portalExperience)) {
+      return;
+    }
+    if (isFanPortal && tab === "calendar") {
+      router.push("/calendar?from=profile");
+      return;
+    }
+    if (isFanPortal && tab === "latayanology") {
+      router.push("/latayanology?from=profile");
       return;
     }
     onTabChange(tab);
@@ -323,6 +335,12 @@ export function ProfileDashboard({
                     key={activeTab}
                     transition={{ duration: 0.22 }}
                   >
+                    {isFanPortal && activeTab !== "overview" ? (
+                      <div className="mb-5">
+                        <BackButton label="Back to Home" onClick={() => onTabChange("overview")} />
+                      </div>
+                    ) : null}
+
                     {activeTab === "overview" ? (
                       fighterView ? (
                         <ProfileFighterPublicProfile view={fighterView} />
@@ -331,7 +349,10 @@ export function ProfileDashboard({
                           {canAccessOpsTabs ? (
                             <AdminPendingTasksPanel />
                           ) : isFanPortal ? (
-                            <FanPortalOverview licenseApplication={licenseApplication} user={user} />
+                            <FanPortalOverview
+                              licenseApplication={licenseApplication}
+                              onOpenLicenses={() => onTabChange("documents")}
+                            />
                           ) : isCoachPortal ? (
                             <CoachPortalOverview
                               licenseApplication={licenseApplication}
@@ -377,7 +398,7 @@ export function ProfileDashboard({
                       )
                     ) : null}
 
-                    {activeTab === "documents" && showCredentials && documentsContent ? (
+                    {activeTab === "documents" && documentsContent ? (
                       <div>{documentsContent}</div>
                     ) : null}
 

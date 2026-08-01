@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { CalendarPage } from "@/components/CalendarPage";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { resolveBreadcrumbs } from "@/lib/navigation/breadcrumbs";
@@ -17,7 +18,9 @@ export default function CalendarRoutePage() {
   return (
     <>
       <BreadcrumbJsonLd items={resolveBreadcrumbs("/calendar", "Official Calendar")} />
-      <CalendarPage />
+      <Suspense fallback={null}>
+        <CalendarPage />
+      </Suspense>
     </>
   );
 }

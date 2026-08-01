@@ -3,6 +3,7 @@ import { getShopProduct } from "@/data/shop";
 import { getLiveShopProduct } from "@/lib/commerce/catalog-store";
 import { getSelectedVariantPrice, getVariantSummary } from "@/lib/commerce/product-options";
 import type { CartItem, MembershipTier } from "@/lib/commerce/types";
+import { resolveWelcomePromo } from "@/lib/profile/onboarding";
 
 function resolveCartProduct(slug: string) {
   if (typeof window !== "undefined") {
@@ -60,12 +61,64 @@ export function getMembershipDiscountPercent(tier: MembershipTier): number {
   return 0;
 }
 
+export function resolvePromoCode(
+  promoCode: string | undefined,
+  options?: {
+    accountType?: AccountType;
+    membershipTier?: MembershipTier;
+    userId?: string | null;
+  },
+) {
+  const normalized = promoCode?.trim().toUpperCase();
+  if (!normalized) {
+    return null;
+  }
+
+  const staticPromo = PROMO_CODES[normalized];
+  if (staticPromo) {
+    const eligible =
+      (!staticPromo.fighterOnly || options?.accountType === "athlete") &&
+      (!staticPromo.eliteOnly || options?.membershipTier === "elite");
+    if (!eligible) {
+      return {
+        ok: false as const,
+        code: normalized,
+        error: staticPromo.fighterOnly
+          ? "This code is for athlete members only."
+          : "This code is for elite members only.",
+      };
+    }
+    return {
+      ok: true as const,
+      code: normalized,
+      discountPercent: staticPromo.discountPercent,
+      label: staticPromo.label,
+    };
+  }
+
+  const welcome = resolveWelcomePromo(normalized, options?.userId);
+  if (!welcome) {
+    return { ok: false as const, code: normalized, error: "Invalid promo code." };
+  }
+  if (welcome.invalid) {
+    return { ok: false as const, code: normalized, error: welcome.reason };
+  }
+
+  return {
+    ok: true as const,
+    code: welcome.code,
+    discountPercent: welcome.discountPercent,
+    label: welcome.label,
+  };
+}
+
 export function calculateLineItems(
   cart: CartItem[],
   options?: {
     accountType?: AccountType;
     membershipTier?: MembershipTier;
     promoCode?: string;
+    userId?: string | null;
   },
 ) {
   const items = cart
@@ -107,17 +160,10 @@ export function calculateLineItems(
   const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
 
   let promoDiscount = 0;
-  const normalizedPromo = options?.promoCode?.trim().toUpperCase();
-  const promo = normalizedPromo ? PROMO_CODES[normalizedPromo] : undefined;
+  const resolvedPromo = resolvePromoCode(options?.promoCode, options);
 
-  if (promo) {
-    const eligible =
-      (!promo.fighterOnly || options?.accountType === "athlete") &&
-      (!promo.eliteOnly || options?.membershipTier === "elite");
-
-    if (eligible) {
-      promoDiscount = Math.round(subtotal * (promo.discountPercent / 100));
-    }
+  if (resolvedPromo?.ok) {
+    promoDiscount = Math.round(subtotal * (resolvedPromo.discountPercent / 100));
   }
 
   const discountedSubtotal = Math.max(0, subtotal - promoDiscount);
@@ -133,8 +179,8 @@ export function calculateLineItems(
     items,
     subtotal,
     promoDiscount,
-    promoCode: promo ? normalizedPromo : undefined,
-    promoLabel: promo?.label,
+    promoCode: resolvedPromo?.ok ? resolvedPromo.code : undefined,
+    promoLabel: resolvedPromo?.ok ? resolvedPromo.label : undefined,
     shipping,
     tax,
     total,

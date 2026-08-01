@@ -179,8 +179,9 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
         accountType: user?.accountType,
         membershipTier: userData.membershipTier,
         promoCode: checkoutDraft.promoCode,
+        userId: user?.id,
       }),
-    [cart, user?.accountType, userData.membershipTier, checkoutDraft.promoCode],
+    [cart, user?.accountType, user?.id, userData.membershipTier, checkoutDraft.promoCode],
   );
 
   const cartCount = totals.itemCount;
@@ -425,6 +426,7 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
         throw new Error("You must be signed in to place an order.");
       }
 
+      const appliedPromo = promoCode ?? checkoutDraft.promoCode;
       const order = await createOrder({
         userId: user.id,
         userEmail: user.email,
@@ -434,8 +436,13 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
         paymentMethod,
         accountType: user.accountType,
         membershipTier: userData.membershipTier,
-        promoCode: promoCode ?? checkoutDraft.promoCode,
+        promoCode: appliedPromo,
       });
+
+      if (appliedPromo && order.promoCode) {
+        const { redeemWelcomePromo } = await import("@/lib/profile/onboarding");
+        redeemWelcomePromo(user.id, order.promoCode);
+      }
 
       setCart([]);
       setCheckoutDraftState({});

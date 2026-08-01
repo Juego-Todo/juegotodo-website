@@ -3,6 +3,7 @@
 import { ArrowRight, CalendarDays, LayoutGrid, List, MapPin, Radio, Settings2, Ticket, Trophy } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
@@ -502,6 +503,8 @@ function NextCalendarBanner({ entry }: { entry: CalendarEntry }) {
 
 export function CalendarPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const fromProfile = searchParams.get("from") === "profile";
   const entries = useMemo(() => getPublicCalendarEntries(), []);
   const [view, setView] = useState<CalendarViewMode>(() => {
     if (typeof window === "undefined") {
@@ -527,7 +530,11 @@ export function CalendarPage() {
       <section className="relative mx-auto max-w-7xl py-10 sm:py-14 lg:py-16">
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
         <div className="relative max-w-5xl">
-          <PageNavigation currentLabel="Official Calendar" />
+          <PageNavigation
+            backHref={fromProfile ? "/profile" : undefined}
+            backLabel={fromProfile ? "Back to Profile" : undefined}
+            currentLabel="Official Calendar"
+          />
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Juego Todo</p>

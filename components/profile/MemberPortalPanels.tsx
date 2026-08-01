@@ -91,23 +91,30 @@ export function RequirementsPanel({
   percent: number;
 }) {
   return (
-    <section className="glass-panel rounded-[1.5rem] p-5">
-      <div className="flex items-start justify-between gap-3">
+    <section className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.03] p-6 sm:p-7">
+      <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-zinc-500">Requirements</p>
-          <h3 className="font-display mt-2 text-3xl uppercase text-white">Profile</h3>
+          <h3 className="text-xl font-semibold tracking-tight text-white">Requirements</h3>
+          <p className="mt-1 text-sm text-zinc-500">What you need before review.</p>
         </div>
-        <p className="font-display text-3xl text-[#FF1010]">{percent}%</p>
+        <p className="text-2xl font-semibold tabular-nums text-white">{percent}%</p>
       </div>
-      <ul className="mt-4 space-y-2">
+      <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-white/10">
+        <div className="h-full rounded-full bg-[#FF1010] transition-all" style={{ width: `${percent}%` }} />
+      </div>
+      <ul className="mt-5 divide-y divide-white/[0.06]">
         {requirements.map((item) => (
-          <li className="flex items-center gap-2 text-sm text-zinc-300" key={item.label}>
+          <li className="flex items-center justify-between gap-3 py-3 text-sm" key={item.label}>
+            <span className={item.complete ? "text-zinc-300" : "text-zinc-500"}>{item.label}</span>
             {item.complete ? (
-              <Check className="text-emerald-400" size={16} aria-hidden />
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
+                <Check size={14} aria-hidden />
+              </span>
             ) : (
-              <X className="text-red-400" size={16} aria-hidden />
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/5 text-zinc-600">
+                <X size={14} aria-hidden />
+              </span>
             )}
-            {item.label}
           </li>
         ))}
       </ul>
@@ -133,25 +140,66 @@ export function VerificationPanel({ items }: { items: MemberVerificationItem[] }
 
 export function LicenseProgressPanel({ steps }: { steps: MemberProgressStep[] }) {
   return (
-    <section className="glass-panel rounded-[1.75rem] p-5 sm:p-8">
-      <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">License Progress</p>
-      <h2 className="font-display mt-2 text-4xl uppercase text-white sm:text-5xl">Credential Pipeline</h2>
-      <ol className="mt-6 space-y-3">
-        {steps.map((step) => (
-          <li className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-3" key={step.label}>
-            <ProgressIcon state={step.state} />
-            <span className="flex-1 text-sm font-semibold text-white">{step.label}</span>
-            <span className="text-[0.62rem] font-black uppercase tracking-[0.14em] text-zinc-500">
-              {step.state === "complete"
-                ? "Complete"
-                : step.state === "current"
-                  ? "In Review"
-                  : step.state === "waiting"
-                    ? "Waiting"
-                    : "Locked"}
-            </span>
-          </li>
-        ))}
+    <section className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.03] p-6 sm:p-7">
+      <h2 className="text-xl font-semibold tracking-tight text-white">License Progress</h2>
+      <p className="mt-1 text-sm text-zinc-500">Follow each step from application to card.</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-zinc-400">
+          About 3–5 business days
+        </span>
+        <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-zinc-400">
+          Est. ₱3,500 / year
+        </span>
+      </div>
+
+      <ol className="mt-7">
+        {steps.map((step, index) => {
+          const isLast = index === steps.length - 1;
+          const label =
+            step.state === "complete"
+              ? "Done"
+              : step.state === "current"
+                ? "In progress"
+                : step.state === "waiting"
+                  ? "Up next"
+                  : "Locked";
+
+          return (
+            <li className="relative flex gap-4 pb-6 last:pb-0" key={step.label}>
+              {!isLast ? (
+                <span
+                  className={`absolute left-[0.7rem] top-7 h-[calc(100%-0.75rem)] w-px ${
+                    step.state === "complete" ? "bg-emerald-400/40" : "bg-white/10"
+                  }`}
+                  aria-hidden
+                />
+              ) : null}
+              <ProgressIcon state={step.state} />
+              <div className="min-w-0 flex-1 pt-0.5">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p
+                    className={`text-[0.95rem] font-medium ${
+                      step.state === "locked" ? "text-zinc-500" : "text-white"
+                    }`}
+                  >
+                    {step.label}
+                  </p>
+                  <p
+                    className={`shrink-0 text-xs ${
+                      step.state === "complete"
+                        ? "text-emerald-300"
+                        : step.state === "current"
+                          ? "text-amber-200"
+                          : "text-zinc-600"
+                    }`}
+                  >
+                    {label}
+                  </p>
+                </div>
+              </div>
+            </li>
+          );
+        })}
       </ol>
     </section>
   );
@@ -262,13 +310,29 @@ function StatusPill({ status }: { status: MemberVerificationItem["status"] }) {
 
 function ProgressIcon({ state }: { state: MemberProgressStep["state"] }) {
   if (state === "complete") {
-    return <Check className="text-emerald-400" size={18} aria-hidden />;
+    return (
+      <span className="relative z-[1] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+        <Check size={13} strokeWidth={2.5} aria-hidden />
+      </span>
+    );
   }
   if (state === "current") {
-    return <Clock3 className="text-amber-300" size={18} aria-hidden />;
+    return (
+      <span className="relative z-[1] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-400/20 ring-2 ring-amber-300/70">
+        <Clock3 className="text-amber-200" size={13} aria-hidden />
+      </span>
+    );
   }
   if (state === "waiting") {
-    return <Circle className="text-zinc-500" size={18} aria-hidden />;
+    return (
+      <span className="relative z-[1] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black">
+        <Circle className="text-zinc-400" size={10} aria-hidden />
+      </span>
+    );
   }
-  return <Lock className="text-zinc-600" size={18} aria-hidden />;
+  return (
+    <span className="relative z-[1] inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black">
+      <Lock className="text-zinc-600" size={12} aria-hidden />
+    </span>
+  );
 }

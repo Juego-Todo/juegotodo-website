@@ -17,19 +17,23 @@ export const portalExperienceLabels: Record<PortalExperience, string> = {
   fan: "Fan",
 };
 
-/** Fan-first workspace: events, tickets, orders, and profile settings. */
+/** Fan-first workspace: home, calendar, fighter search, licenses, settings. */
 export const fanWorkspaceTabs: { id: WorkspaceTabId; label: string }[] = [
   { id: "overview", label: "Home" },
-  { id: "activity", label: "Activity" },
-  { id: "documents", label: "Documents" },
+  { id: "calendar", label: "Calendar" },
+  { id: "latayanology", label: "Latayanology" },
+  { id: "documents", label: "Licenses" },
   { id: "settings", label: "Settings" },
 ];
+
+/** Tabs fans may open even when the same IDs are ops-gated for other roles. */
+export const fanAccessibleTabIds: WorkspaceTabId[] = fanWorkspaceTabs.map((tab) => tab.id);
 
 /** Coach workspace: roster overview plus the standard member tools. */
 export const coachWorkspaceTabs: { id: WorkspaceTabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "activity", label: "Activity" },
-  { id: "documents", label: "Documents" },
+  { id: "documents", label: "Licenses" },
   { id: "analytics", label: "Analytics" },
   { id: "settings", label: "Settings" },
 ];

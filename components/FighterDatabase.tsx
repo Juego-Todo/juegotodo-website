@@ -5,6 +5,7 @@ import { ArrowRight, Search, TrendingUp, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { BackButton } from "@/components/BackButton";
 import {
   filterAthletes,
   getAthleteMeta,
@@ -323,11 +324,18 @@ export function FighterDatabase() {
 
   const topRanked = filtered.slice(0, activeTab === "Pound for Pound" ? 5 : 4);
 
+  const fromProfile = searchParams.get("from") === "profile";
+
   return (
     <section className="py-16 sm:py-20" id="fighters">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl">
-          <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Athlete Intelligence Platform</p>
+          <BackButton
+            href={fromProfile ? "/profile" : "/"}
+            label={fromProfile ? "Back to Profile" : "Back to Home"}
+            preferHistory
+          />
+          <p className="mt-6 text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Athlete Intelligence Platform</p>
           <h2 className="font-display mt-3 text-5xl uppercase leading-none text-white sm:text-7xl">LATAYANOLOGY</h2>
           <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
             Search Fighter only lists athletes with an admin-approved JTGC fighter license — verified records,

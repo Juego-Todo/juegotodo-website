@@ -14,7 +14,7 @@ import { getShopProduct } from "@/data/shop";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
-import { PROMO_CODES, formatCurrency } from "@/lib/commerce/pricing";
+import { formatCurrency, resolvePromoCode } from "@/lib/commerce/pricing";
 import { getStockLabel } from "@/lib/commerce/product-visuals";
 import { getVariantSummary } from "@/lib/commerce/product-options";
 import { shopCategoryLabels } from "@/lib/commerce/types";
@@ -57,20 +57,19 @@ export function CartPage() {
 
   function applyPromo() {
     const code = promoInput.trim().toUpperCase();
-    const promo = PROMO_CODES[code];
-    if (!promo) {
-      setPromoError("Invalid promo code.");
-      setPromoSuccess(false);
-      return;
-    }
-    if (promo.fighterOnly && user?.accountType !== "athlete") {
-      setPromoError("This code is for athlete members only.");
+    const promo = resolvePromoCode(code, {
+      accountType: user?.accountType,
+      membershipTier: userData.membershipTier,
+      userId: user?.id,
+    });
+    if (!promo?.ok) {
+      setPromoError(promo?.error ?? "Invalid promo code.");
       setPromoSuccess(false);
       return;
     }
     setPromoError(null);
     setPromoSuccess(true);
-    setCheckoutDraft({ ...checkoutDraft, promoCode: code });
+    setCheckoutDraft({ ...checkoutDraft, promoCode: promo.code });
   }
 
   return (

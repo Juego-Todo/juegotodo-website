@@ -205,6 +205,7 @@ export async function createOrder(input: {
     accountType: input.accountType,
     membershipTier: input.membershipTier,
     promoCode: input.promoCode,
+    userId: input.userId,
   });
 
   if (totals.items.length === 0) {

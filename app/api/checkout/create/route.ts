@@ -76,7 +76,12 @@ export async function POST(request: NextRequest) {
   const userName = profile?.full_name ?? userEmail;
 
   // Server-side re-pricing — never trust client totals.
-  const totals = calculateLineItems(cart, { accountType, membershipTier, promoCode });
+  const totals = calculateLineItems(cart, {
+    accountType,
+    membershipTier,
+    promoCode,
+    userId: user.id,
+  });
 
   if (totals.items.length === 0) {
     return NextResponse.json({ error: "Cart items are no longer available." }, { status: 400 });

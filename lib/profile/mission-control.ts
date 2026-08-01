@@ -1,7 +1,7 @@
 import type { ProfileSectionId } from "@/components/profile/ProfileSidebarNav";
 import { barrioBrawlsEvent } from "@/data/shop-tickets";
 import type { MemberRecord } from "@/lib/profile/member-record";
-import type { PortalExperience } from "@/lib/profile/portal-experience";
+import { fanAccessibleTabIds, type PortalExperience } from "@/lib/profile/portal-experience";
 import type { ProfileRoleKind, ProfileRoleModule } from "@/lib/profile/role-modules";
 
 export type WorkspaceTabId =
@@ -56,7 +56,7 @@ export type CommandAction = {
 export const workspaceTabs: { id: WorkspaceTabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "activity", label: "Activity" },
-  { id: "documents", label: "Documents" },
+  { id: "documents", label: "Licenses" },
   { id: "analytics", label: "Analytics" },
   { id: "achievements", label: "Achievements" },
   { id: "settings", label: "Settings" },
@@ -83,7 +83,6 @@ export const opsRestrictedTabIds: WorkspaceTabId[] = [
   "members",
   "licenses",
   "latayanology",
-  "activity",
   "membership-analytics",
   "shop-analytics",
   "page-access",
@@ -99,10 +98,22 @@ export function canAccessOpsWorkspaceTab(
   return canAccessOpsTabs;
 }
 
+/** Fan portals may open Calendar + Latayanology without admin ops access. */
+export function canAccessWorkspaceTab(
+  tab: WorkspaceTabId,
+  canAccessOpsTabs: boolean,
+  portalExperience?: PortalExperience | null,
+): boolean {
+  if (portalExperience === "fan" && fanAccessibleTabIds.includes(tab)) {
+    return true;
+  }
+  return canAccessOpsWorkspaceTab(tab, canAccessOpsTabs);
+}
+
 export const fighterWorkspaceTabs: { id: WorkspaceTabId; label: string }[] = [
   { id: "overview", label: "Profile" },
   { id: "camp", label: "Dashboard" },
-  { id: "documents", label: "Documents" },
+  { id: "documents", label: "Licenses" },
   { id: "settings", label: "Settings" },
 ];
 

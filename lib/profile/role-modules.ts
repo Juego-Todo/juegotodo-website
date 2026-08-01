@@ -521,8 +521,8 @@ export function buildProfileRoleModule(input: {
         subtitle: getJtgcTierLabel(userData.membershipTier),
         stats: [
           { label: "Member Since", value: new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" }).format(new Date(user.createdAt)) },
-          { label: "Fan Tier", value: getJtgcTierLabel(userData.membershipTier) },
-          { label: "Events Attended", value: `${userData.savedEvents.length}` },
+          { label: "Membership", value: getJtgcTierLabel(userData.membershipTier) },
+          { label: "Saved Events", value: `${userData.savedEvents.length}` },
           { label: "Saved Fighters", value: `${userData.savedFighters.length}` },
           { label: "Favorite Team", value: userData.savedTeams[0] ?? "—" },
           { label: "Upcoming Event", value: userData.savedEvents[0] ?? "—" },

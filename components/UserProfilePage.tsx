@@ -25,14 +25,10 @@ import { AdminShopManagerPanel } from "@/components/admin/AdminShopManagerPanel"
 import { AdminStoreOrdersPanel } from "@/components/admin/AdminStoreOrdersPanel";
 import { ProfileDashboard } from "@/components/profile/dashboard/ProfileDashboard";
 import { LicenseApplicationProfileSection } from "@/components/profile/LicenseApplicationProfileSection";
-import {
-  LicenseProgressPanel,
-  RequirementsPanel,
-} from "@/components/profile/MemberPortalPanels";
 import { ProfileSettingsPanel } from "@/components/profile/ProfileSettingsPanel";
 import type { ProfileSectionId } from "@/components/profile/ProfileSidebarNav";
 import type { WorkspaceTabId } from "@/lib/profile/mission-control";
-import { canAccessOpsWorkspaceTab } from "@/lib/profile/mission-control";
+import { canAccessWorkspaceTab } from "@/lib/profile/mission-control";
 import { events, fighters, getShopProduct } from "@/data/site";
 import { getAdminAssignedTags } from "@/lib/profile/account-tags";
 import { buildMemberRecord } from "@/lib/profile/member-record";
@@ -259,7 +255,10 @@ export function UserProfilePage() {
     );
   }
 
-  if (!memberRecord.canAccessOpsTabs && !canAccessOpsWorkspaceTab(activeTab, false)) {
+  if (
+    !memberRecord.canAccessOpsTabs &&
+    !canAccessWorkspaceTab(activeTab, false, memberRecord.portalExperience)
+  ) {
     setActiveTab("overview");
   }
 
@@ -322,9 +321,26 @@ export function UserProfilePage() {
   }
 
   function handleTabChange(tab: WorkspaceTabId) {
-    if (!canAccessOpsWorkspaceTab(tab, memberRecord?.canAccessOpsTabs ?? false)) {
+    if (
+      !canAccessWorkspaceTab(
+        tab,
+        memberRecord?.canAccessOpsTabs ?? false,
+        memberRecord?.portalExperience,
+      )
+    ) {
       setActiveTab("overview");
       return;
+    }
+
+    if (memberRecord?.portalExperience === "fan" && !memberRecord.canAccessOpsTabs) {
+      if (tab === "calendar") {
+        router.push("/calendar?from=profile");
+        return;
+      }
+      if (tab === "latayanology") {
+        router.push("/latayanology?from=profile");
+        return;
+      }
     }
 
     setActiveTab(tab);
@@ -376,10 +392,13 @@ export function UserProfilePage() {
   const isDeepSection = !hubSections.includes(activeSection);
 
   const documentsContent = memberRecord.canAccessOpsTabs ? null : (
-    <div className="space-y-6">
-      <RequirementsPanel percent={memberRecord.requirementsPercent} requirements={memberRecord.requirements} />
-      <LicenseProgressPanel steps={memberRecord.progressSteps} />
-      <LicenseApplicationProfileSection application={licenseApplication} />
+    <div className="mx-auto max-w-2xl">
+      <LicenseApplicationProfileSection
+        application={licenseApplication}
+        requirements={memberRecord.requirements}
+        requirementsPercent={memberRecord.requirementsPercent}
+        steps={memberRecord.progressSteps}
+      />
     </div>
   );
 

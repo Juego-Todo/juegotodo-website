@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { FileUploadField, FormGroup } from "@/components/profile/license-form-fields";
+import { LicenseApplicationProcessCard } from "@/components/profile/LicenseApplicationProcessCard";
 import { LicenseIdPreviewSwitch } from "@/components/profile/LicenseIdPreviewSwitch";
 import {
   AddressSection,
@@ -262,6 +263,10 @@ export function UnifiedLicenseApplicationForm({
                 <ConfirmationRow icon={Mail} label={`Confirmation email sent to ${user.email}`} tone="emerald" />
               </div>
 
+              <div className="mt-6 text-left">
+                <LicenseApplicationProcessCard compact presetKey={presetKey} />
+              </div>
+
               {isApproved ? (
                 <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-200">
                   <BadgeCheck size={16} aria-hidden />
@@ -298,6 +303,10 @@ export function UnifiedLicenseApplicationForm({
           <div className="mt-5">
             <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-[#FF1010]">{preset.label}</p>
             <h1 className="font-display mt-2 text-3xl uppercase text-white sm:text-4xl">{preset.title}</h1>
+          </div>
+
+          <div className="mt-5">
+            <LicenseApplicationProcessCard presetKey={presetKey} />
           </div>
 
           {application?.status === "rejected" && application.reviewNotes ? (

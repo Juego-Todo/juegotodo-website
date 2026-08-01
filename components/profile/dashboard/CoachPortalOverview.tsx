@@ -164,7 +164,7 @@ export function CoachPortalOverview({
                 >
                   <span className="flex items-center gap-2 text-sm font-semibold text-white">
                     <FileText className="text-red-200" size={16} aria-hidden />
-                    License Documents
+                    Licenses
                   </span>
                   <ArrowUpRight className="text-zinc-600 transition group-hover:text-red-200" size={14} aria-hidden />
                 </button>

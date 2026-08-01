@@ -1,100 +1,58 @@
 "use client";
 
-import { ArrowUpRight, Check, ChevronRight, Circle, Clock3, Lock, X } from "lucide-react";
-import Link from "next/link";
-import type { LicenseApplication } from "@/data/license-applications";
 import {
-  formatFighterRecord,
-  formatJudgeLevels,
-  formatRefereeRulesets,
-  formatTrainerDisciplines,
-  getRestrictionLabel,
-  isAdviserLicenseApplication,
-  isClubOwnerApplication,
-  isCoachLicenseApplication,
-  isGrandCouncilMemberApplication,
-  isGrandCouncilOfficerApplication,
-  isFighterLicenseApplication,
-  isStaffLicenseApplication,
-  isJudgeLicenseApplication,
-  isRefereeLicenseApplication,
-  isSeniorCoachLicenseApplication,
-  isTrainerLicenseApplication,
+  Award,
+  Briefcase,
+  Building2,
+  Check,
+  ChevronDown,
+  Circle,
+  ClipboardList,
+  Clock3,
+  Dumbbell,
+  Flag,
+  IdCard,
+  Landmark,
+  Lock,
+  PhilippinePeso,
+  Scale,
+  Shield,
+  Swords,
+  Users,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  licenseApplicationStatusLabels,
   resolveApplicationProgram,
   resolveLicenseApplicationHref,
+  type LicenseApplication,
 } from "@/data/license-applications";
+import type { LicenseProgramPresetKey } from "@/data/license-program-presets";
+import { LICENSE_PROGRAM_PRESETS } from "@/data/license-program-presets";
+import { getLicenseProcessMeta } from "@/lib/profile/license-process";
 import type { MemberProgressStep, MemberRequirement } from "@/lib/profile/member-record";
 
-const licenseOptions = [
-  { href: "/register-for-license", label: "Member License", detail: "JT1 membership" },
-  { href: "/register-for-license/fighter", label: "Fighter License", detail: "Competition athlete" },
-  { href: "/register-for-license/coach", label: "Coach License", detail: "Team coaching" },
-  { href: "/register-for-license/senior-coach", label: "Senior Coach", detail: "Elite coaching" },
-  { href: "/register-for-license/trainer", label: "Trainer License", detail: "Training credentials" },
-  { href: "/register-for-license/referee", label: "Referee License", detail: "Officiating" },
-  { href: "/register-for-license/judge", label: "Judge License", detail: "Scoring officials" },
-  { href: "/register-for-license/adviser", label: "Adviser License", detail: "Professional adviser" },
-  { href: "/register-for-license/club-owner", label: "Club Owner", detail: "Gym affiliation" },
-  { href: "/register-for-license/staff", label: "Staff License", detail: "League operations" },
-  { href: "/register-for-license/grand-council-member", label: "Grand Council Member", detail: "Council membership" },
-  { href: "/register-for-license/grand-council-officer", label: "Grand Council Officer", detail: "Council officer" },
-] as const;
-
-function programLabel(program: ReturnType<typeof resolveApplicationProgram>) {
-  switch (program) {
-    case "grand_council_officer":
-      return "Grand Council Officer";
-    case "grand_council_member":
-      return "Grand Council Member";
-    case "club_owner":
-      return "Club Owner";
-    case "coach_license":
-      return "Coach License";
-    case "senior_coach_license":
-      return "Senior Coach License";
-    case "adviser_license":
-      return "Adviser License";
-    case "trainer_license":
-      return "Trainer License";
-    case "referee_license":
-      return "Referee License";
-    case "judge_license":
-      return "Judge License";
-    case "fighter_license":
-      return "Fighter License";
-    case "staff_license":
-      return "Staff License";
-    default:
-      return "Member License";
-  }
-}
-
-function approvedTitle(input: {
-  isOfficerApplication: boolean;
-  isCouncilMemberApplication: boolean;
-  isClubOwner: boolean;
-  isCoach: boolean;
-  isSeniorCoach: boolean;
-  isAdviser: boolean;
-  isTrainer: boolean;
-  isReferee: boolean;
-  isJudge: boolean;
-  isFighter: boolean;
-  isStaff: boolean;
-}) {
-  if (input.isOfficerApplication) return "Officer ID Active";
-  if (input.isCouncilMemberApplication) return "Council Member ID Active";
-  if (input.isClubOwner) return "Club Owner ID Active";
-  if (input.isCoach) return "Coach License Active";
-  if (input.isSeniorCoach) return "Senior Coach License Active";
-  if (input.isAdviser) return "Adviser License Active";
-  if (input.isTrainer) return "Trainer License Active";
-  if (input.isReferee) return "Referee License Active";
-  if (input.isJudge) return "Judge License Active";
-  if (input.isFighter) return "Fighter License Active";
-  if (input.isStaff) return "Staff License Active";
-  return "License Active";
-}
+const LICENSE_OPTIONS: {
+  key: LicenseProgramPresetKey;
+  label: string;
+  icon: LucideIcon;
+}[] = [
+  { key: "jt1_member", label: "Member License", icon: IdCard },
+  { key: "fighter_license", label: "Fighter License", icon: Swords },
+  { key: "coach_license", label: "Coach License", icon: Users },
+  { key: "senior_coach_license", label: "Senior Coach", icon: Award },
+  { key: "trainer_license", label: "Trainer License", icon: Dumbbell },
+  { key: "referee_license", label: "Referee License", icon: Flag },
+  { key: "judge_license", label: "Judge License", icon: Scale },
+  { key: "adviser_license", label: "Adviser License", icon: Briefcase },
+  { key: "club_owner", label: "Club Owner", icon: Building2 },
+  { key: "staff_license", label: "Staff License", icon: ClipboardList },
+  { key: "grand_council_member", label: "Grand Council Member", icon: Landmark },
+  { key: "grand_council_officer", label: "Grand Council Officer", icon: Shield },
+];
 
 function resolveOverallPercent(requirementsPercent: number, steps: MemberProgressStep[]) {
   if (steps.length === 0) {
@@ -105,7 +63,6 @@ function resolveOverallPercent(requirementsPercent: number, steps: MemberProgres
   const currentBonus = steps.some((step) => step.state === "current") ? 0.35 : 0;
   const stepPercent = Math.round(((completeSteps + currentBonus) / steps.length) * 100);
 
-  // Blend document readiness with pipeline progress so one number reflects the whole journey.
   return Math.min(100, Math.round(requirementsPercent * 0.45 + stepPercent * 0.55));
 }
 
@@ -138,6 +95,381 @@ function StepIcon({ state }: { state: MemberProgressStep["state"] }) {
   );
 }
 
+function statusBadgeClasses(kind: "idle" | "progress" | "pending" | "needs_info" | "rejected" | "approved") {
+  switch (kind) {
+    case "approved":
+      return "border-emerald-400/30 bg-emerald-500/15 text-emerald-200";
+    case "pending":
+      return "border-amber-400/30 bg-amber-500/15 text-amber-100";
+    case "needs_info":
+      return "border-sky-400/30 bg-sky-500/15 text-sky-100";
+    case "rejected":
+      return "border-red-400/30 bg-red-500/15 text-red-100";
+    case "progress":
+      return "border-[#FF1010]/35 bg-[#FF1010]/15 text-red-100";
+    default:
+      return "border-white/10 bg-white/[0.04] text-zinc-400";
+  }
+}
+
+function actionButtonClass(variant: "primary" | "secondary" | "accent" = "primary") {
+  const base =
+    "inline-flex min-h-11 w-full items-center justify-center rounded-full px-5 text-sm font-semibold transition sm:w-auto";
+  if (variant === "secondary") {
+    return `${base} border border-white/15 text-white hover:bg-white/5`;
+  }
+  if (variant === "accent") {
+    return `${base} bg-[#FF1010] text-white hover:bg-[#ff2a2a]`;
+  }
+  return `${base} bg-white text-black hover:bg-zinc-200`;
+}
+
+function LicenseOptionCard({
+  optionKey,
+  label,
+  Icon,
+  active,
+  application,
+  requirements,
+  requirementsPercent,
+  steps,
+  expanded,
+  onToggle,
+}: {
+  optionKey: LicenseProgramPresetKey;
+  label: string;
+  Icon: LucideIcon;
+  active: boolean;
+  application: LicenseApplication | null;
+  requirements: MemberRequirement[];
+  requirementsPercent: number;
+  steps: MemberProgressStep[];
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const cardRef = useRef<HTMLElement | null>(null);
+  const preset = LICENSE_PROGRAM_PRESETS[optionKey];
+  const process = getLicenseProcessMeta(optionKey);
+  const status = active ? application?.status ?? null : null;
+  const overallPercent =
+    status === "approved"
+      ? 100
+      : active
+        ? resolveOverallPercent(requirementsPercent, steps)
+        : requirementsPercent;
+  const trackCompletion = active || requirements.length > 0;
+
+  const badge = (() => {
+    if (!active || !status) {
+      return { kind: "idle" as const, label: "Available" };
+    }
+    if (status === "approved") {
+      return { kind: "approved" as const, label: "Approved" };
+    }
+    if (status === "pending") {
+      return { kind: "pending" as const, label: "Pending" };
+    }
+    if (status === "needs_info") {
+      return { kind: "needs_info" as const, label: "Needs info" };
+    }
+    if (status === "rejected") {
+      return { kind: "rejected" as const, label: "Resubmit" };
+    }
+    return { kind: "progress" as const, label: `${overallPercent}%` };
+  })();
+
+  const applyHref = status === "pending" ? `${preset.href}?status=pending` : preset.href;
+  const pathwaySteps: MemberProgressStep[] = active
+    ? steps
+    : process.steps.map((stepLabel, index) => ({
+        label: stepLabel,
+        state: index === 0 ? "waiting" : "locked",
+      }));
+
+  const displayRequirements: MemberRequirement[] =
+    requirements.length > 0
+      ? requirements
+      : [
+          { label: "Membership Profile", complete: false },
+          { label: "Photo", complete: false },
+          { label: "Government ID", complete: false },
+          { label: "Signature", complete: false },
+          { label: "Medical Certificate", complete: false },
+          { label: "Emergency Contact", complete: false },
+        ];
+
+  useEffect(() => {
+    if (!expanded || !cardRef.current) {
+      return;
+    }
+    if (typeof window === "undefined" || window.matchMedia("(min-width: 640px)").matches) {
+      return;
+    }
+    const frame = window.requestAnimationFrame(() => {
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [expanded]);
+
+  return (
+    <article
+      className={`overflow-hidden rounded-2xl border transition ${
+        active
+          ? status === "approved"
+            ? "border-emerald-400/30 bg-emerald-500/[0.06]"
+            : status === "pending"
+              ? "border-amber-400/30 bg-amber-500/[0.06]"
+              : "border-[#FF1010]/30 bg-[#FF1010]/[0.05]"
+          : "border-white/[0.08] bg-black/25"
+      }`}
+      ref={cardRef}
+    >
+      <button
+        aria-expanded={expanded}
+        className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 px-3 py-3.5 text-left transition hover:bg-white/[0.03] active:bg-white/[0.05] sm:gap-x-3.5 sm:px-4 sm:py-4"
+        onClick={onToggle}
+        type="button"
+      >
+        <span
+          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+            active
+              ? "border-white/15 bg-white/10 text-white"
+              : "border-white/10 bg-white/[0.04] text-zinc-400"
+          }`}
+        >
+          <Icon size={18} aria-hidden />
+        </span>
+
+        <span className="min-w-0">
+          <span className="block truncate text-[0.9rem] font-semibold leading-5 text-white sm:text-sm">
+            {label}
+          </span>
+          <span className="mt-0.5 block truncate text-[0.7rem] leading-4 text-zinc-500 sm:text-xs">
+            {process.detail}
+            {active && status && status !== "approved" ? ` · ${overallPercent}%` : ""}
+          </span>
+        </span>
+
+        <span
+          className={`inline-flex h-6 min-w-[4.75rem] items-center justify-center rounded-full border px-2 text-[0.55rem] font-black uppercase tracking-[0.1em] ${statusBadgeClasses(badge.kind)}`}
+        >
+          {badge.label}
+        </span>
+
+        <span className="inline-flex h-8 w-8 items-center justify-center text-zinc-500">
+          <ChevronDown
+            className={`transition ${expanded ? "rotate-180" : ""}`}
+            size={18}
+            aria-hidden
+          />
+        </span>
+
+        {active && status && status !== "approved" ? (
+          <span className="col-span-full mt-2 h-1 overflow-hidden rounded-full bg-white/10 sm:hidden">
+            <span
+              className="block h-full rounded-full bg-[#FF1010]"
+              style={{ width: `${overallPercent}%` }}
+            />
+          </span>
+        ) : null}
+      </button>
+
+      {expanded ? (
+        <div className="border-t border-white/[0.06] px-3 pb-3 pt-3 sm:px-4 sm:pb-4 sm:pt-4">
+          <p className="text-[0.8rem] leading-5 text-zinc-400 sm:text-sm sm:leading-6">
+            {process.description}
+          </p>
+
+          <div className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible [&::-webkit-scrollbar]:hidden">
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1.5 text-[0.7rem] font-medium text-zinc-300 sm:text-xs">
+              <Clock3 size={12} aria-hidden />
+              {process.durationLabel}
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1.5 text-[0.7rem] font-medium text-zinc-300 sm:text-xs">
+              <PhilippinePeso size={12} aria-hidden />
+              {process.costLabel}
+            </span>
+            {active && status ? (
+              <span
+                className={`inline-flex shrink-0 rounded-full border px-2.5 py-1.5 text-[0.7rem] font-medium sm:text-xs ${statusBadgeClasses(badge.kind)}`}
+              >
+                {licenseApplicationStatusLabels[status]}
+              </span>
+            ) : null}
+          </div>
+
+          {trackCompletion ? (
+            <div className="mt-4">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[0.7rem] font-medium text-zinc-400 sm:text-xs">
+                  {active ? "Submission progress" : "Readiness"}
+                </p>
+                <p className="text-sm font-bold tabular-nums text-white">{overallPercent}%</p>
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-[#FF1010] transition-all"
+                  style={{ width: `${overallPercent}%` }}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <div className="mt-4 sm:mt-5">
+            <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-zinc-500">
+              Requirements
+            </p>
+            <ul className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+              {displayRequirements.map((item) => (
+                <li
+                  className={`flex min-h-10 items-center justify-between gap-2 rounded-xl border px-2.5 py-2 text-[0.8rem] sm:px-3 sm:text-sm ${
+                    trackCompletion && item.complete
+                      ? "border-emerald-400/20 bg-emerald-500/10 text-emerald-100"
+                      : "border-white/[0.06] bg-black/20 text-zinc-500"
+                  }`}
+                  key={item.label}
+                >
+                  <span className="truncate">{item.label}</span>
+                  {trackCompletion && item.complete ? (
+                    <Check className="shrink-0 text-emerald-300" size={14} aria-hidden />
+                  ) : (
+                    <X className="shrink-0 text-zinc-600" size={14} aria-hidden />
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-4 sm:mt-5">
+            <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-zinc-500">
+              License pathway
+            </p>
+
+            {/* Mobile: compact horizontal steps */}
+            <ol className="-mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden">
+              {pathwaySteps.map((step, index) => (
+                <li
+                  className={`flex min-w-[7.5rem] shrink-0 flex-col gap-1.5 rounded-xl border px-2.5 py-2 ${
+                    step.state === "complete"
+                      ? "border-emerald-400/20 bg-emerald-500/10"
+                      : step.state === "current"
+                        ? "border-amber-400/25 bg-amber-500/10"
+                        : "border-white/[0.06] bg-black/20"
+                  }`}
+                  key={step.label}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <StepIcon state={step.state} />
+                    <span className="text-[0.58rem] font-bold uppercase tracking-[0.1em] text-zinc-500">
+                      {index + 1}/{pathwaySteps.length}
+                    </span>
+                  </div>
+                  <p
+                    className={`text-[0.75rem] font-medium leading-4 ${
+                      step.state === "locked" ? "text-zinc-500" : "text-white"
+                    }`}
+                  >
+                    {step.label}
+                  </p>
+                </li>
+              ))}
+            </ol>
+
+            {/* Desktop / tablet: 2-col grid */}
+            <ol className="mt-2.5 hidden gap-1.5 sm:grid sm:grid-cols-2">
+              {pathwaySteps.map((step) => {
+                const stepLabel =
+                  step.state === "complete"
+                    ? "Done"
+                    : step.state === "current"
+                      ? "In progress"
+                      : step.state === "waiting"
+                        ? "Up next"
+                        : "Locked";
+
+                return (
+                  <li
+                    className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${
+                      step.state === "complete"
+                        ? "border-emerald-400/20 bg-emerald-500/10"
+                        : step.state === "current"
+                          ? "border-amber-400/25 bg-amber-500/10"
+                          : "border-white/[0.06] bg-black/20"
+                    }`}
+                    key={step.label}
+                  >
+                    <StepIcon state={step.state} />
+                    <p
+                      className={`min-w-0 flex-1 truncate text-sm font-medium ${
+                        step.state === "locked" ? "text-zinc-500" : "text-white"
+                      }`}
+                    >
+                      {step.label}
+                    </p>
+                    <p
+                      className={`shrink-0 text-[0.58rem] font-semibold uppercase tracking-[0.1em] ${
+                        step.state === "complete"
+                          ? "text-emerald-300"
+                          : step.state === "current"
+                            ? "text-amber-200"
+                            : "text-zinc-600"
+                      }`}
+                    >
+                      {stepLabel}
+                    </p>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          {active && status === "needs_info" && application?.reviewNotes ? (
+            <div className="mt-4 rounded-xl bg-sky-400/10 px-3 py-3">
+              <p className="text-sm font-medium text-sky-50">Admin note</p>
+              <p className="mt-1 text-sm leading-5 text-sky-50/80">{application.reviewNotes}</p>
+            </div>
+          ) : null}
+
+          {active && status === "rejected" && application?.reviewNotes ? (
+            <div className="mt-4 rounded-xl bg-red-500/10 px-3 py-3">
+              <p className="text-sm font-medium text-red-100">Admin note</p>
+              <p className="mt-1 text-sm leading-5 text-red-100/80">{application.reviewNotes}</p>
+            </div>
+          ) : null}
+
+          <div className="mt-4 flex flex-col gap-2 sm:mt-5 sm:flex-row sm:flex-wrap">
+            {status === "approved" ? (
+              <Link
+                className={actionButtonClass("primary")}
+                href={resolveLicenseApplicationHref(application)}
+              >
+                View license
+              </Link>
+            ) : status === "pending" ? (
+              <>
+                <Link className={actionButtonClass("primary")} href={applyHref}>
+                  View status
+                </Link>
+                <Link className={actionButtonClass("secondary")} href={preset.href}>
+                  Edit application
+                </Link>
+              </>
+            ) : status === "needs_info" || status === "rejected" ? (
+              <Link className={actionButtonClass("primary")} href={preset.href}>
+                {status === "needs_info" ? "Update application" : "Resubmit application"}
+              </Link>
+            ) : (
+              <Link className={actionButtonClass("accent")} href={preset.href}>
+                Start application
+              </Link>
+            )}
+          </div>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
 export function LicenseApplicationProfileSection({
   application,
   requirements = [],
@@ -149,321 +481,64 @@ export function LicenseApplicationProfileSection({
   requirementsPercent?: number;
   steps?: MemberProgressStep[];
 }) {
-  const status = application?.status ?? null;
-  const program = resolveApplicationProgram(application);
-  const registerHref = resolveLicenseApplicationHref(application);
-  const isOfficerApplication = isGrandCouncilOfficerApplication(application);
-  const isCouncilMemberApplication = isGrandCouncilMemberApplication(application);
-  const isClubOwner = isClubOwnerApplication(application);
-  const isCoach = isCoachLicenseApplication(application);
-  const isSeniorCoach = isSeniorCoachLicenseApplication(application);
-  const isAdviser = isAdviserLicenseApplication(application);
-  const isTrainer = isTrainerLicenseApplication(application);
-  const isReferee = isRefereeLicenseApplication(application);
-  const isJudge = isJudgeLicenseApplication(application);
-  const isFighter = isFighterLicenseApplication(application);
-  const isStaff = isStaffLicenseApplication(application);
-  const positionLabel =
-    application?.backgroundAnswers.staffPosition ||
-    application?.backgroundAnswers.staffDepartment ||
-    application?.backgroundAnswers.nickname ||
-    application?.backgroundAnswers.weightDivision ||
-    application?.backgroundAnswers.highestRank ||
-    application?.backgroundAnswers.coachingLevel ||
-    (application && isJudge
-      ? formatJudgeLevels(application.backgroundAnswers) || getRestrictionLabel(application.restrictionCode)
-      : "") ||
-    (application && isFighter
-      ? formatFighterRecord(application.backgroundAnswers) || getRestrictionLabel(application.restrictionCode)
-      : "") ||
-    (application && isReferee
-      ? formatRefereeRulesets(application.backgroundAnswers) || getRestrictionLabel(application.restrictionCode)
-      : "") ||
-    (application && isTrainer
-      ? formatTrainerDisciplines(application.backgroundAnswers) || getRestrictionLabel(application.restrictionCode)
-      : "") ||
-    application?.backgroundAnswers.clubName ||
-    application?.backgroundAnswers.officerPosition ||
-    application?.backgroundAnswers.councilPosition ||
-    (application ? getRestrictionLabel(application.restrictionCode) : "");
-  const hasCredentialId =
-    isOfficerApplication ||
-    isCouncilMemberApplication ||
-    isClubOwner ||
-    isCoach ||
-    isSeniorCoach ||
-    isAdviser ||
-    isTrainer ||
-    isReferee ||
-    isJudge ||
-    isFighter ||
-    isStaff;
+  const activeProgram = application ? resolveApplicationProgram(application) : null;
+  const activeKey = useMemo(() => {
+    if (!activeProgram || activeProgram === "legacy") {
+      return application ? ("jt1_member" as LicenseProgramPresetKey) : null;
+    }
+    return activeProgram as LicenseProgramPresetKey;
+  }, [activeProgram, application]);
 
-  const overallPercent =
-    status === "approved" ? 100 : resolveOverallPercent(requirementsPercent, steps);
-  const requirementsDone = requirements.filter((item) => item.complete).length;
-  const stepsDone = steps.filter((step) => step.state === "complete").length;
-  const currentStep = steps.find((step) => step.state === "current" || step.state === "waiting");
+  const [expandedKey, setExpandedKey] = useState<LicenseProgramPresetKey | null>(activeKey);
 
-  const title =
-    status === "approved"
-      ? approvedTitle({
-          isOfficerApplication,
-          isCouncilMemberApplication,
-          isClubOwner,
-          isCoach,
-          isSeniorCoach,
-          isAdviser,
-          isTrainer,
-          isReferee,
-          isJudge,
-          isFighter,
-          isStaff,
-        })
-      : status === "pending"
-        ? "Application in review"
-        : status === "needs_info"
-          ? "More information needed"
-          : status === "rejected"
-            ? "Resubmit required"
-            : "Apply for a license";
+  useEffect(() => {
+    if (activeKey) {
+      setExpandedKey(activeKey);
+    }
+  }, [activeKey]);
 
-  const subtitle =
-    status === "approved"
-      ? `Your ${programLabel(program)} is active on this profile.`
-      : status
-        ? `Your ${programLabel(program)} application is ${overallPercent}% complete.`
-        : "Track readiness, pick a credential, and finish your application.";
+  const sortedOptions = useMemo(() => {
+    if (!activeKey) {
+      return LICENSE_OPTIONS;
+    }
+    return [...LICENSE_OPTIONS].sort((a, b) => {
+      if (a.key === activeKey) return -1;
+      if (b.key === activeKey) return 1;
+      return 0;
+    });
+  }, [activeKey]);
 
   return (
-    <section className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.03] p-6 sm:p-7">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          {status === "approved" ? (
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-300">Approved</p>
-          ) : null}
-          <h2
-            className={`text-xl font-semibold tracking-tight text-white ${status === "approved" ? "mt-2" : ""}`}
-          >
-            {title}
-          </h2>
-          <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>
-        </div>
-        <div className="shrink-0 text-right">
-          <p className="text-2xl font-semibold tabular-nums text-white">{overallPercent}%</p>
-          <p className="mt-0.5 text-[0.62rem] font-medium uppercase tracking-[0.12em] text-zinc-500">Complete</p>
-        </div>
+    <section className="space-y-4 sm:space-y-5">
+      <div className="px-0.5">
+        <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">Apply for a license</h2>
+        <p className="mt-1 text-xs leading-5 text-zinc-500 sm:text-sm">
+          Tap a credential for requirements, pathway, cost, and progress.
+        </p>
       </div>
 
-      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
-        <div
-          className="h-full rounded-full bg-[#FF1010] transition-all"
-          style={{ width: `${overallPercent}%` }}
-        />
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-zinc-400">
-          {requirementsDone} of {requirements.length || 0} requirements
-        </span>
-        <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-zinc-400">
-          {stepsDone} of {steps.length || 0} steps
-        </span>
-        <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-zinc-400">
-          About 3–5 business days
-        </span>
-        <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-zinc-400">
-          Est. ₱3,500 / year
-        </span>
-      </div>
-
-      {requirements.length > 0 ? (
-        <div className="mt-6">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-zinc-500">Requirements</p>
-            {currentStep ? (
-              <p className="text-xs text-zinc-500">
-                Up next: <span className="text-zinc-300">{currentStep.label}</span>
-              </p>
-            ) : null}
-          </div>
-          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-            {requirements.map((item) => (
-              <li
-                className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2.5 text-sm ${
-                  item.complete
-                    ? "border-emerald-400/20 bg-emerald-500/10 text-emerald-100"
-                    : "border-white/[0.06] bg-black/25 text-zinc-500"
-                }`}
-                key={item.label}
-              >
-                <span>{item.label}</span>
-                {item.complete ? (
-                  <Check className="shrink-0 text-emerald-300" size={14} aria-hidden />
-                ) : (
-                  <X className="shrink-0 text-zinc-600" size={14} aria-hidden />
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
-      {steps.length > 0 ? (
-        <div className="mt-6">
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-zinc-500">License pathway</p>
-          <ol className="mt-3 grid gap-2 sm:grid-cols-2">
-            {steps.map((step) => {
-              const label =
-                step.state === "complete"
-                  ? "Done"
-                  : step.state === "current"
-                    ? "In progress"
-                    : step.state === "waiting"
-                      ? "Up next"
-                      : "Locked";
-
-              return (
-                <li
-                  className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 ${
-                    step.state === "complete"
-                      ? "border-emerald-400/20 bg-emerald-500/10"
-                      : step.state === "current"
-                        ? "border-amber-400/25 bg-amber-500/10"
-                        : "border-white/[0.06] bg-black/20"
-                  }`}
-                  key={step.label}
-                >
-                  <StepIcon state={step.state} />
-                  <div className="min-w-0 flex-1">
-                    <p
-                      className={`truncate text-sm font-medium ${
-                        step.state === "locked" ? "text-zinc-500" : "text-white"
-                      }`}
-                    >
-                      {step.label}
-                    </p>
-                  </div>
-                  <p
-                    className={`shrink-0 text-[0.62rem] font-semibold uppercase tracking-[0.1em] ${
-                      step.state === "complete"
-                        ? "text-emerald-300"
-                        : step.state === "current"
-                          ? "text-amber-200"
-                          : "text-zinc-600"
-                    }`}
-                  >
-                    {label}
-                  </p>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-      ) : null}
-
-      <div className="mt-6 border-t border-white/[0.08] pt-6">
-        {status === "approved" ? (
-          <Link
-            className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#FF1010] transition hover:text-[#ff3a3a]"
-            href={registerHref}
-          >
-            View application details
-            <ArrowUpRight size={16} aria-hidden />
-          </Link>
-        ) : (
-          <>
-            <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-zinc-500">
-              {status ? "Your application" : "Choose a credential"}
-            </p>
-            <p className="mt-1 text-sm text-zinc-500">
-              {status
-                ? `${programLabel(program)} · continue where you left off.`
-                : "Pick the license that matches your role to begin."}
-            </p>
-
-            {status === "pending" && application ? (
-              <div className="mt-4 flex items-start gap-3 rounded-2xl bg-amber-400/10 px-4 py-3.5">
-                <Clock3 className="mt-0.5 shrink-0 text-amber-200" size={18} aria-hidden />
-                <div>
-                  <p className="text-sm font-medium text-amber-50">Pending admin review</p>
-                  <p className="mt-0.5 text-sm text-amber-50/70">
-                    {application.fullName}
-                    {positionLabel ? ` · ${positionLabel}` : ""}
-                  </p>
-                  {hasCredentialId ? (
-                    <p className="mt-1 text-xs text-amber-100/60">ID {application.idNumber}</p>
-                  ) : null}
-                </div>
-              </div>
-            ) : null}
-
-            {status === "needs_info" && application ? (
-              <div className="mt-4 rounded-2xl bg-sky-400/10 px-4 py-3.5">
-                <p className="text-sm font-medium text-sky-50">Update and resubmit</p>
-                {application.reviewNotes ? (
-                  <p className="mt-1 text-sm text-sky-50/80">{application.reviewNotes}</p>
-                ) : (
-                  <p className="mt-1 text-sm text-sky-50/70">
-                    Add the missing details, then send it back for review.
-                  </p>
-                )}
-              </div>
-            ) : null}
-
-            {status === "rejected" && application?.reviewNotes ? (
-              <div className="mt-4 rounded-2xl bg-red-500/10 px-4 py-3.5">
-                <p className="text-sm font-medium text-red-100">Admin note</p>
-                <p className="mt-1 text-sm text-red-100/80">{application.reviewNotes}</p>
-              </div>
-            ) : null}
-
-            {status ? (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {status === "pending" ? (
-                  <Link
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black transition hover:bg-zinc-200"
-                    href={`${registerHref}?status=pending`}
-                  >
-                    View status
-                  </Link>
-                ) : null}
-                {status === "needs_info" ? (
-                  <Link
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black transition hover:bg-zinc-200"
-                    href={registerHref}
-                  >
-                    Update application
-                  </Link>
-                ) : null}
-                <Link
-                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 px-5 text-sm font-medium text-white transition hover:bg-white/5"
-                  href={registerHref}
-                >
-                  Edit application
-                </Link>
-              </div>
-            ) : (
-              <div className="mt-4 overflow-hidden rounded-2xl border border-white/[0.08] bg-black/25">
-                {licenseOptions.map((option, index) => (
-                  <Link
-                    className={`flex items-center justify-between gap-3 px-4 py-3.5 transition hover:bg-white/[0.04] ${
-                      index > 0 ? "border-t border-white/[0.06]" : ""
-                    }`}
-                    href={option.href}
-                    key={option.href}
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-white">{option.label}</p>
-                      <p className="mt-0.5 text-xs text-zinc-500">{option.detail}</p>
-                    </div>
-                    <ChevronRight className="shrink-0 text-zinc-600" size={18} aria-hidden />
-                  </Link>
-                ))}
-              </div>
-            )}
-          </>
-        )}
+      <div className="space-y-2 rounded-[1.25rem] border border-white/[0.08] bg-white/[0.03] p-2 sm:space-y-2.5 sm:rounded-[1.75rem] sm:p-3">
+        {sortedOptions.map((option) => {
+          const active = activeKey === option.key;
+          const showSharedRequirements = active || !application;
+          return (
+            <LicenseOptionCard
+              Icon={option.icon}
+              active={active}
+              application={active ? application : null}
+              expanded={expandedKey === option.key}
+              key={option.key}
+              label={option.label}
+              onToggle={() =>
+                setExpandedKey((current) => (current === option.key ? null : option.key))
+              }
+              optionKey={option.key}
+              requirements={showSharedRequirements ? requirements : []}
+              requirementsPercent={showSharedRequirements ? requirementsPercent : 0}
+              steps={active ? steps : []}
+            />
+          );
+        })}
       </div>
     </section>
   );

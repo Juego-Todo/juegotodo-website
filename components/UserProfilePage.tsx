@@ -392,7 +392,7 @@ export function UserProfilePage() {
   const isDeepSection = !hubSections.includes(activeSection);
 
   const documentsContent = memberRecord.canAccessOpsTabs ? null : (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto w-full max-w-2xl">
       <LicenseApplicationProfileSection
         application={licenseApplication}
         requirements={memberRecord.requirements}

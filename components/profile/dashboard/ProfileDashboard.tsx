@@ -335,7 +335,7 @@ export function ProfileDashboard({
                     key={activeTab}
                     transition={{ duration: 0.22 }}
                   >
-                    {isFanPortal && activeTab !== "overview" ? (
+                    {isFanPortal && activeTab !== "overview" && activeTab !== "documents" ? (
                       <div className="mb-5">
                         <BackButton label="Back to Home" onClick={() => onTabChange("overview")} />
                       </div>

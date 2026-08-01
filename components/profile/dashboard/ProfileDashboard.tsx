@@ -2,6 +2,9 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { AdminPendingTasksPanel } from "@/components/profile/AdminPendingTasksPanel";
 import { ProfileActivityFeed, ProfileCareerTimeline } from "@/components/profile/dashboard/ProfileCareerTimeline";
 import { ProfileCommandCenter } from "@/components/profile/dashboard/ProfileCommandCenter";
 import { ProfileCommandPalette, ProfileCommandPaletteHotkey } from "@/components/profile/dashboard/ProfileCommandPalette";
@@ -31,6 +34,31 @@ import {
 } from "@/lib/profile/mission-control";
 import { getProfileRolePreviewLabel, type ProfileRoleKind } from "@/lib/profile/role-modules";
 
+function OpsBrandHeader({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="flex items-center gap-4 rounded-[1.75rem] border border-white/10 bg-gradient-to-r from-black via-[#120606] to-black px-5 py-4 sm:px-6">
+      <Link
+        aria-label="Juego Todo home"
+        className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[1.1rem] border border-[#FF1010]/35 bg-black shadow-[0_0_28px_rgba(255,16,16,0.28)] sm:h-16 sm:w-16"
+        href="/"
+      >
+        <Image
+          alt="Juego Todo official logo"
+          className="h-full w-full object-contain"
+          height={64}
+          priority
+          src="/juego-todo-logo.png"
+          width={64}
+        />
+      </Link>
+      <div className="min-w-0">
+        <p className="font-display text-2xl uppercase leading-none tracking-wide text-white sm:text-3xl">{title}</p>
+        <p className="mt-1 text-[0.68rem] font-medium tracking-wide text-zinc-500">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
 export function ProfileDashboard({
   user,
   identity,
@@ -49,6 +77,8 @@ export function ProfileDashboard({
   calendarContent,
   ticketsContent,
   ordersContent,
+  shopContent,
+  membersContent,
   licensesContent,
   shopAnalyticsContent,
   previewRoleKind = null,
@@ -76,6 +106,8 @@ export function ProfileDashboard({
   calendarContent?: React.ReactNode;
   ticketsContent?: React.ReactNode;
   ordersContent?: React.ReactNode;
+  shopContent?: React.ReactNode;
+  membersContent?: React.ReactNode;
   licensesContent?: React.ReactNode;
   previewRoleKind?: ProfileRoleKind | null;
   onExitViewAs?: () => void;
@@ -106,6 +138,9 @@ export function ProfileDashboard({
 
   const showCredentials = !canAccessOpsTabs;
   const credentialPinned = showCredentials && mobileTab === "credential";
+  const isShopWorkspace = activeTab === "shop" || activeTab === "orders";
+  // Ops accounts: keep the profile strip on Overview only — other tabs are tool workspaces.
+  const showOpsProfileHero = canAccessOpsTabs && activeTab === "overview";
   const isFighterRole = memberRecord.roleModule.kind === "fighter";
   const athlete =
     identity.athlete ??
@@ -182,7 +217,9 @@ export function ProfileDashboard({
           <div className="lg:hidden">{settingsContent}</div>
         ) : (
           <>
-            {fighterView ? (
+            {isShopWorkspace ? (
+              <OpsBrandHeader subtitle="Official store operations" title="Juego Todo Shop" />
+            ) : fighterView ? (
               <>
                 <div className={`${mobileTab === "dashboard" ? "" : "hidden lg:block"}`}>
                   <div className="lg:hidden">
@@ -193,7 +230,15 @@ export function ProfileDashboard({
                   </div>
                 </div>
               </>
-            ) : (
+            ) : showOpsProfileHero ? (
+              <ProfileMissionHero
+                licenseApplication={licenseApplication}
+                memberRecord={memberRecord}
+                onPortraitUpload={onPortraitUpload}
+                portraitImage={portraitImage}
+                user={user}
+              />
+            ) : !canAccessOpsTabs ? (
               <div className={`grid gap-8 xl:grid-cols-12 xl:items-start ${mobileTab === "dashboard" ? "" : "hidden lg:grid"}`}>
                 <div className={heroSideCard ? "xl:col-span-8" : "xl:col-span-12"}>
                   <ProfileMissionHero
@@ -206,7 +251,7 @@ export function ProfileDashboard({
                 </div>
                 {heroSideCard ? <div className="hidden xl:col-span-4 xl:block">{heroSideCard}</div> : null}
               </div>
-            )}
+            ) : null}
 
             {deepSectionContent ? (
               <motion.div animate={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 8 }}>
@@ -246,7 +291,11 @@ export function ProfileDashboard({
                         <ProfileFighterPublicProfile view={fighterView} />
                       ) : (
                         <div className="space-y-10">
-                          <ProfileCommandCenter memberRecord={memberRecord} onAction={handleAction} />
+                          {canAccessOpsTabs ? (
+                            <AdminPendingTasksPanel />
+                          ) : (
+                            <ProfileCommandCenter memberRecord={memberRecord} onAction={handleAction} />
+                          )}
                           <ProfileRoleWorkspace memberRecord={memberRecord} />
                         </div>
                       )
@@ -311,7 +360,11 @@ export function ProfileDashboard({
 
                     {activeTab === "tickets" && canAccessOpsTabs ? <div>{ticketsContent}</div> : null}
 
-                    {activeTab === "orders" && canAccessOpsTabs ? <div>{ordersContent}</div> : null}
+                    {(activeTab === "shop" || activeTab === "orders") && canAccessOpsTabs ? (
+                      <div>{shopContent ?? ordersContent}</div>
+                    ) : null}
+
+                    {activeTab === "members" && canAccessOpsTabs ? <div>{membersContent}</div> : null}
 
                     {activeTab === "licenses" && canAccessOpsTabs ? (
                       <div>{licensesContent ?? membershipContent}</div>

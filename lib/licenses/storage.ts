@@ -18,6 +18,7 @@ import {
   reviewLicenseApplicationSupabase,
   saveLicenseApplicationSupabase,
 } from "@/lib/licenses/supabase";
+import { ensureApprovedFighterSlug } from "@/lib/fighters/from-license";
 import { addAdminAssignedTag } from "@/lib/profile/account-tags";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
@@ -113,7 +114,7 @@ function updateLicenseApplicationStatusLocal(
   const current = applications[index];
   const reviewedAt = new Date().toISOString();
 
-  applications[index] = {
+  let nextApplication: LicenseApplication = {
     ...current,
     status,
     reviewNotes,
@@ -122,6 +123,11 @@ function updateLicenseApplicationStatusLocal(
     expiryDate: status === "approved" ? addYears(new Date(reviewedAt), 1) : current.expiryDate,
   };
 
+  if (status === "approved") {
+    nextApplication = ensureApprovedFighterSlug(nextApplication);
+  }
+
+  applications[index] = nextApplication;
   writeApplications(applications);
 
   if (status === "approved") {
@@ -225,7 +231,7 @@ export async function reviewLicenseApplication(
     }
 
     const reviewedAt = new Date().toISOString();
-    const updated: LicenseApplication = {
+    let updated: LicenseApplication = {
       ...current,
       status,
       reviewNotes,
@@ -233,6 +239,10 @@ export async function reviewLicenseApplication(
       issuedDate: status === "approved" ? reviewedAt : current.issuedDate,
       expiryDate: status === "approved" ? addYears(new Date(reviewedAt), 1) : current.expiryDate,
     };
+
+    if (status === "approved") {
+      updated = ensureApprovedFighterSlug(updated);
+    }
 
     const saved = await reviewLicenseApplicationSupabase(applicationId, updated);
 

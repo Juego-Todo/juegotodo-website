@@ -141,7 +141,7 @@ export function AdminDashboard() {
           </Link>
           <Link
             className="rounded-full border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-zinc-300 transition hover:border-red-500/40 hover:text-white"
-            href="/admin/store-orders"
+            href="/profile?tab=shop"
           >
             Store Orders →
           </Link>

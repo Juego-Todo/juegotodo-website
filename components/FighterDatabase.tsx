@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Search, TrendingUp, Trophy, Users } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   filterAthletes,
   getAthleteMeta,
@@ -19,7 +19,8 @@ import {
   type LatayanologySortId,
 } from "@/data/latayanology";
 import { teams } from "@/data/teams";
-import { getAllEnrichedFighters, type EnrichedFighterProfile } from "@/lib/fighters/profile";
+import { fetchLicensedEnrichedFightersClient } from "@/lib/fighters/licensed";
+import type { EnrichedFighterProfile } from "@/lib/fighters/profile";
 
 const filterWeightClasses = [
   "All",
@@ -245,7 +246,9 @@ function ComparePanel({
 }
 
 export function FighterDatabase() {
-  const athletes = useMemo(() => getAllEnrichedFighters(), []);
+  const [athletes, setAthletes] = useState<EnrichedFighterProfile[]>([]);
+  const [loadingAthletes, setLoadingAthletes] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [activeTab, setActiveTab] = useState<LatayanologyRankingTab>("Pound for Pound");
   const [query, setQuery] = useState("");
   const [weightClass, setWeightClass] = useState("All");
@@ -257,6 +260,30 @@ export function FighterDatabase() {
   const [sortBy, setSortBy] = useState<LatayanologySortId>("ranking");
   const [compareLeft, setCompareLeft] = useState("");
   const [compareRight, setCompareRight] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void fetchLicensedEnrichedFightersClient()
+      .then((fighters) => {
+        if (!cancelled) {
+          setAthletes(fighters);
+          setLoadError("");
+          setLoadingAthletes(false);
+        }
+      })
+      .catch((caught) => {
+        if (!cancelled) {
+          setAthletes([]);
+          setLoadError(caught instanceof Error ? caught.message : "Unable to load licensed fighters.");
+          setLoadingAthletes(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const nationalities = useMemo(
     () => ["All", ...new Set(athletes.map((fighter) => fighter.country).filter((value): value is string => Boolean(value)))],
@@ -293,17 +320,40 @@ export function FighterDatabase() {
           <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Athlete Intelligence Platform</p>
           <h2 className="font-display mt-3 text-5xl uppercase leading-none text-white sm:text-7xl">LATAYANOLOGY</h2>
           <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
-            The official athlete intelligence platform of Juego Todo — verified rankings, records, teams,
-            and performance analytics for the global JTGC roster.
+            Search Fighter only lists athletes with an admin-approved JTGC fighter license — verified records,
+            teams, and profiles from the official roster.
           </p>
         </div>
 
-        {featuredAthlete ? (
+        {loadingAthletes ? (
+          <div className="mt-10 rounded-xl border border-white/[0.08] bg-[#0D0D0D]/80 px-5 py-10 text-center text-sm text-zinc-400">
+            Loading licensed fighters...
+          </div>
+        ) : null}
+
+        {loadError ? (
+          <div className="mt-10 rounded-xl border border-red-500/30 bg-red-500/10 px-5 py-6 text-sm text-red-100">
+            {loadError}
+          </div>
+        ) : null}
+
+        {!loadingAthletes && !loadError && athletes.length === 0 ? (
+          <div className="mt-10 rounded-xl border border-white/[0.08] bg-[#0D0D0D]/80 px-5 py-10 text-center">
+            <p className="font-display text-3xl uppercase text-white">No Licensed Fighters Yet</p>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400">
+              Fighters appear here after an admin approves their JT11 fighter license application.
+            </p>
+          </div>
+        ) : null}
+
+        {!loadingAthletes && athletes.length > 0 && featuredAthlete ? (
           <div className="mt-10">
             <FeaturedAthleteHero fighter={featuredAthlete} />
           </div>
         ) : null}
 
+        {!loadingAthletes && athletes.length > 0 ? (
+        <>
         <div className="mt-10">
           <p className="text-[0.62rem] font-black uppercase tracking-[0.22em] text-zinc-500">Top Rankings</p>
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
@@ -444,6 +494,8 @@ export function FighterDatabase() {
             </div>
           </aside>
         </div>
+        </>
+        ) : null}
       </div>
     </section>
   );

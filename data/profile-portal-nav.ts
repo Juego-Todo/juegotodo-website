@@ -55,14 +55,14 @@ const memberCoreNav: PortalNavItem[] = [
 
 const adminPortalNav: PortalNavItem[] = [
   { id: "overview", label: "Dashboard", icon: LayoutDashboard },
-  { id: "admin-members", label: "Member Directory", icon: Users, href: "/profile?tab=licenses&view=members" },
-  { id: "admin-licenses", label: "License Approvals", icon: FileBadge2, href: "/profile?tab=licenses&view=approvals" },
+  { id: "admin-members", label: "Member Directory", icon: Users, href: "/profile?tab=members" },
+  { id: "admin-licenses", label: "License Approvals", icon: FileBadge2, href: "/profile?tab=licenses" },
   { id: "important-documents", label: "Documents", icon: FileText, href: "/admin/documents" },
   { id: "calendar", label: "Calendar", icon: CalendarDays, href: "/admin/calendar" },
   { id: "official-tools", label: "Officials", icon: Flag, href: "/admin/officials" },
   { id: "council-tools", label: "Grand Council", icon: Shield, href: "/admin/grand-council" },
   { id: "admin-reports", label: "Reports", icon: BarChart3, href: "/admin/reports" },
-  { id: "orders", label: "Store Orders", icon: ShoppingBag, href: "/admin/store-orders" },
+  { id: "orders", label: "Shop", icon: ShoppingBag, href: "/profile?tab=shop" },
   { id: "notifications", label: "Announcements", icon: Bell, href: "/admin/announcements" },
   { id: "settings", label: "Settings", icon: Settings, href: "/admin/settings" },
 ];

@@ -42,22 +42,22 @@ function toLicenseApplicationRow(application: LicenseApplication) {
 }
 
 export async function fetchAllLicenseApplicationsSupabase(): Promise<LicenseApplication[]> {
-  const response = await fetch("/api/admin/licenses", {
-    method: "GET",
-    cache: "no-store",
-  });
-
-  if (response.ok) {
-    const payload = (await response.json()) as { applications?: LicenseApplication[] };
-    return payload.applications ?? [];
-  }
-
-  if (response.status !== 503) {
-    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(payload?.error ?? "Unable to load license applications.");
-  }
-
+  // Prefer the browser session — License Approvals lives under /profile, where
+  // cookie session refresh may not have run for /api/admin/* yet.
   const supabase = createSupabaseBrowserClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError) {
+    throw new Error(authError.message);
+  }
+
+  if (!user) {
+    throw new Error("Authentication required. Please sign in again.");
+  }
+
   const { data, error } = await supabase
     .from("license_applications")
     .select("*")

@@ -9,6 +9,8 @@ export type EnrichedFighterProfile = Fighter &
     losses: number;
     country: string;
     teamSlug?: string;
+    imageSrc?: string;
+    imageAlt?: string;
   };
 
 function buildEnrichedFighter(base: Fighter | FighterProfile): EnrichedFighterProfile | undefined {

@@ -344,6 +344,8 @@ export type LicenseApplication = LicenseApplicationInput & {
   submittedAt: string;
   reviewedAt: string | null;
   reviewNotes: string;
+  /** Public LATAYANOLOGY slug assigned when a fighter license is approved. */
+  fighterSlug?: string;
 };
 
 export const licenseReturnAddress = {

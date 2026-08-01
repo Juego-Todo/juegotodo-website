@@ -31,7 +31,7 @@ const profileWorkspacePages: AdminPageAccessEntry[] = [
   {
     id: "profile-members-directory",
     page: "Members Directory",
-    route: "/profile?tab=licenses&view=members",
+    route: "/profile?tab=members",
     category: "Profile Workspace",
     description: "Searchable registry of every registered platform member.",
     requiredPermission: "Can Review Licenses",
@@ -54,10 +54,10 @@ const profileWorkspacePages: AdminPageAccessEntry[] = [
   },
   {
     id: "profile-orders",
-    page: "Orders",
-    route: "/profile?tab=orders",
+    page: "Shop",
+    route: "/profile?tab=shop",
     category: "Profile Workspace",
-    description: "Commerce activity, order fulfillment, and shop revenue metrics.",
+    description: "Product catalog, inventory, order fulfillment, and shop operations.",
     requiredPermission: "Can Manage Shop",
   },
   {
@@ -71,7 +71,7 @@ const profileWorkspacePages: AdminPageAccessEntry[] = [
   {
     id: "profile-shop-analytics",
     page: "Shop Orders Analytics",
-    route: "/profile?tab=orders",
+    route: "/profile?tab=shop",
     category: "Profile Workspace",
     description: "Commerce activity, order fulfillment, and shop revenue metrics.",
     requiredPermission: "Can Manage Shop",

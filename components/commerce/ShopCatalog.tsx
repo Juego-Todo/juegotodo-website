@@ -2,10 +2,11 @@
 
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { ShopProductCard } from "@/components/commerce/ShopProductCard";
-import { shopProducts } from "@/data/shop";
+import { shopProducts, type ShopProduct } from "@/data/shop";
+import { getLiveShopProducts, subscribeCatalogChanges } from "@/lib/commerce/catalog-store";
 import { bestSellerSlugs } from "@/lib/commerce/product-visuals";
 import { getShopCollection, matchesShopCollection, type ShopCollectionId } from "@/lib/commerce/shop-collections";
 import type { ShopCategory } from "@/lib/commerce/types";
@@ -18,11 +19,18 @@ type ShopCatalogProps = {
 export function ShopCatalog({ activeCategory, activeCollection }: ShopCatalogProps) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"featured" | "price-asc" | "price-desc">("featured");
+  const [catalog, setCatalog] = useState<ShopProduct[]>(shopProducts);
   const activeCollectionMeta = getShopCollection(activeCollection);
+
+  useEffect(() => {
+    const refresh = () => setCatalog(getLiveShopProducts());
+    refresh();
+    return subscribeCatalogChanges(refresh);
+  }, []);
 
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    let results = shopProducts.filter((product) => {
+    let results = catalog.filter((product) => {
       const matchesCategory = activeCategory === "all" || product.category === activeCategory;
       const matchesCollection = matchesShopCollection(product, activeCollection);
       if (!normalized) {
@@ -48,7 +56,7 @@ export function ShopCatalog({ activeCategory, activeCollection }: ShopCatalogPro
     }
 
     return results;
-  }, [activeCategory, activeCollection, query, sort]);
+  }, [activeCategory, activeCollection, catalog, query, sort]);
 
   return (
     <MotionSection className="mt-7 border-t border-white/[0.06] pb-10 pt-7 sm:mt-9 sm:pb-14 sm:pt-9" id="full-catalog">

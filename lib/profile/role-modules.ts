@@ -139,7 +139,7 @@ export function buildProfileRoleModule(input: {
     isAdmin,
     ordersCount,
     pendingLicenseCount = 0,
-    memberCountEstimate = 14292,
+    memberCountEstimate = 0,
     overrideKind,
   } = input;
 
@@ -165,30 +165,26 @@ export function buildProfileRoleModule(input: {
         roleTitle: "System Administrator",
         subtitle: "JTGC Internal",
         stats: [
-          { label: "Pending Licenses", value: `${pendingLicenseCount || 18}` },
-          { label: "Pending Cards", value: `${Math.max(pendingLicenseCount - 6, 12)}` },
+          { label: "Pending Licenses", value: `${pendingLicenseCount}` },
+          { label: "Orders", value: `${ordersCount}` },
           { label: "Members", value: memberCountEstimate.toLocaleString() },
-          { label: "Officials", value: "284" },
-          { label: "Events", value: "43" },
         ],
         secondaryStats: [],
         quickLinks: [
-          { label: "Admin Console", href: "/admin" },
-          { label: "License Queue", href: "/admin?tab=licenses" },
-          { label: "Reports", href: "/admin/reports" },
-          { label: "Moderation", section: "notifications" },
+          { label: "License Queue", href: "/profile?tab=licenses" },
+          { label: "Shop Manager", href: "/profile?tab=shop" },
+          { label: "Member Directory", href: "/profile?tab=members" },
+          { label: "Settings", section: "settings" },
         ],
         careerSnapshot: [
-          { icon: "📊", label: "Platform Health", value: `${pendingLicenseCount || 18} Applications Pending` },
-          { icon: "✅", label: "License Approval Rate", value: "92%" },
-          { icon: "🪪", label: "Cards Waiting", value: `${Math.max(pendingLicenseCount - 6, 12)}` },
+          { icon: "📋", label: "License Queue", value: `${pendingLicenseCount} Pending` },
+          { icon: "🛒", label: "Store Activity", value: `${ordersCount} Orders` },
+          { icon: "👥", label: "Directory", value: `${memberCountEstimate} Members` },
         ],
         statistics: [
-          { label: "Pending Licenses", value: `${pendingLicenseCount || 18}` },
-          { label: "Pending Cards", value: "12" },
-          { label: "Members", value: "14,292" },
-          { label: "Officials", value: "284" },
-          { label: "Events", value: "43" },
+          { label: "Pending Licenses", value: `${pendingLicenseCount}` },
+          { label: "Orders", value: `${ordersCount}` },
+          { label: "Members", value: memberCountEstimate.toLocaleString() },
         ],
       };
 

@@ -1,10 +1,36 @@
 import { NextResponse } from "next/server";
+import type { User } from "@supabase/supabase-js";
 import { isServerAdminUser } from "@/lib/auth/admin-access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
-export async function requireAdminServiceClient() {
+async function resolveAdminUser(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  request?: Request,
+): Promise<User | null> {
+  const {
+    data: { user: cookieUser },
+  } = await supabase.auth.getUser();
+
+  if (cookieUser) {
+    return cookieUser;
+  }
+
+  const header = request?.headers.get("authorization");
+  const token = header?.startsWith("Bearer ") ? header.slice(7).trim() : "";
+  if (!token) {
+    return null;
+  }
+
+  const {
+    data: { user: tokenUser },
+  } = await supabase.auth.getUser(token);
+
+  return tokenUser ?? null;
+}
+
+export async function requireAdminServiceClient(request?: Request) {
   if (!isSupabaseConfigured()) {
     return {
       response: NextResponse.json({ error: "Supabase is not configured." }, { status: 503 }),
@@ -12,9 +38,7 @@ export async function requireAdminServiceClient() {
   }
 
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await resolveAdminUser(supabase, request);
 
   if (!user) {
     return {

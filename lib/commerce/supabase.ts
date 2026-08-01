@@ -11,6 +11,7 @@ import type {
   ShippingAddress,
   UserCommerceData,
 } from "@/lib/commerce/types";
+import { orderStatusLabels } from "@/lib/commerce/types";
 import { isPlatformOwnerEmail } from "@/lib/auth/platform-owners";
 import type { AccountType, UserProfile } from "@/lib/auth/types";
 import { calculateLineItems, generatePaymentReference } from "@/lib/commerce/pricing";
@@ -42,7 +43,7 @@ function mapAddress(row: {
   };
 }
 
-function mapOrder(row: OrderRow): Order {
+export function mapOrder(row: OrderRow): Order {
   return {
     id: row.id,
     orderNumber: row.order_number,
@@ -230,7 +231,22 @@ export async function fetchUserOrders(userId: string): Promise<Order[]> {
 }
 
 export async function fetchAllOrders(): Promise<Order[]> {
+  // Prefer the browser session — Shop/Tickets live under /profile, where
+  // cookie session refresh for /api/admin/* can fail with "Authentication required."
   const supabase = createSupabaseBrowserClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError) {
+    throw new Error(authError.message);
+  }
+
+  if (!user) {
+    throw new Error("Authentication required. Please sign in again.");
+  }
+
   const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
 
   if (error) {
@@ -352,6 +368,48 @@ export async function approveSupabaseOrderPayment(orderId: string): Promise<Orde
     throw new Error(error.message);
   }
 
+  await upsertNotification(existing.userId, {
+    title: "Payment Approved",
+    body: `Payment for order ${existing.payment.referenceNumber} was approved. Your order is being prepared.`,
+  });
+
+  return mapOrder(data);
+}
+
+export async function rejectSupabaseOrderPayment(orderId: string): Promise<Order> {
+  const supabase = createSupabaseBrowserClient();
+  const existing = await fetchOrderById(orderId);
+
+  if (!existing) {
+    throw new Error("Order not found.");
+  }
+
+  const now = new Date().toISOString();
+  const payment: OrderPayment = {
+    ...existing.payment,
+    status: "rejected",
+    verifiedAt: now,
+  };
+
+  const { data, error } = await supabase
+    .from("orders")
+    .update({
+      status: "cancelled",
+      payment,
+    })
+    .eq("id", orderId)
+    .select("*")
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  await upsertNotification(existing.userId, {
+    title: "Payment Rejected",
+    body: `Payment for order ${existing.payment.referenceNumber} was rejected. The order was cancelled.`,
+  });
+
   return mapOrder(data);
 }
 
@@ -361,6 +419,7 @@ export async function updateSupabaseOrderStatus(
   trackingNumber?: string,
 ): Promise<Order> {
   const supabase = createSupabaseBrowserClient();
+  const existing = await fetchOrderById(orderId);
   const { data, error } = await supabase
     .from("orders")
     .update({
@@ -375,7 +434,19 @@ export async function updateSupabaseOrderStatus(
     throw new Error(error.message);
   }
 
-  return mapOrder(data);
+  const order = mapOrder(data);
+  if (existing) {
+    const trackingNote =
+      status === "shipped" && (trackingNumber || order.trackingNumber)
+        ? ` Tracking: ${trackingNumber || order.trackingNumber}.`
+        : "";
+    await upsertNotification(existing.userId, {
+      title: "Order Status Updated",
+      body: `Order ${existing.payment.referenceNumber} is now ${orderStatusLabels[status]}.${trackingNote}`,
+    });
+  }
+
+  return order;
 }
 
 export function isSupabaseAdmin(profile: Pick<ProfileRow, "role" | "email"> | Pick<UserProfile, "role" | "email">) {

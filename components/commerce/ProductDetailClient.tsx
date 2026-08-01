@@ -10,6 +10,7 @@ import { ProductVariantSelector } from "@/components/commerce/ProductVariantSele
 import { StickyPurchaseBar } from "@/components/commerce/StickyPurchaseBar";
 import type { ShopProduct } from "@/data/shop";
 import { getShopProduct, shopProducts } from "@/data/shop";
+import { getLiveShopProduct, subscribeCatalogChanges } from "@/lib/commerce/catalog-store";
 import { useCommerce } from "@/lib/commerce/context";
 import {
   getDefaultVariantSelections,
@@ -49,10 +50,34 @@ function StarRating({ rating, reviewCount }: { rating: number; reviewCount: numb
   );
 }
 
-export function ProductDetailClient({ product }: { product: ShopProduct }) {
+export function ProductDetailClient({ product: initialProduct }: { product: ShopProduct }) {
   const { addToCart, trackProductView } = useCommerce();
+  const [product, setProduct] = useState(initialProduct);
   const [activeImage, setActiveImage] = useState(0);
   const [variantSelections, setVariantSelections] = useState(() => getDefaultVariantSelections(product));
+
+  // Reflect admin catalog edits (price, description, variants) made in the Shop manager.
+  useEffect(() => {
+    const refresh = () => {
+      const live = getLiveShopProduct(initialProduct.slug);
+      if (live) {
+        setProduct(live);
+        setVariantSelections((prev) => {
+          const defaults = getDefaultVariantSelections(live);
+          const valid = Object.fromEntries(
+            Object.entries(prev).filter(([groupId, optionId]) =>
+              live.variantGroups?.some(
+                (group) => group.id === groupId && group.options.some((option) => option.id === optionId),
+              ),
+            ),
+          );
+          return { ...defaults, ...valid };
+        });
+      }
+    };
+    refresh();
+    return subscribeCatalogChanges(refresh);
+  }, [initialProduct.slug]);
   const galleryImages = useMemo(() => {
     const images: string[] = [];
     if (product.imageSrc) {

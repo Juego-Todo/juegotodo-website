@@ -1,7 +1,15 @@
 import type { AccountType } from "@/lib/auth/types";
 import { getShopProduct } from "@/data/shop";
+import { getLiveShopProduct } from "@/lib/commerce/catalog-store";
 import { getSelectedVariantPrice, getVariantSummary } from "@/lib/commerce/product-options";
 import type { CartItem, MembershipTier } from "@/lib/commerce/types";
+
+function resolveCartProduct(slug: string) {
+  if (typeof window !== "undefined") {
+    return getLiveShopProduct(slug) ?? getShopProduct(slug);
+  }
+  return getShopProduct(slug);
+}
 
 export const TAX_RATE = 0.12;
 export const FREE_SHIPPING_THRESHOLD = 5000;
@@ -62,7 +70,7 @@ export function calculateLineItems(
 ) {
   const items = cart
     .map((entry) => {
-      const product = getShopProduct(entry.productSlug);
+      const product = resolveCartProduct(entry.productSlug);
       if (!product) {
         return null;
       }

@@ -19,6 +19,8 @@ import {
 } from "@/components/profile/AdminAnalyticsContent";
 import { AdminPageAccessPanel } from "@/components/profile/AdminPageAccessPanel";
 import { AdminCalendarPanel } from "@/components/admin/AdminCalendarPanel";
+import { AdminMemberDirectoryPanel } from "@/components/admin/AdminMemberDirectoryPanel";
+import { AdminShopManagerPanel } from "@/components/admin/AdminShopManagerPanel";
 import { AdminStoreOrdersPanel } from "@/components/admin/AdminStoreOrdersPanel";
 import { ProfileDashboard } from "@/components/profile/dashboard/ProfileDashboard";
 import { LicenseApplicationProfileSection } from "@/components/profile/LicenseApplicationProfileSection";
@@ -164,7 +166,6 @@ export function UserProfilePage() {
       "important-documents": "/admin/documents",
       "official-tools": "/admin/officials",
       "council-tools": "/admin/grand-council",
-      orders: "/admin/store-orders",
       notifications: "/admin/announcements",
       settings: "/admin/settings",
     };
@@ -184,9 +185,11 @@ export function UserProfilePage() {
         ? "calendar"
         : searchParams.get("tab") === "tickets"
           ? "tickets"
-          : searchParams.get("tab") === "orders"
-            ? "orders"
-            : null;
+          : searchParams.get("tab") === "shop" || searchParams.get("tab") === "orders"
+            ? "shop"
+            : searchParams.get("tab") === "members"
+              ? "members"
+              : null;
   const [lastAdminTabDirective, setLastAdminTabDirective] = useState<string | null>(null);
 
   if (adminTabDirective && adminTabDirective !== lastAdminTabDirective) {
@@ -198,8 +201,10 @@ export function UserProfilePage() {
       setActiveTab("calendar");
     } else if (adminTabDirective === "tickets") {
       setActiveTab("tickets");
-    } else if (adminTabDirective === "orders") {
-      setActiveTab("orders");
+    } else if (adminTabDirective === "shop") {
+      setActiveTab("shop");
+    } else if (adminTabDirective === "members") {
+      setActiveTab("members");
     }
   }
 
@@ -286,15 +291,16 @@ export function UserProfilePage() {
       dashboard: isFighterContext ? "camp" : "overview",
       membership: ops ? "licenses" : "overview",
       "admin-licenses": ops ? "licenses" : "overview",
+      "admin-members": ops ? "members" : "overview",
       settings: "settings",
       licenses: isFighterContext ? "camp" : ops ? "licenses" : "documents",
       "important-documents": ops ? "overview" : "documents",
       "digital-id": ops ? "overview" : "documents",
       achievements: ops ? "settings" : "achievements",
-      record: isFighterContext ? "overview" : ops ? "orders" : "analytics",
+      record: isFighterContext ? "overview" : ops ? "shop" : "analytics",
       fighter: isFighterContext ? "camp" : "analytics",
-      "admin-reports": ops ? "orders" : "overview",
-      orders: ops ? "orders" : "overview",
+      "admin-reports": ops ? "shop" : "overview",
+      orders: ops ? "shop" : "overview",
       calendar: ops ? "calendar" : "overview",
       events: ops ? "calendar" : "overview",
       "competition-entries": ops ? "tickets" : "overview",
@@ -331,8 +337,13 @@ export function UserProfilePage() {
       return;
     }
 
-    if (memberRecord?.canAccessOpsTabs && tab === "orders") {
-      router.replace("/profile?tab=orders", { scroll: false });
+    if (memberRecord?.canAccessOpsTabs && (tab === "shop" || tab === "orders")) {
+      router.replace("/profile?tab=shop", { scroll: false });
+      return;
+    }
+
+    if (memberRecord?.canAccessOpsTabs && tab === "members") {
+      router.replace("/profile?tab=members", { scroll: false });
     }
   }
 
@@ -379,7 +390,12 @@ export function UserProfilePage() {
   ) : null;
   const calendarContent = memberRecord.canAccessOpsTabs ? <AdminCalendarPanel /> : null;
   const ticketsContent = memberRecord.canAccessOpsTabs ? <AdminStoreOrdersPanel mode="tickets" /> : null;
-  const ordersContent = memberRecord.canAccessOpsTabs ? <AdminStoreOrdersPanel mode="all" /> : null;
+  const shopView = searchParams.get("view") === "products" ? "products" : "orders";
+  const shopContent = memberRecord.canAccessOpsTabs ? (
+    <AdminShopManagerPanel initialView={shopView} />
+  ) : null;
+  const ordersContent = shopContent;
+  const membersContent = memberRecord.canAccessOpsTabs ? <AdminMemberDirectoryPanel /> : null;
   const licensesContent = membershipContent;
 
   const settingsContent = (
@@ -682,9 +698,11 @@ export function UserProfilePage() {
             licensesContent={licensesContent}
             membershipAnalyticsContent={membershipAnalyticsContent}
             membershipContent={membershipContent}
+            membersContent={membersContent}
             ordersContent={ordersContent}
             pageAccessContent={pageAccessContent}
             shopAnalyticsContent={shopAnalyticsContent}
+            shopContent={shopContent}
             ticketsContent={ticketsContent}
             activeTab={activeTab}
             allowPortraitUpload

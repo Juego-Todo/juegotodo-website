@@ -211,22 +211,22 @@ export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
 }
 
 export async function getAllStoredUsersSupabase(): Promise<UserProfile[]> {
-  const response = await fetch("/api/admin/members", {
-    method: "GET",
-    cache: "no-store",
-  });
-
-  if (response.ok) {
-    const payload = (await response.json()) as { members?: UserProfile[] };
-    return payload.members ?? [];
-  }
-
-  if (response.status !== 503) {
-    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(payload?.error ?? "Unable to load member directory.");
-  }
-
+  // Prefer the browser session — Member Directory is opened from /profile,
+  // where cookie-backed /api/admin/* auth is unreliable.
   const supabase = createSupabaseBrowserClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError) {
+    throw new Error(authError.message);
+  }
+
+  if (!user) {
+    throw new Error("Authentication required. Please sign in again.");
+  }
+
   const { data, error } = await supabase
     .from("profiles")
     .select("*")

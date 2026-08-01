@@ -40,9 +40,11 @@ export async function updateSupabaseSession(request: NextRequest) {
 
     const {
       data: { user },
-    } = await withTimeout(supabase.auth.getUser(), 5000, "Session verification timed out.");
+    } = await withTimeout(supabase.auth.getUser(), 8000, "Session verification timed out.");
 
-    if (request.nextUrl.pathname.startsWith("/admin")) {
+    // Only hard-gate page routes under /admin. API routes and profile should
+    // refresh cookies without bouncing the user to login on transient failures.
+    if (request.nextUrl.pathname.startsWith("/admin") && !request.nextUrl.pathname.startsWith("/api/")) {
       if (!user) {
         return redirectWithCookies(request, response, `/login?next=${encodeURIComponent(request.nextUrl.pathname)}`);
       }
@@ -55,7 +57,7 @@ export async function updateSupabaseSession(request: NextRequest) {
             .eq("id", user.id)
             .maybeSingle(),
         ),
-        5000,
+        8000,
         "Admin verification timed out.",
       );
 
@@ -64,12 +66,8 @@ export async function updateSupabaseSession(request: NextRequest) {
       }
     }
   } catch {
-    if (request.nextUrl.pathname.startsWith("/admin")) {
-      const loginPath = `/login?next=${encodeURIComponent(request.nextUrl.pathname)}&authError=${encodeURIComponent(
-        "Your session could not be verified. Please sign in again.",
-      )}`;
-      return redirectWithCookies(request, response, loginPath);
-    }
+    // Transient network/timeouts must not force a re-login loop.
+    return response;
   }
 
   return response;

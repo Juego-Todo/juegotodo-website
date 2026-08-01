@@ -14,6 +14,8 @@ export type WorkspaceTabId =
   | "calendar"
   | "tickets"
   | "orders"
+  | "shop"
+  | "members"
   | "licenses"
   | "achievements"
   | "page-access"
@@ -63,7 +65,8 @@ export const adminWorkspaceTabs: { id: WorkspaceTabId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "calendar", label: "Calendar" },
   { id: "tickets", label: "Tickets" },
-  { id: "orders", label: "Orders" },
+  { id: "shop", label: "Shop" },
+  { id: "members", label: "Members" },
   { id: "licenses", label: "Licenses" },
   { id: "settings", label: "Settings" },
 ];
@@ -73,6 +76,8 @@ export const opsRestrictedTabIds: WorkspaceTabId[] = [
   "calendar",
   "tickets",
   "orders",
+  "shop",
+  "members",
   "licenses",
   "activity",
   "membership-analytics",

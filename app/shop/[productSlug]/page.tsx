@@ -1,3 +1,4 @@
+import { LiveProductFallback } from "@/components/commerce/LiveProductFallback";
 import { ProductDetailClient } from "@/components/commerce/ProductDetailClient";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { JsonLd } from "@/components/JsonLd";
@@ -10,7 +11,6 @@ import { getShopNeighbors } from "@/lib/navigation/prev-next";
 import { productJsonLd } from "@/lib/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 
 type PageProps = {
   params: Promise<{ productSlug: string }>;
@@ -47,7 +47,12 @@ export default async function ShopProductPage({ params }: PageProps) {
   const product = getShopProduct(productSlug);
 
   if (!product) {
-    notFound();
+    // Admin-created products only exist in the live catalog (client-side).
+    return (
+      <main className="px-4 pb-0 pt-24 sm:px-6 sm:pt-28 lg:px-8">
+        <LiveProductFallback slug={productSlug} />
+      </main>
+    );
   }
 
   const breadcrumbs = resolveBreadcrumbs(`/shop/${productSlug}`, product.name);

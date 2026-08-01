@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/BrandLogo";
 import { footerLegalLinks, socialLinks } from "@/data/site";
 
 /** High-value destinations only — avoids duplicating the full navbar sitemap. */
@@ -73,11 +74,9 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
           <div className="flex items-center justify-between gap-4 lg:justify-start lg:gap-6">
-            <div className="min-w-0">
-              <p className="font-display text-base uppercase leading-none tracking-wide text-white sm:text-lg">
-                Juego Todo
-              </p>
-              <p className="mt-1 text-[0.68rem] font-medium tracking-wide text-zinc-600">
+            <div className="flex min-w-0 items-center gap-3">
+              <BrandLogo variant="header" />
+              <p className="text-[0.68rem] font-medium tracking-wide text-zinc-600">
                 Filipino Combat Sports
               </p>
             </div>

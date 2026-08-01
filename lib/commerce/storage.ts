@@ -23,6 +23,7 @@ import {
   fetchUserOrders,
   isSupabaseAdmin,
   markNotificationReadRemote,
+  rejectSupabaseOrderPayment,
   saveUserCommerceDataRemote,
   updateSupabaseOrderStatus,
   upsertNotification,
@@ -278,6 +279,26 @@ export async function approveOrderPayment(orderId: string): Promise<Order> {
       payment: {
         ...order.payment,
         status: "approved",
+        verifiedAt: now,
+      },
+      updatedAt: now,
+    };
+  });
+}
+
+export async function rejectOrderPayment(orderId: string): Promise<Order> {
+  if (isSupabaseConfigured()) {
+    return rejectSupabaseOrderPayment(orderId);
+  }
+
+  return updateOrderLocal(orderId, (order) => {
+    const now = new Date().toISOString();
+    return {
+      ...order,
+      status: "cancelled",
+      payment: {
+        ...order.payment,
+        status: "rejected",
         verifiedAt: now,
       },
       updatedAt: now,

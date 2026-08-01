@@ -1,28 +1,20 @@
-import { ChevronDown } from "lucide-react";
 import Link from "next/link";
-import { footerLegalLinks, footerNavColumns, socialLinks } from "@/data/site";
+import { footerLegalLinks, socialLinks } from "@/data/site";
 
-const footerColumns = [
-  ...footerNavColumns,
-  {
-    title: "Legal",
-    links: [...footerLegalLinks],
-  },
-];
-
-const mobileQuickLinks = [
+/** High-value destinations only — avoids duplicating the full navbar sitemap. */
+const primaryLinks = [
   { label: "Home", href: "/" },
+  { label: "About", href: "/about-juego-todo" },
   { label: "Calendar", href: "/calendar" },
-  { label: "Shop", href: "/shop" },
+  { label: "Fighters", href: "/latayanology" },
   { label: "Media", href: "/media" },
-  { label: "Fighters", href: "/fighters" },
+  { label: "Shop", href: "/shop" },
+  { label: "Rules", href: "/rules-regulations" },
+  { label: "Partners", href: "/partners" },
 ] as const;
 
-/** Columns with enough links to warrant an accordion on mobile. */
-const mobileAccordionColumns = footerColumns.filter((column) => column.links.length > 1);
-
 function SocialIcon({ icon }: { icon: (typeof socialLinks)[number]["icon"] }) {
-  const className = "h-4 w-4";
+  const className = "h-3.5 w-3.5";
 
   switch (icon) {
     case "instagram":
@@ -54,37 +46,51 @@ function SocialIcon({ icon }: { icon: (typeof socialLinks)[number]["icon"] }) {
   }
 }
 
+function SocialRow({ className = "" }: { className?: string }) {
+  return (
+    <div className={`flex items-center gap-1 ${className}`}>
+      {socialLinks.map((social) => (
+        <a
+          aria-label={social.label}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-500 transition hover:bg-white/[0.06] hover:text-white"
+          href={social.href}
+          key={social.href}
+          rel="noreferrer"
+          target="_blank"
+        >
+          <SocialIcon icon={social.icon} />
+        </a>
+      ))}
+    </div>
+  );
+}
+
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-white/[0.08] bg-[#050505]">
-      <div className="footer-glow-line" aria-hidden />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,16,16,0.08),transparent_45rem)]" aria-hidden />
+    <footer className="relative border-t border-white/[0.08] bg-[#050505]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF1010]/70 to-transparent" aria-hidden />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Mobile compact footer */}
-        <section className="border-b border-white/[0.08] py-5 md:hidden">
-          <div className="flex items-center justify-between gap-4">
-            <p className="font-display text-lg uppercase leading-none tracking-wide text-white">Juego Todo</p>
-            <div className="flex items-center gap-1.5">
-              {socialLinks.map((social) => (
-                <a
-                  aria-label={social.label}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.1] text-zinc-400 transition hover:border-[#FF1010]/40 hover:text-white"
-                  href={social.href}
-                  key={social.href}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  <SocialIcon icon={social.icon} />
-                </a>
-              ))}
+      <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+          <div className="flex items-center justify-between gap-4 lg:justify-start lg:gap-6">
+            <div className="min-w-0">
+              <p className="font-display text-base uppercase leading-none tracking-wide text-white sm:text-lg">
+                Juego Todo
+              </p>
+              <p className="mt-1 text-[0.68rem] font-medium tracking-wide text-zinc-600">
+                Filipino Combat Sports
+              </p>
             </div>
+            <SocialRow className="shrink-0 lg:hidden" />
           </div>
 
-          <nav aria-label="Footer quick links" className="mt-4 flex flex-wrap gap-2">
-            {mobileQuickLinks.map((link) => (
+          <nav
+            aria-label="Footer"
+            className="flex flex-wrap items-center gap-x-4 gap-y-2 lg:justify-center"
+          >
+            {primaryLinks.map((link) => (
               <Link
-                className="inline-flex min-h-9 items-center rounded-full border border-white/[0.1] bg-white/[0.03] px-3.5 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-zinc-400 transition hover:border-[#FF1010]/35 hover:text-white"
+                className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-zinc-500 transition hover:text-white"
                 href={link.href}
                 key={link.href}
               >
@@ -93,79 +99,23 @@ export function Footer() {
             ))}
           </nav>
 
-          <div className="mt-4 divide-y divide-white/[0.08] border-y border-white/[0.08]">
-            {mobileAccordionColumns.map((column) => (
-              <details className="group" key={column.title}>
-                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-2.5 text-[0.7rem] font-black uppercase tracking-[0.18em] text-white marker:content-none [&::-webkit-details-marker]:hidden">
-                  {column.title}
-                  <ChevronDown
-                    aria-hidden
-                    className="shrink-0 text-zinc-500 transition group-open:rotate-180"
-                    size={16}
-                  />
-                </summary>
-                <div className="grid gap-0.5 pb-3">
-                  {column.links.map((link) => (
-                    <Link
-                      className="inline-flex min-h-9 items-center text-[0.8125rem] font-medium text-zinc-500 transition hover:text-white"
-                      href={link.href}
-                      key={`${column.title}-${link.href}`}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
-              </details>
-            ))}
-          </div>
-        </section>
+          <SocialRow className="hidden shrink-0 lg:flex" />
+        </div>
 
-        {/* Desktop / tablet multi-column footer */}
-        <section className="hidden border-b border-white/[0.08] py-8 sm:py-10 md:block">
-          <div className="grid gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {footerColumns.map((column) => (
-              <div key={column.title}>
-                <h3 className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-white">{column.title}</h3>
-                <div className="mt-2.5 grid gap-1">
-                  {column.links.map((link) => (
-                    <Link
-                      className="inline-flex min-h-8 items-center text-xs font-medium text-zinc-500 transition hover:translate-x-0.5 hover:text-white"
-                      href={link.href}
-                      key={`${column.title}-${link.href}`}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            <div>
-              <h3 className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-white">Follow The League</h3>
-              <div className="mt-2.5 grid gap-1">
-                {socialLinks.map((social) => (
-                  <a
-                    className="group/social inline-flex min-h-9 items-center gap-2.5 text-xs font-medium text-zinc-500 transition hover:text-white"
-                    href={social.href}
-                    key={social.href}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    <span className="text-zinc-400 transition group-hover/social:text-[#FF1010]">
-                      <SocialIcon icon={social.icon} />
-                    </span>
-                    {social.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div className="py-4">
-          <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-zinc-600">
-            © {new Date().getFullYear()} Juego Todo Combat Sports Platform
+        <div className="mt-4 flex flex-col gap-3 border-t border-white/[0.06] pt-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-zinc-600">
+            © {new Date().getFullYear()} Juego Todo
           </p>
+          <nav aria-label="Legal" className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-zinc-600">
+            {footerLegalLinks.map((link, index) => (
+              <span className="contents" key={link.href}>
+                {index > 0 ? <span aria-hidden className="text-zinc-800">·</span> : null}
+                <Link className="transition hover:text-zinc-300" href={link.href}>
+                  {link.label}
+                </Link>
+              </span>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

@@ -50,7 +50,7 @@ export function LatayanologySection() {
               not traditional MMA.
             </p>
             <Link
-              className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full border border-[#FF1010]/35 px-6 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-red-100 transition hover:bg-[#FF1010]/10 sm:text-sm"
+              className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF1010] px-6 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-white shadow-[0_0_40px_rgba(255,16,16,0.45)] transition hover:bg-[#ff2828] sm:text-sm"
               href="/rules-regulations/official-rules"
             >
               View Full Rules

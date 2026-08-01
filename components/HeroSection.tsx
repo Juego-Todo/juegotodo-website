@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Ticket } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock3, MapPin, Ticket } from "lucide-react";
 import Image from "next/image";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { AsSeenOnCarousel } from "@/components/AsSeenOnCarousel";
@@ -79,7 +79,7 @@ export function HeroSection() {
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3 sm:mt-8">
-              <MagneticButton href="/login?mode=register" variant="secondary">
+              <MagneticButton href="/login?mode=register">
                 Register Now
                 <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
               </MagneticButton>
@@ -105,7 +105,21 @@ export function HeroSection() {
                     src={heroFeaturedEvent.posterSrc}
                   />
                 </div>
-                <div className="mt-2.5 space-y-2.5 px-0.5 pb-0.5 sm:mt-3.5 sm:space-y-3.5 sm:px-1.5 sm:pb-1.5">
+                <div className="mt-2.5 space-y-2.5 px-0.5 pb-0.5 sm:mt-3.5 sm:space-y-3 sm:px-1.5 sm:pb-1.5">
+                  <div className="space-y-1.5 text-left">
+                    <p className="flex items-start gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
+                      <CalendarDays className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF1010]" aria-hidden />
+                      <span>{heroFeaturedEvent.dateLabel}</span>
+                    </p>
+                    <p className="flex items-start gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
+                      <Clock3 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF1010]" aria-hidden />
+                      <span>{heroFeaturedEvent.timeLabel}</span>
+                    </p>
+                    <p className="flex items-start gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
+                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF1010]" aria-hidden />
+                      <span>{heroFeaturedEvent.venue}</span>
+                    </p>
+                  </div>
                   <CountdownTimer target={heroFeaturedEvent.target} />
                   <MagneticButton className="w-full" href={heroFeaturedEvent.checkoutUrl}>
                     <Ticket className="mr-2" size={16} aria-hidden />

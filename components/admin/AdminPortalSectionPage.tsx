@@ -1,6 +1,6 @@
 "use client";
 
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { AdminCalendarPanel } from "@/components/admin/AdminCalendarPanel";
 import { AdminMemberDirectoryPanel } from "@/components/admin/AdminMemberDirectoryPanel";
 import {
@@ -9,7 +9,38 @@ import {
   AdminPortalShell,
 } from "@/components/admin/AdminPortalShell";
 import { AdminStoreOrdersPanel } from "@/components/admin/AdminStoreOrdersPanel";
+import { ProfileSettingsPanel } from "@/components/profile/ProfileSettingsPanel";
 import { resolveAdminPortalSection, type AdminPortalSectionId } from "@/data/admin-portal-sections";
+import { resolveAccountTypeLabel, resolveUserTypeTagIds } from "@/data/user-type-tags";
+import { useAuth } from "@/lib/auth/context";
+import { useCommerce } from "@/lib/commerce/context";
+import { getAdminAssignedTags } from "@/lib/profile/account-tags";
+
+function AdminSettingsContent() {
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const { userData } = useCommerce();
+
+  if (!user) {
+    return null;
+  }
+
+  const tags = getAdminAssignedTags(user.id, user.assignedTags);
+  const tagIds = resolveUserTypeTagIds(user, null, tags);
+  const accountTypeLabel = resolveAccountTypeLabel(user, tagIds);
+
+  return (
+    <ProfileSettingsPanel
+      accountTypeLabel={accountTypeLabel}
+      membershipTier={userData.membershipTier}
+      onLogout={() => {
+        void logout().then(() => {
+          router.push("/login");
+        });
+      }}
+    />
+  );
+}
 
 function SectionContent({ sectionId }: { sectionId: AdminPortalSectionId }) {
   switch (sectionId) {
@@ -21,6 +52,8 @@ function SectionContent({ sectionId }: { sectionId: AdminPortalSectionId }) {
       return <AdminCalendarPanel />;
     case "store-orders":
       return <AdminStoreOrdersPanel />;
+    case "settings":
+      return <AdminSettingsContent />;
     default: {
       const config = resolveAdminPortalSection(sectionId);
       if (!config) {

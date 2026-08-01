@@ -64,7 +64,7 @@ const adminPortalNav: PortalNavItem[] = [
   { id: "admin-reports", label: "Reports", icon: BarChart3, href: "/admin/reports" },
   { id: "orders", label: "Store Orders", icon: ShoppingBag, href: "/admin/store-orders" },
   { id: "notifications", label: "Announcements", icon: Bell, href: "/admin/announcements" },
-  { id: "settings", label: "System Settings", icon: Settings, href: "/admin/settings" },
+  { id: "settings", label: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
 const fighterNav: PortalNavItem[] = [

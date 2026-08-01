@@ -89,10 +89,10 @@ export const adminPortalSections: Record<AdminPortalSectionId, AdminPortalSectio
   },
   settings: {
     id: "settings",
-    tag: "System",
-    title: "System Settings",
-    description: "Configure platform settings, admin permissions, and league defaults.",
-    placeholder: "System configuration and admin controls will appear here.",
+    tag: "Account",
+    title: "Settings",
+    description: "Manage your profile details and session — the same for every member role.",
+    placeholder: "Account settings appear here.",
   },
 };
 

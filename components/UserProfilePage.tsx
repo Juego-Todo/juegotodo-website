@@ -1,14 +1,10 @@
 ﻿"use client";
 
-import {
-  LogOut,
-} from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { BackButton } from "@/components/BackButton";
 import { AuthGateFallback } from "@/components/auth/AuthGateFallback";
-import { MotionSection } from "@/components/MotionSection";
 import {
   AchievementsSection,
   FightHistorySection,
@@ -27,10 +23,10 @@ import { AdminStoreOrdersPanel } from "@/components/admin/AdminStoreOrdersPanel"
 import { ProfileDashboard } from "@/components/profile/dashboard/ProfileDashboard";
 import { LicenseApplicationProfileSection } from "@/components/profile/LicenseApplicationProfileSection";
 import {
-  AdminPermissionsPanel,
   LicenseProgressPanel,
   RequirementsPanel,
 } from "@/components/profile/MemberPortalPanels";
+import { ProfileSettingsPanel } from "@/components/profile/ProfileSettingsPanel";
 import type { ProfileSectionId } from "@/components/profile/ProfileSidebarNav";
 import type { WorkspaceTabId } from "@/lib/profile/mission-control";
 import { canAccessOpsWorkspaceTab } from "@/lib/profile/mission-control";
@@ -43,23 +39,18 @@ import { useCommerce } from "@/lib/commerce/context";
 import { isAdminProfile } from "@/lib/commerce/storage";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import {
-  membershipTierLabels,
   orderStatusLabels,
   paymentMethodLabels,
-  type MembershipTier,
 } from "@/lib/commerce/types";
 import type { LicenseApplication } from "@/data/license-applications";
 import { fetchLicenseApplicationByUserId, fetchPendingLicenseApplicationCount } from "@/lib/licenses/storage";
-import { buildProfileIdentity, getJtgcTierLabel } from "@/lib/profile/identity";
+import { buildProfileIdentity } from "@/lib/profile/identity";
 import {
-  getProfileRolePreviewLabel,
   isProfileRoleKind,
-  profileRolePreviewOptions,
   type ProfileRoleKind,
 } from "@/lib/profile/role-modules";
 import { useProfilePortrait } from "@/lib/profile/use-profile-portrait";
 
-const membershipTiers = Object.keys(membershipTierLabels) as MembershipTier[];
 const PROFILE_VIEW_AS_STORAGE_KEY = "jt-profile-view-as";
 
 function resolveSection(tab: string | null): ProfileSectionId {
@@ -113,16 +104,11 @@ export function UserProfilePage() {
     toggleSavedFighter,
     toggleSavedEvent,
     toggleSavedTeam,
-    updateUserCommerceProfile,
     markNotificationRead,
   } = useCommerce();
 
   const [activeSection, setActiveSection] = useState<ProfileSectionId>(initialSection);
   const [activeTab, setActiveTab] = useState<WorkspaceTabId>("overview");
-  const [membershipTier, setMembershipTier] = useState<MembershipTier>("free");
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
   const [licenseApplication, setLicenseApplication] = useState<LicenseApplication | null>(null);
   const [previewRoleKind, setPreviewRoleKind] = useState<ProfileRoleKind | null>(() => {
     if (typeof window === "undefined") {
@@ -132,16 +118,6 @@ export function UserProfilePage() {
     const stored = localStorage.getItem(PROFILE_VIEW_AS_STORAGE_KEY);
     return stored && isProfileRoleKind(stored) ? stored : null;
   });
-  const [pendingPreviewRole, setPendingPreviewRole] = useState<ProfileRoleKind | "">(() => {
-    if (typeof window === "undefined") {
-      return "";
-    }
-
-    const stored = localStorage.getItem(PROFILE_VIEW_AS_STORAGE_KEY);
-    return stored && isProfileRoleKind(stored) ? stored : "";
-  });
-  const profileSyncKey = user ? `${user.id}|${userData.membershipTier}` : null;
-  const [lastProfileSyncKey, setLastProfileSyncKey] = useState<string | null>(null);
   const { portraitImage, savePortrait, removePortrait } = useProfilePortrait(
     user?.id,
     licenseApplication?.uploads?.profilePhoto,
@@ -227,11 +203,6 @@ export function UserProfilePage() {
     }
   }
 
-  if (profileSyncKey && profileSyncKey !== lastProfileSyncKey) {
-    setLastProfileSyncKey(profileSyncKey);
-    setMembershipTier(userData.membershipTier);
-  }
-
   const identity = useMemo(() => {
     if (!user) {
       return null;
@@ -285,24 +256,6 @@ export function UserProfilePage() {
   const wishlistProducts = userData.wishlist
     .map((slug) => getShopProduct(slug))
     .filter((product): product is NonNullable<typeof product> => Boolean(product));
-  const isAdmin = isAdminProfile(user);
-  const unreadCount = userData.notifications.filter((entry) => !entry.read).length;
-
-  async function handleSaveSettings(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSaving(true);
-    setError(null);
-    setMessage(null);
-
-    try {
-      updateUserCommerceProfile({ membershipTier });
-      setMessage("Settings updated successfully.");
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unable to save settings.");
-    } finally {
-      setSaving(false);
-    }
-  }
 
   function handleLogout() {
     void logout().then(() => {
@@ -388,23 +341,8 @@ export function UserProfilePage() {
     setActiveTab("overview");
   }
 
-  function handleApplyViewAs() {
-    const nextRole = pendingPreviewRole === "" ? null : pendingPreviewRole;
-    setPreviewRoleKind(nextRole);
-
-    if (nextRole) {
-      localStorage.setItem(PROFILE_VIEW_AS_STORAGE_KEY, nextRole);
-    } else {
-      localStorage.removeItem(PROFILE_VIEW_AS_STORAGE_KEY);
-    }
-
-    setActiveSection("overview");
-    setActiveTab("overview");
-  }
-
   function handleExitViewAs() {
     setPreviewRoleKind(null);
-    setPendingPreviewRole("");
     localStorage.removeItem(PROFILE_VIEW_AS_STORAGE_KEY);
     setActiveSection("overview");
     setActiveTab("overview");
@@ -429,19 +367,6 @@ export function UserProfilePage() {
       />
     );
 
-  const permissionsContent = (
-    <section className="space-y-4">
-      <div>
-        <p className="text-[0.62rem] font-black uppercase tracking-[0.28em] text-amber-200">Access Control</p>
-        <h3 className="font-display mt-2 text-3xl uppercase text-white">Permissions</h3>
-        <p className="mt-2 text-sm text-zinc-400">
-          Platform capabilities assigned to your administrator account.
-        </p>
-      </div>
-      <AdminPermissionsPanel permissions={memberRecord.adminPermissions} />
-    </section>
-  );
-
   const membershipContent = memberRecord.canAccessOpsTabs ? <AdminMembershipPanel /> : null;
 
   const membershipAnalyticsContent = memberRecord.canAccessOpsTabs ? (
@@ -458,110 +383,11 @@ export function UserProfilePage() {
   const licensesContent = membershipContent;
 
   const settingsContent = (
-    <MotionSection>
-      <form className="rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-5 sm:p-8" onSubmit={handleSaveSettings}>
-        <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">System</p>
-        <h2 className="font-display mt-2 text-4xl uppercase text-white sm:text-5xl">Settings</h2>
-        <label className="mt-6 block">
-          <span className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-zinc-400">
-            Membership tier (demo)
-          </span>
-          <select
-            className="w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 focus:ring-4"
-            onChange={(event) => setMembershipTier(event.target.value as MembershipTier)}
-            value={membershipTier}
-          >
-            {membershipTiers.map((tier) => (
-              <option key={tier} value={tier}>
-                {getJtgcTierLabel(tier)}
-              </option>
-            ))}
-          </select>
-        </label>
-        {message ? <p className="mt-4 text-sm text-emerald-300">{message}</p> : null}
-        {error ? <p className="mt-4 text-sm text-red-300">{error}</p> : null}
-        <button
-          className="mt-6 inline-flex min-h-12 items-center rounded-full bg-red-600 px-6 py-3 text-xs font-black uppercase tracking-[0.18em] text-white"
-          disabled={saving}
-          type="submit"
-        >
-          {saving ? "Saving..." : "Save Settings"}
-        </button>
-
-        <div className="mt-8 border-t border-white/10 pt-6">
-          <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-zinc-500">Profile Preview</p>
-          <p className="mt-2 text-sm text-zinc-400">
-            Preview how your dashboard looks for different member roles. Your account data stays the same — only the
-            role workspace changes.
-          </p>
-          <label className="mt-4 block">
-            <span className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-zinc-400">View as</span>
-            <select
-              className="w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 focus:ring-4"
-              onChange={(event) => setPendingPreviewRole(event.target.value as ProfileRoleKind | "")}
-              value={pendingPreviewRole}
-            >
-              <option value="">My actual profile</option>
-              {profileRolePreviewOptions.map((option) => (
-                <option key={option.kind} value={option.kind}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-red-600 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-red-500"
-              onClick={handleApplyViewAs}
-              type="button"
-            >
-              View As
-            </button>
-            {previewRoleKind ? (
-              <button
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-amber-200 transition hover:border-amber-400/50"
-                onClick={handleExitViewAs}
-                type="button"
-              >
-                Exit Preview
-              </button>
-            ) : null}
-          </div>
-          {previewRoleKind ? (
-            <p className="mt-4 text-sm text-amber-200">
-              Currently previewing as {getProfileRolePreviewLabel(previewRoleKind)}.
-            </p>
-          ) : null}
-        </div>
-
-        {memberRecord.isAdmin ? (
-          <div className="mt-8 border-t border-white/10 pt-6">{permissionsContent}</div>
-        ) : null}
-
-        <div className="mt-8 border-t border-white/10 pt-6">
-          <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-zinc-500">Session</p>
-          <p className="mt-2 text-sm text-zinc-400">Sign out of your JTGC account on this device.</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            {isAdmin ? (
-              <Link
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-amber-200"
-                href="/admin"
-              >
-                Admin Dashboard
-              </Link>
-            ) : null}
-            <button
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 bg-black/40 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:border-red-500/40"
-              onClick={handleLogout}
-              type="button"
-            >
-              <LogOut className="mr-2" size={16} aria-hidden />
-              Logout
-            </button>
-          </div>
-        </div>
-      </form>
-    </MotionSection>
+    <ProfileSettingsPanel
+      accountTypeLabel={memberRecord.accountTypeLabel}
+      membershipTier={userData.membershipTier}
+      onLogout={handleLogout}
+    />
   );
 
   const deepSectionContent = isDeepSection ? (

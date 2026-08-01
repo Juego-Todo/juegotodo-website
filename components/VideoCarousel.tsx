@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Play } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useState } from "react";
 import { YouTubeVideoPopup, YouTubeWatchChooser } from "@/components/YouTubeVideoPopup";
 import { featuredVideos, getYouTubeThumbnailFallbacks } from "@/data/featured-videos";
@@ -48,11 +49,20 @@ export function VideoCarousel() {
     <section className="relative overflow-hidden border-t border-white/[0.08] bg-[#050505] py-16 sm:py-20">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,16,16,0.1),transparent_40rem)]" aria-hidden />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl">
-          <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Broadcast Library</p>
-          <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-6xl">
-            Featured Videos
-          </h2>
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.32em] text-[#FF1010]">Broadcast Library</p>
+            <h2 className="font-display mt-3 text-4xl uppercase leading-none text-white sm:text-6xl">
+              Featured Videos
+            </h2>
+          </div>
+          <Link
+            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-full bg-[#FF1010] px-6 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-white shadow-[0_0_40px_rgba(255,16,16,0.45)] transition hover:bg-[#ff2828] sm:text-sm"
+            href="/media#clips"
+          >
+            Media Clips
+            <ArrowRight className="ml-2" size={16} aria-hidden />
+          </Link>
         </div>
 
         <div className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:thin] sm:mx-0 sm:mt-10 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 xl:grid-cols-5">

@@ -365,7 +365,7 @@ function getBannerCopy(entry: CalendarEntry) {
     return {
       eyebrow: `${barrioBrawlsEvent.series} × Juego Todo`,
       headline: barrioBrawlsEvent.title,
-      subtitle: "Sta. Lucia Barrio Brawls",
+      subtitle: `${barrioBrawlsEvent.brandTitle} · ${barrioBrawlsEvent.dateLabel} · ${barrioBrawlsEvent.timeLabel}`,
       venue: barrioBrawlsEvent.venue,
     };
   }

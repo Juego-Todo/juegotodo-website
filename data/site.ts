@@ -1,4 +1,11 @@
-import { barrioBrawlsEvent, barrioBrawlsEventPosterSrc, barrioBrawlsTicketCheckoutUrl, barrioBrawlsTicketSlug } from "@/data/shop-tickets";
+import {
+  barrioBrawlsBoutLabels,
+  barrioBrawlsEvent,
+  barrioBrawlsEventFullName,
+  barrioBrawlsEventPosterSrc,
+  barrioBrawlsTicketCheckoutUrl,
+  barrioBrawlsTicketSlug,
+} from "@/data/shop-tickets";
 
 export type Fighter = {
   slug: string;
@@ -456,14 +463,14 @@ export const fighters: Fighter[] = [
 export const events: Event[] = [
   {
     slug: "barrio-brawls",
-    title: "UGB46 and JUEGO TODO 1st Proclamation Anniversary",
+    title: barrioBrawlsEventFullName,
     date: barrioBrawlsEvent.target,
     venue: barrioBrawlsEvent.venue,
-    city: "Philippines",
+    city: barrioBrawlsEvent.city,
     status: "Upcoming",
-    mainEvent: "UGB46 and JUEGO TODO 1st Proclamation Anniversary",
+    mainEvent: barrioBrawlsEvent.mainEvent,
     posterTone: "from-red-950 via-black to-zinc-950",
-    bouts: ["Main card TBA", "Regional qualifiers", "Amateur showcase"],
+    bouts: [...barrioBrawlsBoutLabels],
     isChampionship: true,
     imageSrc: barrioBrawlsEventPosterSrc,
     ticketCheckoutUrl: barrioBrawlsTicketCheckoutUrl,

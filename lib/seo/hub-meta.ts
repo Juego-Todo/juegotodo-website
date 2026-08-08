@@ -10,7 +10,7 @@ export const hubSeo: Record<
     description:
       "Browse official Juego Todo fight cards, venues, countdowns, and ticket links for upcoming Filipino combat sports events in the Philippines.",
     keywords: ["Juego Todo events", "fight cards Philippines", "UGB46"],
-    image: "/events/ugb46-juego-todo-proclamation-anniversary.png",
+    image: "/events/juego-todo-sta-lucia-barrio-brawls.png",
   },
   media: {
     title: "News, Media Clips & Goatism Podcast",

@@ -8,7 +8,7 @@ export const barrioBrawlsTicketCheckoutUrl =
   "https://paymongo.page/l/ugb46andjuegotodo1stproclamationanniversary";
 
 export const barrioBrawlsEventPosterSrc =
-  "/events/ugb46-juego-todo-proclamation-anniversary.png";
+  "/events/juego-todo-sta-lucia-barrio-brawls.png";
 
 export type BarrioBrawlsBout = {
   matchup: string;
@@ -19,8 +19,8 @@ export type BarrioBrawlsBout = {
 /** Single source of truth for the featured event date/time, venue, and fight card. */
 export const barrioBrawlsEvent = {
   series: "UGB46",
-  brandTitle: "Sta. Lucia Barrio Brawls",
-  title: "1st Proclamation Anniversary",
+  brandTitle: "Juego Todo: Sta. Lucia Barrio Brawls",
+  title: "Sta. Lucia Barrio Brawls",
   fullName: barrioBrawlsEventFullName,
   dateLabel: "August 28, 2026",
   timeLabel: "1:00 PM",
@@ -43,8 +43,8 @@ export const barrioBrawlsEvent = {
       division: "Fun Fight Flyweight Championship Bout",
     },
     {
-      matchup: "Monsod vs Cañete",
-      division: "Juego Todo Professional Featherweight Bout",
+      matchup: "Bulado vs Cadalso",
+      division: "Juego Todo Professional Bantamweight Bout",
     },
   ] satisfies BarrioBrawlsBout[],
 } as const;
@@ -62,7 +62,7 @@ export const eventTicketProducts: ShopProduct[] = [
     priceAmount: 1999,
     description: `Digital general admission for ${barrioBrawlsEventFullName} on ${barrioBrawlsEvent.dateLabel}.`,
     summary:
-      "AUGUST 28, 2026 | UGB 46 x BLAZE FC 10 x Juego Todo 1st Proclamation Anniversary. Two championships. Four warriors. One unforgettable night.",
+      "AUGUST 28, 2026 | 1:00 PM | Juego Todo: Sta. Lucia Barrio Brawls at Entertainment Center, Building 3, Sta. Lucia East Mall. Title fights, pro bouts, and championship action.",
     features: [
       "QR ticket delivered to your account instantly",
       "General admission seating",

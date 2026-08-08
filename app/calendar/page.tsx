@@ -10,7 +10,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "View the official Juego Todo fight calendar with upcoming cards, countdowns, venues, and ticket links for Filipino combat sports events.",
   path: "/calendar",
-  image: "/events/ugb46-juego-todo-proclamation-anniversary.png",
+  image: "/events/juego-todo-sta-lucia-barrio-brawls.png",
   keywords: ["Juego Todo calendar", "fight schedule Philippines", "upcoming events"],
 });
 

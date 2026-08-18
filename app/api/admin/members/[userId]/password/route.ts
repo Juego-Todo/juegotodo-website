@@ -19,7 +19,12 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
   }
 
-  const { error } = await admin.serviceClient.auth.admin.updateUserById(userId, { password });
+  const { error } = await admin.serviceClient.auth.admin.updateUserById(userId, {
+    password,
+    user_metadata: {
+      must_change_password: true,
+    },
+  });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

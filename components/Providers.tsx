@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { SiteLoadingScreen } from "@/components/SiteLoadingScreen";
 import { AuthProvider } from "@/lib/auth/context";
+import { ForcePasswordChangeGate } from "@/components/auth/ForcePasswordChangeGate";
 import { CartAddedToast } from "@/components/commerce/CartAddedToast";
 import { CartDrawer } from "@/components/commerce/CartDrawer";
 import { FloatingCartBar } from "@/components/commerce/FloatingCartBar";
@@ -13,6 +14,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
       <CommerceProvider>
+        <ForcePasswordChangeGate />
         <SiteLoadingScreen />
         {children}
         <CartAddedToast />

@@ -18,6 +18,8 @@ export type StoredUser = {
   bio: string;
   /** Admin-assigned portal tags (fighter, coach, staff, …). */
   assignedTags: UserTypeTagId[];
+  /** When true, the member must set a new password before using the site. */
+  mustChangePassword?: boolean;
   createdAt: string;
 };
 
@@ -57,6 +59,23 @@ export type AdminUserUpdateInput = {
   city: string;
   bio: string;
   phone?: string;
+  country?: string;
+};
+
+export type AdminCreateMemberInput = {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  email: string;
+  password: string;
+  dateOfBirth: string;
+  username?: string;
+  gender?: string;
+  accountType?: AccountType;
+  role?: UserRole;
+  assignedTags?: UserTypeTagId[];
+  mustChangePassword?: boolean;
+  city?: string;
   country?: string;
 };
 

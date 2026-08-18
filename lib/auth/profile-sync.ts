@@ -28,6 +28,7 @@ export function mapProfileRow(row: ProfileRow): UserProfile {
     city: row.city,
     bio: row.bio,
     assignedTags: mapAssignedTags(row.assigned_tags),
+    mustChangePassword: false,
     createdAt: row.created_at,
   };
 }

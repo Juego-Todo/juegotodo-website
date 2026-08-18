@@ -39,7 +39,15 @@ function buildProfileFromAuthUser(user: User, fallbackEmail = ""): UserProfile {
     city: typeof user.user_metadata?.city === "string" ? user.user_metadata.city : "",
     bio: "",
     assignedTags: [],
+    mustChangePassword: Boolean(user.user_metadata?.must_change_password),
     createdAt: user.created_at,
+  };
+}
+
+function withMustChangePassword(profile: UserProfile, user: User): UserProfile {
+  return {
+    ...profile,
+    mustChangePassword: Boolean(user.user_metadata?.must_change_password),
   };
 }
 
@@ -202,10 +210,10 @@ export async function getSupabaseSessionUser(): Promise<UserProfile | null> {
         return buildProfileFromAuthUser(user);
       }
 
-      return mapProfile(refreshedProfile);
+      return withMustChangePassword(mapProfile(refreshedProfile), user);
     }
 
-    return mapProfile(profile);
+    return withMustChangePassword(mapProfile(profile), user);
   } catch {
     return null;
   }
@@ -274,6 +282,15 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
     if (message.includes("database error saving new user")) {
       throw new Error(
         "Account setup failed in the database. Ask an admin to run the latest Supabase migrations, then try again.",
+      );
+    }
+    if (
+      message.includes("error sending confirmation email") ||
+      message.includes("confirmation email") ||
+      message.includes("error sending email")
+    ) {
+      throw new Error(
+        "We couldn't send the confirmation email. Please try again in a few minutes, or contact support if this keeps happening.",
       );
     }
     if (message.includes("already registered") || message.includes("already exists")) {
@@ -421,7 +438,12 @@ export async function updateSupabasePassword(password: string) {
   }
 
   const supabase = createSupabaseBrowserClient();
-  const { error } = await supabase.auth.updateUser({ password });
+  const { error } = await supabase.auth.updateUser({
+    password,
+    data: {
+      must_change_password: false,
+    },
+  });
 
   if (error) {
     throw new Error(error.message);

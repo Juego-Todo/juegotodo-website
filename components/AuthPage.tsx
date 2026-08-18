@@ -31,7 +31,7 @@ import {
 } from "@/lib/auth/welcome";
 import { shouldSkipWelcomeChooser } from "@/data/welcome-paths";
 
-type AuthMode = "login" | "register" | "forgot" | "reset";
+type AuthMode = "login" | "register" | "forgot" | "reset" | "change-password";
 type UsernameCheckStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "error";
 
 const authInputClassName =
@@ -48,6 +48,9 @@ function resolveAuthMode(value: string | null): AuthMode {
   }
   if (value === "reset") {
     return "reset";
+  }
+  if (value === "change-password") {
+    return "change-password";
   }
   return "login";
 }
@@ -74,7 +77,7 @@ export function AuthPage() {
   const searchParams = useSearchParams();
   const nextPath = resolveSafeNextPath(searchParams.get("next"));
   const mode = resolveAuthMode(searchParams.get("mode"));
-  const { user, login, register, requestPasswordReset, updatePassword, usesSupabase } = useAuth();
+  const { user, login, register, requestPasswordReset, updatePassword, logout, usesSupabase } = useAuth();
 
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
@@ -111,7 +114,7 @@ export function AuthPage() {
   const [error, setError] = useState<string | null>(() => searchParams.get("authError"));
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const resolvedEmail = mode === "reset" && user?.email ? user.email : email;
+  const resolvedEmail = (mode === "reset" || mode === "change-password") && user?.email ? user.email : email;
 
   const usernameValidationError =
     mode === "register" && username.trim() ? getUsernameValidationError(username) : null;
@@ -148,6 +151,12 @@ export function AuthPage() {
       );
     }
   }, []);
+
+  useEffect(() => {
+    if (user?.mustChangePassword && mode !== "change-password") {
+      switchMode("change-password");
+    }
+  }, [mode, user?.mustChangePassword]);
 
   useEffect(() => {
     if (mode !== "register" || !username.trim() || usernameValidationError) {
@@ -298,15 +307,19 @@ export function AuthPage() {
         return;
       }
 
-      if (mode === "reset") {
+      if (mode === "reset" || mode === "change-password") {
         if (password !== confirmPassword) {
           throw new Error("Passwords do not match.");
+        }
+
+        if (mode === "change-password" && password === "JuegoTodo2026!") {
+          throw new Error("Choose a new password. You cannot reuse the temporary password.");
         }
 
         await updatePassword(resolvedEmail, password);
         clearPendingPasswordResetEmail();
 
-        if (usesSupabase) {
+        if (usesSupabase || mode === "change-password") {
           router.push("/profile");
           return;
         }
@@ -316,12 +329,18 @@ export function AuthPage() {
         return;
       }
 
-      await login(email, password);
+      const profile = await login(email, password);
 
       if (rememberMe) {
         setRememberedEmail(email);
       } else {
         clearRememberedEmail();
+      }
+
+      if (profile.mustChangePassword) {
+        switchMode("change-password");
+        setSuccess("Please choose a new password before continuing.");
+        return;
       }
 
       const preferWelcome = consumePendingWelcomeChooser();
@@ -351,7 +370,7 @@ export function AuthPage() {
         : "Create Your Account"
       : mode === "forgot"
         ? "Reset Your Password"
-        : mode === "reset"
+        : mode === "reset" || mode === "change-password"
           ? "Choose A New Password"
           : isCheckoutReturn
             ? "Login To Checkout"
@@ -364,11 +383,13 @@ export function AuthPage() {
         : ""
       : mode === "forgot"
         ? "Enter the email tied to your JTGC account and we will send password reset instructions."
-        : mode === "reset"
-          ? "Create a new password for your account. Use at least 8 characters."
-          : isCheckoutReturn
-            ? "Sign in to continue checkout. Your cart items will still be there."
-            : "";
+        : mode === "change-password"
+          ? "Your account was created with a temporary password. Choose a new password to continue."
+          : mode === "reset"
+            ? "Create a new password for your account. Use at least 8 characters."
+            : isCheckoutReturn
+              ? "Sign in to continue checkout. Your cart items will still be there."
+              : "";
 
   const usernameBlocksSubmit =
     mode === "register" &&
@@ -412,15 +433,29 @@ export function AuthPage() {
               ) : (
                 <div className="rounded-2xl border border-white/[0.08] bg-black/45 px-4 py-3.5">
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
-                    {mode === "forgot" ? "Forgot Password" : "Password Recovery"}
+                    {mode === "forgot"
+                      ? "Forgot Password"
+                      : mode === "change-password"
+                        ? "First Login"
+                        : "Password Recovery"}
                   </p>
-                  <button
-                    className="mt-2 text-xs font-semibold text-zinc-400 transition hover:text-white"
-                    onClick={() => switchMode("login")}
-                    type="button"
-                  >
-                    ← Back to login
-                  </button>
+                  {mode === "change-password" ? (
+                    <button
+                      className="mt-2 text-xs font-semibold text-zinc-400 transition hover:text-white"
+                      onClick={() => void logout()}
+                      type="button"
+                    >
+                      Sign out
+                    </button>
+                  ) : (
+                    <button
+                      className="mt-2 text-xs font-semibold text-zinc-400 transition hover:text-white"
+                      onClick={() => switchMode("login")}
+                      type="button"
+                    >
+                      ← Back to login
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -500,18 +535,23 @@ export function AuthPage() {
                 <AuthField
                   autoComplete="email"
                   label="Email address"
-                  onChange={mode === "reset" && user?.email ? () => undefined : setEmail}
+                  onChange={
+                    (mode === "reset" || mode === "change-password") && user?.email ? () => undefined : setEmail
+                  }
                   placeholder="you@email.com"
-                  readOnly={mode === "reset" && Boolean(user?.email || getPendingPasswordResetEmail())}
+                  readOnly={
+                    (mode === "reset" || mode === "change-password") &&
+                    Boolean(user?.email || getPendingPasswordResetEmail())
+                  }
                   required
                   type="email"
                   value={resolvedEmail}
                 />
 
-                {mode === "login" || mode === "register" || mode === "reset" ? (
+                {mode === "login" || mode === "register" || mode === "reset" || mode === "change-password" ? (
                   <AuthPasswordField
                     autoComplete={mode === "login" ? "current-password" : "new-password"}
-                    label={mode === "reset" ? "New password" : "Password"}
+                    label={mode === "reset" || mode === "change-password" ? "New password" : "Password"}
                     onChange={setPassword}
                     onToggleVisibility={() => setShowPassword((value) => !value)}
                     placeholder={mode === "login" ? "Your password" : "At least 8 characters"}
@@ -521,7 +561,7 @@ export function AuthPage() {
                   />
                 ) : null}
 
-                {mode === "register" || mode === "reset" ? (
+                {mode === "register" || mode === "reset" || mode === "change-password" ? (
                   <AuthPasswordField
                     autoComplete="new-password"
                     label="Confirm password"
@@ -607,7 +647,7 @@ export function AuthPage() {
                       ? "Create Account"
                       : mode === "forgot"
                         ? "Send Reset Link"
-                        : mode === "reset"
+                        : mode === "reset" || mode === "change-password"
                           ? "Update Password"
                           : "Login"}
                   <ArrowRight

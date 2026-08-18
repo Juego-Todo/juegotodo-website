@@ -1,12 +1,13 @@
 "use client";
 
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AdminMemberManageModal } from "@/components/admin/AdminMemberManageModal";
 import { AdminPortalHeader } from "@/components/admin/AdminPortalShell";
 import { AdminAccountTagEditor } from "@/components/profile/AdminAccountTagEditor";
 import { UserTypeBadge } from "@/components/profile/UserTypeBadge";
-import { fetchAdminMemberRecords, type AdminMemberRecord } from "@/lib/admin/member-directory";
+import { fetchAdminMemberRecords, provisionLeadershipStaffMembers, type AdminMemberRecord } from "@/lib/admin/member-directory";
+import { leadershipStaffAccounts } from "@/data/leadership-staff-accounts";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import { getAllOrders } from "@/lib/commerce/storage";
 
@@ -43,6 +44,9 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   const [manageMember, setManageMember] = useState<AdminMemberRecord | null>(null);
   const [manageMode, setManageMode] = useState<ManageMode | null>(null);
+  const [provisionStatus, setProvisionStatus] = useState("");
+  const [provisioning, setProvisioning] = useState(false);
+  const autoProvisionedRef = useRef(false);
 
   const refreshMembers = useCallback(() => {
     void getAllOrders()
@@ -58,9 +62,52 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
       });
   }, []);
 
+  const createLeadershipAccounts = useCallback(async () => {
+    setProvisioning(true);
+    setProvisionStatus("Creating leadership accounts...");
+    try {
+      const result = await provisionLeadershipStaffMembers();
+      const createdCount = result?.results?.filter((entry) => entry.ok && entry.created).length ?? 0;
+      const updatedCount = result?.results?.filter((entry) => entry.ok && !entry.created).length ?? 0;
+      const failed = result?.results?.filter((entry) => !entry.ok) ?? [];
+
+      if (failed.length > 0) {
+        setProvisionStatus(
+          `Created ${createdCount}, updated ${updatedCount}. Failed: ${failed
+            .map((entry) => `${entry.email} (${entry.error ?? "error"})`)
+            .join("; ")}`,
+        );
+      } else if (createdCount > 0) {
+        setProvisionStatus(`Created ${createdCount} leadership account${createdCount === 1 ? "" : "s"} with the temporary password.`);
+      } else {
+        setProvisionStatus("Leadership accounts are already in the directory.");
+      }
+      refreshMembers();
+    } catch (caught) {
+      setProvisionStatus(caught instanceof Error ? caught.message : "Unable to create leadership accounts.");
+    } finally {
+      setProvisioning(false);
+    }
+  }, [refreshMembers]);
+
   useEffect(() => {
     refreshMembers();
   }, [refreshMembers]);
+
+  useEffect(() => {
+    if (!loaded || autoProvisionedRef.current) {
+      return;
+    }
+
+    const existing = new Set(members.map((member) => member.email.trim().toLowerCase()));
+    const missing = leadershipStaffAccounts.some((account) => !existing.has(account.email));
+    if (!missing) {
+      return;
+    }
+
+    autoProvisionedRef.current = true;
+    void createLeadershipAccounts();
+  }, [createLeadershipAccounts, loaded, members]);
 
   useEffect(() => {
     function handleVisibilityChange() {
@@ -136,13 +183,26 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
           <p className="text-sm text-zinc-400">
             {error ? "Unable to load profiles" : loaded ? `${filteredMembers.length} of ${members.length} profiles` : "Loading profiles..."}
           </p>
-          <input
-            className="w-full max-w-md rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm text-white outline-none ring-red-500/40 focus:ring-4"
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by name, email, username, city, tags..."
-            value={search}
-          />
+          <div className="flex w-full max-w-xl flex-col gap-2 sm:flex-row sm:items-center">
+            <input
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm text-white outline-none ring-red-500/40 focus:ring-4"
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by name, email, username, city, tags..."
+              value={search}
+            />
+            <button
+              className="shrink-0 rounded-full border border-white/15 px-4 py-2.5 text-[0.62rem] font-black uppercase tracking-[0.14em] text-white transition hover:border-red-400/40 hover:text-red-100 disabled:opacity-50"
+              disabled={provisioning}
+              onClick={() => void createLeadershipAccounts()}
+              type="button"
+            >
+              {provisioning ? "Creating..." : "Add Leadership Accounts"}
+            </button>
+          </div>
         </div>
+        {provisionStatus ? (
+          <p className="mt-3 text-sm text-zinc-300">{provisionStatus}</p>
+        ) : null}
 
         {error ? (
           <div className="mt-5 rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-100">

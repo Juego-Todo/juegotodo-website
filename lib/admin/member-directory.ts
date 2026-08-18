@@ -6,6 +6,7 @@ import {
   adminResetStoredUserPassword,
   adminUpdateStoredUser,
   getAllStoredUsers,
+  provisionLeadershipStaffAccounts,
 } from "@/lib/auth/storage";
 import {
   accountTypeLabels,
@@ -191,4 +192,8 @@ export async function adminDeleteMemberAccount(userId: string) {
   deleteLicenseApplicationsByUserId(userId);
   clearAdminAssignedTags(userId);
   await adminDeleteStoredUser(userId);
+}
+
+export async function provisionLeadershipStaffMembers() {
+  return provisionLeadershipStaffAccounts();
 }

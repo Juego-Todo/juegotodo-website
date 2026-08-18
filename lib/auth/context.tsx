@@ -121,6 +121,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updatePassword = useCallback(async (email: string, password: string) => {
     await updateStoredPassword(email, password);
+    const profile = await getStoredSessionUser();
+    setUser(profile);
   }, []);
 
   const value = useMemo(

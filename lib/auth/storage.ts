@@ -29,6 +29,7 @@ import {
   updateSupabasePassword,
   updateSupabaseProfile,
 } from "@/lib/auth/supabase";
+import { adminFetch } from "@/lib/auth/admin-fetch";
 
 const USERS_KEY = "juego-todo.users";
 const SESSION_KEY = "juego-todo.session";
@@ -180,6 +181,7 @@ function registerStoredUserLocal(input: RegisterInput): UserProfile {
     city: input.city?.trim() ?? "",
     bio: input.bio?.trim() ?? "",
     assignedTags: [],
+    mustChangePassword: false,
     createdAt: new Date().toISOString(),
   };
 
@@ -250,6 +252,7 @@ function updateStoredPasswordLocal(email: string, password: string) {
   users[index] = {
     ...users[index],
     password,
+    mustChangePassword: false,
   };
   writeUsers(users);
   window.sessionStorage.removeItem(RESET_EMAIL_KEY);
@@ -305,6 +308,7 @@ function adminResetStoredUserPasswordLocal(userId: string, password: string) {
   users[index] = {
     ...users[index],
     password,
+    mustChangePassword: true,
   };
   writeUsers(users);
 }
@@ -362,6 +366,25 @@ export async function adminDeleteStoredUser(userId: string) {
   }
   assertAuthBackendAvailable();
   adminDeleteStoredUserLocal(userId);
+}
+
+export async function provisionLeadershipStaffAccounts() {
+  const response = await adminFetch("/api/admin/members/provision-staff", {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+
+  const payload = (await response.json().catch(() => null)) as {
+    ok?: boolean;
+    error?: string;
+    results?: Array<{ email: string; ok: boolean; created: boolean; error?: string }>;
+  } | null;
+
+  if (!response.ok && response.status !== 207) {
+    throw new Error(payload?.error ?? "Unable to create leadership accounts.");
+  }
+
+  return payload;
 }
 
 function requestPasswordResetLocal(email: string) {

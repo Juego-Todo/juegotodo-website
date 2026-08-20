@@ -255,6 +255,7 @@ export function FighterDatabase() {
   const [loadError, setLoadError] = useState("");
   const [activeTab, setActiveTab] = useState<LatayanologyRankingTab>("Pound for Pound");
   const [query, setQuery] = useState(initialQuery);
+  const [urlQuery, setUrlQuery] = useState(initialQuery);
   const [weightClass, setWeightClass] = useState("All");
   const [nationality, setNationality] = useState("All");
   const [team, setTeam] = useState("All");
@@ -265,12 +266,13 @@ export function FighterDatabase() {
   const [compareLeft, setCompareLeft] = useState("");
   const [compareRight, setCompareRight] = useState("");
 
-  useEffect(() => {
-    const nextQuery = searchParams.get("q")?.trim() ?? "";
-    if (nextQuery) {
-      setQuery(nextQuery);
+  const nextUrlQuery = searchParams.get("q")?.trim() ?? "";
+  if (nextUrlQuery !== urlQuery) {
+    setUrlQuery(nextUrlQuery);
+    if (nextUrlQuery) {
+      setQuery(nextUrlQuery);
     }
-  }, [searchParams]);
+  }
 
   useEffect(() => {
     let cancelled = false;

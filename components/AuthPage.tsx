@@ -156,6 +156,8 @@ export function AuthPage() {
     if (user?.mustChangePassword && mode !== "change-password") {
       switchMode("change-password");
     }
+    // Intentionally omit switchMode: it resets form state and should only run on this gate.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- switchMode would re-run on every render
   }, [mode, user?.mustChangePassword]);
 
   useEffect(() => {

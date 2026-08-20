@@ -490,12 +490,12 @@ export function LicenseApplicationProfileSection({
   }, [activeProgram, application]);
 
   const [expandedKey, setExpandedKey] = useState<LicenseProgramPresetKey | null>(activeKey);
+  const [trackedActiveKey, setTrackedActiveKey] = useState(activeKey);
 
-  useEffect(() => {
-    if (activeKey) {
-      setExpandedKey(activeKey);
-    }
-  }, [activeKey]);
+  if (activeKey && activeKey !== trackedActiveKey) {
+    setTrackedActiveKey(activeKey);
+    setExpandedKey(activeKey);
+  }
 
   const sortedOptions = useMemo(() => {
     if (!activeKey) {

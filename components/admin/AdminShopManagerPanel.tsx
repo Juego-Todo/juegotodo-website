@@ -679,12 +679,21 @@ export function AdminShopManagerPanel({ initialView = "orders" }: { initialView?
   }
 
   useEffect(() => {
-    refresh();
-    return subscribeCatalogChanges(refresh);
+    const timer = window.setTimeout(() => {
+      refresh();
+    }, 0);
+    const unsubscribe = subscribeCatalogChanges(refresh);
+    return () => {
+      window.clearTimeout(timer);
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
-    setView(initialView);
+    const timer = window.setTimeout(() => {
+      setView(initialView);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [initialView]);
 
   function handleSort(key: ProductSortKey) {

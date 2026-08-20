@@ -53,10 +53,17 @@ export function ProfileOnboardingChecklist({
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [trackedUserId, setTrackedUserId] = useState(user.id);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timer);
   }, []);
+
+  if (user.id !== trackedUserId) {
+    setTrackedUserId(user.id);
+    setState(getOnboardingState(user.id));
+  }
 
   const items = buildOnboardingChecklist({
     user,
@@ -68,15 +75,10 @@ export function ProfileOnboardingChecklist({
   const shouldShow = shouldShowOnboarding(user.id, items);
 
   useEffect(() => {
-    setState(getOnboardingState(user.id));
-  }, [user.id, portraitImage, dateOfBirth, phone, user.city, user.username]);
-
-  useEffect(() => {
-    if (shouldShow) {
-      setOpen(true);
-    } else {
-      setOpen(false);
-    }
+    const timer = window.setTimeout(() => {
+      setOpen(shouldShow);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [shouldShow]);
 
   useEffect(() => {

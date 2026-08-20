@@ -40,7 +40,10 @@ export function AdminLatayanologyPanel({ embedded = false }: { embedded?: boolea
   }, []);
 
   useEffect(() => {
-    refresh();
+    const timer = window.setTimeout(() => {
+      refresh();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [refresh]);
 
   useEffect(() => {

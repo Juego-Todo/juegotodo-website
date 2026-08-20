@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, FileText, Inbox, Plus, Search, Users, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { LicenseApplication } from "@/data/license-applications";
 import type { UserProfile } from "@/lib/auth/types";
 import {
@@ -21,12 +21,14 @@ export function CoachPortalOverview({
   licenseApplication: LicenseApplication | null;
   onOpenDocuments?: () => void;
 }) {
-  const [roster, setRoster] = useState<CoachRosterEntry[]>([]);
+  const [roster, setRoster] = useState<CoachRosterEntry[]>(() => getCoachRoster(user.id));
+  const [rosterUserId, setRosterUserId] = useState(user.id);
   const [fighterName, setFighterName] = useState("");
 
-  useEffect(() => {
+  if (user.id !== rosterUserId) {
+    setRosterUserId(user.id);
     setRoster(getCoachRoster(user.id));
-  }, [user.id]);
+  }
 
   const coachingClub =
     user.gym.trim() ||

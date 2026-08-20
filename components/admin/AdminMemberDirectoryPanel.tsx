@@ -91,7 +91,10 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   }, [refreshMembers]);
 
   useEffect(() => {
-    refreshMembers();
+    const timer = window.setTimeout(() => {
+      refreshMembers();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [refreshMembers]);
 
   useEffect(() => {
@@ -106,7 +109,10 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
     }
 
     autoProvisionedRef.current = true;
-    void createLeadershipAccounts();
+    const timer = window.setTimeout(() => {
+      void createLeadershipAccounts();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [createLeadershipAccounts, loaded, members]);
 
   useEffect(() => {

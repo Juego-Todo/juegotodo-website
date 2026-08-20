@@ -142,7 +142,10 @@ export function AdminStoreOrdersPanel({
   }, []);
 
   useEffect(() => {
-    void refreshOrders();
+    const timer = window.setTimeout(() => {
+      void refreshOrders();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [refreshOrders]);
 
   async function runOrderAction(orderId: string, action: () => Promise<void>) {

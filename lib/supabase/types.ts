@@ -107,6 +107,69 @@ type LicenseApplicationRow = {
   payload: Json;
   created_at: string;
   updated_at: string;
+  application_number: string | null;
+  application_status: string;
+  payment_status: string;
+  amount_due: number;
+  amount_paid: number;
+  place_of_birth: string;
+  facebook_url: string;
+  martial_arts_system: string;
+  fight_team: string;
+  delivery_recipient_name: string;
+  delivery_address: string;
+  delivery_zip: string;
+  delivery_landmark: string;
+  delivery_contact: string;
+  courier: string;
+  tracking_number: string;
+  shipping_date: string | null;
+  delivery_date: string | null;
+  approved_at: string | null;
+  rejected_at: string | null;
+  completed_at: string | null;
+  applicant_visible_notes: string;
+  idempotency_key: string | null;
+  consent_confirmed: boolean;
+};
+
+type ApplicationDocumentRow = {
+  id: string;
+  application_id: string;
+  document_type: string;
+  storage_path: string;
+  original_filename: string;
+  mime_type: string;
+  file_size: number;
+  uploaded_by: string | null;
+  verification_status: string;
+  rejection_reason: string;
+  created_at: string;
+};
+
+type ApplicationPaymentRow = {
+  id: string;
+  application_id: string;
+  payment_method: string;
+  amount: number;
+  reference_number: string;
+  screenshot_document_id: string | null;
+  submitted_at: string;
+  verification_status: string;
+  verified_by: string | null;
+  verified_at: string | null;
+  rejection_reason: string;
+};
+
+type ApplicationHistoryRow = {
+  id: string;
+  application_id: string;
+  action: string;
+  actor_id: string | null;
+  actor_email: string;
+  notes: string;
+  metadata: Json;
+  created_at: string;
 };
 
 export type Database = {
@@ -167,6 +230,25 @@ export type Database = {
         Update: Partial<Omit<LicenseApplicationRow, "id">>;
         Relationships: [];
       };
+      application_documents: {
+        Row: ApplicationDocumentRow;
+        Insert: Partial<ApplicationDocumentRow> &
+          Pick<ApplicationDocumentRow, "application_id" | "document_type" | "storage_path">;
+        Update: Partial<Omit<ApplicationDocumentRow, "id">>;
+        Relationships: [];
+      };
+      application_payments: {
+        Row: ApplicationPaymentRow;
+        Insert: Partial<ApplicationPaymentRow> & Pick<ApplicationPaymentRow, "application_id">;
+        Update: Partial<Omit<ApplicationPaymentRow, "id">>;
+        Relationships: [];
+      };
+      application_history: {
+        Row: ApplicationHistoryRow;
+        Insert: Partial<ApplicationHistoryRow> & Pick<ApplicationHistoryRow, "application_id" | "action">;
+        Update: Partial<Omit<ApplicationHistoryRow, "id">>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -174,10 +256,21 @@ export type Database = {
         Args: { check_username: string };
         Returns: boolean;
       };
+      next_membership_application_number: {
+        Args: Record<string, never>;
+        Returns: string;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
 };
 
-export type { LicenseApplicationRow, OrderRow, ProfileRow };
+export type {
+  ApplicationDocumentRow,
+  ApplicationHistoryRow,
+  ApplicationPaymentRow,
+  LicenseApplicationRow,
+  OrderRow,
+  ProfileRow,
+};

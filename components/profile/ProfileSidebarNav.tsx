@@ -38,6 +38,7 @@ export type ProfileSectionId =
   | "council-tools"
   | "staff-tools"
   | "admin-members"
+  | "admin-applications"
   | "admin-licenses"
   | "admin-reports"
   | "orders"
@@ -73,6 +74,7 @@ export function ProfileSidebarNav({
     isAdmin: memberRecord.isAdmin,
     unreadCount,
     pendingLicenseCount,
+    pendingMembershipCount: 0,
   });
 
   return (

@@ -4,6 +4,7 @@ import {
   Bell,
   Building2,
   CalendarDays,
+  ClipboardList,
   CreditCard,
   FileBadge2,
   FileText,
@@ -13,7 +14,6 @@ import {
   History,
   IdCard,
   LayoutDashboard,
-  Package,
   Settings,
   Shield,
   ShoppingBag,
@@ -42,8 +42,8 @@ export type PortalNavGroup = {
 const memberCoreNav: PortalNavItem[] = [
   { id: "overview", label: "Dashboard", icon: LayoutDashboard },
   { id: "calendar", label: "Calendar", icon: CalendarDays, href: "/calendar" },
-  { id: "membership", label: "My Membership", icon: UserRound },
-  { id: "licenses", label: "Licenses", icon: FileBadge2 },
+  { id: "membership", label: "My Membership", icon: UserRound, href: "/membership" },
+  { id: "licenses", label: "Licenses", icon: FileBadge2, href: "/membership/applications" },
   { id: "important-documents", label: "Important Documents", icon: FileText },
   { id: "digital-id", label: "Digital ID", icon: IdCard },
   { id: "certificates", label: "Certificates", icon: Award },
@@ -56,6 +56,12 @@ const memberCoreNav: PortalNavItem[] = [
 const adminPortalNav: PortalNavItem[] = [
   { id: "overview", label: "Dashboard", icon: LayoutDashboard },
   { id: "admin-members", label: "Member Directory", icon: Users, href: "/profile?tab=members" },
+  {
+    id: "admin-applications",
+    label: "Applications",
+    icon: ClipboardList,
+    href: "/admin/membership-applications",
+  },
   { id: "admin-licenses", label: "License Approvals", icon: FileBadge2, href: "/profile?tab=licenses" },
   { id: "important-documents", label: "Documents", icon: FileText, href: "/admin/documents" },
   { id: "calendar", label: "Calendar", icon: CalendarDays, href: "/admin/calendar" },
@@ -145,8 +151,15 @@ export function resolvePortalNavigation(input: {
   isAdmin: boolean;
   unreadCount: number;
   pendingLicenseCount?: number;
+  pendingMembershipCount?: number;
 }): PortalNavGroup[] {
-  const { tagIds, isAdmin, unreadCount, pendingLicenseCount = 0 } = input;
+  const {
+    tagIds,
+    isAdmin,
+    unreadCount,
+    pendingLicenseCount = 0,
+    pendingMembershipCount = 0,
+  } = input;
 
   if (isAdmin) {
     return [
@@ -155,6 +168,12 @@ export function resolvePortalNavigation(input: {
         items: adminPortalNav.map((item) => {
           if (item.id === "notifications") {
             return { ...item, badge: unreadCount };
+          }
+          if (item.id === "admin-applications") {
+            return {
+              ...item,
+              badge: pendingMembershipCount > 0 ? pendingMembershipCount : undefined,
+            };
           }
           if (item.id === "admin-licenses") {
             return { ...item, badge: pendingLicenseCount > 0 ? pendingLicenseCount : undefined };

@@ -400,3 +400,12 @@ drop trigger if exists license_applications_guard_self_update on public.license_
 create trigger license_applications_guard_self_update
 before update on public.license_applications
 for each row execute function public.guard_license_application_self_update();
+
+-- ---------------------------------------------------------------------------
+-- Membership portal extensions (see migrations/20260820000000_membership_application_portal.sql)
+-- Applied via ordered migration after 20260731000000. Do not re-define here;
+-- keep schema.sql as the historical base and apply migrations for portal tables:
+-- application_documents, application_payments, application_history,
+-- private storage bucket application-documents, and lifecycle columns on
+-- license_applications (application_number, application_status, payment_status, etc.).
+-- ---------------------------------------------------------------------------

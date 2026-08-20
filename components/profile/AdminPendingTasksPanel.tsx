@@ -6,12 +6,14 @@ import {
   ClipboardList,
   CreditCard,
   FileBadge2,
+  IdCard,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fetchAdminMemberRecords } from "@/lib/admin/member-directory";
+import { adminFetch } from "@/lib/auth/admin-fetch";
 import { getAllOrders } from "@/lib/commerce/storage";
 import { fetchAllLicenseApplications } from "@/lib/licenses/storage";
 import { computeLicenseAnalytics, computeMembershipAnalytics } from "@/lib/profile/admin-analytics";
@@ -30,6 +32,8 @@ type PendingTask = {
 type PendingSnapshot = {
   pendingLicenses: number;
   needsInfoLicenses: number;
+  pendingMembershipPayments: number;
+  pendingMembershipReviews: number;
   pendingPayments: number;
   awaitingVerification: number;
   newMembers: number;
@@ -40,6 +44,8 @@ type PendingSnapshot = {
 const emptySnapshot: PendingSnapshot = {
   pendingLicenses: 0,
   needsInfoLicenses: 0,
+  pendingMembershipPayments: 0,
+  pendingMembershipReviews: 0,
   pendingPayments: 0,
   awaitingVerification: 0,
   newMembers: 0,
@@ -49,6 +55,32 @@ const emptySnapshot: PendingSnapshot = {
 
 function buildTasks(snapshot: PendingSnapshot): PendingTask[] {
   return [
+    {
+      id: "membership-payments",
+      label: "Payment Verification",
+      count: snapshot.pendingMembershipPayments,
+      detail:
+        snapshot.pendingMembershipPayments === 0
+          ? "No membership payments waiting"
+          : `${snapshot.pendingMembershipPayments} membership payment${snapshot.pendingMembershipPayments === 1 ? "" : "s"} awaiting verification`,
+      href: "/admin/membership-applications",
+      actionLabel: "Open Applications",
+      icon: IdCard,
+      urgent: snapshot.pendingMembershipPayments > 0,
+    },
+    {
+      id: "membership-reviews",
+      label: "Membership Reviews",
+      count: snapshot.pendingMembershipReviews,
+      detail:
+        snapshot.pendingMembershipReviews === 0
+          ? "Membership review queue is clear"
+          : `${snapshot.pendingMembershipReviews} application${snapshot.pendingMembershipReviews === 1 ? "" : "s"} need review or action`,
+      href: "/admin/membership-applications",
+      actionLabel: "Review Queue",
+      icon: ClipboardList,
+      urgent: snapshot.pendingMembershipReviews > 0,
+    },
     {
       id: "licenses",
       label: "Pending Licenses",
@@ -61,19 +93,6 @@ function buildTasks(snapshot: PendingSnapshot): PendingTask[] {
       actionLabel: "Open Approvals",
       icon: FileBadge2,
       urgent: snapshot.pendingLicenses > 0,
-    },
-    {
-      id: "needs-info",
-      label: "Awaiting Applicant",
-      count: snapshot.needsInfoLicenses,
-      detail:
-        snapshot.needsInfoLicenses === 0
-          ? "No follow-ups needed"
-          : `${snapshot.needsInfoLicenses} sent back for more information`,
-      href: "/profile?tab=licenses",
-      actionLabel: "Review Queue",
-      icon: ClipboardList,
-      urgent: snapshot.needsInfoLicenses > 0,
     },
     {
       id: "orders",
@@ -114,13 +133,29 @@ export function AdminPendingTasksPanel() {
 
     async function load() {
       try {
-        const [applications, orders] = await Promise.all([
+        const [applications, orders, membershipResponse] = await Promise.all([
           fetchAllLicenseApplications(),
           getAllOrders(),
+          adminFetch("/api/admin/membership-applications"),
         ]);
         const members = await fetchAdminMemberRecords(orders);
         const license = computeLicenseAnalytics(applications);
         const membership = computeMembershipAnalytics(members);
+
+        let pendingMembershipPayments = 0;
+        let pendingMembershipReviews = 0;
+        if (membershipResponse.ok) {
+          const payload = (await membershipResponse.json()) as {
+            counts?: {
+              paymentVerification?: number;
+              documentReview?: number;
+              actionRequired?: number;
+            };
+          };
+          pendingMembershipPayments = payload.counts?.paymentVerification ?? 0;
+          pendingMembershipReviews =
+            (payload.counts?.documentReview ?? 0) + (payload.counts?.actionRequired ?? 0);
+        }
 
         if (cancelled) {
           return;
@@ -129,6 +164,8 @@ export function AdminPendingTasksPanel() {
         setSnapshot({
           pendingLicenses: license.pendingCount,
           needsInfoLicenses: license.needsInfoCount,
+          pendingMembershipPayments,
+          pendingMembershipReviews,
           pendingPayments: orders.filter((order) => order.payment.status === "pending").length,
           awaitingVerification: orders.filter((order) => order.payment.status === "awaiting_verification")
             .length,
@@ -163,7 +200,8 @@ export function AdminPendingTasksPanel() {
         <div>
           <h2 className="font-display text-3xl uppercase text-white sm:text-4xl">Pending Tasks</h2>
           <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-            What needs admin attention right now across licenses, orders, and members.
+            What needs admin attention right now across membership applications, licenses, orders, and
+            members.
           </p>
         </div>
         <div className="rounded-full border border-white/10 bg-black/40 px-4 py-2 text-[0.68rem] font-black uppercase tracking-[0.14em] text-zinc-300">
@@ -177,7 +215,7 @@ export function AdminPendingTasksPanel() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {tasks.map((task, index) => {
           const Icon = task.icon;
           return (

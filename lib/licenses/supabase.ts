@@ -76,6 +76,8 @@ export async function fetchLicenseApplicationByUserIdSupabase(userId: string) {
     .from("license_applications")
     .select("*")
     .eq("user_id", userId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (error) {
@@ -105,7 +107,7 @@ export async function saveLicenseApplicationSupabase(application: LicenseApplica
   const row = toLicenseApplicationRow(application);
   const { data, error } = await supabase
     .from("license_applications")
-    .upsert(row, { onConflict: "user_id" })
+    .upsert(row, { onConflict: "id" })
     .select("*")
     .single();
 

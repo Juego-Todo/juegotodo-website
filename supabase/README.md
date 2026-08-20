@@ -34,6 +34,33 @@ For an existing project, apply every file in `supabase/migrations` in filename o
 
 Do not apply only selected auth migrations: the signup trigger, profile columns, RLS policies, and backfill depend on the complete ordered chain.
 
+### Membership & Licensing Portal (required for `/membership`)
+
+After the migrations above (through `20260731000000_profiles_assigned_tags.sql`), apply:
+
+`supabase/migrations/20260820000000_membership_application_portal.sql`
+
+This migration:
+
+- Hardens profile self-updates (`assigned_tags`, `account_type`, `membership_tier`)
+- Extends `license_applications` with application/payment lifecycle fields
+- Adds `application_documents`, `application_payments`, `application_history`
+- Creates the private Storage bucket `application-documents` with owner/admin policies
+
+**Verify after apply** (SQL Editor):
+
+```sql
+select id, name, public from storage.buckets where id = 'application-documents';
+select column_name from information_schema.columns
+where table_schema = 'public' and table_name = 'license_applications'
+  and column_name in ('application_number', 'application_status', 'payment_status');
+select to_regclass('public.application_documents') as documents,
+       to_regclass('public.application_payments') as payments,
+       to_regclass('public.application_history') as history;
+```
+
+Expect: one private bucket row, three column names, and three non-null relation names.
+
 This creates:
 
 - `profiles` (extends auth users)

@@ -78,6 +78,7 @@ function resolveSection(tab: string | null): ProfileSectionId {
     "council-tools": "council-tools",
     "staff-tools": "staff-tools",
     "admin-members": "admin-members",
+    "admin-applications": "admin-applications",
     "admin-licenses": "admin-licenses",
     "admin-reports": "admin-reports",
     orders: "orders",

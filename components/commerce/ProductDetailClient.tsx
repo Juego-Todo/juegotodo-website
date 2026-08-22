@@ -100,7 +100,7 @@ export function ProductDetailClient({ product: initialProduct }: { product: Shop
     () => getSelectedVariantPrice(product, variantSelections),
     [product, variantSelections],
   );
-  const { rating, reviewCount } = getProductRating(product);
+  const rating = getProductRating(product);
   const stock = getStockLabel(product.stock);
   const badges = getProductBadges(product);
   const athletesUsing = getAthletesUsingProduct(product.slug);
@@ -154,17 +154,17 @@ export function ProductDetailClient({ product: initialProduct }: { product: Shop
               />
             </div>
             {galleryImages.length > 1 && !product.digital && !product.eventTicket ? (
-            <div className="grid grid-cols-5 gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:grid sm:grid-cols-5 sm:overflow-visible sm:pb-0 [&::-webkit-scrollbar]:hidden">
               {galleryImages.map((imageSrc, index) => (
                 <button
-                  className={`overflow-hidden rounded-lg bg-white/[0.02] p-1.5 text-[0.5rem] font-medium uppercase tracking-[0.08em] transition ${
+                  className={`min-h-11 shrink-0 overflow-hidden rounded-lg bg-white/[0.02] p-1.5 text-[0.5rem] font-medium uppercase tracking-[0.08em] transition sm:min-h-0 sm:shrink ${
                     activeImage === index ? "ring-1 ring-[#FF1010]/60 text-white" : "text-zinc-600 hover:text-zinc-300"
                   }`}
                   key={imageSrc}
                   onClick={() => setActiveImage(index)}
                   type="button"
                 >
-                  <div className="aspect-square w-full overflow-hidden rounded-md">
+                  <div className="aspect-square w-14 overflow-hidden rounded-md sm:w-full">
                     <ProductDisplayImage
                       alt={`${product.name} view ${index + 1}`}
                       className="rounded-none"
@@ -201,7 +201,7 @@ export function ProductDetailClient({ product: initialProduct }: { product: Shop
             </h1>
 
             <div className="mt-4">
-              <StarRating rating={rating} reviewCount={reviewCount} />
+              {rating != null ? <StarRating rating={rating} reviewCount={0} /> : null}
             </div>
 
             <p className="font-display mt-6 text-4xl font-normal text-white">{formatCurrency(displayPrice)}</p>

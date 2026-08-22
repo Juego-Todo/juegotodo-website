@@ -143,7 +143,7 @@ export function ProfileOnboardingChecklist({
       {open ? (
         <motion.div
           animate={{ opacity: 1 }}
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-3 backdrop-blur-sm sm:p-6"
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/75 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:p-6 sm:pb-6"
           exit={{ opacity: 0 }}
           initial={{ opacity: 0 }}
           role="presentation"

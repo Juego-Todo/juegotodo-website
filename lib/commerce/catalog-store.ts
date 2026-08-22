@@ -83,6 +83,24 @@ function writeLocalCatalogState(state: CatalogState) {
   window.dispatchEvent(new CustomEvent(CATALOG_CHANGED_EVENT));
 }
 
+function queueCatalogRemoteUpsert(product: ShopProduct) {
+  if (typeof window === "undefined") return;
+
+  void fetch("/api/catalog/overrides", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slug: product.slug, product }),
+  }).catch(() => undefined);
+}
+
+function queueCatalogRemoteDeactivate(slug: string) {
+  if (typeof window === "undefined") return;
+
+  void fetch(`/api/catalog/overrides?slug=${encodeURIComponent(slug)}`, {
+    method: "DELETE",
+  }).catch(() => undefined);
+}
+
 function applyOverride(product: ShopProduct, override?: Partial<ShopProduct>): ShopProduct {
   if (!override) {
     return product;
@@ -248,7 +266,9 @@ export function upsertCatalogProduct(input: CatalogProductInput, slug?: string):
   }
 
   writeLocalCatalogState(state);
-  return getLiveShopProduct(nextProduct.slug) ?? nextProduct;
+  const saved = getLiveShopProduct(nextProduct.slug) ?? nextProduct;
+  queueCatalogRemoteUpsert(saved);
+  return saved;
 }
 
 export function updateCatalogStock(slug: string, stock: number): ShopProduct | undefined {
@@ -272,7 +292,11 @@ export function updateCatalogStock(slug: string, stock: number): ShopProduct | u
 
   state.removedSlugs = state.removedSlugs.filter((value) => value !== slug);
   writeLocalCatalogState(state);
-  return getLiveShopProduct(slug);
+  const saved = getLiveShopProduct(slug);
+  if (saved) {
+    queueCatalogRemoteUpsert(saved);
+  }
+  return saved;
 }
 
 export function removeCatalogProduct(slug: string) {
@@ -287,6 +311,7 @@ export function removeCatalogProduct(slug: string) {
 
   delete state.overrides[slug];
   writeLocalCatalogState(state);
+  queueCatalogRemoteDeactivate(slug);
 }
 
 export function restoreCatalogProduct(slug: string) {

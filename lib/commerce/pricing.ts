@@ -119,11 +119,14 @@ export function calculateLineItems(
     membershipTier?: MembershipTier;
     promoCode?: string;
     userId?: string | null;
+    resolveProduct?: (slug: string) => ReturnType<typeof resolveCartProduct>;
   },
 ) {
+  const resolveProduct = options?.resolveProduct ?? resolveCartProduct;
+
   const items = cart
     .map((entry) => {
-      const product = resolveCartProduct(entry.productSlug);
+      const product = resolveProduct(entry.productSlug);
       if (!product) {
         return null;
       }

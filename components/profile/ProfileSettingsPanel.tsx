@@ -73,9 +73,8 @@ export function ProfileSettingsPanel({
         className="rounded-[1.75rem] border border-white/10 bg-white/[0.02] p-5 sm:p-8"
         onSubmit={(event) => void handleSubmit(event)}
       >
-        <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">Account</p>
-        <h2 className="font-display mt-2 text-4xl uppercase text-white sm:text-5xl">Settings</h2>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-400">
+        <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-zinc-500">Profile</p>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
           Manage your profile details. The same settings are available for every member role.
         </p>
 

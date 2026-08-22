@@ -29,14 +29,14 @@ export function CheckoutSteps() {
   })();
 
   return (
-    <ol className="mb-8 flex flex-wrap gap-2">
+    <ol className="mb-8 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {steps.map((step, index) => {
         const completed = user ? index < activeIndex : index < activeIndex && index !== 1;
         const current = index === activeIndex;
         const reachable = user || index <= 1;
 
         return (
-          <li key={step.href}>
+          <li className="shrink-0" key={step.href}>
             {reachable ? (
               <Link
                 className={`inline-flex rounded-full px-3 py-2 text-[0.58rem] font-black uppercase tracking-[0.14em] transition sm:px-4 sm:text-[0.62rem] ${

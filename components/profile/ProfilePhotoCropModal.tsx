@@ -106,7 +106,7 @@ export function ProfilePhotoCropModal({ imageSrc, onCancel, onConfirm }: Profile
   return (
     <motion.div
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[120] flex items-end justify-center bg-black/80 p-4 sm:items-center"
+      className="fixed inset-0 z-[120] flex items-end justify-center bg-black/80 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:items-center sm:pb-4"
       exit={{ opacity: 0 }}
       initial={{ opacity: 0 }}
       onClick={onCancel}
@@ -225,7 +225,7 @@ export function ProfilePhotoCropModal({ imageSrc, onCancel, onConfirm }: Profile
           {error ? <p className="mt-4 text-sm text-red-300">{error}</p> : null}
         </div>
 
-        <div className="grid grid-cols-2 gap-3 border-t border-white/10 px-5 py-4">
+        <div className="grid grid-cols-2 gap-3 border-t border-white/10 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-4">
           <button
             className="min-h-11 rounded-full border border-white/10 px-4 text-[0.62rem] font-black uppercase tracking-[0.14em] text-zinc-300 transition hover:border-white/20 hover:text-white"
             disabled={saving}

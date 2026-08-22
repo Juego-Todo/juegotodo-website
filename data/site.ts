@@ -152,11 +152,6 @@ export const socialLinks = [
     icon: "facebook" as const,
   },
   {
-    label: "Facebook PH",
-    href: "https://www.facebook.com/profile.php?id=61583785331326",
-    icon: "facebook" as const,
-  },
-  {
     label: "Instagram",
     href: "https://www.instagram.com/juegotodophilippines",
     icon: "instagram" as const,

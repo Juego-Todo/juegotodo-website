@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Bookmark, Heart, ShoppingCart, Trash2, X } from "lucide-react";
 import Link from "next/link";
@@ -62,6 +63,34 @@ export function CartDrawer() {
     }
     router.push("/checkout/shipping");
   }
+
+  useEffect(() => {
+    if (!cartDrawerOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [cartDrawerOpen]);
+
+  useEffect(() => {
+    if (!cartDrawerOpen) {
+      return;
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        closeCartDrawer();
+      }
+    }
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [cartDrawerOpen, closeCartDrawer]);
 
   return (
     <AnimatePresence>

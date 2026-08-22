@@ -296,7 +296,7 @@ export function MediaHub() {
         })}
       />
 
-      <div className="sticky top-[4.5rem] z-20 -mx-4 bg-[#050505]/90 px-4 pb-4 pt-1 backdrop-blur-xl sm:top-24 sm:mx-0 sm:px-0">
+      <div className="sticky top-[calc(env(safe-area-inset-top)+4.5rem)] z-20 -mx-4 bg-[#050505]/90 px-4 pb-4 pt-1 backdrop-blur-xl sm:top-24 sm:mx-0 sm:px-0">
         <SegmentedControl onChange={selectChannel} value={channel} />
       </div>
 

@@ -263,7 +263,7 @@ export function Navbar() {
             <motion.button
               animate={{ opacity: 1 }}
               aria-label="Close navigation menu"
-              className="nav-mobile-backdrop fixed inset-0 z-40 xl:hidden"
+              className="nav-mobile-backdrop fixed inset-0 z-[69] xl:hidden"
               exit={{ opacity: 0 }}
               initial={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
@@ -273,7 +273,7 @@ export function Navbar() {
             <motion.aside
               animate={{ opacity: 1, x: 0 }}
               aria-label="Mobile navigation"
-              className="nav-mobile-drawer fixed right-0 top-0 z-50 flex h-dvh w-[min(420px,calc(100vw-1rem))] flex-col overflow-hidden pt-[env(safe-area-inset-top)] xl:hidden"
+              className="nav-mobile-drawer fixed right-0 top-0 z-[70] flex h-dvh w-[min(420px,calc(100vw-1rem))] flex-col overflow-hidden pt-[env(safe-area-inset-top)] xl:hidden"
               exit={{ opacity: 0, x: "100%" }}
               id="mobile-primary-nav"
               initial={{ opacity: 0, x: "100%" }}

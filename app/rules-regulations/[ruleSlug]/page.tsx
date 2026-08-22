@@ -126,7 +126,7 @@ export default async function RulebookPage({ params }: PageProps) {
               <RoundCard number="02" icon={<Swords aria-hidden />} title="Solo Baston" detail="1 stick" text="One-stick format with limited empty-hand body strikes." />
               <RoundCard number="03" icon={<UserCheck aria-hidden />} title="Mano Y Mano" detail="Empty hand" text="FMA striking, takedowns, grappling, and no weapons." />
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-2">
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
               <MiniStat icon={<CalendarDays aria-hidden />} label="Rounds" value="3" />
               <MiniStat icon={<RotateCcw aria-hidden />} label="Transitions" value="2" />
               <MiniStat icon={<ShieldCheck aria-hidden />} label="Equipment" value="Checked" />
@@ -229,7 +229,7 @@ function VisualPanel({ title, items }: { title: string; items: string[][] }) {
   return (
     <section className="glass-panel rounded-[1.5rem] p-4 lg:p-5">
       <h2 className="font-display text-3xl uppercase text-white">{title}</h2>
-      <div className="mt-4 grid grid-cols-3 gap-2.5">
+      <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
         {items.map(([round, label, detail]) => (
           <div className="rounded-2xl border border-white/10 bg-black/35 p-3 text-center" key={round}>
             <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-200">

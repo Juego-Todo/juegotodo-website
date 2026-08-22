@@ -21,7 +21,6 @@ export const SITE_LOCALE = "en_PH";
 
 export const SITE_SOCIAL = {
   facebook: "https://www.facebook.com/JuegoTodoPH",
-  facebookPh: "https://www.facebook.com/profile.php?id=61583785331326",
   instagram: "https://www.instagram.com/juegotodophilippines",
   tiktok: "https://www.tiktok.com/@juegotodoofficial",
   youtube: "https://www.youtube.com/@juegotodoph",

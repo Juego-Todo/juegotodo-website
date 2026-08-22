@@ -64,7 +64,7 @@ export function getOnboardingState(userId: string) {
   return readState(userId);
 }
 
-/** One link per required platform (skips duplicate Facebook PH). */
+/** One link per required platform. */
 export function getOnboardingSocialLinks() {
   const seen = new Set<OnboardingSocialPlatform>();
   return socialLinks.filter((link) => {
@@ -104,6 +104,11 @@ export function markOnboardingSocialClick(userId: string, platform: OnboardingSo
   if (hasCompletedSocialFollows(next) && !next.rewardCode) {
     next.rewardCode = generateRewardCode(userId);
     next.rewardIssuedAt = new Date().toISOString();
+    void fetch("/api/member/promo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: next.rewardCode }),
+    }).catch(() => undefined);
   }
 
   writeState(userId, next);
@@ -211,6 +216,8 @@ export function resolveWelcomePromo(code: string, userId?: string | null) {
     if (state.rewardRedeemedAt) {
       return { invalid: true as const, reason: "This welcome code has already been used." };
     }
+  } else {
+    return { invalid: true as const, reason: "Welcome codes must be validated at checkout." };
   }
 
   return {

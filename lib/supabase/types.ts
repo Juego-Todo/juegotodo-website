@@ -172,83 +172,211 @@ type ApplicationHistoryRow = {
   created_at: string;
 };
 
+type GenericTable<T extends Record<string, unknown>> = {
+  Row: T;
+  Insert: Partial<T>;
+  Update: Partial<T>;
+  Relationships: [];
+};
+
+type InquiryRow = {
+  id: string;
+  inquiry_type: string;
+  status: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  organization: string;
+  subject: string;
+  message: string;
+  metadata: Json;
+  created_at: string;
+  updated_at: string;
+};
+
+type CalendarEventRow = {
+  id: string;
+  slug: string;
+  title: string;
+  event_date: string;
+  published: boolean;
+  operational_status: string;
+  payload: Json;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type AnnouncementRow = {
+  id: string;
+  title: string;
+  body: string;
+  audience: string;
+  published: boolean;
+  published_at: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type MemberDocumentRow = {
+  id: string;
+  user_id: string;
+  document_type: string;
+  title: string;
+  status: string;
+  storage_path: string;
+  expires_at: string | null;
+  notes: string;
+  metadata: Json;
+  reviewed_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type CompetitionEntryRow = {
+  id: string;
+  user_id: string;
+  calendar_event_id: string | null;
+  event_title: string;
+  division: string;
+  status: string;
+  notes: string;
+  metadata: Json;
+  reviewed_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type OfficialAssignmentRow = {
+  id: string;
+  official_user_id: string;
+  calendar_event_id: string | null;
+  role: string;
+  event_title: string;
+  status: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type CouncilRecordRow = {
+  id: string;
+  record_type: string;
+  title: string;
+  summary: string;
+  status: string;
+  metadata: Json;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type CoachRosterLinkRow = {
+  id: string;
+  coach_user_id: string;
+  fighter_user_id: string | null;
+  fighter_name: string;
+  fighter_slug: string;
+  status: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type ShopCatalogProductRow = {
+  slug: string;
+  payload: Json;
+  active: boolean;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type ConsultationBookingRow = {
+  id: string;
+  user_id: string | null;
+  service_slug: string;
+  slot_start: string;
+  slot_end: string;
+  status: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  notes: string;
+  payment_status: string;
+  metadata: Json;
+  created_at: string;
+  updated_at: string;
+};
+
+type PromoCodeRow = {
+  code: string;
+  user_id: string | null;
+  discount_percent: number;
+  redeemed: boolean;
+  redeemed_at: string | null;
+  order_id: string | null;
+  expires_at: string | null;
+  created_at: string;
+};
+
+type FightRecordRow = {
+  id: string;
+  fighter_slug: string;
+  fighter_user_id: string | null;
+  opponent_name: string;
+  event_title: string;
+  event_date: string | null;
+  result: string;
+  method: string;
+  round: string;
+  metadata: Json;
+  created_at: string;
+  updated_at: string;
+};
+
+type EmailOutboxRow = {
+  id: string;
+  to_email: string;
+  subject: string;
+  body: string;
+  template: string;
+  status: string;
+  error_message: string;
+  metadata: Json;
+  created_at: string;
+  sent_at: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
-      profiles: {
-        Row: ProfileRow;
-        Insert: Partial<ProfileRow> & Pick<ProfileRow, "id" | "email">;
-        Update: Partial<Omit<ProfileRow, "id">>;
-        Relationships: [];
-      };
-      addresses: {
-        Row: AddressRow;
-        Insert: Partial<AddressRow> & Pick<AddressRow, "user_id" | "full_name" | "line1" | "city">;
-        Update: Partial<Omit<AddressRow, "id">>;
-        Relationships: [];
-      };
-      wishlist_items: {
-        Row: WishlistRow;
-        Insert: Partial<WishlistRow> & Pick<WishlistRow, "user_id" | "product_slug">;
-        Update: Partial<Omit<WishlistRow, "id">>;
-        Relationships: [];
-      };
-      saved_fighters: {
-        Row: SavedFighterRow;
-        Insert: Partial<SavedFighterRow> & Pick<SavedFighterRow, "user_id" | "fighter_slug">;
-        Update: Partial<Omit<SavedFighterRow, "id">>;
-        Relationships: [];
-      };
-      saved_teams: {
-        Row: SavedTeamRow;
-        Insert: Partial<SavedTeamRow> & Pick<SavedTeamRow, "user_id" | "team_slug">;
-        Update: Partial<Omit<SavedTeamRow, "id">>;
-        Relationships: [];
-      };
-      saved_events: {
-        Row: SavedEventRow;
-        Insert: Partial<SavedEventRow> & Pick<SavedEventRow, "user_id" | "event_slug">;
-        Update: Partial<Omit<SavedEventRow, "id">>;
-        Relationships: [];
-      };
-      notifications: {
-        Row: NotificationRow;
-        Insert: Partial<NotificationRow> & Pick<NotificationRow, "user_id" | "title" | "body">;
-        Update: Partial<Omit<NotificationRow, "id">>;
-        Relationships: [];
-      };
-      orders: {
-        Row: OrderRow;
-        Insert: Partial<OrderRow> &
-          Pick<OrderRow, "order_number" | "user_id" | "user_email" | "user_name" | "items" | "subtotal" | "total" | "status" | "payment" | "shipping_address">;
-        Update: Partial<Omit<OrderRow, "id">>;
-        Relationships: [];
-      };
-      license_applications: {
-        Row: LicenseApplicationRow;
-        Insert: Partial<LicenseApplicationRow> & Pick<LicenseApplicationRow, "user_id" | "payload">;
-        Update: Partial<Omit<LicenseApplicationRow, "id">>;
-        Relationships: [];
-      };
-      application_documents: {
-        Row: ApplicationDocumentRow;
-        Insert: Partial<ApplicationDocumentRow> &
-          Pick<ApplicationDocumentRow, "application_id" | "document_type" | "storage_path">;
-        Update: Partial<Omit<ApplicationDocumentRow, "id">>;
-        Relationships: [];
-      };
-      application_payments: {
-        Row: ApplicationPaymentRow;
-        Insert: Partial<ApplicationPaymentRow> & Pick<ApplicationPaymentRow, "application_id">;
-        Update: Partial<Omit<ApplicationPaymentRow, "id">>;
-        Relationships: [];
-      };
-      application_history: {
-        Row: ApplicationHistoryRow;
-        Insert: Partial<ApplicationHistoryRow> & Pick<ApplicationHistoryRow, "application_id" | "action">;
-        Update: Partial<Omit<ApplicationHistoryRow, "id">>;
-        Relationships: [];
-      };
+      profiles: GenericTable<ProfileRow>;
+      addresses: GenericTable<AddressRow>;
+      wishlist_items: GenericTable<WishlistRow>;
+      saved_fighters: GenericTable<SavedFighterRow>;
+      saved_teams: GenericTable<SavedTeamRow>;
+      saved_events: GenericTable<SavedEventRow>;
+      notifications: GenericTable<NotificationRow>;
+      orders: GenericTable<OrderRow>;
+      license_applications: GenericTable<LicenseApplicationRow>;
+      application_documents: GenericTable<ApplicationDocumentRow>;
+      application_payments: GenericTable<ApplicationPaymentRow>;
+      application_history: GenericTable<ApplicationHistoryRow>;
+      inquiries: GenericTable<InquiryRow>;
+      calendar_events: GenericTable<CalendarEventRow>;
+      announcements: GenericTable<AnnouncementRow>;
+      member_documents: GenericTable<MemberDocumentRow>;
+      competition_entries: GenericTable<CompetitionEntryRow>;
+      official_assignments: GenericTable<OfficialAssignmentRow>;
+      council_records: GenericTable<CouncilRecordRow>;
+      coach_roster_links: GenericTable<CoachRosterLinkRow>;
+      shop_catalog_products: GenericTable<ShopCatalogProductRow>;
+      consultation_bookings: GenericTable<ConsultationBookingRow>;
+      promo_codes: GenericTable<PromoCodeRow>;
+      fight_records: GenericTable<FightRecordRow>;
+      email_outbox: GenericTable<EmailOutboxRow>;
     };
     Views: Record<string, never>;
     Functions: {

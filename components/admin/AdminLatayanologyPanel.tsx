@@ -101,15 +101,7 @@ export function AdminLatayanologyPanel({ embedded = false }: { embedded?: boolea
       )}
 
       {embedded ? (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-[0.62rem] font-black uppercase tracking-[0.28em] text-red-300">Latayanology</p>
-            <h2 className="font-display mt-2 text-3xl uppercase text-white sm:text-4xl">Fighter Database</h2>
-            <p className="mt-2 max-w-3xl text-sm text-zinc-400">
-              Fighters appear here after their license is approved. This same roster feeds the public Search Fighter
-              experience on Latayanology.
-            </p>
-          </div>
+        <div className="flex justify-end">
           <Link
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/10 px-4 text-[0.62rem] font-black uppercase tracking-[0.14em] text-zinc-300 transition hover:border-red-500/40 hover:text-white"
             href="/latayanology"
@@ -136,8 +128,8 @@ export function AdminLatayanologyPanel({ embedded = false }: { embedded?: boolea
         </div>
       </div>
 
-      <div className="glass-panel rounded-[1.75rem] p-4 sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-zinc-400">
             {error
               ? "Unable to load roster"
@@ -145,54 +137,55 @@ export function AdminLatayanologyPanel({ embedded = false }: { embedded?: boolea
                 ? `${filtered.length} of ${fighters.length} fighters`
                 : "Loading roster..."}
           </p>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <label className="relative block min-w-0 flex-1 sm:w-80">
-              <Search
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
-                size={14}
-                aria-hidden
-              />
-              <input
-                className="w-full rounded-xl border border-white/10 bg-black/40 py-2.5 pl-9 pr-3 text-sm text-white outline-none ring-red-500/40 placeholder:text-zinc-500 focus:ring-4"
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search name, slug, division, gym..."
-                value={search}
-              />
-            </label>
-            <button
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/10 px-4 text-[0.62rem] font-black uppercase tracking-[0.14em] text-zinc-300 transition hover:text-white"
-              onClick={refresh}
-              type="button"
-            >
-              <RefreshCw size={14} aria-hidden />
-              Refresh
-            </button>
-          </div>
+          <button
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/10 px-4 text-[0.62rem] font-black uppercase tracking-[0.14em] text-zinc-300 transition hover:text-white"
+            onClick={refresh}
+            type="button"
+          >
+            <RefreshCw size={14} aria-hidden />
+            Refresh
+          </button>
         </div>
+        <label className="relative block">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+            size={14}
+            aria-hidden
+          />
+          <input
+            className="w-full rounded-xl border border-white/10 bg-black/40 py-2.5 pl-9 pr-3 text-sm text-white outline-none ring-red-500/30 placeholder:text-zinc-500 focus:ring-2"
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search name, slug, division, gym..."
+            value={search}
+          />
+        </label>
+      </div>
 
-        {error ? (
-          <div className="mt-5 rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-100">
-            <p className="font-bold">Latayanology roster failed to load.</p>
-            <p className="mt-2 text-red-100/80">{error}</p>
-            <button
-              className="mt-4 rounded-full border border-red-300/30 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-red-50"
-              onClick={refresh}
-              type="button"
-            >
-              Retry
-            </button>
-          </div>
-        ) : !loaded ? (
-          <div className="py-16 text-center text-zinc-400">Loading approved fighters...</div>
-        ) : filtered.length === 0 ? (
-          <div className="py-16 text-center text-zinc-400">
-            {fighters.length === 0
-              ? "No approved fighter licenses yet. Approve a fighter license in Licenses to add them here and to public Search Fighter."
-              : "No fighters match your search."}
-          </div>
-        ) : (
-          <>
-            <div className="mt-5 space-y-3 md:hidden">
+      {error ? (
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+          <p className="font-bold">Latayanology roster failed to load.</p>
+          <p className="mt-2 text-red-100/80">{error}</p>
+          <button
+            className="mt-4 rounded-full border border-red-300/30 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-red-50"
+            onClick={refresh}
+            type="button"
+          >
+            Retry
+          </button>
+        </div>
+      ) : !loaded ? (
+        <div className="rounded-[1.75rem] border border-white/10 px-5 py-10 text-center text-sm text-zinc-400">
+          Loading approved fighters...
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="rounded-[1.75rem] border border-white/10 px-5 py-10 text-center text-sm text-zinc-400">
+          {fighters.length === 0
+            ? "No approved fighter licenses yet. Approve a fighter license in Licenses to add them here and to public Search Fighter."
+            : "No fighters match your search."}
+        </div>
+      ) : (
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-3 sm:p-4">
+            <div className="space-y-3 md:hidden">
               {filtered.map((fighter) => (
                 <article
                   className="rounded-2xl border border-white/10 bg-black/30 p-4"
@@ -288,9 +281,8 @@ export function AdminLatayanologyPanel({ embedded = false }: { embedded?: boolea
                 </tbody>
               </table>
             </div>
-          </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

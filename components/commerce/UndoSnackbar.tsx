@@ -2,19 +2,26 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { RotateCcw, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { getShopProduct } from "@/data/shop";
 import { useCommerce } from "@/lib/commerce/context";
+import { shouldHideFloatingCartChrome } from "@/lib/commerce/floating-cart-visibility";
 
 export function UndoSnackbar() {
-  const { pendingRemoval, undoRemove, dismissPendingRemoval } = useCommerce();
+  const pathname = usePathname();
+  const { cartCount, pendingRemoval, undoRemove, dismissPendingRemoval } = useCommerce();
   const product = pendingRemoval ? getShopProduct(pendingRemoval.productSlug) : null;
+  const floatingCartVisible = cartCount > 0 && !shouldHideFloatingCartChrome(pathname);
+  const bottomClass = floatingCartVisible
+    ? "bottom-[calc(max(1rem,env(safe-area-inset-bottom))+6.5rem)] sm:bottom-[8.5rem]"
+    : "bottom-[max(1rem,env(safe-area-inset-bottom))] sm:bottom-8";
 
   return (
     <AnimatePresence>
       {pendingRemoval && product ? (
         <motion.div
           animate={{ opacity: 1, y: 0 }}
-          className="fixed inset-x-4 bottom-24 z-[58] mx-auto max-w-lg sm:bottom-8 sm:left-auto sm:right-6 sm:mx-0"
+          className={`fixed inset-x-4 z-[58] mx-auto max-w-lg sm:left-auto sm:right-6 sm:mx-0 ${bottomClass}`}
           exit={{ opacity: 0, y: 16 }}
           initial={{ opacity: 0, y: 16 }}
           role="status"

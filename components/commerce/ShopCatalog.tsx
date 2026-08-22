@@ -96,7 +96,7 @@ export function ShopCatalog({
       </div>
 
       {/* Mobile sticky search + category chips (Lazada-style) */}
-      <div className="sticky top-[4.25rem] z-30 -mx-4 mb-3 border-b border-white/[0.06] bg-[#050505]/95 px-4 py-2.5 backdrop-blur-md sm:static sm:mx-0 sm:mb-6 sm:mt-6 sm:rounded-xl sm:border sm:border-white/[0.06] sm:bg-white/[0.02] sm:p-3 sm:backdrop-blur-none">
+      <div className="sticky top-[calc(env(safe-area-inset-top)+4.25rem)] z-30 -mx-4 mb-3 border-b border-white/[0.06] bg-[#050505]/95 px-4 py-2.5 backdrop-blur-md sm:static sm:mx-0 sm:mb-6 sm:mt-6 sm:rounded-xl sm:border sm:border-white/[0.06] sm:bg-white/[0.02] sm:p-3 sm:backdrop-blur-none sm:top-auto">
         <div className="flex items-center gap-2">
           <label className="relative block min-w-0 flex-1">
             <Search

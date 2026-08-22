@@ -10,7 +10,9 @@ type EventTicketCardBodyProps = {
 
 export function EventTicketCardBody({ product }: EventTicketCardBodyProps) {
   const ticket = product.eventTicket;
-  const { rating, soldThisMonth } = getProductCardSocialProof(product);
+  const { rating, soldThisMonth, proofLine } = getProductCardSocialProof(product);
+  const socialLine =
+    rating != null && soldThisMonth != null ? `${rating.toFixed(1)} ★ · ${soldThisMonth} sold` : proofLine;
   const { memberPrice, savings } = getProductMemberPricing(product);
 
   if (!ticket) {
@@ -28,7 +30,7 @@ export function EventTicketCardBody({ product }: EventTicketCardBodyProps) {
           {formatCurrency(product.priceAmount)}
         </p>
         <p className="text-[0.58rem] leading-4 text-zinc-500">
-          {rating.toFixed(1)} ★ · {soldThisMonth} sold
+          {socialLine}
         </p>
       </div>
 
@@ -54,9 +56,9 @@ export function EventTicketCardBody({ product }: EventTicketCardBodyProps) {
           </div>
 
           <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
-            <ProductStarRating rating={rating} size={10} />
+            {rating != null ? <ProductStarRating rating={rating} size={10} /> : null}
             <span className="text-[0.52rem] text-zinc-400">
-              {rating.toFixed(1)} · {soldThisMonth} sold
+              {socialLine}
             </span>
           </div>
         </div>

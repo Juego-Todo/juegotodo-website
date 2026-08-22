@@ -11,11 +11,11 @@ export type SponsorshipOpportunity = {
 };
 
 export const partnershipMetrics = [
-  { value: "550+", label: "Verified Athletes" },
-  { value: "58+", label: "Partner Gyms" },
-  { value: "18", label: "Regions" },
-  { value: "100+", label: "Matches" },
-  { value: "50,000+", label: "Community Reach" },
+  { value: "Licensed", label: "Fighter Database" },
+  { value: "Growing", label: "Partner Network" },
+  { value: "PH", label: "National Footprint" },
+  { value: "Live", label: "Event Calendar" },
+  { value: "Community", label: "First Mission" },
 ] as const;
 
 export const partnerCategoryCards: PartnerCategoryCard[] = [

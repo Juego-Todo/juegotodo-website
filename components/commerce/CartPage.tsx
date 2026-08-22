@@ -73,7 +73,7 @@ export function CartPage() {
   }
 
   return (
-    <main className="overflow-hidden px-4 pt-24 pb-28 sm:px-6 sm:pt-28 sm:pb-14 lg:px-8 lg:pt-32">
+    <main className="overflow-x-clip px-4 pb-28 pt-24 sm:px-6 sm:pb-14 sm:pt-28 lg:px-8 lg:pt-32">
       <section className="relative mx-auto max-w-7xl py-10 sm:py-14">
         <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
         <div className="relative">
@@ -244,7 +244,7 @@ export function CartPage() {
       </section>
 
       {cart.length > 0 ? (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#050505]/95 p-4 backdrop-blur-md lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#050505]/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
           <div className="mx-auto flex max-w-lg items-center gap-3">
             <div className="min-w-0 flex-1">
               <p className="text-[0.58rem] font-black uppercase tracking-[0.14em] text-zinc-500">Total</p>

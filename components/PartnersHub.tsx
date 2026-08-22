@@ -13,6 +13,7 @@ import {
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
+import { InquiryFormSubmit } from "@/components/forms/InquiryFormSubmit";
 import Image from "next/image";
 import { MotionSection } from "@/components/MotionSection";
 import {
@@ -218,73 +219,13 @@ export function PartnersHub() {
             </p>
           </div>
 
-          <form className="glass-panel rounded-[1.75rem] border-white/[0.08] p-6 sm:p-8">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <input
-                aria-label="Name"
-                className="rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-[#FF1010]/40 transition placeholder:text-zinc-500 focus:ring-4 sm:col-span-2"
-                name="name"
-                placeholder="Name"
-                type="text"
-              />
-              <input
-                aria-label="Company"
-                className="rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-[#FF1010]/40 transition placeholder:text-zinc-500 focus:ring-4"
-                name="company"
-                placeholder="Company"
-                type="text"
-              />
-              <input
-                aria-label="Position"
-                className="rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-[#FF1010]/40 transition placeholder:text-zinc-500 focus:ring-4"
-                name="position"
-                placeholder="Position"
-                type="text"
-              />
-              <input
-                aria-label="Email"
-                className="rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-[#FF1010]/40 transition placeholder:text-zinc-500 focus:ring-4"
-                name="email"
-                placeholder="Email"
-                type="email"
-              />
-              <input
-                aria-label="Phone"
-                className="rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-[#FF1010]/40 transition placeholder:text-zinc-500 focus:ring-4"
-                name="phone"
-                placeholder="Phone"
-                type="tel"
-              />
-              <select
-                aria-label="Partnership Type"
-                className="rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-[#FF1010]/40 transition focus:ring-4 sm:col-span-2"
-                defaultValue=""
-                name="partnershipType"
-              >
-                <option disabled value="">
-                  Partnership Type
-                </option>
-                {partnershipTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-              <textarea
-                aria-label="Message"
-                className="min-h-32 rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-[#FF1010]/40 transition placeholder:text-zinc-500 focus:ring-4 sm:col-span-2"
-                name="message"
-                placeholder="Message"
-              />
-            </div>
-            <button
-              className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#FF1010] px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white transition hover:bg-[#ff2828]"
-              type="button"
-            >
-              Become A Partner
-              <ArrowRight className="ml-2" size={18} aria-hidden />
-            </button>
-          </form>
+          <InquiryFormSubmit
+            className="glass-panel rounded-[1.75rem] border-white/[0.08] p-6 sm:p-8"
+            inquiryType="partnership"
+            organizationLabel="Company"
+            subjectDefault="Partnership inquiry"
+            submitLabel="Become A Partner"
+          />
         </div>
       </MotionSection>
 

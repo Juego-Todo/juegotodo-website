@@ -7,7 +7,7 @@ import { AddToCartButton } from "@/components/commerce/AddToCartButton";
 import { ProductDisplayImage } from "@/components/commerce/ProductDisplayImage";
 import type { ShopProduct } from "@/data/shop";
 import { formatCurrency } from "@/lib/commerce/pricing";
-import { getProductBadges, getProductRating, getStockLabel } from "@/lib/commerce/product-visuals";
+import { getProductBadges, getStockLabel } from "@/lib/commerce/product-visuals";
 
 export function ProductQuickViewModal({
   product,
@@ -18,9 +18,8 @@ export function ProductQuickViewModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const { rating, reviewCount } = getProductRating(product);
-  const badges = getProductBadges(product);
   const stock = getStockLabel(product.stock);
+  const badges = getProductBadges(product);
 
   return (
     <AnimatePresence>
@@ -63,9 +62,7 @@ export function ProductQuickViewModal({
                 <h2 className="font-display mt-3 text-3xl uppercase text-white">{product.name}</h2>
                 <p className="mt-2 text-sm text-zinc-400">{product.summary}</p>
                 <p className="font-display mt-4 text-3xl text-white">{formatCurrency(product.priceAmount)}</p>
-                <p className="mt-2 text-xs text-zinc-500">
-                  {rating.toFixed(1)} · {reviewCount} reviews · {stock.label}
-                </p>
+                <p className="mt-2 text-xs text-zinc-500">{stock.label}</p>
                 <div className="mt-5 space-y-2">
                   <AddToCartButton fullWidth product={product} />
                   <Link

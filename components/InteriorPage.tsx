@@ -13,6 +13,7 @@ import { TeamsHub } from "@/components/TeamsHub";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { FmaLineageSection } from "@/components/FmaLineageSection";
+import { InquiryFormSubmit } from "@/components/forms/InquiryFormSubmit";
 import { LegalPageContent } from "@/components/LegalPageContent";
 import { OrganizationalStructureSection } from "@/components/OrganizationalStructureSection";
 import { PageNavigation } from "@/components/PageNavigation";
@@ -302,23 +303,15 @@ function InquiryForm({
 }) {
   return (
     <MotionSection className={compact ? "" : "mx-auto max-w-3xl pb-20"}>
-      <form className="glass-panel rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-8">
+      <div className="glass-panel rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-8">
         <h2 className="font-display text-4xl uppercase text-white sm:text-5xl">{title}</h2>
-        <div className="mt-6 grid gap-4 sm:mt-8">
-          {fields.map((field, index) => {
-            const isLong = field.toLowerCase().includes("message") || index === fields.length - 1;
-            return isLong ? (
-              <textarea aria-label={field} className="min-h-32 rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 transition placeholder:text-zinc-500 focus:ring-4" key={field} placeholder={field} />
-            ) : (
-              <input aria-label={field} className="rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none ring-red-500/40 transition placeholder:text-zinc-500 focus:ring-4" key={field} placeholder={field} />
-            );
-          })}
-        </div>
-        <button className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-red-600 px-6 py-4 text-sm font-black uppercase tracking-[0.2em] text-white transition hover:bg-red-500" type="button">
-          {button}
-          <ArrowRight className="ml-2" size={18} aria-hidden />
-        </button>
-      </form>
+        <InquiryFormSubmit
+          className="mt-6"
+          inquiryType="contact"
+          subjectDefault={fields.includes("Topic") ? "General inquiry" : title}
+          submitLabel={button}
+        />
+      </div>
     </MotionSection>
   );
 }

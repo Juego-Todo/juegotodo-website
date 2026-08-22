@@ -17,7 +17,9 @@ import {
 function StandardProductCardBody({ product }: { product: ShopProduct }) {
   const badge = getProductCardBadge(product);
   const secondaryBadge = getProductCardSecondaryBadge(product);
-  const { rating, soldThisMonth } = getProductCardSocialProof(product);
+  const { rating, soldThisMonth, proofLine } = getProductCardSocialProof(product);
+  const socialLine =
+    rating != null && soldThisMonth != null ? `${rating.toFixed(1)} ★ · ${soldThisMonth} sold` : proofLine;
   const { memberPrice, savings } = getProductMemberPricing(product);
 
   return (
@@ -56,7 +58,7 @@ function StandardProductCardBody({ product }: { product: ShopProduct }) {
           {formatCurrency(product.priceAmount)}
         </p>
         <p className="text-[0.58rem] leading-4 text-zinc-500">
-          {rating.toFixed(1)} ★ · {soldThisMonth} sold
+          {socialLine}
         </p>
       </div>
 
@@ -81,10 +83,16 @@ function StandardProductCardBody({ product }: { product: ShopProduct }) {
           </div>
 
           <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
-            <ProductStarRating rating={rating} size={10} />
-            <span className="text-[0.52rem] font-semibold text-zinc-500">{rating.toFixed(1)}</span>
-            <span className="text-[0.5rem] text-zinc-600">·</span>
-            <span className="text-[0.52rem] text-zinc-400">{soldThisMonth} sold</span>
+            {rating != null && soldThisMonth != null ? (
+              <>
+                <ProductStarRating rating={rating} size={10} />
+                <span className="text-[0.52rem] font-semibold text-zinc-500">{rating.toFixed(1)}</span>
+                <span className="text-[0.5rem] text-zinc-600">·</span>
+                <span className="text-[0.52rem] text-zinc-400">{soldThisMonth} sold</span>
+              </>
+            ) : (
+              <span className="text-[0.52rem] text-zinc-400">{proofLine}</span>
+            )}
           </div>
         </div>
 

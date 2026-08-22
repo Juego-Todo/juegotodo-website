@@ -26,6 +26,14 @@ import { AdminStoreOrdersPanel } from "@/components/admin/AdminStoreOrdersPanel"
 import { ProfileDashboard } from "@/components/profile/dashboard/ProfileDashboard";
 import { LicenseApplicationProfileSection } from "@/components/profile/LicenseApplicationProfileSection";
 import { ProfileSettingsPanel } from "@/components/profile/ProfileSettingsPanel";
+import { MemberClubPanel } from "@/components/profile/member-workspace/MemberClubPanel";
+import { MemberCompetitionEntriesPanel } from "@/components/profile/member-workspace/MemberCompetitionEntriesPanel";
+import { MemberCertificatesPanel } from "@/components/profile/member-workspace/MemberCertificatesPanel";
+import { MemberMedicalPanel } from "@/components/profile/member-workspace/MemberMedicalPanel";
+import { MemberMembershipPanel } from "@/components/profile/member-workspace/MemberMembershipPanel";
+import { MemberRankingsPanel } from "@/components/profile/member-workspace/MemberRankingsPanel";
+import { RoleToolsPanel } from "@/components/profile/member-workspace/RoleToolsPanel";
+import { MemberPanelShell, PanelEmptyState } from "@/components/profile/member-workspace/shared";
 import type { ProfileSectionId } from "@/components/profile/ProfileSidebarNav";
 import type { WorkspaceTabId } from "@/lib/profile/mission-control";
 import { canAccessWorkspaceTab } from "@/lib/profile/mission-control";
@@ -411,7 +419,7 @@ export function UserProfilePage() {
       />
     );
 
-  const membershipContent = memberRecord.canAccessOpsTabs ? <AdminMembershipPanel /> : null;
+  const membershipContent = memberRecord.canAccessOpsTabs ? <AdminMembershipPanel /> : <MemberMembershipPanel />;
 
   const membershipAnalyticsContent = memberRecord.canAccessOpsTabs ? (
     <AdminMembershipLicenseAnalyticsContent />
@@ -452,48 +460,33 @@ export function UserProfilePage() {
     if (!memberRecord || !identity) return null;
     return (
       <>
-        {activeSection === "membership" ? (
-          <PortalPlaceholderSection
-            description="Track membership standing, renewal dates, and official league affiliation."
-            title="My Membership"
-          />
-        ) : null}
+        {activeSection === "membership" ? <MemberMembershipPanel /> : null}
 
-        {activeSection === "competition-entries" ? (
-          <PortalPlaceholderSection
-            ctaHref="/register-for-license"
-            ctaLabel="Open Registration"
-            description="View sanctioned competition entries, bout assignments, and registration status."
-            title="Competition Entries"
-          />
-        ) : null}
+        {activeSection === "competition-entries" ? <MemberCompetitionEntriesPanel /> : null}
 
-        {activeSection === "certificates" ? (
-          <PortalPlaceholderSection
-            description="Official certificates, coaching credentials, and league recognitions appear here once issued."
-            title="Certificates"
-          />
-        ) : null}
+        {activeSection === "certificates" ? <MemberCertificatesPanel /> : null}
 
         {activeSection === "club" ? (
-          <PortalPlaceholderSection
-            description={`Official club affiliation: ${memberRecord.club}. Club management tools unlock for gym owners and coaches.`}
-            title="Club"
-          />
+          <MemberClubPanel isCoach={identity.isCoach} memberRecord={memberRecord} />
         ) : null}
 
-        {activeSection === "medical" ? (
-          <PortalPlaceholderSection
-            description="Medical clearance, expiry dates, and upload status for competition eligibility."
-            title="Medical Clearance"
-          />
-        ) : null}
+        {activeSection === "medical" ? <MemberMedicalPanel /> : null}
 
         {activeSection === "rankings" && identity.athlete ? (
-          <PortalPlaceholderSection
-            description={`Current league rank: ${identity.athlete.rank}. Rankings sync from sanctioned JTGC results.`}
+          <MemberRankingsPanel athlete={identity.athlete} fighterName={memberRecord.roleModule.displayName} />
+        ) : null}
+
+        {activeSection === "rankings" && !identity.athlete ? (
+          <MemberPanelShell
+            description="Rankings sync from sanctioned JTGC results once you have a verified fighter profile."
             title="Rankings"
-          />
+          >
+            <PanelEmptyState
+              href="/register-for-license"
+              linkLabel="Apply for Fighter License"
+              message="No athlete profile is linked to this account yet."
+            />
+          </MemberPanelShell>
         ) : null}
 
         {activeSection === "payments" || activeSection === "orders" ? (
@@ -557,40 +550,15 @@ export function UserProfilePage() {
 
         {activeSection === "history" && identity.athlete ? <FightHistorySection athlete={identity.athlete} /> : null}
 
-        {activeSection === "coach-tools" ? (
-          <IdentityToolsSection
-            description="Manage coaching credentials, athlete assignments, and certification visibility."
-            title="Coach Tools"
-          />
-        ) : null}
+        {activeSection === "coach-tools" ? <RoleToolsPanel variant="coach" /> : null}
 
-        {activeSection === "official-tools" ? (
-          <IdentityToolsSection
-            description="Access referee assignments, bout oversight tools, and official credential controls."
-            title="Official Tools"
-          />
-        ) : null}
+        {activeSection === "official-tools" ? <RoleToolsPanel variant="official" /> : null}
 
-        {activeSection === "judge-tools" ? (
-          <IdentityToolsSection
-            description="Review scoring assignments, judge credentials, and sanctioned event access."
-            title="Judge Tools"
-          />
-        ) : null}
+        {activeSection === "judge-tools" ? <RoleToolsPanel variant="judge" /> : null}
 
-        {activeSection === "council-tools" ? (
-          <IdentityToolsSection
-            description="Grand Council governance tools, league oversight, and membership administration."
-            title="Council Tools"
-          />
-        ) : null}
+        {activeSection === "council-tools" ? <RoleToolsPanel variant="council" /> : null}
 
-        {activeSection === "staff-tools" ? (
-          <IdentityToolsSection
-            description="Staff operations, event support workflows, and internal league utilities."
-            title="Staff Tools"
-          />
-        ) : null}
+        {activeSection === "staff-tools" ? <RoleToolsPanel variant="staff" /> : null}
 
         {activeSection === "wishlist" ? (
           <CommerceSection title="Wishlist">
@@ -786,22 +754,6 @@ function PortalPlaceholderSection({
           {ctaLabel ?? "Open"} →
         </Link>
       ) : null}
-    </div>
-  );
-}
-
-function IdentityToolsSection({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="glass-panel rounded-[1.75rem] p-6 sm:p-8">
-      <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FF1010]">Identity Tools</p>
-      <h2 className="font-display mt-2 text-4xl uppercase text-white sm:text-5xl">{title}</h2>
-      <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-400">{description}</p>
-      <Link
-        className="mt-6 inline-flex min-h-11 items-center rounded-full bg-red-600 px-5 py-2.5 text-xs font-black uppercase tracking-[0.18em] text-white"
-        href="/register-for-license"
-      >
-        Manage License →
-      </Link>
     </div>
   );
 }

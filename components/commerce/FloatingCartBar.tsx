@@ -10,6 +10,7 @@ import {
   formatCurrency,
   FREE_SHIPPING_THRESHOLD,
 } from "@/lib/commerce/pricing";
+import { shouldHideFloatingCartChrome } from "@/lib/commerce/floating-cart-visibility";
 
 export function FloatingCartBar() {
   const router = useRouter();
@@ -22,12 +23,7 @@ export function FloatingCartBar() {
   const shippingProgress = Math.min(100, (eligibleSubtotal / FREE_SHIPPING_THRESHOLD) * 100);
   const freeShippingUnlocked = shippingRemaining <= 0;
 
-  const onProfile = pathname.startsWith("/profile") || pathname.startsWith("/admin");
-  const hidden =
-    cartCount === 0 ||
-    pathname.startsWith("/checkout") ||
-    pathname === "/cart" ||
-    onProfile;
+  const hidden = cartCount === 0 || shouldHideFloatingCartChrome(pathname);
 
   function goCheckout() {
     if (!user) {

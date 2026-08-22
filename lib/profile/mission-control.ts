@@ -141,6 +141,64 @@ export function mobileTabToWorkspace(tab: MobileTabId, experience?: PortalExperi
   }
 }
 
+/** Map desktop workspace tab to the closest mobile bottom-nav highlight. */
+export function deriveMobileTabFromWorkspace(
+  activeTab: WorkspaceTabId,
+  options: {
+    canAccessOpsTabs: boolean;
+    isCoachPortal: boolean;
+    isFighterPortal?: boolean;
+  },
+): MobileTabId {
+  const { canAccessOpsTabs, isCoachPortal, isFighterPortal } = options;
+
+  if (activeTab === "settings") {
+    return "settings";
+  }
+
+  if (canAccessOpsTabs) {
+    if (activeTab === "shop" || activeTab === "orders") {
+      return "career";
+    }
+    if (activeTab === "licenses") {
+      return "activity";
+    }
+    if (activeTab === "overview") {
+      return "dashboard";
+    }
+    return "dashboard";
+  }
+
+  if (isFighterPortal) {
+    if (activeTab === "camp") {
+      return "career";
+    }
+    if (activeTab === "overview") {
+      return "dashboard";
+    }
+    return "dashboard";
+  }
+
+  if (isCoachPortal) {
+    if (activeTab === "documents") {
+      return "career";
+    }
+    if (activeTab === "activity" || activeTab === "analytics") {
+      return "activity";
+    }
+    return "dashboard";
+  }
+
+  if (activeTab === "activity") {
+    return "activity";
+  }
+  if (activeTab === "overview") {
+    return "dashboard";
+  }
+
+  return "dashboard";
+}
+
 export function buildMissionItems(role: ProfileRoleModule, memberRecord: MemberRecord): MissionItem[] {
   const pending = memberRecord.statistics.find((s) => s.label.includes("Pending"))?.value ?? "0";
 

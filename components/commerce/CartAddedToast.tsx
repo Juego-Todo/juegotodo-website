@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Check, X } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CartItemPhoto } from "@/components/commerce/CartItemPhoto";
 import { FreeShippingBar } from "@/components/commerce/FreeShippingBar";
@@ -11,17 +11,24 @@ import { getShopProduct } from "@/data/shop";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
 import { getCheckoutAuthHref } from "@/lib/commerce/checkout-auth";
+import { shouldHideFloatingCartChrome } from "@/lib/commerce/floating-cart-visibility";
 import { formatCurrency } from "@/lib/commerce/pricing";
 
 const TOAST_MS = 5000;
 
 export function CartAddedToast() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
   const { lastAddedSlug, lastAddedQuantity, cartAddedSignal, cartCount, totals, closeCartDrawer } = useCommerce();
   const [dismissedSignal, setDismissedSignal] = useState(0);
   const product = lastAddedSlug ? getShopProduct(lastAddedSlug) : null;
-  const visible = cartAddedSignal > 0 && cartAddedSignal !== dismissedSignal && Boolean(product);
+  const chromeHidden = shouldHideFloatingCartChrome(pathname);
+  const visible =
+    cartAddedSignal > 0 &&
+    cartAddedSignal !== dismissedSignal &&
+    Boolean(product) &&
+    !chromeHidden;
 
   useEffect(() => {
     if (!visible) {
@@ -90,23 +97,23 @@ export function CartAddedToast() {
               <FreeShippingBar compact totals={totals} />
             </div>
 
-            <div className="grid grid-cols-3 gap-2 border-t border-white/10 p-3">
+            <div className="grid grid-cols-1 gap-2 border-t border-white/10 p-3 sm:grid-cols-3">
               <button
-                className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/10 text-[0.58rem] font-black uppercase tracking-[0.1em] text-zinc-300 transition hover:text-white"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 text-[0.62rem] font-black uppercase tracking-[0.1em] text-zinc-300 transition hover:text-white sm:min-h-10 sm:text-[0.58rem]"
                 onClick={dismiss}
                 type="button"
               >
                 Continue
               </button>
               <Link
-                className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/10 text-[0.58rem] font-black uppercase tracking-[0.1em] text-white transition hover:border-[#FF1010]/40"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 text-[0.62rem] font-black uppercase tracking-[0.1em] text-white transition hover:border-[#FF1010]/40 sm:min-h-10 sm:text-[0.58rem]"
                 href="/cart"
                 onClick={dismiss}
               >
                 View Cart
               </Link>
               <button
-                className="inline-flex min-h-10 items-center justify-center gap-1 rounded-full bg-[#FF1010] text-[0.58rem] font-black uppercase tracking-[0.1em] text-white transition hover:bg-[#ff2828]"
+                className="inline-flex min-h-11 items-center justify-center gap-1 rounded-full bg-[#FF1010] text-[0.62rem] font-black uppercase tracking-[0.1em] text-white transition hover:bg-[#ff2828] sm:min-h-10 sm:text-[0.58rem]"
                 onClick={goCheckout}
                 type="button"
               >

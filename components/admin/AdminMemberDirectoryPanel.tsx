@@ -184,51 +184,75 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
         />
       )}
 
-      <div className="glass-panel rounded-[1.75rem] p-4 sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-zinc-400">
-            {error ? "Unable to load profiles" : loaded ? `${filteredMembers.length} of ${members.length} profiles` : "Loading profiles..."}
-          </p>
-          <div className="flex w-full max-w-xl flex-col gap-2 sm:flex-row sm:items-center">
-            <input
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm text-white outline-none ring-red-500/40 focus:ring-4"
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by name, email, username, city, tags..."
-              value={search}
-            />
-            <button
-              className="shrink-0 rounded-full border border-white/15 px-4 py-2.5 text-[0.62rem] font-black uppercase tracking-[0.14em] text-white transition hover:border-red-400/40 hover:text-red-100 disabled:opacity-50"
-              disabled={provisioning}
-              onClick={() => void createLeadershipAccounts()}
-              type="button"
-            >
-              {provisioning ? "Creating..." : "Add Leadership Accounts"}
-            </button>
-          </div>
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+        <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.02] px-3 py-3 sm:px-4 sm:py-4">
+          <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">Profiles</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">{loaded ? members.length : "—"}</p>
         </div>
-        {provisionStatus ? (
-          <p className="mt-3 text-sm text-zinc-300">{provisionStatus}</p>
-        ) : null}
+        <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.02] px-3 py-3 sm:px-4 sm:py-4">
+          <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">Showing</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">
+            {loaded ? filteredMembers.length : "—"}
+          </p>
+        </div>
+        <div className="col-span-2 rounded-[1.25rem] border border-emerald-500/20 bg-emerald-500/[0.06] px-3 py-3 sm:col-span-1 sm:px-4 sm:py-4">
+          <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-emerald-200/70">Admins</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">
+            {loaded ? members.filter((member) => member.role === "admin").length : "—"}
+          </p>
+        </div>
+      </div>
 
-        {error ? (
-          <div className="mt-5 rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-100">
-            <p className="font-bold">Member directory failed to load.</p>
-            <p className="mt-2 text-red-100/80">{error}</p>
-            <button
-              className="mt-4 rounded-full border border-red-300/30 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-red-50"
-              onClick={refreshMembers}
-              type="button"
-            >
-              Retry
-            </button>
-          </div>
-        ) : !loaded ? (
-          <div className="py-16 text-center text-zinc-400">Loading member directory...</div>
-        ) : filteredMembers.length === 0 ? (
-          <div className="py-16 text-center text-zinc-400">No members match your search.</div>
-        ) : (
-          <>
-            <div className="mt-5 space-y-3 md:hidden">
+      <div className="flex flex-col gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-zinc-400">
+            {error
+              ? "Unable to load profiles"
+              : loaded
+                ? `${filteredMembers.length} of ${members.length} profiles`
+                : "Loading profiles..."}
+          </p>
+          <button
+            className="shrink-0 rounded-full border border-white/15 px-4 py-2.5 text-[0.62rem] font-black uppercase tracking-[0.14em] text-white transition hover:border-red-400/40 hover:text-red-100 disabled:opacity-50"
+            disabled={provisioning}
+            onClick={() => void createLeadershipAccounts()}
+            type="button"
+          >
+            {provisioning ? "Creating..." : "Add Leadership Accounts"}
+          </button>
+        </div>
+        <input
+          className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm text-white outline-none ring-red-500/30 placeholder:text-zinc-500 focus:ring-2"
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search by name, email, username, city, tags..."
+          value={search}
+        />
+        {provisionStatus ? <p className="text-sm text-zinc-300">{provisionStatus}</p> : null}
+      </div>
+
+      {error ? (
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+          <p className="font-bold">Member directory failed to load.</p>
+          <p className="mt-2 text-red-100/80">{error}</p>
+          <button
+            className="mt-4 rounded-full border border-red-300/30 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-red-50"
+            onClick={refreshMembers}
+            type="button"
+          >
+            Retry
+          </button>
+        </div>
+      ) : !loaded ? (
+        <div className="rounded-[1.75rem] border border-white/10 px-5 py-10 text-center text-sm text-zinc-400">
+          Loading member directory...
+        </div>
+      ) : filteredMembers.length === 0 ? (
+        <div className="rounded-[1.75rem] border border-white/10 px-5 py-10 text-center text-sm text-zinc-400">
+          No members match your search.
+        </div>
+      ) : (
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-3 sm:p-4">
+            <div className="space-y-3 md:hidden">
               {filteredMembers.map((member) => {
                 const expanded = expandedUserId === member.userId;
                 const displayName = memberDisplayName(member);
@@ -452,9 +476,8 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                 </tbody>
               </table>
             </div>
-          </>
-        )}
-      </div>
+        </div>
+      )}
 
       {manageMember && manageMode ? (
         <AdminMemberManageModal

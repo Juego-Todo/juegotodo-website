@@ -15,12 +15,12 @@ export function AdminMembershipPanel() {
   const view = searchParams.get("view");
 
   if (view === "members") {
-    return <AdminMemberDirectoryPanel />;
+    return <AdminMemberDirectoryPanel embedded />;
   }
 
   if (view === "applications") {
-    return <AdminMembershipApplicationsPanel />;
+    return <AdminMembershipApplicationsPanel embedded />;
   }
 
-  return <LicenseApprovalPanel />;
+  return <LicenseApprovalPanel embedded />;
 }

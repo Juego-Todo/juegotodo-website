@@ -4,7 +4,7 @@ import { ArrowRight, CalendarDays, LayoutGrid, List, MapPin, Radio, Settings2, T
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { EventCardBackdrop } from "@/components/EventCardBackdrop";
 import { MotionSection } from "@/components/MotionSection";
@@ -505,7 +505,31 @@ export function CalendarPage() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const fromProfile = searchParams.get("from") === "profile";
-  const entries = useMemo(() => getPublicCalendarEntries(), []);
+  const localEntries = useMemo(() => getPublicCalendarEntries(), []);
+  const [remoteEntries, setRemoteEntries] = useState<CalendarEntry[]>([]);
+
+  useEffect(() => {
+    void fetch("/api/calendar/public")
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return (await response.json()) as { entries?: CalendarEntry[] };
+      })
+      .then((payload) => {
+        if (payload?.entries?.length) {
+          setRemoteEntries(payload.entries);
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
+  const entries = useMemo(() => {
+    const merged = [...localEntries];
+    const slugs = new Set(localEntries.map((entry) => entry.slug));
+    for (const entry of remoteEntries) {
+      if (!slugs.has(entry.slug)) merged.push(entry);
+    }
+    return merged.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [localEntries, remoteEntries]);
   const [view, setView] = useState<CalendarViewMode>(() => {
     if (typeof window === "undefined") {
       return "grid";

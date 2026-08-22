@@ -241,6 +241,24 @@ function writeStoredEntries(entries: CalendarEntry[]) {
   writeJson(CALENDAR_KEY, entries.map((entry) => normalizeCalendarEntry({ ...entry, source: "admin" })));
 }
 
+function queueCalendarRemoteSync(entry: CalendarEntry, createdBy?: string) {
+  if (typeof window === "undefined") return;
+
+  void fetch("/api/admin/calendar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ entry }),
+  }).catch(() => undefined);
+}
+
+function queueCalendarRemoteDelete(slug: string) {
+  if (typeof window === "undefined") return;
+
+  void fetch(`/api/admin/calendar?slug=${encodeURIComponent(slug)}`, {
+    method: "DELETE",
+  }).catch(() => undefined);
+}
+
 function sortByDate(entries: CalendarEntry[]) {
   return [...entries].sort((left, right) => new Date(left.date).getTime() - new Date(right.date).getTime());
 }
@@ -268,7 +286,7 @@ export function getAllCalendarEntries(includeDrafts = false) {
 }
 
 export function getPublicCalendarEntries() {
-  return sortByDate(events.map(mapSiteEventToCalendarEntry));
+  return getAllCalendarEntries(false);
 }
 
 export function getCalendarEntryById(id: string) {
@@ -334,6 +352,7 @@ export function createCalendarEntry(input: CalendarEntryInput, createdBy?: strin
   const now = new Date().toISOString();
   const entry: CalendarEntry = { ...normalized, id: crypto.randomUUID(), createdAt: now, updatedAt: now, createdBy };
   writeStoredEntries([...entries, entry]);
+  queueCalendarRemoteSync(entry, createdBy);
   return entry;
 }
 
@@ -356,14 +375,19 @@ export function updateCalendarEntry(id: string, input: CalendarEntryInput) {
   });
   entries[index] = updated;
   writeStoredEntries(entries);
+  queueCalendarRemoteSync(updated, updated.createdBy);
   return updated;
 }
 
 export function deleteCalendarEntry(id: string) {
   const entries = readStoredEntries();
+  const target = entries.find((entry) => entry.id === id);
   const next = entries.filter((entry) => entry.id !== id);
   if (next.length === entries.length) throw new Error("Calendar entry not found.");
   writeStoredEntries(next);
+  if (target?.slug) {
+    queueCalendarRemoteDelete(target.slug);
+  }
 }
 
 export function updateCalendarOperationalStatus(id: string, operationalStatus: CalendarOperationalStatus) {

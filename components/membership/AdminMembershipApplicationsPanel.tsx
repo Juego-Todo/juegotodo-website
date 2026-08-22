@@ -66,7 +66,7 @@ function applicationBadgeTone(status: MembershipApplicationStatus) {
   return "border-white/15 bg-white/5 text-zinc-200";
 }
 
-export function AdminMembershipApplicationsPanel() {
+export function AdminMembershipApplicationsPanel({ embedded = false }: { embedded?: boolean } = {}) {
   const [applications, setApplications] = useState<MembershipApplicationRecord[]>([]);
   const [counts, setCounts] = useState<Counts>({
     paymentVerification: 0,
@@ -125,30 +125,39 @@ export function AdminMembershipApplicationsPanel() {
 
   return (
     <div className="space-y-6">
-      <AdminPortalHeader
-        description="Review membership applications, verify payment proof, process IDs, and manage delivery."
-        tag="Membership"
-        title="Membership Applications"
-      />
+      {embedded ? null : (
+        <AdminPortalHeader
+          description="Review membership applications, verify payment proof, process IDs, and manage delivery."
+          tag="Membership"
+          title="Membership Applications"
+        />
+      )}
 
-      <div className="glass-panel rounded-[1.75rem] p-5 sm:p-6">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
-          <input
-            className="w-full rounded-xl border border-white/10 bg-black/40 py-2.5 pl-11 pr-4 text-sm text-white outline-none ring-red-500/40 focus:ring-4"
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by name, email, or application number"
-            value={query}
-          />
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+        <div className="rounded-[1.25rem] border border-amber-500/20 bg-amber-500/[0.06] px-3 py-3 sm:px-4 sm:py-4">
+          <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-amber-200/70">Payment</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">{counts.paymentVerification}</p>
         </div>
+        <div className="rounded-[1.25rem] border border-sky-500/20 bg-sky-500/[0.06] px-3 py-3 sm:px-4 sm:py-4">
+          <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-sky-200/70">Documents</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">{counts.documentReview}</p>
+        </div>
+        <div className="col-span-2 rounded-[1.25rem] border border-white/10 bg-white/[0.02] px-3 py-3 sm:col-span-1 sm:px-4 sm:py-4">
+          <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">Action Required</p>
+          <p className="font-display mt-1 text-2xl text-white sm:text-3xl">{counts.actionRequired}</p>
+        </div>
+      </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
+      <div className="flex flex-col gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-3">
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible [&::-webkit-scrollbar]:hidden">
           {FILTERS.map((item) => {
             const count = item.countKey ? counts[item.countKey] : applications.length;
             return (
               <button
-                className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] ${
-                  filter === item.id ? "bg-[#FF1010] text-white" : "border border-white/10 text-zinc-300"
+                className={`shrink-0 rounded-full px-3.5 py-2.5 text-[0.6rem] font-black uppercase tracking-[0.12em] transition sm:py-2 ${
+                  filter === item.id
+                    ? "bg-[#FF1010] text-white"
+                    : "border border-white/10 text-zinc-400 hover:text-white"
                 }`}
                 key={item.id}
                 onClick={() => setFilter(item.id)}
@@ -160,10 +169,23 @@ export function AdminMembershipApplicationsPanel() {
             );
           })}
         </div>
+        <label className="relative block">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+            size={14}
+            aria-hidden
+          />
+          <input
+            className="w-full rounded-xl border border-white/10 bg-black/40 py-2.5 pl-9 pr-3 text-sm text-white outline-none ring-red-500/30 placeholder:text-zinc-500 focus:ring-2"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search by name, email, or application number"
+            value={query}
+          />
+        </label>
       </div>
 
       {error ? (
-        <div className="glass-panel rounded-[1.75rem] border border-red-500/30 bg-red-500/10 p-6 text-red-100">
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
           <p className="font-bold">Membership applications failed to load.</p>
           <p className="mt-2 text-sm text-red-100/80">{error}</p>
           <button
@@ -177,11 +199,13 @@ export function AdminMembershipApplicationsPanel() {
       ) : null}
 
       {loading ? (
-        <div className="glass-panel rounded-[1.75rem] p-8 text-center text-sm text-zinc-400">Loading queue...</div>
+        <div className="rounded-[1.75rem] border border-white/10 px-5 py-10 text-center text-sm text-zinc-400">
+          Loading queue...
+        </div>
       ) : null}
 
       {!loading && !error && filteredApplications.length === 0 ? (
-        <div className="glass-panel rounded-[1.75rem] p-8 text-center text-sm text-zinc-400">
+        <div className="rounded-[1.75rem] border border-white/10 px-5 py-10 text-center text-sm text-zinc-400">
           No applications match this filter.
         </div>
       ) : null}
@@ -191,7 +215,7 @@ export function AdminMembershipApplicationsPanel() {
           {filteredApplications.map((application) => (
             <li key={application.id}>
               <Link
-                className="glass-panel flex items-center justify-between gap-4 rounded-[1.35rem] p-4 transition hover:border-[#FF1010]/35 sm:p-5"
+                className="flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-4 transition hover:border-[#FF1010]/35 sm:p-5"
                 href={`/admin/membership-applications/${application.id}`}
               >
                 <div className="min-w-0">

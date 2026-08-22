@@ -117,7 +117,7 @@ export function CheckoutReviewPage() {
   }
 
   return (
-    <main className="overflow-hidden px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
+    <main className="overflow-x-clip px-4 pb-8 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
       <section className="relative mx-auto max-w-7xl py-10 sm:py-14">
         <PageNavigation currentLabel="Checkout — Review" />
         <h1 className="font-display mt-3 text-5xl uppercase text-white sm:text-6xl">Review Order</h1>

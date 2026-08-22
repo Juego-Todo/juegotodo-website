@@ -181,20 +181,8 @@ export function getProductImageKey(product: ShopProduct): ProductImageKey {
   return slugImageMap[product.slug] ?? categoryImageMap[product.category];
 }
 
-export function getProductRating(product: ShopProduct) {
-  let hash = 0;
-  for (let index = 0; index < product.slug.length; index += 1) {
-    hash = (hash * 31 + product.slug.charCodeAt(index)) >>> 0;
-  }
-  hash = (hash + product.priceAmount * 17 + product.stock * 3) >>> 0;
-
-  const rating = 3.4 + (hash % 17) / 10;
-  const reviewCount = 8 + (hash % 312);
-
-  return {
-    rating: Math.min(5, Math.round(rating * 10) / 10),
-    reviewCount,
-  };
+export function getProductRating(_product: ShopProduct) {
+  return null;
 }
 
 export function isBestSeller(product: ShopProduct) {
@@ -202,21 +190,19 @@ export function isBestSeller(product: ShopProduct) {
 }
 
 export function getProductSocialProof(product: ShopProduct) {
-  const seed = product.slug.length * 7 + product.stock;
-  const athleteCount = 42 + (seed % 90);
   if (isBestSeller(product)) {
-    return `Purchased by ${athleteCount} athletes`;
+    return "Official JTGC best seller";
   }
   if (product.category === "competition-equipment" || product.category === "official-gear") {
     return "Used in championship events";
   }
   if (product.badge === "New" || product.badge === "New Arrival") {
-    return "Popular with fighters";
+    return "New in the JT shop";
   }
   if (product.category === "championship-collection") {
-    return "Limited drop — collector demand";
+    return "Limited drop";
   }
-  return `Trusted by ${athleteCount} JTGC members`;
+  return "Official Juego Todo gear";
 }
 
 export function getProductBadges(product: ShopProduct) {

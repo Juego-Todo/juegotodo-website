@@ -85,6 +85,73 @@ export async function createConsultationBooking(input: {
     throw new Error("Consultation service not found.");
   }
 
+  const durationMatch = service.duration.match(/(\d+)/);
+  const durationMinutes = durationMatch ? Number.parseInt(durationMatch[1] ?? "60", 10) : 60;
+  const slotStart = new Date(`${input.date}T${input.time}:00`).toISOString();
+  const slotEnd = new Date(new Date(slotStart).getTime() + durationMinutes * 60_000).toISOString();
+
+  try {
+    const response = await fetch("/api/consultations/book", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        serviceSlug: service.slug,
+        slotStart,
+        slotEnd,
+        customerName: input.userName,
+        customerEmail: input.userEmail,
+        customerPhone: input.phone,
+        notes: input.notes,
+      }),
+    });
+
+    if (response.ok) {
+      const payload = (await response.json()) as {
+        booking?: {
+          id: string;
+          serviceSlug: string;
+          slotStart: string;
+          slotEnd: string;
+          customerName: string;
+          customerEmail: string;
+          status: string;
+          createdAt: string;
+        };
+      };
+
+      if (payload.booking) {
+        const remote = payload.booking;
+        const booking: ConsultationBooking = {
+          id: remote.id,
+          slotId: input.slotId,
+          consultationSlug: service.slug,
+          consultationName: service.name,
+          date: input.date,
+          time: input.time,
+          consultant: input.consultant,
+          format: input.format,
+          userId: input.userId,
+          userEmail: input.userEmail,
+          userName: input.userName,
+          phone: input.phone,
+          notes: input.notes,
+          paymentMethod: input.paymentMethod,
+          referenceNumber: generatePaymentReference(input.paymentMethod),
+          orderId: remote.id,
+          orderNumber: `JT-CON-${remote.id.slice(0, 8).toUpperCase()}`,
+          amount: service.price,
+          status: remote.status === "confirmed" ? "confirmed" : "awaiting_verification",
+          createdAt: remote.createdAt,
+        };
+        writeJson(BOOKINGS_KEY, [...getConsultationBookings(), booking]);
+        window.dispatchEvent(new CustomEvent(BOOKINGS_UPDATED_EVENT));
+        return booking;
+      }
+    }
+  } catch {
+    // Fall back to local booking flow below.
+  }
+
   const bookedIds = getBookedConsultationSlotIds();
   if (bookedIds.has(input.slotId)) {
     throw new Error("This consultation slot is no longer available.");

@@ -99,20 +99,13 @@ export function getShippingConfidence(product: ShopProduct): string {
   return "Ships within 24 Hours · Nationwide Delivery";
 }
 
-export function getProductSoldThisMonth(product: ShopProduct): number {
-  let hash = 0;
-  for (let index = 0; index < product.slug.length; index += 1) {
-    hash = (hash * 17 + product.slug.charCodeAt(index)) >>> 0;
-  }
-  return 38 + ((hash + product.priceAmount) % 264);
+export function getProductSoldThisMonth(_product: ShopProduct): number | null {
+  return null;
 }
 
 export function getProductCardSocialProof(product: ShopProduct) {
-  const { rating } = getProductRating(product);
-  const soldThisMonth = getProductSoldThisMonth(product);
   const proofLine = getProductSocialProof(product);
-
-  return { rating, soldThisMonth, proofLine };
+  return { rating: null as number | null, soldThisMonth: null as number | null, proofLine };
 }
 
 export function getProductMemberPricing(product: ShopProduct) {

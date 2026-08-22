@@ -522,7 +522,7 @@ export function MembershipApplicationWizard({ user, phone = "" }: MembershipAppl
 
   if (submittedApplication) {
     return (
-      <main className="overflow-hidden px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
+      <main className="overflow-x-clip px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
         <section className="relative mx-auto max-w-2xl py-8 sm:py-10">
           <MotionSection>
             <Link
@@ -574,7 +574,7 @@ export function MembershipApplicationWizard({ user, phone = "" }: MembershipAppl
   }
 
   return (
-    <main className="overflow-hidden px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
+    <main className="overflow-x-clip px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
       <section className="relative mx-auto max-w-3xl py-8 sm:py-10">
         <MotionSection>
           <button

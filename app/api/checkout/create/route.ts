@@ -1,6 +1,8 @@
 import { randomUUID } from "crypto";
 import { NextResponse, type NextRequest } from "next/server";
-import { calculateLineItems, generatePaymentReference } from "@/lib/commerce/pricing";
+import { calculateLineItemsServer } from "@/lib/commerce/pricing-server";
+import { generatePaymentReference } from "@/lib/commerce/pricing";
+import { redeemPromoCodeServer } from "@/lib/platform/promo-server";
 import type { CartItem, MembershipTier, OrderPayment, PaymentMethod, ShippingAddress } from "@/lib/commerce/types";
 import type { AccountType } from "@/lib/auth/types";
 import {
@@ -76,12 +78,16 @@ export async function POST(request: NextRequest) {
   const userName = profile?.full_name ?? userEmail;
 
   // Server-side re-pricing — never trust client totals.
-  const totals = calculateLineItems(cart, {
+  const totals = await calculateLineItemsServer(cart, {
     accountType,
     membershipTier,
     promoCode,
     userId: user.id,
   });
+
+  if ("promoError" in totals && totals.promoError) {
+    return NextResponse.json({ error: totals.promoError }, { status: 400 });
+  }
 
   if (totals.items.length === 0) {
     return NextResponse.json({ error: "Cart items are no longer available." }, { status: 400 });
@@ -183,6 +189,14 @@ export async function POST(request: NextRequest) {
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 500 });
+  }
+
+  if (totals.promoCode) {
+    try {
+      await redeemPromoCodeServer(totals.promoCode, user.id, orderId);
+    } catch {
+      // Non-blocking — order already created
+    }
   }
 
   await supabase.from("notifications").insert({

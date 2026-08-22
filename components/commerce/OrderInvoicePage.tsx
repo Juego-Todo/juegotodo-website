@@ -63,24 +63,26 @@ export function OrderInvoicePage({ orderId }: { orderId: string }) {
             </div>
           </div>
 
-          <table className="mt-8 w-full text-sm">
-            <thead className="border-b border-white/10 text-left text-xs uppercase tracking-[0.14em] text-zinc-500">
-              <tr>
-                <th className="py-3">Item</th>
-                <th className="py-3">Qty</th>
-                <th className="py-3 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {order.items.map((item) => (
-                <tr className="border-b border-white/[0.06]" key={item.productSlug}>
-                  <td className="py-3 text-zinc-300">{item.name}</td>
-                  <td className="py-3 text-zinc-400">{item.quantity}</td>
-                  <td className="py-3 text-right text-white">{formatCurrency(item.lineTotal)}</td>
+          <div className="-mx-2 mt-8 overflow-x-auto px-2 sm:mx-0 sm:px-0">
+            <table className="min-w-[20rem] w-full text-sm">
+              <thead className="border-b border-white/10 text-left text-xs uppercase tracking-[0.14em] text-zinc-500">
+                <tr>
+                  <th className="py-3">Item</th>
+                  <th className="py-3">Qty</th>
+                  <th className="py-3 text-right">Total</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {order.items.map((item) => (
+                  <tr className="border-b border-white/[0.06]" key={item.productSlug}>
+                    <td className="py-3 text-zinc-300">{item.name}</td>
+                    <td className="py-3 text-zinc-400">{item.quantity}</td>
+                    <td className="py-3 text-right text-white">{formatCurrency(item.lineTotal)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <dl className="mt-6 space-y-2 text-sm">
             <div className="flex justify-between text-zinc-400"><dt>Subtotal</dt><dd>{formatCurrency(order.subtotal)}</dd></div>

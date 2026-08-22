@@ -29,6 +29,7 @@ import { buildFighterProfileView } from "@/lib/profile/fighter-profile-view";
 import {
   adminWorkspaceTabs,
   canAccessWorkspaceTab,
+  deriveMobileTabFromWorkspace,
   fighterWorkspaceTabs,
   mobileTabToWorkspace,
   workspaceTabs,
@@ -124,23 +125,42 @@ export function ProfileDashboard({
 }) {
   const router = useRouter();
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [mobileTab, setMobileTab] = useState<MobileTabId>("dashboard");
+  const [mobileNavOverride, setMobileNavOverride] = useState<{
+    tab: MobileTabId;
+    forWorkspace: WorkspaceTabId;
+  } | null>(null);
   const canAccessOpsTabs = memberRecord.canAccessOpsTabs;
   const portalExperience = memberRecord.portalExperience;
   const isFanPortal = !canAccessOpsTabs && portalExperience === "fan";
   const isCoachPortal = !canAccessOpsTabs && portalExperience === "coach";
+  const isStandardMemberPortal = !canAccessOpsTabs && !isFanPortal && !isCoachPortal;
+  const isFighterRole = memberRecord.roleModule.kind === "fighter";
+
+  const derivedMobileTab = useMemo(
+    () =>
+      deriveMobileTabFromWorkspace(activeTab, {
+        canAccessOpsTabs,
+        isCoachPortal,
+        isFighterPortal: isFighterRole,
+      }),
+    [activeTab, canAccessOpsTabs, isCoachPortal, isFighterRole],
+  );
+  const mobileTab =
+    mobileNavOverride?.forWorkspace === activeTab ? mobileNavOverride.tab : derivedMobileTab;
 
   function handleMobileTab(tab: MobileTabId) {
-    setMobileTab(tab);
     if (tab === "credential") {
+      setMobileNavOverride({ tab, forWorkspace: activeTab });
       return;
     }
     if (canAccessOpsTabs) {
       if (tab === "career") {
+        setMobileNavOverride({ tab, forWorkspace: "shop" });
         onTabChange("shop");
         return;
       }
       if (tab === "activity") {
+        setMobileNavOverride({ tab, forWorkspace: "licenses" });
         onTabChange("licenses");
         return;
       }
@@ -156,7 +176,23 @@ export function ProfileDashboard({
         return;
       }
     }
-    onTabChange(mobileTabToWorkspace(tab, portalExperience));
+    if (isCoachPortal && tab === "career") {
+      setMobileNavOverride({ tab, forWorkspace: "documents" });
+      onTabChange("documents");
+      return;
+    }
+    if (isStandardMemberPortal && tab === "career") {
+      setMobileNavOverride({ tab, forWorkspace: "activity" });
+      onTabChange("activity");
+      return;
+    }
+    const nextWorkspace = mobileTabToWorkspace(tab, portalExperience);
+    setMobileNavOverride({ tab, forWorkspace: nextWorkspace });
+    onTabChange(nextWorkspace);
+  }
+
+  function handleOpsMoreNavigate(tab: WorkspaceTabId) {
+    onTabChange(tab);
   }
 
   function handleNavigateSection(section: ProfileSectionId) {
@@ -173,9 +209,13 @@ export function ProfileDashboard({
   const credentialPinned = showCredentials && mobileTab === "credential";
   const isShopWorkspace = activeTab === "shop" || activeTab === "orders";
   const isTicketsWorkspace = activeTab === "tickets";
+  const isMembersWorkspace = activeTab === "members";
+  const isLicensesWorkspace = activeTab === "licenses";
+  const isLatayanologyWorkspace = activeTab === "latayanology";
+  const isSettingsWorkspace = activeTab === "settings";
+  const isCalendarWorkspace = activeTab === "calendar";
   // Ops accounts: keep the profile strip on Overview only — other tabs are tool workspaces.
   const showOpsProfileHero = canAccessOpsTabs && activeTab === "overview";
-  const isFighterRole = memberRecord.roleModule.kind === "fighter";
   const athlete =
     identity.athlete ??
     (isFighterRole ? resolveAthleteProfile(user, ["fighter", ...identity.roles]) : undefined);
@@ -260,13 +300,26 @@ export function ProfileDashboard({
         {credentialPinned && credentialCard ? (
           <div className="lg:hidden">{credentialCard}</div>
         ) : mobileTab === "settings" ? (
-          <div className="lg:hidden">{settingsContent}</div>
+          <div className="space-y-6 lg:hidden">
+            <OpsBrandHeader subtitle="Account profile and preferences" title="Juego Todo Settings" />
+            {settingsContent}
+          </div>
         ) : (
           <>
             {isShopWorkspace ? (
               <OpsBrandHeader subtitle="Official store operations" title="Juego Todo Shop" />
             ) : isTicketsWorkspace ? (
               <OpsBrandHeader subtitle="Event ticket purchases" title="Juego Todo Tickets" />
+            ) : isMembersWorkspace && canAccessOpsTabs ? (
+              <OpsBrandHeader subtitle="Member directory and account tags" title="Juego Todo Members" />
+            ) : isLicensesWorkspace && canAccessOpsTabs ? (
+              <OpsBrandHeader subtitle="Approvals and membership applications" title="Juego Todo Licenses" />
+            ) : isLatayanologyWorkspace && canAccessOpsTabs ? (
+              <OpsBrandHeader subtitle="Licensed fighter database" title="Juego Todo Latayanology" />
+            ) : isCalendarWorkspace && canAccessOpsTabs ? (
+              <OpsBrandHeader subtitle="Events and schedule operations" title="Juego Todo Calendar" />
+            ) : isSettingsWorkspace ? (
+              <OpsBrandHeader subtitle="Account profile and preferences" title="Juego Todo Settings" />
             ) : fighterView ? (
               <>
                 <div className={`${mobileTab === "dashboard" ? "" : "hidden lg:block"}`}>
@@ -454,12 +507,15 @@ export function ProfileDashboard({
 
       <ProfileMobileNav
         active={mobileTab}
+        activeWorkspace={activeTab}
         adminMode={canAccessOpsTabs}
         coachMode={isCoachPortal && !fighterView}
         fanMode={isFanPortal && !fighterView}
         fighterMode={Boolean(fighterView)}
         hideCredentials={!showCredentials}
+        memberMode={isStandardMemberPortal && !fighterView}
         onChange={handleMobileTab}
+        onWorkspaceNavigate={handleOpsMoreNavigate}
       />
 
       <ProfileCommandPalette

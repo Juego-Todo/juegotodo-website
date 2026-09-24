@@ -19,7 +19,17 @@ export type CredentialsFilter = "all" | "licensed" | "none" | "pending";
 export type RoleFilter = "all" | UserTypeTagId | "admin_role";
 export type JoinedFilter = "all" | "today" | "7d" | "30d" | "90d";
 export type QuickView = "all" | "team" | "fans" | "pro" | "unlimited" | "licensed";
-export type MemberSortColumn = "name" | "account" | "plan" | "credentials" | "roles" | "joined" | "expiry";
+export type MemberSortColumn =
+  | "firstName"
+  | "lastName"
+  | "username"
+  | "name"
+  | "account"
+  | "plan"
+  | "credentials"
+  | "roles"
+  | "joined"
+  | "expiry";
 export type MemberSortDirection = "asc" | "desc";
 
 export type MemberSort = {
@@ -38,8 +48,8 @@ export type MemberSortPreset =
 export const MEMBER_SORT_PRESETS: Array<{ id: MemberSortPreset; label: string; sort: MemberSort }> = [
   { id: "joined_desc", label: "Recently joined", sort: { column: "joined", direction: "desc" } },
   { id: "joined_asc", label: "Oldest joined", sort: { column: "joined", direction: "asc" } },
-  { id: "name_asc", label: "Name A–Z", sort: { column: "name", direction: "asc" } },
-  { id: "name_desc", label: "Name Z–A", sort: { column: "name", direction: "desc" } },
+  { id: "name_asc", label: "First name A–Z", sort: { column: "firstName", direction: "asc" } },
+  { id: "name_desc", label: "First name Z–A", sort: { column: "firstName", direction: "desc" } },
   { id: "expiry", label: "Membership expiry", sort: { column: "expiry", direction: "asc" } },
   { id: "credentials", label: "Credential status", sort: { column: "credentials", direction: "asc" } },
 ];
@@ -301,8 +311,9 @@ function planSortRank(member: AdminMemberRecord) {
 }
 
 function accountSortKey(member: AdminMemberRecord) {
+  const teamRank = isTeamMember(member) ? 0 : 1;
   const roleRank = member.role === "admin" ? 0 : 1;
-  return `${roleRank}:${member.accountTypeLabel}:${memberDisplayName(member)}`;
+  return `${teamRank}:${roleRank}:${memberDisplayName(member)}`;
 }
 
 function credentialsSortKey(member: AdminMemberRecord) {
@@ -320,6 +331,10 @@ function rolesSortKey(member: AdminMemberRecord) {
   return `${admin}:${roles}` || "zzz";
 }
 
+function namePart(value: string) {
+  return value === "—" || !value.trim() ? "" : value.trim().toLowerCase();
+}
+
 export function toggleMemberSort(current: MemberSort, column: MemberSortColumn): MemberSort {
   if (current.column === column) {
     return {
@@ -329,7 +344,7 @@ export function toggleMemberSort(current: MemberSort, column: MemberSortColumn):
   }
   return {
     column,
-    direction: column === "joined" || column === "plan" ? "desc" : "asc",
+    direction: column === "joined" || column === "plan" || column === "expiry" ? "desc" : "asc",
   };
 }
 
@@ -340,6 +355,17 @@ export function sortMembers(members: AdminMemberRecord[], sort: MemberSort) {
   list.sort((a, b) => {
     let cmp = 0;
     switch (sort.column) {
+      case "firstName":
+        cmp = namePart(a.firstName).localeCompare(namePart(b.firstName));
+        if (cmp === 0) cmp = namePart(a.lastName).localeCompare(namePart(b.lastName));
+        break;
+      case "lastName":
+        cmp = namePart(a.lastName).localeCompare(namePart(b.lastName));
+        if (cmp === 0) cmp = namePart(a.firstName).localeCompare(namePart(b.firstName));
+        break;
+      case "username":
+        cmp = namePart(a.username).localeCompare(namePart(b.username));
+        break;
       case "name":
         cmp = memberDisplayName(a).localeCompare(memberDisplayName(b));
         break;

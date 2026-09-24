@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  ArrowUpDown,
   Check,
   ChevronDown,
+  ChevronUp,
   Download,
   Filter,
   MoreHorizontal,
@@ -38,19 +38,18 @@ import {
   defaultMemberSort,
   filterMembers,
   isPendingCredential,
-  MEMBER_SORT_PRESETS,
   memberDisplayName,
   memberHasUnlimitedPlan,
   planCaption,
   proStatusCaption,
-  resolveMemberSortPreset,
   sortMembers,
+  toggleMemberSort,
   type AccountFilter,
   type CredentialsFilter,
   type JoinedFilter,
   type MemberDirectoryFilters,
   type MemberSort,
-  type MemberSortPreset,
+  type MemberSortColumn,
   type MembershipFilter,
   type QuickView,
   type RoleFilter,
@@ -58,7 +57,7 @@ import {
 import { getAllOrders } from "@/lib/commerce/storage";
 
 type ManageMode = "edit" | "reset" | "delete" | "pro" | "tags";
-type OpenPopover = "filter" | "sort" | "export" | "more" | "add" | null;
+type OpenPopover = "filter" | "export" | "more" | "add" | null;
 
 const ROLE_FILTER_OPTIONS: Array<{ value: RoleFilter; label: string }> = [
   { value: "all", label: "All" },
@@ -159,6 +158,41 @@ function RolesCell({ member }: { member: AdminMemberRecord }) {
 
 function AccountCell({ member }: { member: AdminMemberRecord }) {
   return <MemberBadge {...resolveAccountBadge(member)} />;
+}
+
+function SortableColumnHeader({
+  label,
+  column,
+  sort,
+  onSort,
+}: {
+  label: string;
+  column: MemberSortColumn;
+  sort: MemberSort;
+  onSort: (column: MemberSortColumn) => void;
+}) {
+  const active = sort.column === column;
+  return (
+    <th className="px-3 py-2.5 text-left">
+      <button
+        aria-label={`Sort by ${label}${active ? `, ${sort.direction === "asc" ? "ascending" : "descending"}` : ""}`}
+        className={`inline-flex items-center gap-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] transition ${
+          active ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+        }`}
+        onClick={() => onSort(column)}
+        type="button"
+      >
+        {label}
+        <span className={active ? "opacity-100" : "opacity-35"} aria-hidden>
+          {active && sort.direction === "asc" ? (
+            <ChevronUp size={12} strokeWidth={2.5} />
+          ) : (
+            <ChevronDown size={12} strokeWidth={active ? 2.5 : 2} />
+          )}
+        </span>
+      </button>
+    </th>
+  );
 }
 
 function ToolbarButton({
@@ -552,7 +586,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
 
   const chips = useMemo(() => activeFilterChips(filters), [filters]);
   const activeFilterCount = chips.length;
-  const activeSortPreset = resolveMemberSortPreset(sort);
 
   function applyQuickView(view: QuickView) {
     setQuickView(view);
@@ -611,10 +644,8 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
     setSelectedIds(filteredMembers.map((member) => member.userId));
   }
 
-  function applySortPreset(preset: MemberSortPreset) {
-    const found = MEMBER_SORT_PRESETS.find((entry) => entry.id === preset);
-    if (found) setSort(found.sort);
-    setOpenPopover(null);
+  function applySortColumn(column: MemberSortColumn) {
+    setSort((current) => toggleMemberSort(current, column));
   }
 
   function exportMembers(scope: "view" | "all") {
@@ -778,15 +809,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
             </ToolbarButton>
 
             <ToolbarButton
-              active={openPopover === "sort"}
-              ariaLabel="Sort members"
-              label="Sort"
-              onClick={() => togglePopover("sort")}
-            >
-              <ArrowUpDown size={14} aria-hidden />
-            </ToolbarButton>
-
-            <ToolbarButton
               active={openPopover === "export"}
               ariaLabel="Export members"
               label="Export"
@@ -856,31 +878,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                       Clear all filters
                     </button>
                   ) : null}
-                </div>
-              </PopoverShell>
-            ) : null}
-
-            {openPopover === "sort" ? (
-              <PopoverShell title="Sort by" onClose={() => setOpenPopover(null)}>
-                <div className="space-y-0.5">
-                  {MEMBER_SORT_PRESETS.map((preset) => {
-                    const active = activeSortPreset === preset.id;
-                    return (
-                      <button
-                        className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition ${
-                          active ? "bg-white/[0.06] text-white" : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
-                        }`}
-                        key={preset.id}
-                        onClick={() => applySortPreset(preset.id)}
-                        type="button"
-                      >
-                        <span className="inline-flex w-4 justify-center">
-                          {active ? <Check size={14} className="text-[#FF1010]" aria-hidden /> : null}
-                        </span>
-                        {preset.label}
-                      </button>
-                    );
-                  })}
                 </div>
               </PopoverShell>
             ) : null}
@@ -1104,16 +1101,26 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
               <thead>
                 <tr className="border-b border-white/10">
                   <th className="w-10 px-2 py-2.5" />
-                  {["First Name", "Last Name", "Username", "Account", "Membership", "Credentials", "Roles", "Joined"].map(
-                    (label) => (
-                      <th
-                        className="px-3 py-2.5 text-left text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-zinc-500"
-                        key={label}
-                      >
-                        {label}
-                      </th>
-                    ),
-                  )}
+                  {(
+                    [
+                      { label: "First Name", column: "firstName" },
+                      { label: "Last Name", column: "lastName" },
+                      { label: "Username", column: "username" },
+                      { label: "Account", column: "account" },
+                      { label: "Membership", column: "plan" },
+                      { label: "Credentials", column: "credentials" },
+                      { label: "Roles", column: "roles" },
+                      { label: "Joined", column: "joined" },
+                    ] as const
+                  ).map((header) => (
+                    <SortableColumnHeader
+                      column={header.column}
+                      key={header.column}
+                      label={header.label}
+                      onSort={applySortColumn}
+                      sort={sort}
+                    />
+                  ))}
                   <th className="px-3 py-2.5 text-right text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-zinc-500">
                     <span className="sr-only">Actions</span>
                     <MoreHorizontal size={14} className="ml-auto text-zinc-600" aria-hidden />

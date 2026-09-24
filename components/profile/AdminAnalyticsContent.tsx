@@ -41,7 +41,7 @@ export function AdminMembershipAnalyticsContent() {
 
   useEffect(() => {
     void getAllOrders().then((orders) => {
-      void fetchAdminMemberRecords(orders).then((records) => {
+      void fetchAdminMemberRecords(orders).then(({ records }) => {
         setSnapshot(computeMembershipAnalytics(records));
         setLoaded(true);
       });

@@ -138,7 +138,8 @@ export function AdminPendingTasksPanel() {
           getAllOrders(),
           adminFetch("/api/admin/membership-applications"),
         ]);
-        const members = await fetchAdminMemberRecords(orders);
+        const membersResult = await fetchAdminMemberRecords(orders);
+        const members = membersResult.records;
         const license = computeLicenseAnalytics(applications);
         const membership = computeMembershipAnalytics(members);
 

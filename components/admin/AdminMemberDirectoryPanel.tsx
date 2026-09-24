@@ -26,7 +26,6 @@ import {
 } from "@/lib/admin/member-directory";
 import {
   resolveAccountBadge,
-  resolveCredentialBadges,
   resolveRoleBadges,
   memberAccountKind,
   memberSystemAccess,
@@ -37,7 +36,6 @@ import {
   defaultMemberFilters,
   defaultMemberSort,
   filterMembers,
-  isPendingCredential,
   memberDisplayName,
   memberHasUnlimitedPlan,
   planCaption,
@@ -132,17 +130,6 @@ function MembershipCell({ member }: { member: AdminMemberRecord }) {
           ? "accent"
           : "warn";
   return <StatusPill tone={tone}>Pro · {proStatusCaption(member.proStatus, member.proEntitled)}</StatusPill>;
-}
-
-function CredentialsCell({ member }: { member: AdminMemberRecord }) {
-  const badges = resolveCredentialBadges(member);
-  if (badges.length === 0) {
-    if (member.licenseStatus && isPendingCredential(member)) {
-      return <MemberBadge label="Pending" variant="status" />;
-    }
-    return <span className="text-xs text-zinc-600">None</span>;
-  }
-  return <MemberBadgeList badges={badges} limit={2} overflowTitle="Credentials" />;
 }
 
 function RolesCell({ member }: { member: AdminMemberRecord }) {
@@ -518,12 +505,12 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   const [members, setMembers] = useState<AdminMemberRecord[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
+  const [proLoadError, setProLoadError] = useState("");
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const [filters, setFilters] = useState<MemberDirectoryFilters>(defaultMemberFilters);
   const [quickView, setQuickView] = useState<QuickView>("all");
   const [sort, setSort] = useState<MemberSort>(defaultMemberSort);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [menuUserId, setMenuUserId] = useState<string | null>(null);
   const [drawerMember, setDrawerMember] = useState<AdminMemberRecord | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -541,13 +528,46 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   const refreshMembers = useCallback(() => {
     void getAllOrders()
       .then((orders) => fetchAdminMemberRecords(orders))
-      .then((records) => {
-        setMembers(records);
+      .then(({ records, proLoadError: nextProLoadError }) => {
+        setProLoadError(nextProLoadError ?? "");
         setError("");
         setLoaded(true);
+        setMembers((previous) => {
+          if (!nextProLoadError || previous.length === 0) {
+            return records;
+          }
+          const previousById = new Map(previous.map((member) => [member.userId, member]));
+          return records.map((record) => {
+            const prior = previousById.get(record.userId);
+            if (!prior) return record;
+            return {
+              ...record,
+              proStatus: prior.proStatus,
+              proEntitled: prior.proEntitled,
+              proMembershipId: prior.proMembershipId,
+              proExpiresAt: prior.proExpiresAt,
+              proPaymentStatus: prior.proPaymentStatus,
+            };
+          });
+        });
         setDrawerMember((current) => {
           if (!current) return current;
-          return records.find((record) => record.userId === current.userId) ?? current;
+          const next = records.find((record) => record.userId === current.userId);
+          if (!next) {
+            setDrawerOpen(false);
+            return null;
+          }
+          if (nextProLoadError) {
+            return {
+              ...next,
+              proStatus: current.proStatus,
+              proEntitled: current.proEntitled,
+              proMembershipId: current.proMembershipId,
+              proExpiresAt: current.proExpiresAt,
+              proPaymentStatus: current.proPaymentStatus,
+            };
+          }
+          return next;
         });
       })
       .catch((caught) => {
@@ -692,20 +712,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   function clearFilterChipsOnly() {
     setFilters(defaultMemberFilters);
     setQuickView("all");
-  }
-
-  function toggleSelected(userId: string) {
-    setSelectedIds((current) =>
-      current.includes(userId) ? current.filter((id) => id !== userId) : [...current, userId],
-    );
-  }
-
-  function toggleSelectAll() {
-    if (selectedIds.length === filteredMembers.length) {
-      setSelectedIds([]);
-      return;
-    }
-    setSelectedIds(filteredMembers.map((member) => member.userId));
   }
 
   function applySortColumn(column: MemberSortColumn) {
@@ -1039,36 +1045,21 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
         ) : null}
 
         {provisionStatus ? <p className="text-sm text-zinc-400">{provisionStatus}</p> : null}
-      </div>
 
-      {selectedIds.length > 0 ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#FF1010]/20 bg-[#FF1010]/[0.06] px-3.5 py-2.5">
-          <p className="text-sm text-zinc-300">
-            <span className="font-semibold text-white">{selectedIds.length}</span> selected
-          </p>
-          <div className="flex flex-wrap gap-2">
+        {proLoadError ? (
+          <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.08] px-4 py-3 text-sm text-amber-50">
+            <p className="font-semibold">Unable to load Pro membership data.</p>
+            <p className="mt-1 text-amber-50/70">{proLoadError}</p>
             <button
-              className="rounded-lg border border-white/12 px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-zinc-200"
-              onClick={() =>
-                downloadMembersCsv(
-                  members.filter((member) => selectedIds.includes(member.userId)),
-                  "juegotodo-members-selected.csv",
-                )
-              }
+              className="mt-2 rounded-lg border border-amber-300/25 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-amber-50"
+              onClick={refreshMembers}
               type="button"
             >
-              Export selected
-            </button>
-            <button
-              className="rounded-lg border border-white/10 px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-zinc-500"
-              onClick={() => setSelectedIds([])}
-              type="button"
-            >
-              Clear
+              Retry Pro data
             </button>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
       {error ? (
         <div className="rounded-xl border border-red-500/25 bg-red-500/[0.08] px-4 py-5 text-sm text-red-100">
@@ -1112,12 +1103,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
             {filteredMembers.map((member) => (
               <article className="rounded-xl border border-white/10 bg-black/30 p-3.5" key={member.userId}>
                 <div className="flex items-start gap-3">
-                  <input
-                    checked={selectedIds.includes(member.userId)}
-                    className="mt-1"
-                    onChange={() => toggleSelected(member.userId)}
-                    type="checkbox"
-                  />
                   <button className="min-w-0 flex-1 text-left" onClick={() => openDrawer(member)} type="button">
                     <p className="font-medium text-white">
                       {member.firstName !== "—" ? member.firstName : "—"}{" "}
@@ -1153,17 +1138,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="w-10 px-2 py-2.5">
-                    <input
-                      aria-label="Select all members"
-                      checked={
-                        filteredMembers.length > 0 &&
-                        selectedIds.length === filteredMembers.length
-                      }
-                      onChange={toggleSelectAll}
-                      type="checkbox"
-                    />
-                  </th>
                   {(
                     [
                       { label: "First Name", column: "firstName" },
@@ -1171,7 +1145,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                       { label: "Username", column: "username" },
                       { label: "Account", column: "account" },
                       { label: "Membership", column: "plan" },
-                      { label: "Credentials", column: "credentials" },
                       { label: "Roles", column: "roles" },
                       { label: "Joined", column: "joined" },
                     ] as const
@@ -1197,13 +1170,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                     key={member.userId}
                     onClick={() => openDrawer(member)}
                   >
-                    <td className="px-2 py-3" onClick={(event) => event.stopPropagation()}>
-                      <input
-                        checked={selectedIds.includes(member.userId)}
-                        onChange={() => toggleSelected(member.userId)}
-                        type="checkbox"
-                      />
-                    </td>
                     <td className="px-3 py-3">
                       <p className="font-medium text-white">
                         {member.firstName !== "—" ? member.firstName : "—"}
@@ -1224,9 +1190,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                     </td>
                     <td className="px-3 py-3">
                       <MembershipCell member={member} />
-                    </td>
-                    <td className="px-3 py-3">
-                      <CredentialsCell member={member} />
                     </td>
                     <td className="px-3 py-3">
                       <RolesCell member={member} />
@@ -1282,8 +1245,15 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
           mode={manageMode}
           onClose={closeManage}
           onSaved={() => {
+            const deletedId = manageMode === "delete" ? manageMember.userId : null;
+            if (deletedId) {
+              setDrawerOpen(false);
+              setDrawerMember((current) => (current?.userId === deletedId ? null : current));
+            }
             refreshMembers();
-            setDrawerOpen(Boolean(drawerMember && manageMember?.userId === drawerMember.userId));
+            if (!deletedId) {
+              setDrawerOpen(Boolean(drawerMember && manageMember.userId === drawerMember.userId));
+            }
           }}
         />
       ) : null}

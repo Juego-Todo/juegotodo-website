@@ -1,6 +1,7 @@
 import { licenseApplicationStatusLabels, type LicenseApplication } from "@/data/license-applications";
 import type { UserTypeTagId } from "@/data/user-type-tags";
 import { userTypeTags } from "@/data/user-type-tags";
+import { adminFetch } from "@/lib/auth/admin-fetch";
 import {
   adminDeleteStoredUser,
   adminResetStoredUserPassword,
@@ -196,14 +197,28 @@ export function buildAdminMemberRecord(
   };
 }
 
-async function fetchProMembershipMap(): Promise<Map<string, AdminProMembershipSummary>> {
+async function fetchProMembershipMap(): Promise<{
+  map: Map<string, AdminProMembershipSummary>;
+  error: string | null;
+}> {
   const map = new Map<string, AdminProMembershipSummary>();
 
   try {
-    const response = await fetch("/api/admin/pro", { cache: "no-store" });
+    const response = await adminFetch("/api/admin/pro");
     if (!response.ok) {
-      return map;
+      let message = "Unable to load Pro membership data.";
+      try {
+        const payload = (await response.json()) as { error?: string };
+        if (payload.error) message = payload.error;
+      } catch {
+        // keep default message
+      }
+      if (response.status === 401 || response.status === 403) {
+        message = "Unable to load Pro membership data. Admin authentication failed.";
+      }
+      return { map, error: message };
     }
+
     const payload = (await response.json()) as {
       memberships?: Array<{
         user_id: string;
@@ -227,24 +242,32 @@ async function fetchProMembershipMap(): Promise<Map<string, AdminProMembershipSu
         displayStatus: row.displayStatus,
       });
     }
-  } catch {
-    // Directory still loads without Pro enrichment.
-  }
 
-  return map;
+    return { map, error: null };
+  } catch {
+    return { map, error: "Unable to load Pro membership data." };
+  }
 }
 
-export async function fetchAdminMemberRecords(orders: Order[]): Promise<AdminMemberRecord[]> {
-  const [users, proMap] = await Promise.all([getAllStoredUsers(), fetchProMembershipMap()]);
+export type FetchAdminMemberRecordsResult = {
+  records: AdminMemberRecord[];
+  proLoadError: string | null;
+};
+
+export async function fetchAdminMemberRecords(orders: Order[]): Promise<FetchAdminMemberRecordsResult> {
+  const [users, proResult] = await Promise.all([getAllStoredUsers(), fetchProMembershipMap()]);
   const records = await Promise.all(
     users.map(async (user) => {
       const commerce = await getUserCommerceData(user.id);
       const license = await fetchLicenseApplicationByUserId(user.id);
-      return buildAdminMemberRecord(user, commerce, license, orders, proMap.get(user.id) ?? null);
+      return buildAdminMemberRecord(user, commerce, license, orders, proResult.map.get(user.id) ?? null);
     }),
   );
 
-  return records.sort((a, b) => a.firstName.localeCompare(b.firstName));
+  return {
+    records: records.sort((a, b) => a.firstName.localeCompare(b.firstName)),
+    proLoadError: proResult.error,
+  };
 }
 
 export async function adminUpdateMemberProfile(userId: string, input: AdminUserUpdateInput) {

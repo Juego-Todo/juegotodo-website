@@ -107,6 +107,15 @@ export function memberHasUnlimitedPlan(member: AdminMemberRecord) {
   });
 }
 
+/** Active paid/comp Pro access — excludes Unlimited team accounts. */
+export function isActiveProMember(member: AdminMemberRecord) {
+  return (
+    !memberHasUnlimitedPlan(member) &&
+    member.proEntitled &&
+    member.proStatus === "active"
+  );
+}
+
 export function memberPlanKind(member: AdminMemberRecord) {
   return resolveMemberPlanKind({
     unlimited: memberHasUnlimitedPlan(member),
@@ -158,7 +167,7 @@ export function credentialLabels(member: AdminMemberRecord): string[] {
 
 export function membershipBucket(member: AdminMemberRecord): MembershipFilter {
   if (memberHasUnlimitedPlan(member)) return "unlimited";
-  if (member.proEntitled && member.proStatus === "active") return "pro";
+  if (isActiveProMember(member)) return "pro";
   if (member.proStatus === "expired") return "expired";
   if (member.proStatus === "pending") return "pending";
   if (member.proEntitled) return "pro";
@@ -177,12 +186,12 @@ export function computeMemberStats(members: AdminMemberRecord[]) {
 
   for (const member of members) {
     if (memberHasUnlimitedPlan(member)) unlimited += 1;
-    else if (member.proEntitled) pro += 1;
+    else if (isActiveProMember(member)) pro += 1;
     if (isTeamMember(member)) team += 1;
     else fans += 1;
     if (isLicensed(member)) licensed += 1;
     if (isPendingCredential(member)) pending += 1;
-    if (!memberHasUnlimitedPlan(member) && member.proEntitled && member.proExpiresAt) {
+    if (isActiveProMember(member) && member.proExpiresAt) {
       if (resolveProTimer(member.proExpiresAt, now).inReminderWindow) expiring += 1;
     }
   }
@@ -228,7 +237,7 @@ export function filterMembers(
   const now = new Date();
 
   return members.filter((member) => {
-    if (input.quickView === "pro" && !(member.proEntitled && !memberHasUnlimitedPlan(member))) return false;
+    if (input.quickView === "pro" && !isActiveProMember(member)) return false;
     if (input.quickView === "unlimited" && !memberHasUnlimitedPlan(member)) return false;
     if (input.quickView === "team" && !isTeamMember(member)) return false;
     if (input.quickView === "fans" && !isFanAccount(member)) return false;
@@ -237,11 +246,7 @@ export function filterMembers(
     const { membership, account, credentials, role, joined } = input.filters;
 
     if (membership === "unlimited" && !memberHasUnlimitedPlan(member)) return false;
-    if (membership === "pro") {
-      if (memberHasUnlimitedPlan(member) || !(member.proEntitled && member.proStatus === "active")) {
-        return false;
-      }
-    }
+    if (membership === "pro" && !isActiveProMember(member)) return false;
     if (membership === "free") {
       if (member.proEntitled || memberHasUnlimitedPlan(member)) return false;
     }
@@ -252,7 +257,7 @@ export function filterMembers(
       return false;
     }
     if (membership === "expiring") {
-      if (memberHasUnlimitedPlan(member) || !member.proEntitled || !member.proExpiresAt) return false;
+      if (!isActiveProMember(member) || !member.proExpiresAt) return false;
       if (!resolveProTimer(member.proExpiresAt, now).inReminderWindow) return false;
     }
 

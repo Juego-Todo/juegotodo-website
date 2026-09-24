@@ -12,6 +12,7 @@ import {
   type AdminMemberRecord,
 } from "@/lib/admin/member-directory";
 import { memberHasUnlimitedPlan, proStatusCaption } from "@/lib/admin/member-directory-filters";
+import { adminFetch } from "@/lib/auth/admin-fetch";
 import { ProCountdown } from "@/components/pro/ProCountdown";
 
 type ManageMode = "edit" | "reset" | "delete" | "tags" | "pro";
@@ -101,6 +102,7 @@ export function AdminMemberManageModal({
 }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [proAction, setProAction] = useState<"grant" | "extend" | "cancel" | null>(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [form, setForm] = useState<AdminUserUpdateInput>(() =>
@@ -126,6 +128,7 @@ export function AdminMemberManageModal({
   if (memberSyncKey && memberSyncKey !== lastMemberSyncKey) {
     setLastMemberSyncKey(memberSyncKey);
     setError("");
+    setProAction(null);
     setPassword("");
     setConfirmPassword("");
     setForm(memberToForm(member!));
@@ -171,16 +174,26 @@ export function AdminMemberManageModal({
   }
 
   async function handleProAction(action: "grant" | "extend" | "cancel") {
+    if (!member || busy) return;
     setBusy(true);
+    setProAction(action);
     setError("");
     try {
-      const response = await fetch(`/api/admin/pro/${member!.userId}`, {
+      const response = await adminFetch(`/api/admin/pro/${member.userId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action }),
       });
-      const payload = (await response.json()) as { error?: string };
+      let payload: { error?: string } = {};
+      try {
+        payload = (await response.json()) as { error?: string };
+      } catch {
+        // non-JSON error body
+      }
       if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("Unable to update Pro membership. Admin authentication failed.");
+        }
         throw new Error(payload.error || "Unable to update Pro membership.");
       }
       onSaved();
@@ -191,6 +204,7 @@ export function AdminMemberManageModal({
       setError(proError instanceof Error ? proError.message : "Unable to update Pro membership.");
     } finally {
       setBusy(false);
+      setProAction(null);
     }
   }
 
@@ -553,7 +567,13 @@ export function AdminMemberManageModal({
                         onClick={() => void handleProAction("grant")}
                         type="button"
                       >
-                        {member.proEntitled ? "Renew +12 months" : "Upgrade to Pro"}
+                        {proAction === "grant"
+                          ? member.proEntitled
+                            ? "Renewing..."
+                            : "Upgrading..."
+                          : member.proEntitled
+                            ? "Renew +12 months"
+                            : "Upgrade to Pro"}
                       </button>
                       <button
                         className="rounded-lg border border-white/12 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200 transition hover:border-white/25 disabled:opacity-60"
@@ -561,7 +581,7 @@ export function AdminMemberManageModal({
                         onClick={() => void handleProAction("extend")}
                         type="button"
                       >
-                        Extend from expiry
+                        {proAction === "extend" ? "Extending..." : "Extend from expiry"}
                       </button>
                       <button
                         className="rounded-lg border border-red-500/25 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-red-200 transition hover:bg-red-500/10 disabled:opacity-60"
@@ -569,7 +589,7 @@ export function AdminMemberManageModal({
                         onClick={() => void handleProAction("cancel")}
                         type="button"
                       >
-                        Cancel Pro
+                        {proAction === "cancel" ? "Cancelling..." : "Cancel Pro"}
                       </button>
                     </div>
                   </>

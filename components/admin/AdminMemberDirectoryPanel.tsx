@@ -387,6 +387,12 @@ function RowActions({
     function placeMenu() {
       if (!buttonRef.current) return;
       const rect = buttonRef.current.getBoundingClientRect();
+      // Mobile + desktop both mount RowActions; the CSS-hidden copy has a zero rect
+      // but its portal still lands on document.body — skip it so only one menu shows.
+      if (rect.width === 0 || rect.height === 0) {
+        setMenuStyle(null);
+        return;
+      }
       const menuWidth = 192;
       const left = Math.min(
         Math.max(8, rect.right - menuWidth),

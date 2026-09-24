@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Check,
   ChevronDown,
   ChevronUp,
   Download,
@@ -13,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { AdminMemberDetailDrawer } from "@/components/admin/AdminMemberDetailDrawer";
 import { AdminMemberManageModal } from "@/components/admin/AdminMemberManageModal";
 import { AdminPortalHeader } from "@/components/admin/AdminPortalShell";
@@ -368,6 +368,7 @@ function RowActions({
   member,
   open,
   onToggle,
+  onClose,
   onView,
   onEdit,
   onPro,
@@ -378,6 +379,7 @@ function RowActions({
   member: AdminMemberRecord;
   open: boolean;
   onToggle: () => void;
+  onClose: () => void;
   onView: () => void;
   onEdit: () => void;
   onPro: () => void;
@@ -385,35 +387,73 @@ function RowActions({
   onReset: () => void;
   onDelete: () => void;
 }) {
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const [menuStyle, setMenuStyle] = useState<{ top: number; left: number } | null>(null);
+
+  useEffect(() => {
+    if (!open || !buttonRef.current) {
+      setMenuStyle(null);
+      return;
+    }
+
+    function placeMenu() {
+      if (!buttonRef.current) return;
+      const rect = buttonRef.current.getBoundingClientRect();
+      const menuWidth = 192;
+      const left = Math.min(
+        Math.max(8, rect.right - menuWidth),
+        window.innerWidth - menuWidth - 8,
+      );
+      setMenuStyle({
+        top: rect.bottom + 6,
+        left,
+      });
+    }
+
+    placeMenu();
+    window.addEventListener("resize", placeMenu);
+    window.addEventListener("scroll", placeMenu, true);
+    return () => {
+      window.removeEventListener("resize", placeMenu);
+      window.removeEventListener("scroll", placeMenu, true);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
-    function handleClick(event: MouseEvent) {
-      if (!menuRef.current?.contains(event.target as Node)) {
-        onToggle();
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [open, onToggle]);
 
-  return (
-    <div className="relative" ref={menuRef}>
-      <button
-        aria-expanded={open}
-        aria-label={`Actions for ${memberDisplayName(member)}`}
-        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-zinc-400 transition hover:border-white/25 hover:text-white"
-        onClick={(event) => {
-          event.stopPropagation();
-          onToggle();
-        }}
-        type="button"
-      >
-        <MoreHorizontal size={15} aria-hidden />
-      </button>
-      {open ? (
-        <div className="absolute right-0 z-20 mt-1.5 w-48 overflow-hidden rounded-xl border border-white/10 bg-[#111] py-1 shadow-2xl">
+    function handlePointer(event: MouseEvent) {
+      const target = event.target as Node;
+      if (menuRef.current?.contains(target) || buttonRef.current?.contains(target)) {
+        return;
+      }
+      onClose();
+    }
+
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+
+    const timer = window.setTimeout(() => {
+      document.addEventListener("mousedown", handlePointer);
+      document.addEventListener("keydown", handleKey);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("mousedown", handlePointer);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open, onClose]);
+
+  const menu = open && menuStyle
+    ? createPortal(
+        <div
+          className="fixed z-[90] w-48 overflow-hidden rounded-xl border border-white/10 bg-[#111] py-1 shadow-2xl"
+          ref={menuRef}
+          style={{ top: menuStyle.top, left: menuStyle.left }}
+        >
           {[
             { label: "View profile", action: onView },
             { label: "Edit member", action: onEdit },
@@ -427,6 +467,7 @@ function RowActions({
               onClick={(event) => {
                 event.stopPropagation();
                 item.action();
+                onClose();
               }}
               type="button"
             >
@@ -439,14 +480,37 @@ function RowActions({
             onClick={(event) => {
               event.stopPropagation();
               onDelete();
+              onClose();
             }}
             type="button"
           >
             Delete account
           </button>
-        </div>
-      ) : null}
-    </div>
+        </div>,
+        document.body,
+      )
+    : null;
+
+  return (
+    <>
+      <button
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label={`Actions for ${memberDisplayName(member)}`}
+        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-zinc-400 transition hover:border-white/25 hover:text-white"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onToggle();
+        }}
+        onMouseDown={(event) => event.stopPropagation()}
+        ref={buttonRef}
+        type="button"
+      >
+        <MoreHorizontal size={15} aria-hidden />
+      </button>
+      {menu}
+    </>
   );
 }
 
@@ -1038,22 +1102,10 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
         </div>
       ) : (
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2 sm:p-3">
-          <div className="mb-2 flex items-center justify-between gap-3 px-1">
+          <div className="mb-2 px-1">
             <p className="text-sm text-zinc-500">
               {filteredMembers.length} of {members.length} members
             </p>
-            <button
-              className="inline-flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-zinc-500 hover:text-zinc-300"
-              onClick={toggleSelectAll}
-              type="button"
-            >
-              <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded border border-white/20">
-                {selectedIds.length === filteredMembers.length && filteredMembers.length > 0 ? (
-                  <Check size={9} aria-hidden />
-                ) : null}
-              </span>
-              Select all
-            </button>
           </div>
 
           <div className="space-y-2 md:hidden">
@@ -1082,6 +1134,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                   </button>
                   <RowActions
                     member={member}
+                    onClose={() => setMenuUserId(null)}
                     onDelete={() => openManage(member, "delete")}
                     onEdit={() => openManage(member, "edit")}
                     onPro={() => openManage(member, "pro")}
@@ -1100,7 +1153,17 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="w-10 px-2 py-2.5" />
+                  <th className="w-10 px-2 py-2.5">
+                    <input
+                      aria-label="Select all members"
+                      checked={
+                        filteredMembers.length > 0 &&
+                        selectedIds.length === filteredMembers.length
+                      }
+                      onChange={toggleSelectAll}
+                      type="checkbox"
+                    />
+                  </th>
                   {(
                     [
                       { label: "First Name", column: "firstName" },
@@ -1173,6 +1236,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                       <div className="inline-flex justify-end">
                         <RowActions
                           member={member}
+                          onClose={() => setMenuUserId(null)}
                           onDelete={() => openManage(member, "delete")}
                           onEdit={() => openManage(member, "edit")}
                           onPro={() => openManage(member, "pro")}

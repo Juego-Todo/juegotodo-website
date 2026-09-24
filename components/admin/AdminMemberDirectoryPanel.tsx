@@ -283,13 +283,14 @@ function CompactSelect<T extends string>({
 }
 
 function downloadMembersCsv(rows: AdminMemberRecord[], filename: string) {
-  const header = ["Name", "Username", "Email", "Account", "Role", "Plan", "City", "Joined", "Pro ID"];
+  const header = ["First Name", "Last Name", "Username", "Email", "Account", "Role", "Plan", "City", "Joined", "Pro ID"];
   const lines = [
     header.join(","),
     ...rows.map((member) =>
       [
-        memberDisplayName(member),
-        member.username,
+        member.firstName === "—" ? "" : member.firstName,
+        member.lastName === "—" ? "" : member.lastName,
+        member.username === "—" ? "" : member.username,
         member.email,
         memberAccountKind(member) === "staff" ? "Staff" : "Fan",
         memberSystemAccess(member) === "admin" ? "Admin" : "User",
@@ -1069,9 +1070,14 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                     type="checkbox"
                   />
                   <button className="min-w-0 flex-1 text-left" onClick={() => openDrawer(member)} type="button">
-                    <p className="font-medium text-white">{memberDisplayName(member)}</p>
+                    <p className="font-medium text-white">
+                      {member.firstName !== "—" ? member.firstName : "—"}{" "}
+                      <span className="text-zinc-300">
+                        {member.lastName !== "—" ? member.lastName : ""}
+                      </span>
+                    </p>
                     <p className="mt-0.5 text-xs text-zinc-500">
-                      @{member.username !== "—" ? member.username : "no-username"}
+                      {member.username !== "—" ? `@${member.username}` : "—"}
                     </p>
                     <div className="mt-2.5 flex flex-wrap gap-2">
                       <MembershipCell member={member} />
@@ -1098,14 +1104,16 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
               <thead>
                 <tr className="border-b border-white/10">
                   <th className="w-10 px-2 py-2.5" />
-                  {["Member", "Account", "Membership", "Credentials", "Roles", "Joined"].map((label) => (
-                    <th
-                      className="px-3 py-2.5 text-left text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-zinc-500"
-                      key={label}
-                    >
-                      {label}
-                    </th>
-                  ))}
+                  {["First Name", "Last Name", "Username", "Account", "Membership", "Credentials", "Roles", "Joined"].map(
+                    (label) => (
+                      <th
+                        className="px-3 py-2.5 text-left text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-zinc-500"
+                        key={label}
+                      >
+                        {label}
+                      </th>
+                    ),
+                  )}
                   <th className="px-3 py-2.5 text-right text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-zinc-500">
                     <span className="sr-only">Actions</span>
                     <MoreHorizontal size={14} className="ml-auto text-zinc-600" aria-hidden />
@@ -1127,9 +1135,18 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                       />
                     </td>
                     <td className="px-3 py-3">
-                      <p className="font-medium text-white">{memberDisplayName(member)}</p>
-                      <p className="mt-0.5 text-xs text-zinc-500">
-                        @{member.username !== "—" ? member.username : "no-username"}
+                      <p className="font-medium text-white">
+                        {member.firstName !== "—" ? member.firstName : "—"}
+                      </p>
+                    </td>
+                    <td className="px-3 py-3">
+                      <p className="font-medium text-zinc-200">
+                        {member.lastName !== "—" ? member.lastName : "—"}
+                      </p>
+                    </td>
+                    <td className="px-3 py-3">
+                      <p className="text-sm text-zinc-400">
+                        {member.username !== "—" ? `@${member.username}` : "—"}
                       </p>
                     </td>
                     <td className="px-3 py-3">

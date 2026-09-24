@@ -3,8 +3,8 @@ import type { UserProfile } from "@/lib/auth/types";
 
 const ONBOARDING_KEY_PREFIX = "juego-todo.onboarding.";
 
-/** Distinct social platforms required for the welcome reward. */
-export const onboardingSocialPlatforms = ["facebook", "instagram", "tiktok", "youtube"] as const;
+/** Social platforms that unlock the follow milestone (any one click counts). */
+export const onboardingSocialPlatforms = ["facebook", "instagram"] as const;
 export type OnboardingSocialPlatform = (typeof onboardingSocialPlatforms)[number];
 
 export type OnboardingState = {
@@ -16,7 +16,7 @@ export type OnboardingState = {
 };
 
 export type OnboardingChecklistItem = {
-  id: "photo" | "details" | "social" | "reward";
+  id: "photo" | "social" | "reward";
   label: string;
   detail: string;
   complete: boolean;
@@ -64,7 +64,7 @@ export function getOnboardingState(userId: string) {
   return readState(userId);
 }
 
-/** One link per required platform. */
+/** Facebook + Instagram only (any click unlocks follow milestone). */
 export function getOnboardingSocialLinks() {
   const seen = new Set<OnboardingSocialPlatform>();
   return socialLinks.filter((link) => {
@@ -80,8 +80,9 @@ export function getOnboardingSocialLinks() {
   });
 }
 
+/** Complete when the member opens Facebook or Instagram. */
 export function hasCompletedSocialFollows(state: OnboardingState) {
-  return onboardingSocialPlatforms.every((platform) => Boolean(state.socialClicks[platform]));
+  return onboardingSocialPlatforms.some((platform) => Boolean(state.socialClicks[platform]));
 }
 
 function generateRewardCode(userId: string) {
@@ -91,9 +92,36 @@ function generateRewardCode(userId: string) {
   return `JT10-${userBit}${stamp}${random}`;
 }
 
-export function markOnboardingSocialClick(userId: string, platform: OnboardingSocialPlatform) {
-  const state = readState(userId);
+function maybeIssueReward(userId: string, state: OnboardingState, photoDone: boolean): OnboardingState {
+  if (state.rewardCode || !photoDone || !hasCompletedSocialFollows(state)) {
+    return state;
+  }
+
+  const rewardCode = generateRewardCode(userId);
   const next: OnboardingState = {
+    ...state,
+    rewardCode,
+    rewardIssuedAt: new Date().toISOString(),
+  };
+
+  void fetch("/api/member/promo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code: rewardCode }),
+  }).catch(() => undefined);
+
+  try {
+    window.localStorage.setItem("juego-todo.checkout.welcome-promo", rewardCode);
+  } catch {
+    // Ignore storage failures; code is still on the onboarding record.
+  }
+
+  return next;
+}
+
+export function markOnboardingSocialClick(userId: string, platform: OnboardingSocialPlatform, photoDone = false) {
+  const state = readState(userId);
+  let next: OnboardingState = {
     ...state,
     socialClicks: {
       ...state.socialClicks,
@@ -101,17 +129,18 @@ export function markOnboardingSocialClick(userId: string, platform: OnboardingSo
     },
   };
 
-  if (hasCompletedSocialFollows(next) && !next.rewardCode) {
-    next.rewardCode = generateRewardCode(userId);
-    next.rewardIssuedAt = new Date().toISOString();
-    void fetch("/api/member/promo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: next.rewardCode }),
-    }).catch(() => undefined);
-  }
-
+  next = maybeIssueReward(userId, next, photoDone);
   writeState(userId, next);
+  return next;
+}
+
+/** Call when portrait changes so the auto voucher can issue without another social click. */
+export function syncOnboardingProgress(userId: string, photoDone: boolean) {
+  const state = readState(userId);
+  const next = maybeIssueReward(userId, state, photoDone);
+  if (next !== state) {
+    writeState(userId, next);
+  }
   return next;
 }
 
@@ -148,7 +177,6 @@ export function buildOnboardingChecklist(input: {
 }): OnboardingChecklistItem[] {
   const state = input.state ?? getOnboardingState(input.user.id);
   const photoDone = isProfilePhotoComplete(input.portraitImage);
-  const detailsDone = isProfileDetailsComplete(input.user, input.dateOfBirth, input.phone);
   const socialDone = hasCompletedSocialFollows(state);
   const rewardReady = Boolean(state.rewardCode);
 
@@ -160,26 +188,19 @@ export function buildOnboardingChecklist(input: {
       complete: photoDone,
     },
     {
-      id: "details",
-      label: "Complete your details",
-      detail: "Add city and confirm DOB in Settings",
-      complete: detailsDone,
-      href: "/profile?tab=settings",
-    },
-    {
       id: "social",
-      label: "Follow Juego Todo socials",
-      detail: "Open each official link below",
+      label: "Follow Juego Todo",
+      detail: "Open Facebook or Instagram",
       complete: socialDone,
     },
     {
       id: "reward",
-      label: "Claim your 10% shop code",
-      detail: socialDone
+      label: "10% off automatic voucher",
+      detail: rewardReady
         ? state.rewardRedeemedAt
-          ? "Code already used on an order"
-          : "One-time code unlocked — copy it for checkout"
-        : "Unlocks after all social links",
+          ? "Already used on an order"
+          : "Auto-applied at checkout — or copy your code"
+        : "Unlocks after photo + social",
       complete: rewardReady,
     },
   ];
@@ -187,10 +208,10 @@ export function buildOnboardingChecklist(input: {
 
 export function shouldShowOnboarding(userId: string, items: OnboardingChecklistItem[]) {
   const state = getOnboardingState(userId);
-  if (state.dismissedAt) {
+  if (state.dismissedAt && state.rewardCode) {
     return false;
   }
-  const unfinished = items.some((item) => item.id !== "reward" && !item.complete);
+  const unfinished = items.some((item) => !item.complete);
   const unusedReward = Boolean(state.rewardCode && !state.rewardRedeemedAt);
   return unfinished || unusedReward;
 }
@@ -204,7 +225,6 @@ export function resolveWelcomePromo(code: string, userId?: string | null) {
     return null;
   }
 
-  // Browser: bind to the signed-in member and block re-use.
   if (typeof window !== "undefined") {
     if (!userId) {
       return { invalid: true as const, reason: "Sign in to use your welcome code." };
@@ -228,6 +248,14 @@ export function resolveWelcomePromo(code: string, userId?: string | null) {
   };
 }
 
+export function getAutoWelcomePromoCode(userId: string) {
+  const state = getOnboardingState(userId);
+  if (!state.rewardCode || state.rewardRedeemedAt) {
+    return null;
+  }
+  return state.rewardCode;
+}
+
 export function redeemWelcomePromo(userId: string, code: string) {
   const state = readState(userId);
   if (!state.rewardCode || state.rewardCode.toUpperCase() !== code.trim().toUpperCase()) {
@@ -238,5 +266,10 @@ export function redeemWelcomePromo(userId: string, code: string) {
   }
   const next = { ...state, rewardRedeemedAt: new Date().toISOString() };
   writeState(userId, next);
+  try {
+    window.localStorage.removeItem("juego-todo.checkout.welcome-promo");
+  } catch {
+    // ignore
+  }
   return next;
 }

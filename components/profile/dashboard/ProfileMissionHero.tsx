@@ -7,7 +7,6 @@ import { ProfileAvatarButton } from "@/components/profile/ProfileAvatarButton";
 import type { LicenseApplication } from "@/data/license-applications";
 import type { MemberRecord } from "@/lib/profile/member-record";
 import type { UserProfile } from "@/lib/auth/types";
-import { useCommerce } from "@/lib/commerce/context";
 import { buildStoryKpis } from "@/lib/profile/mission-control";
 import { resolveProfileDateOfBirth } from "@/lib/profile/profile-details-storage";
 
@@ -42,7 +41,6 @@ export function ProfileMissionHero({
   onPortraitUpload?: (dataUrl: string) => Promise<void> | void;
 }) {
   const role = memberRecord.roleModule;
-  const { userData } = useCommerce();
 
   if (memberRecord.isAdmin) {
     return (
@@ -126,12 +124,9 @@ export function ProfileMissionHero({
         </div>
       </motion.section>
 
-      <ProfileOnboardingChecklist
-        dateOfBirth={dateOfBirth}
-        phone={userData.phone}
-        portraitImage={portraitImage}
-        user={user}
-      />
+      <div className="mt-4">
+        <ProfileOnboardingChecklist portraitImage={portraitImage} user={user} />
+      </div>
     </>
   );
 }

@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useAuth } from "@/lib/auth/context";
 import { calculateLineItems } from "@/lib/commerce/pricing";
+import { getAutoWelcomePromoCode, redeemWelcomePromo } from "@/lib/profile/onboarding";
 import {
   approveOrderPayment,
   createOrder,
@@ -160,6 +161,25 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
+  }, [user]);
+
+  // Auto-apply unused welcome 10% voucher at checkout.
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    const code = getAutoWelcomePromoCode(user.id);
+    if (!code) {
+      return;
+    }
+    setCheckoutDraftState((current) => {
+      if (current.promoCode?.trim()) {
+        return current;
+      }
+      const next = { ...current, promoCode: code };
+      saveCheckoutDraft(next);
+      return next;
+    });
   }, [user]);
 
   const persistUserData = useCallback(
@@ -440,7 +460,6 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
       });
 
       if (appliedPromo && order.promoCode) {
-        const { redeemWelcomePromo } = await import("@/lib/profile/onboarding");
         redeemWelcomePromo(user.id, order.promoCode);
       }
 

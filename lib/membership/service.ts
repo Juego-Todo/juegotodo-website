@@ -101,7 +101,11 @@ export async function listMembershipApplications(
   client: AnyClient,
   options?: { userId?: string },
 ) {
-  let query = client.from("license_applications").select("*").order("updated_at", { ascending: false });
+  let query = client
+    .from("license_applications")
+    .select("*")
+    .eq("application_program", "jt1_member")
+    .order("updated_at", { ascending: false });
   if (options?.userId) {
     query = query.eq("user_id", options.userId);
   }
@@ -207,7 +211,6 @@ export async function createOrUpdateMembershipDraft(
       idempotency_key: input.draft.idempotencyKey ?? null,
       payload: payload as Json,
       status: "pending",
-      submitted_at: new Date().toISOString(),
     })
     .select("*")
     .single();
@@ -239,6 +242,11 @@ export async function submitMembershipApplication(
   const existing = await fetchMembershipApplicationBundle(client, input.applicationId);
   if (!existing || existing.userId !== input.userId) {
     throw new Error("Application not found.");
+  }
+
+  // Idempotent re-submit: already past draft/action-required means payment was recorded.
+  if (!["DRAFT", "ACTION_REQUIRED"].includes(existing.applicationStatus)) {
+    return existing;
   }
 
   const requiredTypes: MembershipDocumentType[] = ["VALID_ID", "PHOTO_1X1", "E_SIGNATURE"];
@@ -484,6 +492,39 @@ export async function adminTransitionMembershipApplication(
   const notice = notificationMap[input.action];
   if (notice) {
     await notifyUser(client, existing.userId, notice.title, notice.body);
+  }
+
+  if (input.applicationStatus === "APPROVED" || input.applicationStatus === "COMPLETED") {
+    const { data: profile } = await client
+      .from("profiles")
+      .select("assigned_tags, membership_tier, account_type")
+      .eq("id", existing.userId)
+      .maybeSingle();
+
+    const existingTags = Array.isArray(profile?.assigned_tags)
+      ? (profile.assigned_tags as string[])
+      : [];
+    const nextTags = existingTags.includes("regular_member")
+      ? existingTags
+      : [...existingTags, "regular_member"];
+
+    const profileUpdates: Database["public"]["Tables"]["profiles"]["Update"] = {
+      assigned_tags: nextTags,
+    };
+
+    // Promote paid local members without overwriting elite/pro upgrades already set.
+    if (!profile?.membership_tier || profile.membership_tier === "free") {
+      profileUpdates.membership_tier = "pro";
+    }
+
+    const { error: profileError } = await client
+      .from("profiles")
+      .update(profileUpdates)
+      .eq("id", existing.userId);
+
+    if (profileError) {
+      console.error("membership profile promotion failed", profileError.message);
+    }
   }
 
   return fetchMembershipApplicationBundle(client, input.applicationId);

@@ -281,72 +281,96 @@ alter table public.fight_records enable row level security;
 alter table public.email_outbox enable row level security;
 
 -- Public can insert inquiries
+drop policy if exists inquiries_public_insert on public.inquiries;
 create policy inquiries_public_insert on public.inquiries for insert to anon, authenticated with check (true);
+drop policy if exists inquiries_admin_all on public.inquiries;
 create policy inquiries_admin_all on public.inquiries for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- Calendar: public read published; admin full
+drop policy if exists calendar_public_read on public.calendar_events;
 create policy calendar_public_read on public.calendar_events for select to anon, authenticated
   using (published = true);
+drop policy if exists calendar_admin_all on public.calendar_events;
 create policy calendar_admin_all on public.calendar_events for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
 -- Announcements: public read published; admin full
+drop policy if exists announcements_public_read on public.announcements;
 create policy announcements_public_read on public.announcements for select to anon, authenticated
   using (published = true);
+drop policy if exists announcements_admin_all on public.announcements;
 create policy announcements_admin_all on public.announcements for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
 -- Member documents: owner read own; admin all
+drop policy if exists member_documents_owner_read on public.member_documents;
 create policy member_documents_owner_read on public.member_documents for select to authenticated
   using (user_id = auth.uid() or public.is_admin());
+drop policy if exists member_documents_owner_insert on public.member_documents;
 create policy member_documents_owner_insert on public.member_documents for insert to authenticated
   with check (user_id = auth.uid() or public.is_admin());
+drop policy if exists member_documents_admin_update on public.member_documents;
 create policy member_documents_admin_update on public.member_documents for update to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
 -- Competition entries: owner CRUD own; admin all
+drop policy if exists competition_entries_owner on public.competition_entries;
 create policy competition_entries_owner on public.competition_entries for all to authenticated
   using (user_id = auth.uid() or public.is_admin())
   with check (user_id = auth.uid() or public.is_admin());
 
 -- Official assignments: assignee read; admin all
+drop policy if exists official_assignments_read on public.official_assignments;
 create policy official_assignments_read on public.official_assignments for select to authenticated
   using (official_user_id = auth.uid() or public.is_admin());
+drop policy if exists official_assignments_admin on public.official_assignments;
 create policy official_assignments_admin on public.official_assignments for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
 -- Council records: authenticated read active; admin write
+drop policy if exists council_records_read on public.council_records;
 create policy council_records_read on public.council_records for select to authenticated
   using (status = 'active' or public.is_admin());
+drop policy if exists council_records_admin on public.council_records;
 create policy council_records_admin on public.council_records for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
 -- Coach roster: coach owns; admin all
+drop policy if exists coach_roster_owner on public.coach_roster_links;
 create policy coach_roster_owner on public.coach_roster_links for all to authenticated
   using (coach_user_id = auth.uid() or public.is_admin())
   with check (coach_user_id = auth.uid() or public.is_admin());
 
 -- Shop catalog: public read active; admin write
+drop policy if exists shop_catalog_public_read on public.shop_catalog_products;
 create policy shop_catalog_public_read on public.shop_catalog_products for select to anon, authenticated
   using (active = true);
+drop policy if exists shop_catalog_admin on public.shop_catalog_products;
 create policy shop_catalog_admin on public.shop_catalog_products for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
 -- Consultations: owner read own; public insert; admin all
+drop policy if exists consultation_insert on public.consultation_bookings;
 create policy consultation_insert on public.consultation_bookings for insert to anon, authenticated with check (true);
+drop policy if exists consultation_read on public.consultation_bookings;
 create policy consultation_read on public.consultation_bookings for select to authenticated
   using (user_id = auth.uid() or public.is_admin());
+drop policy if exists consultation_admin on public.consultation_bookings;
 create policy consultation_admin on public.consultation_bookings for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
 -- Promo codes: owner read own unredeemed; admin all
+drop policy if exists promo_owner_read on public.promo_codes;
 create policy promo_owner_read on public.promo_codes for select to authenticated
   using (user_id = auth.uid() or public.is_admin());
+drop policy if exists promo_admin on public.promo_codes;
 create policy promo_admin on public.promo_codes for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
 -- Fight records: public read; admin write
+drop policy if exists fight_records_public_read on public.fight_records;
 create policy fight_records_public_read on public.fight_records for select to anon, authenticated using (true);
+drop policy if exists fight_records_admin on public.fight_records;
 create policy fight_records_admin on public.fight_records for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 

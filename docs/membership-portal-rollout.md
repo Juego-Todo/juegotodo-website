@@ -29,6 +29,16 @@ Payment screenshot upload **never** sets payment status to `VERIFIED`. Only admi
 
 Fee, eligibility, validity, and benefits for Local Membership are intentionally unset (`null` / omitted) until Juego Todo provides official values. The UI shows “To be confirmed by Juego Todo” where missing.
 
+## License mutation security
+
+Admin license review/delete and applicant role-license submits go through authenticated server routes:
+
+- `POST /api/licenses` — applicant self-submit for role licenses only (blocks JT1/local membership; use Membership Portal)
+- `GET|PATCH|DELETE /api/admin/licenses` — admin list/review/delete for **non-JT1** role licenses
+- Membership apps are filtered to `application_program = jt1_member` and reviewed via `/api/admin/membership-applications`
+
+Browser clients must not mutate `license_applications` directly for reviews or deletes.
+
 ## Safe rollout
 
 1. Deploy migration during a maintenance window.

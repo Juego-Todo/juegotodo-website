@@ -43,6 +43,7 @@ import { buildMemberRecord } from "@/lib/profile/member-record";
 import { teams } from "@/data/teams";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
+import { adminFetch } from "@/lib/auth/admin-fetch";
 import { isAdminProfile } from "@/lib/commerce/storage";
 import { formatCurrency } from "@/lib/commerce/pricing";
 import {
@@ -150,6 +151,7 @@ export function UserProfilePage() {
     [user],
   );
   const [pendingLicenseCount, setPendingLicenseCount] = useState(0);
+  const [pendingMembershipCount, setPendingMembershipCount] = useState(0);
 
   useEffect(() => {
     if (!user || !isAdminProfile(user)) {
@@ -157,8 +159,27 @@ export function UserProfilePage() {
     }
 
     void fetchPendingLicenseApplicationCount().then(setPendingLicenseCount);
+
+    void adminFetch("/api/admin/membership-applications")
+      .then(async (response) => {
+        if (!response.ok) return;
+        const payload = (await response.json()) as {
+          counts?: {
+            paymentVerification?: number;
+            documentReview?: number;
+            actionRequired?: number;
+          };
+        };
+        const total =
+          (payload.counts?.paymentVerification ?? 0) +
+          (payload.counts?.documentReview ?? 0) +
+          (payload.counts?.actionRequired ?? 0);
+        setPendingMembershipCount(total);
+      })
+      .catch(() => undefined);
   }, [user]);
   const effectivePendingLicenseCount = user && isAdminProfile(user) ? pendingLicenseCount : 0;
+  const effectivePendingMembershipCount = user && isAdminProfile(user) ? pendingMembershipCount : 0;
 
   useEffect(() => {
     const tab = searchParams.get("tab");
@@ -241,9 +262,10 @@ export function UserProfilePage() {
       isAdmin: isAdminProfile(user),
       ordersCount: orders.length,
       pendingLicenseCount: effectivePendingLicenseCount,
+      pendingMembershipCount: effectivePendingMembershipCount,
       previewRoleKind,
     });
-  }, [user, userData, identity, licenseApplication, adminAssignedTags, orders.length, effectivePendingLicenseCount, previewRoleKind]);
+  }, [user, userData, identity, licenseApplication, adminAssignedTags, orders.length, effectivePendingLicenseCount, effectivePendingMembershipCount, previewRoleKind]);
 
   if (!user) {
     return (

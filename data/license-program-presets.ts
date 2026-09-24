@@ -39,7 +39,7 @@ export const LICENSE_PROGRAM_PRESETS: Record<
     restrictionCode: "JT1",
     title: "Member Application",
     label: "JT1 Member License",
-    href: "/register-for-license",
+    href: "/membership/apply/local-membership",
     loadingLabel: "Loading license registration...",
     match: isJt1MemberApplication,
   },

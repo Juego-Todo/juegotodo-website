@@ -138,7 +138,7 @@ export const userTypeTags: Record<UserTypeTagId, UserTypeTag> = {
 };
 
 const licenseTagMap: Partial<Record<LicenseRestrictionCode, UserTypeTagId>> = {
-  JT1: "grandmaster",
+  JT1: "regular_member",
   JT2: "grand_council_member",
   JT3: "grand_council_member",
   JT4: "gym_owner",

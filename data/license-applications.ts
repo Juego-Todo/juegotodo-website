@@ -946,6 +946,10 @@ export function resolveLicenseApplicationHref(application: LicenseApplication | 
     return "/register-for-license/staff";
   }
 
+  if (program === "jt1_member" || program === "legacy") {
+    return "/membership/apply/local-membership";
+  }
+
   return "/register-for-license";
 }
 

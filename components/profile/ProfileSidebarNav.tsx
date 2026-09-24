@@ -56,6 +56,7 @@ export function ProfileSidebarNav({
   onSectionChange,
   unreadCount,
   pendingLicenseCount = 0,
+  pendingMembershipCount = 0,
 }: {
   user: UserProfile;
   memberRecord: MemberRecord;
@@ -65,6 +66,7 @@ export function ProfileSidebarNav({
   onSectionChange: (section: ProfileSectionId) => void;
   unreadCount: number;
   pendingLicenseCount?: number;
+  pendingMembershipCount?: number;
 }) {
   const pathname = usePathname();
   const tagIds = resolveUserTypeTagIds(user, licenseApplication, adminAssignedTags);
@@ -74,7 +76,7 @@ export function ProfileSidebarNav({
     isAdmin: memberRecord.isAdmin,
     unreadCount,
     pendingLicenseCount,
-    pendingMembershipCount: 0,
+    pendingMembershipCount,
   });
 
   return (

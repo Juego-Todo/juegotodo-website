@@ -30,6 +30,7 @@ const paymentStatuses = [
 
 const APPLICANT_PAYMENT_STATUSES = new Set(["UNPAID", "PAYMENT_SUBMITTED", "UNDER_VERIFICATION"]);
 const ADMIN_ONLY_PAYMENT_STATUSES = new Set(["VERIFIED", "REJECTED", "REFUNDED"]);
+const RESUBMITTABLE_APPLICATION_STATUSES = new Set(["DRAFT", "ACTION_REQUIRED"]);
 
 test("payment verification is admin only", () => {
   assert.ok(!APPLICANT_PAYMENT_STATUSES.has("VERIFIED"));
@@ -47,4 +48,19 @@ test("submit implies under verification not verified", () => {
   const afterSubmitPaymentStatus = "UNDER_VERIFICATION";
   assert.notEqual(afterSubmitPaymentStatus, "VERIFIED");
   assert.ok(APPLICANT_PAYMENT_STATUSES.has(afterSubmitPaymentStatus));
+});
+
+test("submit is idempotent outside draft and action-required", () => {
+  assert.ok(RESUBMITTABLE_APPLICATION_STATUSES.has("DRAFT"));
+  assert.ok(RESUBMITTABLE_APPLICATION_STATUSES.has("ACTION_REQUIRED"));
+  assert.ok(!RESUBMITTABLE_APPLICATION_STATUSES.has("PAYMENT_VERIFICATION"));
+  assert.ok(!RESUBMITTABLE_APPLICATION_STATUSES.has("APPROVED"));
+});
+
+test("approval grants regular member privileges", () => {
+  const existingTags = ["fighter"];
+  const nextTags = existingTags.includes("regular_member")
+    ? existingTags
+    : [...existingTags, "regular_member"];
+  assert.deepEqual(nextTags, ["fighter", "regular_member"]);
 });

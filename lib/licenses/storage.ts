@@ -5,6 +5,7 @@ import {
   resolveApplicationProgram,
   type LicenseApplication,
   type LicenseApplicationInput,
+  type LicenseApplicationProgram,
   type LicenseApplicationStatus,
 } from "@/data/license-applications";
 import { resolveLicenseTag } from "@/data/user-type-tags";
@@ -13,6 +14,7 @@ import {
   deleteLicenseApplicationsByUserIdSupabase,
   fetchAllLicenseApplicationsSupabase,
   fetchLicenseApplicationByIdSupabase,
+  fetchLicenseApplicationByUserAndProgramSupabase,
   fetchLicenseApplicationByUserIdSupabase,
   fetchPendingLicenseApplicationCountSupabase,
   reviewLicenseApplicationSupabase,
@@ -21,6 +23,33 @@ import {
 import { ensureApprovedFighterSlug } from "@/lib/fighters/from-license";
 import { addAdminAssignedTag } from "@/lib/profile/account-tags";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+
+function isMembershipApplication(application: LicenseApplication) {
+  return (
+    resolveApplicationProgram(application) === "jt1_member" || application.restrictionCode === "JT1"
+  );
+}
+
+function pickPrimaryRoleLicense(applications: LicenseApplication[]): LicenseApplication | null {
+  const roleApps = applications.filter((application) => !isMembershipApplication(application));
+  if (roleApps.length === 0) {
+    return null;
+  }
+
+  const approved = roleApps.find((application) => application.status === "approved");
+  if (approved) {
+    return approved;
+  }
+
+  const inReview = roleApps.find(
+    (application) => application.status === "pending" || application.status === "needs_info",
+  );
+  if (inReview) {
+    return inReview;
+  }
+
+  return roleApps[0] ?? null;
+}
 
 const LICENSES_KEY = "juego-todo.license.applications";
 
@@ -85,7 +114,11 @@ function submitLicenseApplicationLocal(
   input: LicenseApplicationInput,
 ): LicenseApplication {
   const applications = readApplications();
-  const existingIndex = applications.findIndex((application) => application.userId === userId);
+  const program = resolveApplicationProgram(input);
+  const existingIndex = applications.findIndex(
+    (application) =>
+      application.userId === userId && resolveApplicationProgram(application) === program,
+  );
   const existing = existingIndex >= 0 ? applications[existingIndex] : null;
   const application = buildLicenseApplication(userId, userEmail, input, existing);
 
@@ -141,7 +174,19 @@ function updateLicenseApplicationStatusLocal(
 }
 
 export function getLicenseApplicationByUserId(userId: string) {
-  return readApplications().find((application) => application.userId === userId) ?? null;
+  return pickPrimaryRoleLicense(readApplications().filter((application) => application.userId === userId));
+}
+
+export function getLicenseApplicationByUserAndProgram(
+  userId: string,
+  program: LicenseApplicationProgram,
+) {
+  return (
+    readApplications().find(
+      (application) =>
+        application.userId === userId && resolveApplicationProgram(application) === program,
+    ) ?? null
+  );
 }
 
 export function getLicenseApplicationById(applicationId: string) {
@@ -168,6 +213,16 @@ export async function fetchLicenseApplicationByUserId(userId: string) {
     return fetchLicenseApplicationByUserIdSupabase(userId);
   }
   return getLicenseApplicationByUserId(userId);
+}
+
+export async function fetchLicenseApplicationByUserAndProgram(
+  userId: string,
+  program: LicenseApplicationProgram,
+) {
+  if (isSupabaseConfigured()) {
+    return fetchLicenseApplicationByUserAndProgramSupabase(userId, program);
+  }
+  return getLicenseApplicationByUserAndProgram(userId, program);
 }
 
 export async function fetchLicenseApplicationById(applicationId: string) {
@@ -207,7 +262,8 @@ export async function saveLicenseApplication(
   input: LicenseApplicationInput,
 ) {
   if (isSupabaseConfigured()) {
-    const existing = await fetchLicenseApplicationByUserIdSupabase(userId);
+    const program = resolveApplicationProgram(input);
+    const existing = await fetchLicenseApplicationByUserAndProgramSupabase(userId, program);
     const application = buildLicenseApplication(userId, userEmail, input, existing);
     const saved = await saveLicenseApplicationSupabase(application);
     await sendLicenseSubmissionConfirmation(userId, userEmail, saved.fullName);

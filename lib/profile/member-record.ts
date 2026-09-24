@@ -101,6 +101,7 @@ export type MemberRecord = {
   adminPermissions: AdminPermission[];
   estimatedReviewDays: number | null;
   roleModule: ProfileRoleModule;
+  pendingMembershipCount: number;
 };
 
 function formatMonthYear(value?: string | null) {
@@ -340,6 +341,7 @@ export function buildMemberRecord(input: {
   isAdmin?: boolean;
   ordersCount?: number;
   pendingLicenseCount?: number;
+  pendingMembershipCount?: number;
   previewRoleKind?: ProfileRoleKind | null;
 }): MemberRecord {
   const {
@@ -351,6 +353,7 @@ export function buildMemberRecord(input: {
     isAdmin = false,
     ordersCount = 0,
     pendingLicenseCount = 0,
+    pendingMembershipCount = 0,
     previewRoleKind = null,
   } = input;
 
@@ -471,5 +474,6 @@ export function buildMemberRecord(input: {
     adminPermissions,
     estimatedReviewDays: licenseApplication?.status === "pending" ? 3 : null,
     roleModule,
+    pendingMembershipCount,
   };
 }

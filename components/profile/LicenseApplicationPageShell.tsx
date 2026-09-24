@@ -6,14 +6,10 @@ import { UnifiedLicenseApplicationForm } from "@/components/profile/UnifiedLicen
 import { AuthGateFallback } from "@/components/auth/AuthGateFallback";
 import type { LicenseProgramPresetKey } from "@/data/license-program-presets";
 import { LICENSE_PROGRAM_PRESETS } from "@/data/license-program-presets";
-import { resolveLicenseApplicationHref, type LicenseApplication } from "@/data/license-applications";
+import type { LicenseApplication } from "@/data/license-applications";
 import { useAuth } from "@/lib/auth/context";
 import { useCommerce } from "@/lib/commerce/context";
-import { fetchLicenseApplicationByUserId } from "@/lib/licenses/storage";
-
-function normalizePath(path: string) {
-  return path.split("?")[0];
-}
+import { fetchLicenseApplicationByUserAndProgram } from "@/lib/licenses/storage";
 
 export function LicenseApplicationPageShell({ presetKey }: { presetKey: LicenseProgramPresetKey }) {
   const preset = LICENSE_PROGRAM_PRESETS[presetKey];
@@ -27,7 +23,13 @@ export function LicenseApplicationPageShell({ presetKey }: { presetKey: LicenseP
   const applicationLoaded = Boolean(user && loadedUserId === user.id);
 
   useEffect(() => {
-    if (loading) {
+    if (presetKey === "jt1_member") {
+      router.replace("/membership/apply/local-membership");
+    }
+  }, [presetKey, router]);
+
+  useEffect(() => {
+    if (loading || presetKey === "jt1_member") {
       return;
     }
 
@@ -37,24 +39,12 @@ export function LicenseApplicationPageShell({ presetKey }: { presetKey: LicenseP
     }
 
     let cancelled = false;
-    let redirecting = false;
 
-    void fetchLicenseApplicationByUserId(user.id)
+    void fetchLicenseApplicationByUserAndProgram(user.id, preset.program)
       .then((existing) => {
-        if (cancelled) {
-          return;
+        if (!cancelled) {
+          setApplication(existing);
         }
-
-        if (existing && !preset.match(existing)) {
-          const targetHref = resolveLicenseApplicationHref(existing);
-          if (normalizePath(targetHref) !== normalizePath(preset.href)) {
-            redirecting = true;
-            router.replace(targetHref);
-            return;
-          }
-        }
-
-        setApplication(existing);
       })
       .catch(() => {
         if (!cancelled) {
@@ -62,7 +52,7 @@ export function LicenseApplicationPageShell({ presetKey }: { presetKey: LicenseP
         }
       })
       .finally(() => {
-        if (!cancelled && !redirecting) {
+        if (!cancelled) {
           setLoadedUserId(user.id);
         }
       });
@@ -70,7 +60,17 @@ export function LicenseApplicationPageShell({ presetKey }: { presetKey: LicenseP
     return () => {
       cancelled = true;
     };
-  }, [loading, user, router, preset]);
+  }, [loading, user, router, preset.href, preset.program, presetKey]);
+
+  if (presetKey === "jt1_member") {
+    return (
+      <main className="flex min-h-[60vh] items-center justify-center px-4 pt-24">
+        <p className="text-sm font-black uppercase tracking-[0.24em] text-zinc-400">
+          Redirecting to membership application...
+        </p>
+      </main>
+    );
+  }
 
   if (!user) {
     return (

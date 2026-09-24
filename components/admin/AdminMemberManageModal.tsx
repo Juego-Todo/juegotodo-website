@@ -100,6 +100,27 @@ export function AdminMemberManageModal({
     }
   }
 
+  async function handleProAction(action: "grant" | "extend" | "cancel") {
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/pro/${member!.userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(payload.error || "Unable to update Pro membership.");
+      }
+      onSaved();
+    } catch (proError) {
+      setError(proError instanceof Error ? proError.message : "Unable to update Pro membership.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleResetSubmit(event: React.FormEvent) {
     event.preventDefault();
     setBusy(true);
@@ -288,6 +309,40 @@ export function AdminMemberManageModal({
                   value={form.bio}
                 />
               </label>
+              <div className="rounded-2xl border border-[#FFCF6A]/20 bg-[#FFCF6A]/5 p-4">
+                <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#FFCF6A]">
+                  JuegoTodo Pro
+                </p>
+                <p className="mt-1 text-xs text-zinc-400">
+                  Grant or extend annual Pro (comp). Does not approve licenses.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    className="rounded-full border border-[#FFCF6A]/35 px-4 py-2 text-[0.65rem] font-black uppercase tracking-[0.12em] text-[#FFCF6A] disabled:opacity-60"
+                    disabled={busy}
+                    onClick={() => void handleProAction("grant")}
+                    type="button"
+                  >
+                    Grant Pro
+                  </button>
+                  <button
+                    className="rounded-full border border-white/15 px-4 py-2 text-[0.65rem] font-black uppercase tracking-[0.12em] text-zinc-300 disabled:opacity-60"
+                    disabled={busy}
+                    onClick={() => void handleProAction("extend")}
+                    type="button"
+                  >
+                    Extend +12mo
+                  </button>
+                  <button
+                    className="rounded-full border border-white/15 px-4 py-2 text-[0.65rem] font-black uppercase tracking-[0.12em] text-zinc-400 disabled:opacity-60"
+                    disabled={busy}
+                    onClick={() => void handleProAction("cancel")}
+                    type="button"
+                  >
+                    Cancel Pro
+                  </button>
+                </div>
+              </div>
               <div className="flex flex-wrap gap-2 pt-2">
                 <button
                   className="rounded-full bg-[#FF1010] px-5 py-2.5 text-xs font-black uppercase tracking-[0.16em] text-white disabled:opacity-60"

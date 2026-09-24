@@ -5,6 +5,7 @@ import {
   type LicenseApplication,
   type LicenseApplicationStatus,
 } from "@/data/license-applications";
+import { requireProMembership } from "@/lib/pro/entitlement";
 import type { LicenseApplicationRow, Json } from "@/lib/supabase/types";
 
 function mapLicenseApplication(row: LicenseApplicationRow): LicenseApplication {
@@ -58,6 +59,21 @@ export async function POST(request: Request) {
         },
         { status: 400 },
       );
+    }
+
+    const { data: profile } = await auth.supabase
+      .from("profiles")
+      .select("role, email")
+      .eq("id", auth.user.id)
+      .maybeSingle();
+
+    const proGate = await requireProMembership({
+      userId: auth.user.id,
+      authEmail: auth.user.email,
+      profile,
+    });
+    if (!proGate.ok) {
+      return proGate.response;
     }
 
     const { data: existingRow } = await auth.supabase

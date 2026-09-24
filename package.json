@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test tests/membership-validation.test.ts tests/membership-authorization.test.ts tests/platform-validation.test.ts"
+    "test": "node --experimental-strip-types --test tests/membership-validation.test.ts tests/membership-authorization.test.ts tests/platform-validation.test.ts tests/pro-entitlement.test.ts"
   },
   "keywords": [
     "juego todo",

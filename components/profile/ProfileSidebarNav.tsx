@@ -8,6 +8,7 @@ import { resolvePortalNavigation } from "@/data/profile-portal-nav";
 import { resolveAccountTypeLabel, resolveUserTypeTagIds, type UserTypeTagId } from "@/data/user-type-tags";
 import type { MemberRecord } from "@/lib/profile/member-record";
 import type { UserProfile } from "@/lib/auth/types";
+import { useProMembership } from "@/lib/pro/use-pro-membership";
 import type { LucideIcon } from "lucide-react";
 
 export type ProfileSectionId =
@@ -45,7 +46,8 @@ export type ProfileSectionId =
   | "wishlist"
   | "saved-fighters"
   | "saved-teams"
-  | "saved-events";
+  | "saved-events"
+  | "pro";
 
 export function ProfileSidebarNav({
   user,
@@ -71,6 +73,7 @@ export function ProfileSidebarNav({
   const pathname = usePathname();
   const tagIds = resolveUserTypeTagIds(user, licenseApplication, adminAssignedTags);
   const accountTypeLabel = resolveAccountTypeLabel(user, tagIds);
+  const { entitled: hasPro, loading: proLoading } = useProMembership();
   const navGroups = resolvePortalNavigation({
     tagIds,
     isAdmin: memberRecord.isAdmin,
@@ -92,15 +95,20 @@ export function ProfileSidebarNav({
             </p>
             <div className="flex flex-col gap-1.5">
               {group.items.map((item) =>
-            item.href ? (
-              <SidebarLink
-                active={pathname === item.href || pathname.startsWith(`${item.href}/`)}
-                href={item.href}
-                icon={item.icon}
-                key={item.href}
-                label={item.label}
-              />
-            ) : (
+                item.href ? (
+                  <SidebarLink
+                    active={pathname === item.href || pathname.startsWith(`${item.href}/`)}
+                    href={item.href}
+                    icon={item.icon}
+                    key={item.href}
+                    label={item.label}
+                    tag={
+                      item.id === "licenses" && !proLoading && !hasPro && !memberRecord.isAdmin
+                        ? "PRO"
+                        : undefined
+                    }
+                  />
+                ) : (
                   <SidebarButton
                     active={activeSection === item.id || (activeSection === "profile" && item.id === "overview")}
                     badge={item.badge}
@@ -183,11 +191,13 @@ function SidebarLink({
   icon: Icon,
   href,
   active,
+  tag,
 }: {
   label: string;
   icon: LucideIcon;
   href: string;
   active: boolean;
+  tag?: string;
 }) {
   return (
     <Link
@@ -202,6 +212,17 @@ function SidebarLink({
       <span className="min-w-0 flex-1 text-[0.6875rem] font-bold uppercase leading-snug tracking-[0.1em]">
         {label}
       </span>
+      {tag ? (
+        <span
+          className={`shrink-0 rounded-md border px-1.5 py-0.5 text-[0.55rem] font-black uppercase tracking-[0.12em] ${
+            active
+              ? "border-white/30 bg-white/15 text-white"
+              : "border-[#FFCF6A]/35 bg-[#FFCF6A]/10 text-[#FFCF6A]"
+          }`}
+        >
+          {tag}
+        </span>
+      ) : null}
     </Link>
   );
 }

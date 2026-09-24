@@ -34,6 +34,7 @@ import type { LicenseProgramPresetKey } from "@/data/license-program-presets";
 import { LICENSE_PROGRAM_PRESETS } from "@/data/license-program-presets";
 import { getLicenseProcessMeta } from "@/lib/profile/license-process";
 import type { MemberProgressStep, MemberRequirement } from "@/lib/profile/member-record";
+import { useProMembership } from "@/lib/pro/use-pro-membership";
 
 const LICENSE_OPTIONS: {
   key: LicenseProgramPresetKey;
@@ -135,6 +136,7 @@ function LicenseOptionCard({
   steps,
   expanded,
   onToggle,
+  proRequired = false,
 }: {
   optionKey: LicenseProgramPresetKey;
   label: string;
@@ -146,6 +148,7 @@ function LicenseOptionCard({
   steps: MemberProgressStep[];
   expanded: boolean;
   onToggle: () => void;
+  proRequired?: boolean;
 }) {
   const cardRef = useRef<HTMLElement | null>(null);
   const preset = LICENSE_PROGRAM_PRESETS[optionKey];
@@ -160,6 +163,9 @@ function LicenseOptionCard({
   const trackCompletion = active || requirements.length > 0;
 
   const badge = (() => {
+    if (proRequired && optionKey !== "jt1_member" && (!active || !status)) {
+      return { kind: "idle" as const, label: "PRO REQUIRED" };
+    }
     if (!active || !status) {
       return { kind: "idle" as const, label: "Available" };
     }
@@ -178,7 +184,12 @@ function LicenseOptionCard({
     return { kind: "progress" as const, label: `${overallPercent}%` };
   })();
 
-  const applyHref = status === "pending" ? `${preset.href}?status=pending` : preset.href;
+  const applyHref =
+    proRequired && optionKey !== "jt1_member"
+      ? "/pro"
+      : status === "pending"
+        ? `${preset.href}?status=pending`
+        : preset.href;
   const pathwaySteps: MemberProgressStep[] = active
     ? steps
     : process.steps.map((stepLabel, index) => ({
@@ -459,8 +470,10 @@ function LicenseOptionCard({
                 {status === "needs_info" ? "Update application" : "Resubmit application"}
               </Link>
             ) : (
-              <Link className={actionButtonClass("accent")} href={preset.href}>
-                Start application
+              <Link className={actionButtonClass("accent")} href={applyHref}>
+                {proRequired && optionKey !== "jt1_member"
+                  ? "Become a Pro Member"
+                  : "Start application"}
               </Link>
             )}
           </div>
@@ -481,6 +494,8 @@ export function LicenseApplicationProfileSection({
   requirementsPercent?: number;
   steps?: MemberProgressStep[];
 }) {
+  const { entitled, loading: proLoading } = useProMembership();
+  const proRequired = !proLoading && !entitled;
   const activeProgram = application ? resolveApplicationProgram(application) : null;
   const activeKey = useMemo(() => {
     if (!activeProgram || activeProgram === "legacy") {
@@ -514,6 +529,9 @@ export function LicenseApplicationProfileSection({
         <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">Apply for a license</h2>
         <p className="mt-1 text-xs leading-5 text-zinc-500 sm:text-sm">
           Tap a credential for requirements, pathway, cost, and progress.
+          {proRequired
+            ? " Role licenses require JuegoTodo Pro; JT1 Local Membership stays open."
+            : ""}
         </p>
       </div>
 
@@ -533,6 +551,7 @@ export function LicenseApplicationProfileSection({
                 setExpandedKey((current) => (current === option.key ? null : option.key))
               }
               optionKey={option.key}
+              proRequired={proRequired}
               requirements={showSharedRequirements ? requirements : []}
               requirementsPercent={showSharedRequirements ? requirementsPercent : 0}
               steps={active ? steps : []}

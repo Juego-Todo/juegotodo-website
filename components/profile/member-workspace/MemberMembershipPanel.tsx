@@ -8,7 +8,9 @@ import {
   membershipPaymentStatusLabels,
   type MembershipApplicationRecord,
 } from "@/data/membership-applications";
+import { MembershipStatus } from "@/components/pro/MembershipStatus";
 import { membershipFetch } from "@/lib/membership/client";
+import { useProMembership } from "@/lib/pro/use-pro-membership";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { isSupabaseUnavailableResponse } from "@/lib/platform/client";
 import {
@@ -27,6 +29,7 @@ export function MemberMembershipPanel() {
   const [loading, setLoading] = useState(supabaseReady);
   const [error, setError] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(!supabaseReady);
+  const { displayStatus, membership, loading: proLoading } = useProMembership();
 
   useEffect(() => {
     if (!supabaseReady) return;
@@ -81,6 +84,16 @@ export function MemberMembershipPanel() {
       description="Track membership standing, renewal dates, and official league affiliation."
       title="My Membership"
     >
+      {!proLoading ? (
+        <div className="mb-5">
+          <MembershipStatus
+            status={displayStatus}
+            membershipId={membership?.membership_id}
+            expiresAt={membership?.expires_at}
+          />
+        </div>
+      ) : null}
+
       {unavailable ? <SupabaseUnavailableNotice /> : null}
       {loading ? <PanelLoadingState /> : null}
       {error ? <PanelErrorState message={error} /> : null}
@@ -89,7 +102,7 @@ export function MemberMembershipPanel() {
         <PanelEmptyState
           href="/membership/apply/local-membership"
           linkLabel="Apply for Membership"
-          message="You have not submitted a membership application yet."
+          message="You have not submitted a JT1 local membership application yet."
         />
       ) : null}
 
@@ -100,7 +113,9 @@ export function MemberMembershipPanel() {
         >
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-zinc-500">Latest Application</p>
+              <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-zinc-500">
+                Latest JT1 Application
+              </p>
               <p className="mt-2 truncate text-lg font-semibold text-white">{latest.applicationNumber}</p>
               <p className="mt-1 truncate text-sm text-zinc-400">{latest.fullName}</p>
               <div className="mt-4 flex flex-wrap gap-2">

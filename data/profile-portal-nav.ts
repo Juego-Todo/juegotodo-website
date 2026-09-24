@@ -17,6 +17,7 @@ import {
   Settings,
   Shield,
   ShoppingBag,
+  Sparkles,
   Star,
   Swords,
   Users,
@@ -42,8 +43,9 @@ export type PortalNavGroup = {
 const memberCoreNav: PortalNavItem[] = [
   { id: "overview", label: "Dashboard", icon: LayoutDashboard },
   { id: "calendar", label: "Calendar", icon: CalendarDays, href: "/calendar" },
+  { id: "pro", label: "JuegoTodo Pro", icon: Sparkles, href: "/pro" },
   { id: "membership", label: "My Membership", icon: UserRound, href: "/membership" },
-  { id: "licenses", label: "Licenses", icon: FileBadge2, href: "/membership/applications" },
+  { id: "licenses", label: "Licenses", icon: FileBadge2, href: "/register-for-license" },
   { id: "important-documents", label: "Important Documents", icon: FileText },
   { id: "digital-id", label: "Digital ID", icon: IdCard },
   { id: "certificates", label: "Certificates", icon: Award },

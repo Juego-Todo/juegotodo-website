@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { OrderPayment } from "@/lib/commerce/types";
+import { PRO_CHECKOUT_TYPE } from "@/data/pro-membership";
 import { verifyPayMongoWebhookSignature } from "@/lib/paymongo/client";
 import { getPayMongoWebhookSecret } from "@/lib/paymongo/config";
+import { activateProMembership } from "@/lib/pro/service";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 type PayMongoWebhookEvent = {
@@ -25,7 +27,7 @@ type PayMongoWebhookEvent = {
 async function markOrderPaid(input: {
   orderId: string;
   paymongoPaymentId?: string;
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<{ ok: boolean; error?: string; userId?: string; isProCheckout?: boolean }> {
   const supabase = createSupabaseServiceClient();
   if (!supabase) {
     return { ok: false, error: "SUPABASE_SERVICE_ROLE_KEY is not configured." };
@@ -33,7 +35,7 @@ async function markOrderPaid(input: {
 
   const { data: orderRow, error: fetchError } = await supabase
     .from("orders")
-    .select("id, user_id, order_number, status, payment")
+    .select("id, user_id, order_number, status, payment, items")
     .eq("id", input.orderId)
     .maybeSingle();
 
@@ -45,10 +47,26 @@ async function markOrderPaid(input: {
   }
 
   const existingPayment = orderRow.payment as OrderPayment;
+  const items = (orderRow.items as { productSlug?: string }[] | null) ?? [];
+  const isProCheckout =
+    items.some((item) => item.productSlug === "juegotodo-pro") ||
+    String(orderRow.order_number ?? "").startsWith("JT-PRO-");
 
   // Idempotent — webhooks can be delivered more than once.
   if (existingPayment.status === "approved") {
-    return { ok: true };
+    if (isProCheckout) {
+      const activated = await activateProMembership({
+        userId: orderRow.user_id,
+        orderId: input.orderId,
+        provider: "paymongo",
+        paymentStatus: "paid",
+        extendFromExisting: true,
+      });
+      if (!activated.ok) {
+        return { ok: false, error: activated.error };
+      }
+    }
+    return { ok: true, userId: orderRow.user_id, isProCheckout };
   }
 
   const now = new Date().toISOString();
@@ -69,13 +87,26 @@ async function markOrderPaid(input: {
     return { ok: false, error: updateError.message };
   }
 
-  await supabase.from("notifications").insert({
-    user_id: orderRow.user_id,
-    title: "Payment Confirmed",
-    body: `Payment for order ${orderRow.order_number} was received via PayMongo. We're preparing your order.`,
-  });
+  if (isProCheckout) {
+    const activated = await activateProMembership({
+      userId: orderRow.user_id,
+      orderId: input.orderId,
+      provider: "paymongo",
+      paymentStatus: "paid",
+      extendFromExisting: true,
+    });
+    if (!activated.ok) {
+      return { ok: false, error: activated.error };
+    }
+  } else {
+    await supabase.from("notifications").insert({
+      user_id: orderRow.user_id,
+      title: "Payment Confirmed",
+      body: `Payment for order ${orderRow.order_number} was received via PayMongo. We're preparing your order.`,
+    });
+  }
 
-  return { ok: true };
+  return { ok: true, userId: orderRow.user_id, isProCheckout };
 }
 
 export async function POST(request: NextRequest) {
@@ -101,34 +132,41 @@ export async function POST(request: NextRequest) {
   const resource = event.data?.attributes?.data;
   const metadata = resource?.attributes?.metadata ?? {};
   const orderId = metadata?.order_id;
+  const checkoutType = metadata?.type;
 
   switch (eventType) {
-    case "checkout_session.payment.paid": {
-      if (!orderId) {
-        // Not one of our sessions (e.g. a dashboard-created payment link).
-        return NextResponse.json({ received: true, skipped: "no order_id metadata" });
-      }
-      const paymentId = resource?.attributes?.payments?.[0]?.id;
-      const result = await markOrderPaid({ orderId, paymongoPaymentId: paymentId });
-      if (!result.ok) {
-        return NextResponse.json({ error: result.error }, { status: 500 });
-      }
-      return NextResponse.json({ received: true });
-    }
-
+    case "checkout_session.payment.paid":
     case "payment.paid": {
       if (!orderId) {
         return NextResponse.json({ received: true, skipped: "no order_id metadata" });
       }
-      const result = await markOrderPaid({ orderId, paymongoPaymentId: resource?.id });
+      const paymentId =
+        eventType === "payment.paid"
+          ? resource?.id
+          : resource?.attributes?.payments?.[0]?.id;
+      const result = await markOrderPaid({ orderId, paymongoPaymentId: paymentId });
       if (!result.ok) {
         return NextResponse.json({ error: result.error }, { status: 500 });
       }
-      return NextResponse.json({ received: true });
+
+      // Metadata type is authoritative when present; order items are the fallback.
+      if (checkoutType === PRO_CHECKOUT_TYPE && !result.isProCheckout && result.userId) {
+        const activated = await activateProMembership({
+          userId: result.userId,
+          orderId,
+          provider: "paymongo",
+          paymentStatus: "paid",
+          extendFromExisting: true,
+        });
+        if (!activated.ok) {
+          return NextResponse.json({ error: activated.error }, { status: 500 });
+        }
+      }
+
+      return NextResponse.json({ received: true, pro: Boolean(result.isProCheckout) });
     }
 
     default:
-      // Acknowledge everything else (payment.failed, source.chargeable, etc.)
       return NextResponse.json({ received: true, ignored: eventType });
   }
 }

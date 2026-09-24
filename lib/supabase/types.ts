@@ -349,6 +349,24 @@ type EmailOutboxRow = {
   sent_at: string | null;
 };
 
+type ProMembershipRow = {
+  id: string;
+  user_id: string;
+  plan: string;
+  status: string;
+  started_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
+  payment_status: string;
+  provider: string | null;
+  provider_customer_id: string | null;
+  provider_subscription_id: string | null;
+  order_id: string | null;
+  membership_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -377,6 +395,7 @@ export type Database = {
       promo_codes: GenericTable<PromoCodeRow>;
       fight_records: GenericTable<FightRecordRow>;
       email_outbox: GenericTable<EmailOutboxRow>;
+      pro_memberships: GenericTable<ProMembershipRow>;
     };
     Views: Record<string, never>;
     Functions: {
@@ -401,4 +420,5 @@ export type {
   LicenseApplicationRow,
   OrderRow,
   ProfileRow,
+  ProMembershipRow,
 };

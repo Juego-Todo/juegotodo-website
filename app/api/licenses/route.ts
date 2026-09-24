@@ -63,7 +63,7 @@ export async function POST(request: Request) {
 
     const { data: profile } = await auth.supabase
       .from("profiles")
-      .select("role, email")
+      .select("role, email, assigned_tags")
       .eq("id", auth.user.id)
       .maybeSingle();
 

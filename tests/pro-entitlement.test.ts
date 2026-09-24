@@ -130,3 +130,33 @@ test("annual Pro price and checkout type", () => {
   assert.equal(2500, 2500);
   assert.equal("juegotodo_pro", "juegotodo_pro");
 });
+
+function hasUnlimitedPlan(account: {
+  email?: string | null;
+  role?: string | null;
+  tags?: string[] | null;
+  assignedTags?: string[] | null;
+} | null | undefined): boolean {
+  if (!account) return false;
+  if (account.role === "admin") return true;
+  const owners = new Set(["admin@juegotodo.com", "kiran.aames@gmail.com"]);
+  if (owners.has((account.email ?? "").trim().toLowerCase())) return true;
+  const tags = account.tags ?? account.assignedTags ?? [];
+  return tags.some((tag) => tag === "staff" || tag === "admin");
+}
+
+test("admin role gets Unlimited plan", () => {
+  assert.equal(hasUnlimitedPlan({ role: "admin", email: "fan@example.com", tags: [] }), true);
+});
+
+test("staff tag gets Unlimited plan", () => {
+  assert.equal(hasUnlimitedPlan({ role: "user", tags: ["staff"] }), true);
+});
+
+test("platform owner email gets Unlimited plan", () => {
+  assert.equal(hasUnlimitedPlan({ role: "user", email: "admin@juegotodo.com", tags: [] }), true);
+});
+
+test("regular fan does not get Unlimited plan", () => {
+  assert.equal(hasUnlimitedPlan({ role: "user", email: "fan@example.com", tags: [] }), false);
+});

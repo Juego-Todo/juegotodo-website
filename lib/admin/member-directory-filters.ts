@@ -1,21 +1,59 @@
 import type { AdminMemberRecord, AdminProDisplayStatus } from "@/lib/admin/member-directory";
 import type { UserTypeTagId } from "@/data/user-type-tags";
 import { userTypeTags } from "@/data/user-type-tags";
+import { memberCredentialTags, memberOrganizationalRoleTags } from "@/lib/admin/member-badges";
+import { hasUnlimitedPlan, resolveMemberPlanKind } from "@/lib/pro/plan";
 import { resolveProTimer } from "@/lib/pro/timer";
 
-export type MembershipFilter = "all" | "pro" | "free" | "expired" | "pending" | "expiring";
+export type MembershipFilter =
+  | "all"
+  | "unlimited"
+  | "pro"
+  | "free"
+  | "expired"
+  | "pending"
+  | "expiring";
 export type AccountFilter = "all" | "fan" | "staff" | "admin";
 export type CredentialsFilter = "all" | "licensed" | "none" | "pending";
 export type RoleFilter = "all" | UserTypeTagId | "admin_role";
-export type JoinedFilter = "all" | "today" | "7d" | "30d";
-export type QuickView = "all" | "pro" | "staff" | "leadership" | "licensed" | "pending";
-export type MemberSort =
+export type JoinedFilter = "all" | "today" | "7d" | "30d" | "90d";
+export type QuickView = "all" | "pro" | "staff" | "leadership" | "licensed" | "pending" | "unlimited";
+export type MemberSortColumn = "name" | "account" | "plan" | "credentials" | "roles" | "joined" | "expiry";
+export type MemberSortDirection = "asc" | "desc";
+
+export type MemberSort = {
+  column: MemberSortColumn;
+  direction: MemberSortDirection;
+};
+
+export type MemberSortPreset =
   | "joined_desc"
   | "joined_asc"
   | "name_asc"
   | "name_desc"
-  | "pro_first"
-  | "expiring";
+  | "expiry"
+  | "credentials";
+
+export const MEMBER_SORT_PRESETS: Array<{ id: MemberSortPreset; label: string; sort: MemberSort }> = [
+  { id: "joined_desc", label: "Recently joined", sort: { column: "joined", direction: "desc" } },
+  { id: "joined_asc", label: "Oldest joined", sort: { column: "joined", direction: "asc" } },
+  { id: "name_asc", label: "Name A–Z", sort: { column: "name", direction: "asc" } },
+  { id: "name_desc", label: "Name Z–A", sort: { column: "name", direction: "desc" } },
+  { id: "expiry", label: "Membership expiry", sort: { column: "expiry", direction: "asc" } },
+  { id: "credentials", label: "Credential status", sort: { column: "credentials", direction: "asc" } },
+];
+
+export function resolveMemberSortPreset(sort: MemberSort): MemberSortPreset {
+  const match = MEMBER_SORT_PRESETS.find(
+    (preset) => preset.sort.column === sort.column && preset.sort.direction === sort.direction,
+  );
+  return match?.id ?? "joined_desc";
+}
+
+export const defaultMemberSort: MemberSort = {
+  column: "joined",
+  direction: "desc",
+};
 
 export type MemberDirectoryFilters = {
   membership: MembershipFilter;
@@ -51,6 +89,22 @@ export function memberDisplayName(member: AdminMemberRecord) {
   return parts.join(" ") || member.fullName || member.email;
 }
 
+export function memberHasUnlimitedPlan(member: AdminMemberRecord) {
+  return hasUnlimitedPlan({
+    email: member.email,
+    role: member.role,
+    tags: member.tags,
+  });
+}
+
+export function memberPlanKind(member: AdminMemberRecord) {
+  return resolveMemberPlanKind({
+    unlimited: memberHasUnlimitedPlan(member),
+    proEntitled: member.proEntitled,
+    proStatus: member.proStatus,
+  });
+}
+
 export function isStaffAccount(member: AdminMemberRecord) {
   return member.role === "admin" || member.tags.some((tag) => STAFF_TAGS.has(tag));
 }
@@ -69,19 +123,18 @@ export function isLeadership(member: AdminMemberRecord) {
 }
 
 export function orgRoleTags(member: AdminMemberRecord): UserTypeTagId[] {
-  return member.tags.filter((tag) => tag !== "admin");
+  return memberOrganizationalRoleTags(member);
 }
 
 export function credentialLabels(member: AdminMemberRecord): string[] {
-  const fromTags = member.tags
-    .filter((tag) => CREDENTIAL_TAGS.has(tag))
-    .map((tag) => userTypeTags[tag].label);
+  const fromTags = memberCredentialTags(member).map((tag) => userTypeTags[tag].label);
   if (fromTags.length > 0) return fromTags;
   if (member.licenseStatus === "Approved") return ["Licensed"];
   return [];
 }
 
 export function membershipBucket(member: AdminMemberRecord): MembershipFilter {
+  if (memberHasUnlimitedPlan(member)) return "unlimited";
   if (member.proEntitled && member.proStatus === "active") return "pro";
   if (member.proStatus === "expired") return "expired";
   if (member.proStatus === "pending") return "pending";
@@ -92,6 +145,7 @@ export function membershipBucket(member: AdminMemberRecord): MembershipFilter {
 export function computeMemberStats(members: AdminMemberRecord[]) {
   const now = new Date();
   let pro = 0;
+  let unlimited = 0;
   let staff = 0;
   let licensed = 0;
   let pending = 0;
@@ -100,13 +154,14 @@ export function computeMemberStats(members: AdminMemberRecord[]) {
   let fans = 0;
 
   for (const member of members) {
-    if (member.proEntitled) pro += 1;
+    if (memberHasUnlimitedPlan(member)) unlimited += 1;
+    else if (member.proEntitled) pro += 1;
     if (isStaffAccount(member)) staff += 1;
     else fans += 1;
     if (isLicensed(member)) licensed += 1;
     if (isPendingCredential(member)) pending += 1;
     if (isLeadership(member)) leadership += 1;
-    if (member.proEntitled && member.proExpiresAt) {
+    if (!memberHasUnlimitedPlan(member) && member.proEntitled && member.proExpiresAt) {
       if (resolveProTimer(member.proExpiresAt, now).inReminderWindow) expiring += 1;
     }
   }
@@ -114,6 +169,7 @@ export function computeMemberStats(members: AdminMemberRecord[]) {
   return {
     total: members.length,
     pro,
+    unlimited,
     staff,
     fans,
     licensed,
@@ -132,7 +188,7 @@ function matchesJoined(createdAt: string, filter: JoinedFilter, now: Date) {
   if (filter === "today") {
     return created >= start;
   }
-  const days = filter === "7d" ? 7 : 30;
+  const days = filter === "7d" ? 7 : filter === "30d" ? 30 : 90;
   const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
   return created >= cutoff;
 }
@@ -149,7 +205,8 @@ export function filterMembers(
   const now = new Date();
 
   return members.filter((member) => {
-    if (input.quickView === "pro" && !member.proEntitled) return false;
+    if (input.quickView === "pro" && !(member.proEntitled && !memberHasUnlimitedPlan(member))) return false;
+    if (input.quickView === "unlimited" && !memberHasUnlimitedPlan(member)) return false;
     if (input.quickView === "staff" && !isStaffAccount(member)) return false;
     if (input.quickView === "leadership" && !isLeadership(member)) return false;
     if (input.quickView === "licensed" && !isLicensed(member)) return false;
@@ -157,12 +214,23 @@ export function filterMembers(
 
     const { membership, account, credentials, role, joined } = input.filters;
 
-    if (membership === "pro" && !(member.proEntitled && member.proStatus === "active")) return false;
-    if (membership === "free" && member.proEntitled) return false;
-    if (membership === "expired" && member.proStatus !== "expired") return false;
-    if (membership === "pending" && member.proStatus !== "pending") return false;
+    if (membership === "unlimited" && !memberHasUnlimitedPlan(member)) return false;
+    if (membership === "pro") {
+      if (memberHasUnlimitedPlan(member) || !(member.proEntitled && member.proStatus === "active")) {
+        return false;
+      }
+    }
+    if (membership === "free") {
+      if (member.proEntitled || memberHasUnlimitedPlan(member)) return false;
+    }
+    if (membership === "expired" && (memberHasUnlimitedPlan(member) || member.proStatus !== "expired")) {
+      return false;
+    }
+    if (membership === "pending" && (memberHasUnlimitedPlan(member) || member.proStatus !== "pending")) {
+      return false;
+    }
     if (membership === "expiring") {
-      if (!member.proEntitled || !member.proExpiresAt) return false;
+      if (memberHasUnlimitedPlan(member) || !member.proEntitled || !member.proExpiresAt) return false;
       if (!resolveProTimer(member.proExpiresAt, now).inReminderWindow) return false;
     }
 
@@ -201,30 +269,101 @@ export function filterMembers(
   });
 }
 
+function planSortRank(member: AdminMemberRecord) {
+  const kind = memberPlanKind(member);
+  switch (kind) {
+    case "unlimited":
+      return 0;
+    case "pro":
+      return 1;
+    case "pending":
+      return 2;
+    case "cancelled":
+      return 3;
+    case "expired":
+      return 4;
+    case "free":
+    default:
+      return 5;
+  }
+}
+
+function accountSortKey(member: AdminMemberRecord) {
+  const roleRank = member.role === "admin" ? 0 : 1;
+  return `${roleRank}:${member.accountTypeLabel}:${memberDisplayName(member)}`;
+}
+
+function credentialsSortKey(member: AdminMemberRecord) {
+  const labels = credentialLabels(member);
+  if (labels.length > 0) return `0:${labels.join(",")}`;
+  if (isPendingCredential(member)) return `1:pending`;
+  return `2:none`;
+}
+
+function rolesSortKey(member: AdminMemberRecord) {
+  const roles = orgRoleTags(member)
+    .map((tag) => userTypeTags[tag]?.label ?? tag)
+    .join(",");
+  const admin = member.role === "admin" || member.tags.includes("admin") ? "admin" : "";
+  return `${admin}:${roles}` || "zzz";
+}
+
+export function toggleMemberSort(current: MemberSort, column: MemberSortColumn): MemberSort {
+  if (current.column === column) {
+    return {
+      column,
+      direction: current.direction === "asc" ? "desc" : "asc",
+    };
+  }
+  return {
+    column,
+    direction: column === "joined" || column === "plan" ? "desc" : "asc",
+  };
+}
+
 export function sortMembers(members: AdminMemberRecord[], sort: MemberSort) {
   const list = [...members];
-  const now = new Date();
+  const direction = sort.direction === "asc" ? 1 : -1;
 
   list.sort((a, b) => {
-    switch (sort) {
-      case "name_asc":
-        return memberDisplayName(a).localeCompare(memberDisplayName(b));
-      case "name_desc":
-        return memberDisplayName(b).localeCompare(memberDisplayName(a));
-      case "joined_asc":
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      case "pro_first":
-        if (a.proEntitled !== b.proEntitled) return a.proEntitled ? -1 : 1;
-        return memberDisplayName(a).localeCompare(memberDisplayName(b));
-      case "expiring": {
-        const aMs = a.proExpiresAt ? new Date(a.proExpiresAt).getTime() - now.getTime() : Number.POSITIVE_INFINITY;
-        const bMs = b.proExpiresAt ? new Date(b.proExpiresAt).getTime() - now.getTime() : Number.POSITIVE_INFINITY;
-        return aMs - bMs;
+    let cmp = 0;
+    switch (sort.column) {
+      case "name":
+        cmp = memberDisplayName(a).localeCompare(memberDisplayName(b));
+        break;
+      case "account":
+        cmp = accountSortKey(a).localeCompare(accountSortKey(b));
+        break;
+      case "plan":
+        cmp = planSortRank(a) - planSortRank(b);
+        if (cmp === 0) {
+          const aExpiry = a.proExpiresAt ? new Date(a.proExpiresAt).getTime() : Number.POSITIVE_INFINITY;
+          const bExpiry = b.proExpiresAt ? new Date(b.proExpiresAt).getTime() : Number.POSITIVE_INFINITY;
+          cmp = aExpiry - bExpiry;
+        }
+        break;
+      case "expiry": {
+        const aMs = a.proExpiresAt ? new Date(a.proExpiresAt).getTime() : Number.POSITIVE_INFINITY;
+        const bMs = b.proExpiresAt ? new Date(b.proExpiresAt).getTime() : Number.POSITIVE_INFINITY;
+        cmp = aMs - bMs;
+        break;
       }
-      case "joined_desc":
+      case "credentials":
+        cmp = credentialsSortKey(a).localeCompare(credentialsSortKey(b));
+        break;
+      case "roles":
+        cmp = rolesSortKey(a).localeCompare(rolesSortKey(b));
+        break;
+      case "joined":
+        cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        break;
       default:
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        cmp = 0;
     }
+    if (cmp === 0) {
+      cmp = memberDisplayName(a).localeCompare(memberDisplayName(b));
+    }
+    return cmp * direction;
   });
 
   return list;
@@ -234,13 +373,14 @@ export function activeFilterChips(filters: MemberDirectoryFilters): Array<{ key:
   const chips: Array<{ key: keyof MemberDirectoryFilters; label: string }> = [];
   if (filters.membership !== "all") {
     const labels: Record<Exclude<MembershipFilter, "all">, string> = {
+      unlimited: "Unlimited",
       pro: "Pro",
       free: "Free",
       expired: "Expired Pro",
       pending: "Pending Pro",
       expiring: "Expiring Pro",
     };
-    chips.push({ key: "membership", label: `Membership: ${labels[filters.membership]}` });
+    chips.push({ key: "membership", label: `Plan: ${labels[filters.membership]}` });
   }
   if (filters.account !== "all") {
     chips.push({ key: "account", label: `Account: ${filters.account}` });
@@ -263,6 +403,7 @@ export function activeFilterChips(filters: MemberDirectoryFilters): Array<{ key:
       today: "Joined today",
       "7d": "Joined last 7 days",
       "30d": "Joined last 30 days",
+      "90d": "Joined last 90 days",
     };
     chips.push({ key: "joined", label: labels[filters.joined] });
   }
@@ -276,5 +417,15 @@ export function proStatusCaption(status: AdminProDisplayStatus, entitled: boolea
   if (status === "expired") return "Expired";
   if (status === "past_due") return "Past due";
   if (status === "cancelled") return "Cancelled";
+  return "Free";
+}
+
+export function planCaption(member: AdminMemberRecord) {
+  const kind = memberPlanKind(member);
+  if (kind === "unlimited") return "Unlimited";
+  if (kind === "pro") return "Pro · Active";
+  if (kind === "cancelled") return "Pro · Until expiry";
+  if (kind === "pending") return "Pro · Pending";
+  if (kind === "expired") return "Pro · Expired";
   return "Free";
 }

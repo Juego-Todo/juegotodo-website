@@ -6,6 +6,7 @@ import {
   resolveProAccessState,
   type ProAccessRecord,
 } from "@/lib/pro/access";
+import { hasUnlimitedPlan } from "@/lib/pro/plan";
 import type { ProMembershipRow } from "@/lib/supabase/types";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -48,10 +49,25 @@ type RequireProResult =
 export async function requireProMembership(input: {
   userId: string;
   authEmail?: string | null;
-  profile?: { role?: string | null; email?: string | null } | null;
+  profile?: {
+    role?: string | null;
+    email?: string | null;
+    assigned_tags?: string[] | null;
+    assignedTags?: string[] | null;
+  } | null;
 }): Promise<RequireProResult> {
   if (isServerAdminUser(input.authEmail, input.profile)) {
     return { ok: true, record: null, isAdmin: true };
+  }
+
+  if (
+    hasUnlimitedPlan({
+      email: input.authEmail ?? input.profile?.email,
+      role: input.profile?.role,
+      assignedTags: input.profile?.assigned_tags ?? input.profile?.assignedTags,
+    })
+  ) {
+    return { ok: true, record: null, isAdmin: false };
   }
 
   const record = await fetchProMembershipForUser(input.userId);

@@ -252,68 +252,76 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
   const supabase = createSupabaseBrowserClient();
   const email = input.email.trim().toLowerCase();
   const username = validateUsername(input.username);
-  const fullName = buildFullName(input);
   const dateOfBirth = validateDateOfBirth(input.dateOfBirth);
 
+  const controller = new AbortController();
+  const abortTimer = setTimeout(() => controller.abort(), 20000);
+  let registerResponse: Response;
+
+  try {
+    registerResponse = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...input,
+        email,
+        username,
+        dateOfBirth,
+        firstName: input.firstName.trim(),
+        lastName: input.lastName.trim(),
+        middleName: input.middleName?.trim() ?? "",
+        gender: input.gender.trim(),
+      }),
+      signal: controller.signal,
+    });
+  } catch {
+    throw new Error("Unable to reach the registration service. Check your connection and try again.");
+  } finally {
+    clearTimeout(abortTimer);
+  }
+
+  const registerPayload = (await registerResponse.json().catch(() => null)) as {
+    error?: string;
+    email?: string;
+  } | null;
+
+  if (!registerResponse.ok) {
+    throw new Error(registerPayload?.error ?? "Unable to create account.");
+  }
+
   const { data, error } = await withTimeout(
-    supabase.auth.signUp({
+    supabase.auth.signInWithPassword({
       email,
       password: input.password,
-      options: {
-        data: {
-          full_name: fullName,
-          username,
-          gender: input.gender.trim(),
-          date_of_birth: dateOfBirth,
-          account_type: input.accountType,
-          city: input.city?.trim() ?? "",
-          phone: input.phone?.trim() ?? "",
-          country: input.country?.trim() ?? "Philippines",
-        },
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/profile")}`,
-      },
     }),
-    15000,
-    "Account creation timed out. Check your connection and try again.",
+    12000,
+    "Sign in timed out after registration. Try logging in with your new account.",
   );
 
   if (error) {
     const message = error.message.toLowerCase();
-    if (message.includes("database error saving new user")) {
-      throw new Error(
-        "Account setup failed in the database. Ask an admin to run the latest Supabase migrations, then try again.",
-      );
-    }
-    if (
-      message.includes("error sending confirmation email") ||
-      message.includes("confirmation email") ||
-      message.includes("error sending email")
-    ) {
-      throw new Error(
-        "We couldn't send the confirmation email. Please try again in a few minutes, or contact support if this keeps happening.",
-      );
-    }
-    if (message.includes("already registered") || message.includes("already exists")) {
-      throw new Error("An account with this email already exists. Sign in or reset your password.");
-    }
     if (message.includes("fetch")) {
-      throw new Error("Unable to reach the authentication service. Check your connection and try again.");
+      throw new Error("Account created, but sign-in failed. Try logging in.");
     }
     throw new Error(error.message);
   }
 
   if (!data.user) {
-    throw new Error("Unable to create account.");
+    throw new Error("Account created, but sign-in failed. Try logging in.");
   }
 
-  if (data.session) {
-    // Registration succeeded. Profile synchronization must never hold the UI
-    // hostage; the database trigger and this background repair cover it.
-    void syncRegistrationProfile(input).catch(() => undefined);
-    return buildProfileFromAuthUser(data.user, email);
-  }
+  void syncRegistrationProfile({
+    ...input,
+    email,
+    username,
+    dateOfBirth,
+    firstName: input.firstName.trim(),
+    lastName: input.lastName.trim(),
+    middleName: input.middleName?.trim() ?? "",
+    gender: input.gender.trim(),
+  }).catch(() => undefined);
 
-  throw new Error("Account created. Check your email to confirm your account before logging in.");
+  return buildProfileFromAuthUser(data.user, email);
 }
 
 export async function loginSupabaseUser(email: string, password: string): Promise<UserProfile> {

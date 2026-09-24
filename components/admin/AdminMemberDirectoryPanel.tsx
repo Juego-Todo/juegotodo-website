@@ -12,12 +12,11 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AdminMemberDetailDrawer } from "@/components/admin/AdminMemberDetailDrawer";
 import { AdminMemberManageModal } from "@/components/admin/AdminMemberManageModal";
 import { AdminPortalHeader } from "@/components/admin/AdminPortalShell";
 import { MemberBadge, MemberBadgeList } from "@/components/admin/MemberBadge";
-import { ProCountdown } from "@/components/pro/ProCountdown";
 import { leadershipStaffAccounts } from "@/data/leadership-staff-accounts";
 import { userTypeTags } from "@/data/user-type-tags";
 import {
@@ -79,7 +78,7 @@ const MEMBERSHIP_OPTIONS: Array<{ value: MembershipFilter; label: string }> = [
 const ACCOUNT_OPTIONS: Array<{ value: AccountFilter; label: string }> = [
   { value: "all", label: "All" },
   { value: "fan", label: "Fan" },
-  { value: "staff", label: "Staff" },
+  { value: "staff", label: "Team" },
 ];
 
 const CREDENTIAL_OPTIONS: Array<{ value: CredentialsFilter; label: string }> = [
@@ -120,12 +119,7 @@ function StatusPill({
 
 function MembershipCell({ member }: { member: AdminMemberRecord }) {
   if (memberHasUnlimitedPlan(member)) {
-    return (
-      <div>
-        <StatusPill tone="accent">Unlimited</StatusPill>
-        <p className="mt-1.5 text-[0.65rem] text-zinc-500">Staff / admin plan</p>
-      </div>
-    );
+    return <StatusPill tone="accent">Unlimited</StatusPill>;
   }
   if (!member.proEntitled && member.proStatus === "none") {
     return <StatusPill>Free</StatusPill>;
@@ -138,16 +132,7 @@ function MembershipCell({ member }: { member: AdminMemberRecord }) {
         : member.proStatus === "pending"
           ? "accent"
           : "warn";
-  return (
-    <div>
-      <StatusPill tone={tone}>Pro · {proStatusCaption(member.proStatus, member.proEntitled)}</StatusPill>
-      {member.proExpiresAt ? (
-        <div className="mt-1.5">
-          <ProCountdown compact entitled={member.proEntitled} expiresAt={member.proExpiresAt} showBar={false} />
-        </div>
-      ) : null}
-    </div>
-  );
+  return <StatusPill tone={tone}>Pro · {proStatusCaption(member.proStatus, member.proEntitled)}</StatusPill>;
 }
 
 function CredentialsCell({ member }: { member: AdminMemberRecord }) {
@@ -332,13 +317,12 @@ function filtersForQuickView(view: QuickView): MemberDirectoryFilters {
       return { ...defaultMemberFilters, membership: "pro" };
     case "unlimited":
       return { ...defaultMemberFilters, membership: "unlimited" };
-    case "staff":
+    case "team":
       return { ...defaultMemberFilters, account: "staff" };
+    case "fans":
+      return { ...defaultMemberFilters, account: "fan" };
     case "licensed":
       return { ...defaultMemberFilters, credentials: "licensed" };
-    case "pending":
-      return { ...defaultMemberFilters, credentials: "pending" };
-    case "leadership":
     case "all":
     default:
       return defaultMemberFilters;
@@ -436,6 +420,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
   const [filters, setFilters] = useState<MemberDirectoryFilters>(defaultMemberFilters);
   const [quickView, setQuickView] = useState<QuickView>("all");
   const [sort, setSort] = useState<MemberSort>(defaultMemberSort);
@@ -450,6 +435,8 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   const [openPopover, setOpenPopover] = useState<OpenPopover>(null);
   const autoProvisionedRef = useRef(false);
   const searchRef = useRef<HTMLInputElement | null>(null);
+  const searchValueRef = useRef(search);
+  searchValueRef.current = search;
   const toolbarRef = useRef<HTMLDivElement | null>(null);
 
   const refreshMembers = useCallback(() => {
@@ -542,24 +529,24 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
           setOpenPopover(null);
           return;
         }
-        if (document.activeElement === searchRef.current && search) {
+        if (document.activeElement === searchRef.current && searchValueRef.current) {
           setSearch("");
         }
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [openPopover, search]);
+  }, [openPopover]);
 
   const stats = useMemo(() => computeMemberStats(members), [members]);
 
   const filteredMembers = useMemo(
     () =>
       sortMembers(
-        filterMembers(members, { search, filters, quickView }),
+        filterMembers(members, { search: deferredSearch, filters, quickView }),
         sort,
       ),
-    [members, search, filters, quickView, sort],
+    [members, deferredSearch, filters, quickView, sort],
   );
 
   const chips = useMemo(() => activeFilterChips(filters), [filters]);
@@ -645,11 +632,11 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
 
   const quickViews: Array<{ id: QuickView; label: string; count: number }> = [
     { id: "all", label: "All Members", count: stats.total },
-    { id: "pro", label: "Pro Members", count: stats.pro },
-    { id: "staff", label: "Staff", count: stats.staff },
-    { id: "leadership", label: "Leadership", count: stats.leadership },
+    { id: "team", label: "Team", count: stats.team },
+    { id: "fans", label: "Fan Accounts", count: stats.fans },
+    { id: "pro", label: "Pro Plan", count: stats.pro },
+    { id: "unlimited", label: "Unlimited", count: stats.unlimited },
     { id: "licensed", label: "Licensed", count: stats.licensed },
-    { id: "pending", label: "Pending", count: stats.pending },
   ];
 
   return (
@@ -672,7 +659,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
           ) : null}
           <p className="mt-1 text-sm text-zinc-400">
             {loaded
-              ? `${stats.total} members · ${stats.staff} staff · ${stats.fans} fans`
+              ? `${stats.total} members · ${stats.team} team · ${stats.fans} fans`
               : "Loading member community…"}
           </p>
         </div>
@@ -710,9 +697,9 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
         {(
           [
             { label: "Members", value: stats.total, view: "all" as QuickView },
-            { label: "Pro Members", value: stats.pro, view: "pro" as QuickView },
-            { label: "Staff", value: stats.staff, view: "staff" as QuickView },
-            { label: "Licensed", value: stats.licensed, view: "licensed" as QuickView },
+            { label: "Team", value: stats.team, view: "team" as QuickView },
+            { label: "Fan Accounts", value: stats.fans, view: "fans" as QuickView },
+            { label: "Pro Plan", value: stats.pro, view: "pro" as QuickView },
           ] as const
         ).map((card) => (
           <button
@@ -754,25 +741,28 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
           <div className="relative min-w-0 flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={15} aria-hidden />
             <input
-              className="w-full rounded-lg border border-transparent bg-transparent py-2 pl-9 pr-9 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-white/10 focus:bg-black/30"
+              className="w-full rounded-lg border border-transparent bg-transparent py-2 pl-9 pr-9 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-white/10"
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search members by name, email, username, city or Pro ID..."
               ref={searchRef}
+              spellCheck={false}
               value={search}
             />
-            {search ? (
-              <button
-                aria-label="Clear search"
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-zinc-500 transition hover:text-white"
-                onClick={() => {
-                  setSearch("");
-                  searchRef.current?.focus();
-                }}
-                type="button"
-              >
-                <X size={14} />
-              </button>
-            ) : null}
+            <button
+              aria-hidden={!search}
+              aria-label="Clear search"
+              className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-zinc-500 transition-opacity hover:text-white ${
+                search ? "opacity-100" : "pointer-events-none opacity-0"
+              }`}
+              onClick={() => {
+                setSearch("");
+                searchRef.current?.focus();
+              }}
+              tabIndex={search ? 0 : -1}
+              type="button"
+            >
+              <X size={14} />
+            </button>
           </div>
 
           <div className="relative flex flex-wrap items-center gap-1.5 sm:flex-nowrap">

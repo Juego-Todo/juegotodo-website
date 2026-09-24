@@ -1,6 +1,7 @@
 import type { AdminMemberRecord, AdminProDisplayStatus } from "@/lib/admin/member-directory";
 import type { UserTypeTagId } from "@/data/user-type-tags";
 import { userTypeTags } from "@/data/user-type-tags";
+import { isPlatformOwnerEmail } from "@/lib/auth/platform-owners";
 import { memberCredentialTags, memberOrganizationalRoleTags } from "@/lib/admin/member-badges";
 import { hasUnlimitedPlan, resolveMemberPlanKind } from "@/lib/pro/plan";
 import { resolveProTimer } from "@/lib/pro/timer";
@@ -17,7 +18,7 @@ export type AccountFilter = "all" | "fan" | "staff" | "admin";
 export type CredentialsFilter = "all" | "licensed" | "none" | "pending";
 export type RoleFilter = "all" | UserTypeTagId | "admin_role";
 export type JoinedFilter = "all" | "today" | "7d" | "30d" | "90d";
-export type QuickView = "all" | "pro" | "staff" | "leadership" | "licensed" | "pending" | "unlimited";
+export type QuickView = "all" | "team" | "fans" | "pro" | "unlimited" | "licensed";
 export type MemberSortColumn = "name" | "account" | "plan" | "credentials" | "roles" | "joined" | "expiry";
 export type MemberSortDirection = "asc" | "desc";
 
@@ -72,7 +73,6 @@ export const defaultMemberFilters: MemberDirectoryFilters = {
 };
 
 const STAFF_TAGS = new Set<UserTypeTagId>(["staff", "admin", "grand_council_member"]);
-const LEADERSHIP_TAGS = new Set<UserTypeTagId>(["admin", "grand_council_member", "staff"]);
 const CREDENTIAL_TAGS = new Set<UserTypeTagId>([
   "fighter",
   "coach",
@@ -109,6 +109,19 @@ export function isStaffAccount(member: AdminMemberRecord) {
   return member.role === "admin" || member.tags.some((tag) => STAFF_TAGS.has(tag));
 }
 
+/** Owner, Admin, Staff, and Grand Council — the internal Team. */
+export function isTeamMember(member: AdminMemberRecord) {
+  if (isPlatformOwnerEmail(member.email)) return true;
+  if (member.role === "admin") return true;
+  return member.tags.some(
+    (tag) => tag === "staff" || tag === "admin" || tag === "grand_council_member",
+  );
+}
+
+export function isFanAccount(member: AdminMemberRecord) {
+  return !isTeamMember(member);
+}
+
 export function isLicensed(member: AdminMemberRecord) {
   return member.licenseStatus === "Approved" || member.tags.some((tag) => CREDENTIAL_TAGS.has(tag));
 }
@@ -119,7 +132,7 @@ export function isPendingCredential(member: AdminMemberRecord) {
 }
 
 export function isLeadership(member: AdminMemberRecord) {
-  return member.role === "admin" || member.tags.some((tag) => LEADERSHIP_TAGS.has(tag));
+  return isTeamMember(member);
 }
 
 export function orgRoleTags(member: AdminMemberRecord): UserTypeTagId[] {
@@ -146,21 +159,19 @@ export function computeMemberStats(members: AdminMemberRecord[]) {
   const now = new Date();
   let pro = 0;
   let unlimited = 0;
-  let staff = 0;
+  let team = 0;
   let licensed = 0;
   let pending = 0;
-  let leadership = 0;
   let expiring = 0;
   let fans = 0;
 
   for (const member of members) {
     if (memberHasUnlimitedPlan(member)) unlimited += 1;
     else if (member.proEntitled) pro += 1;
-    if (isStaffAccount(member)) staff += 1;
+    if (isTeamMember(member)) team += 1;
     else fans += 1;
     if (isLicensed(member)) licensed += 1;
     if (isPendingCredential(member)) pending += 1;
-    if (isLeadership(member)) leadership += 1;
     if (!memberHasUnlimitedPlan(member) && member.proEntitled && member.proExpiresAt) {
       if (resolveProTimer(member.proExpiresAt, now).inReminderWindow) expiring += 1;
     }
@@ -170,11 +181,13 @@ export function computeMemberStats(members: AdminMemberRecord[]) {
     total: members.length,
     pro,
     unlimited,
-    staff,
+    team,
+    /** @deprecated alias for team — kept for older call sites */
+    staff: team,
     fans,
     licensed,
     pending,
-    leadership,
+    leadership: team,
     expiring,
   };
 }
@@ -207,10 +220,9 @@ export function filterMembers(
   return members.filter((member) => {
     if (input.quickView === "pro" && !(member.proEntitled && !memberHasUnlimitedPlan(member))) return false;
     if (input.quickView === "unlimited" && !memberHasUnlimitedPlan(member)) return false;
-    if (input.quickView === "staff" && !isStaffAccount(member)) return false;
-    if (input.quickView === "leadership" && !isLeadership(member)) return false;
+    if (input.quickView === "team" && !isTeamMember(member)) return false;
+    if (input.quickView === "fans" && !isFanAccount(member)) return false;
     if (input.quickView === "licensed" && !isLicensed(member)) return false;
-    if (input.quickView === "pending" && !isPendingCredential(member)) return false;
 
     const { membership, account, credentials, role, joined } = input.filters;
 
@@ -235,8 +247,8 @@ export function filterMembers(
     }
 
     if (account === "admin" && member.role !== "admin") return false;
-    if (account === "staff" && !isStaffAccount(member)) return false;
-    if (account === "fan" && isStaffAccount(member)) return false;
+    if (account === "staff" && !isTeamMember(member)) return false;
+    if (account === "fan" && !isFanAccount(member)) return false;
 
     if (credentials === "licensed" && !isLicensed(member)) return false;
     if (credentials === "none" && (isLicensed(member) || isPendingCredential(member))) return false;
@@ -383,7 +395,12 @@ export function activeFilterChips(filters: MemberDirectoryFilters): Array<{ key:
     chips.push({ key: "membership", label: `Plan: ${labels[filters.membership]}` });
   }
   if (filters.account !== "all") {
-    chips.push({ key: "account", label: `Account: ${filters.account}` });
+    const labels: Record<Exclude<AccountFilter, "all">, string> = {
+      fan: "Fan",
+      staff: "Team",
+      admin: "Admin",
+    };
+    chips.push({ key: "account", label: `Account: ${labels[filters.account]}` });
   }
   if (filters.credentials !== "all") {
     const labels: Record<Exclude<CredentialsFilter, "all">, string> = {

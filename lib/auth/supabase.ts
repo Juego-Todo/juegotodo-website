@@ -1,5 +1,5 @@
 import { adminFetch } from "@/lib/auth/admin-fetch";
-import { validateDateOfBirth } from "@/lib/auth/name";
+import { buildFullName, validateDateOfBirth } from "@/lib/auth/name";
 import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
 import { mapProfileRow, upsertProfileFromRegisterInputClient } from "@/lib/auth/profile-sync";
@@ -253,6 +253,11 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
   const email = input.email.trim().toLowerCase();
   const username = validateUsername(input.username);
   const dateOfBirth = validateDateOfBirth(input.dateOfBirth);
+  const fullName = buildFullName({
+    firstName: input.firstName.trim(),
+    middleName: input.middleName?.trim() ?? "",
+    lastName: input.lastName.trim(),
+  });
 
   const controller = new AbortController();
   const abortTimer = setTimeout(() => controller.abort(), 20000);
@@ -289,6 +294,9 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
     throw new Error(registerPayload?.error ?? "Unable to create account.");
   }
 
+  // Drop any prior session (e.g. admin still signed in) so the new account owns the welcome page.
+  await supabase.auth.signOut({ scope: "local" });
+
   const { data, error } = await withTimeout(
     supabase.auth.signInWithPassword({
       email,
@@ -321,7 +329,15 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
     gender: input.gender.trim(),
   }).catch(() => undefined);
 
-  return buildProfileFromAuthUser(data.user, email);
+  return {
+    ...buildProfileFromAuthUser(data.user, email),
+    fullName,
+    username,
+    gender: input.gender.trim(),
+    dateOfBirth,
+    city: input.city?.trim() ?? "",
+    accountType: input.accountType,
+  };
 }
 
 export async function loginSupabaseUser(email: string, password: string): Promise<UserProfile> {

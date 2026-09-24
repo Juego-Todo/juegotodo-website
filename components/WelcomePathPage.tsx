@@ -10,6 +10,7 @@ import { MotionSection } from "@/components/MotionSection";
 import { PageNavigation } from "@/components/PageNavigation";
 import { welcomePaths, type WelcomePath } from "@/data/welcome-paths";
 import { useAuth } from "@/lib/auth/context";
+import { getProfileFirstName } from "@/lib/auth/name";
 import { clearPendingWelcomeChooser } from "@/lib/auth/welcome";
 
 export function WelcomePathPage() {
@@ -76,7 +77,7 @@ export function WelcomePathPage() {
       <MotionSection className="relative mx-auto max-w-5xl">
         <PageNavigation />
         <p className="mt-4 text-[0.68rem] font-black uppercase tracking-[0.22em] text-[#FF1010]">
-          Welcome{user.fullName ? `, ${user.fullName.split(" ")[0]}` : ""}
+          Welcome, {getProfileFirstName(user)}
         </p>
         <h1 className="font-display mt-3 max-w-3xl text-[clamp(2.4rem,9vw,4.75rem)] uppercase leading-[0.9] text-white">
           What do you want to do?

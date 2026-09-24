@@ -11,8 +11,9 @@ import {
   adminUpdateMemberProfile,
   type AdminMemberRecord,
 } from "@/lib/admin/member-directory";
+import { ProCountdown } from "@/components/pro/ProCountdown";
 
-type ManageMode = "edit" | "reset" | "delete" | "tags";
+type ManageMode = "edit" | "reset" | "delete" | "tags" | "pro";
 
 const fieldClassName =
   "mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm text-white outline-none ring-red-500/40 focus:ring-4";
@@ -82,7 +83,16 @@ export function AdminMemberManageModal({
     reset: "Reset Password",
     delete: "Delete Profile",
     tags: "Manage Tags",
+    pro: "JuegoTodo Pro",
   };
+
+  const proExpiryLabel = member.proExpiresAt
+    ? new Date(member.proExpiresAt).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
 
   async function handleEditSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -114,6 +124,9 @@ export function AdminMemberManageModal({
         throw new Error(payload.error || "Unable to update Pro membership.");
       }
       onSaved();
+      if (mode === "pro") {
+        onClose();
+      }
     } catch (proError) {
       setError(proError instanceof Error ? proError.message : "Unable to update Pro membership.");
     } finally {
@@ -313,8 +326,32 @@ export function AdminMemberManageModal({
                 <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-[#FFCF6A]">
                   JuegoTodo Pro
                 </p>
-                <p className="mt-1 text-xs text-zinc-400">
-                  Grant or extend annual Pro (comp). Does not approve licenses.
+                <p className="mt-2 text-sm text-white">
+                  Status:{" "}
+                  <span className="font-semibold uppercase tracking-wide">
+                    {member.proEntitled
+                      ? member.proStatus === "active"
+                        ? "Active"
+                        : member.proStatus
+                      : member.proStatus === "none"
+                        ? "Inactive"
+                        : member.proStatus}
+                  </span>
+                </p>
+                {member.proMembershipId ? (
+                  <p className="mt-1 font-mono text-xs text-zinc-400">{member.proMembershipId}</p>
+                ) : null}
+                {member.proExpiresAt ? (
+                  <div className="mt-3">
+                    <ProCountdown entitled={member.proEntitled} expiresAt={member.proExpiresAt} />
+                  </div>
+                ) : proExpiryLabel ? (
+                  <p className="mt-1 text-xs text-zinc-400">
+                    {member.proEntitled ? "Expires" : "Ended"} {proExpiryLabel}
+                  </p>
+                ) : null}
+                <p className="mt-2 text-xs text-zinc-400">
+                  Manual grant/extend comps annual access. Does not approve licenses.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button
@@ -323,11 +360,11 @@ export function AdminMemberManageModal({
                     onClick={() => void handleProAction("grant")}
                     type="button"
                   >
-                    Grant Pro
+                    {member.proEntitled ? "Renew / Reset +12mo" : "Upgrade to Pro"}
                   </button>
                   <button
                     className="rounded-full border border-white/15 px-4 py-2 text-[0.65rem] font-black uppercase tracking-[0.12em] text-zinc-300 disabled:opacity-60"
-                    disabled={busy}
+                    disabled={busy || !member.proEntitled}
                     onClick={() => void handleProAction("extend")}
                     type="button"
                   >
@@ -335,7 +372,7 @@ export function AdminMemberManageModal({
                   </button>
                   <button
                     className="rounded-full border border-white/15 px-4 py-2 text-[0.65rem] font-black uppercase tracking-[0.12em] text-zinc-400 disabled:opacity-60"
-                    disabled={busy}
+                    disabled={busy || member.proStatus === "none" || member.proStatus === "cancelled"}
                     onClick={() => void handleProAction("cancel")}
                     type="button"
                   >
@@ -429,6 +466,80 @@ export function AdminMemberManageModal({
                   type="button"
                 >
                   Cancel
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {mode === "pro" ? (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                <p className="text-[0.62rem] font-black uppercase tracking-[0.16em] text-zinc-500">
+                  Current status
+                </p>
+                <p className="mt-2 text-lg font-semibold uppercase tracking-wide text-white">
+                  {member.proEntitled
+                    ? member.proStatus === "active"
+                      ? "Active"
+                      : member.proStatus
+                    : member.proStatus === "none"
+                      ? "Inactive"
+                      : member.proStatus}
+                </p>
+                {member.proMembershipId ? (
+                  <p className="mt-1 font-mono text-sm text-zinc-400">{member.proMembershipId}</p>
+                ) : (
+                  <p className="mt-1 text-sm text-zinc-500">No Pro membership ID yet</p>
+                )}
+                {member.proExpiresAt ? (
+                  <div className="mt-3">
+                    <ProCountdown
+                      entitled={member.proEntitled}
+                      expiresAt={member.proExpiresAt}
+                    />
+                  </div>
+                ) : null}
+                {member.proPaymentStatus ? (
+                  <p className="mt-2 text-xs uppercase tracking-[0.12em] text-zinc-500">
+                    Payment: {member.proPaymentStatus}
+                  </p>
+                ) : null}
+              </div>
+              <p className="text-sm leading-relaxed text-zinc-400">
+                Manually upgrade this member to JuegoTodo Pro (comp). This unlocks License Center access
+                only — it does not approve any license application.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className="rounded-full bg-[#FFCF6A] px-5 py-2.5 text-xs font-black uppercase tracking-[0.16em] text-black disabled:opacity-60"
+                  disabled={busy}
+                  onClick={() => void handleProAction("grant")}
+                  type="button"
+                >
+                  {member.proEntitled ? "Renew +12 months" : "Upgrade to Pro"}
+                </button>
+                <button
+                  className="rounded-full border border-white/15 px-5 py-2.5 text-xs font-black uppercase tracking-[0.16em] text-zinc-200 disabled:opacity-60"
+                  disabled={busy || !member.proEntitled}
+                  onClick={() => void handleProAction("extend")}
+                  type="button"
+                >
+                  Extend from expiry
+                </button>
+                <button
+                  className="rounded-full border border-red-500/30 px-5 py-2.5 text-xs font-black uppercase tracking-[0.16em] text-red-200 disabled:opacity-60"
+                  disabled={busy || member.proStatus === "none" || member.proStatus === "cancelled"}
+                  onClick={() => void handleProAction("cancel")}
+                  type="button"
+                >
+                  Cancel Pro
+                </button>
+                <button
+                  className="rounded-full border border-white/10 px-5 py-2.5 text-xs font-black uppercase tracking-[0.16em] text-zinc-300"
+                  onClick={onClose}
+                  type="button"
+                >
+                  Close
                 </button>
               </div>
             </div>

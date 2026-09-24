@@ -22,7 +22,17 @@ import {
 } from "@/lib/commerce/storage";
 import type { Order, UserCommerceData } from "@/lib/commerce/types";
 import { deleteLicenseApplicationsByUserId, fetchLicenseApplicationByUserId } from "@/lib/licenses/storage";
+import { resolveProAccessState, type ProAccessRecord } from "@/lib/pro/access";
 import { clearAdminAssignedTags, getAdminAssignedTags } from "@/lib/profile/account-tags";
+
+export type AdminProDisplayStatus =
+  | "none"
+  | "inactive"
+  | "active"
+  | "expired"
+  | "cancelled"
+  | "past_due"
+  | "pending";
 
 export type AdminMemberRecord = {
   userId: string;
@@ -51,6 +61,22 @@ export type AdminMemberRecord = {
   licenseStatus: string | null;
   fullName: string;
   createdAt: string;
+  /** JuegoTodo Pro entitlement (separate from shop membership_tier). */
+  proStatus: AdminProDisplayStatus;
+  proEntitled: boolean;
+  proMembershipId: string | null;
+  proExpiresAt: string | null;
+  proPaymentStatus: string | null;
+};
+
+export type AdminProMembershipSummary = {
+  userId: string;
+  status: string;
+  expiresAt: string | null;
+  membershipId: string | null;
+  paymentStatus: string | null;
+  entitled: boolean;
+  displayStatus: AdminProDisplayStatus;
 };
 
 const DIRECTORY_TAG_PRIORITY: UserTypeTagId[] = [
@@ -116,12 +142,22 @@ export function buildAdminMemberRecord(
   commerce: UserCommerceData,
   license: LicenseApplication | null,
   orders: Order[],
+  pro?: AdminProMembershipSummary | null,
 ): AdminMemberRecord {
   const userOrders = orders.filter((order) => order.userId === user.id);
   const { firstName: splitFirst, lastName: splitLast } = splitFullName(user.fullName);
   const licenseFirst = license?.firstName?.trim();
   const licenseLast = license?.lastName?.trim();
   const tags = getAdminAssignedTags(user.id, user.assignedTags);
+
+  const proAccess = resolveProAccessState(
+    pro
+      ? ({
+          status: pro.status,
+          expires_at: pro.expiresAt,
+        } satisfies ProAccessRecord)
+      : null,
+  );
 
   return {
     userId: user.id,
@@ -152,16 +188,59 @@ export function buildAdminMemberRecord(
     licenseStatus: license ? licenseApplicationStatusLabels[license.status] : null,
     fullName: user.fullName,
     createdAt: user.createdAt,
+    proStatus: pro?.displayStatus ?? proAccess.displayStatus,
+    proEntitled: pro?.entitled ?? proAccess.entitled,
+    proMembershipId: pro?.membershipId ?? null,
+    proExpiresAt: pro?.expiresAt ?? null,
+    proPaymentStatus: pro?.paymentStatus ?? null,
   };
 }
 
+async function fetchProMembershipMap(): Promise<Map<string, AdminProMembershipSummary>> {
+  const map = new Map<string, AdminProMembershipSummary>();
+
+  try {
+    const response = await fetch("/api/admin/pro", { cache: "no-store" });
+    if (!response.ok) {
+      return map;
+    }
+    const payload = (await response.json()) as {
+      memberships?: Array<{
+        user_id: string;
+        status: string;
+        expires_at: string | null;
+        membership_id: string | null;
+        payment_status: string | null;
+        entitled: boolean;
+        displayStatus: AdminProDisplayStatus;
+      }>;
+    };
+
+    for (const row of payload.memberships ?? []) {
+      map.set(row.user_id, {
+        userId: row.user_id,
+        status: row.status,
+        expiresAt: row.expires_at,
+        membershipId: row.membership_id,
+        paymentStatus: row.payment_status,
+        entitled: row.entitled,
+        displayStatus: row.displayStatus,
+      });
+    }
+  } catch {
+    // Directory still loads without Pro enrichment.
+  }
+
+  return map;
+}
+
 export async function fetchAdminMemberRecords(orders: Order[]): Promise<AdminMemberRecord[]> {
-  const users = await getAllStoredUsers();
+  const [users, proMap] = await Promise.all([getAllStoredUsers(), fetchProMembershipMap()]);
   const records = await Promise.all(
     users.map(async (user) => {
       const commerce = await getUserCommerceData(user.id);
       const license = await fetchLicenseApplicationByUserId(user.id);
-      return buildAdminMemberRecord(user, commerce, license, orders);
+      return buildAdminMemberRecord(user, commerce, license, orders, proMap.get(user.id) ?? null);
     }),
   );
 

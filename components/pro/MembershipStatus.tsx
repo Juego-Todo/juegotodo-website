@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { PRO_PAGE_PATH } from "@/data/pro-membership";
 import { ProBadge } from "@/components/pro/ProBadge";
+import { ProCountdown } from "@/components/pro/ProCountdown";
 
 export type MembershipStatusDisplay =
   | "none"
@@ -66,22 +67,20 @@ export function MembershipStatus({
   compact?: boolean;
 }) {
   const copy = STATUS_COPY[status] ?? STATUS_COPY.none;
-  const expiryLabel = expiresAt
-    ? new Date(expiresAt).toLocaleDateString("en-PH", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      })
-    : null;
+  const showTimer =
+    Boolean(expiresAt) &&
+    (status === "active" || status === "cancelled" || status === "expired");
 
   if (compact) {
     return (
       <div className="flex flex-wrap items-center gap-2">
         <ProBadge label={`PRO ${copy.label}`} variant={copy.badge} />
-        {expiryLabel && status === "active" ? (
-          <span className="text-[0.65rem] uppercase tracking-[0.12em] text-zinc-500">
-            until {expiryLabel}
-          </span>
+        {showTimer ? (
+          <ProCountdown
+            compact
+            entitled={status === "active" || status === "cancelled"}
+            expiresAt={expiresAt}
+          />
         ) : null}
         <Link
           href={PRO_PAGE_PATH}
@@ -96,7 +95,7 @@ export function MembershipStatus({
   return (
     <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#FFCF6A]">
             JuegoTodo Pro
           </p>
@@ -107,10 +106,13 @@ export function MembershipStatus({
             ) : null}
           </div>
           <p className="mt-2 text-sm text-zinc-400">{copy.hint}</p>
-          {expiryLabel ? (
-            <p className="mt-1 text-xs text-zinc-500">
-              {status === "active" ? "Expires" : "Ended"} {expiryLabel}
-            </p>
+          {showTimer ? (
+            <div className="mt-3 max-w-sm">
+              <ProCountdown
+                entitled={status === "active" || status === "cancelled"}
+                expiresAt={expiresAt}
+              />
+            </div>
           ) : null}
         </div>
         <Link

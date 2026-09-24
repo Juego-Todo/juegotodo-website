@@ -172,14 +172,17 @@ export function CommerceProvider({ children }: { children: ReactNode }) {
     if (!code) {
       return;
     }
-    setCheckoutDraftState((current) => {
-      if (current.promoCode?.trim()) {
-        return current;
-      }
-      const next = { ...current, promoCode: code };
-      saveCheckoutDraft(next);
-      return next;
-    });
+    const timer = window.setTimeout(() => {
+      setCheckoutDraftState((current) => {
+        if (current.promoCode?.trim()) {
+          return current;
+        }
+        const next = { ...current, promoCode: code };
+        saveCheckoutDraft(next);
+        return next;
+      });
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [user]);
 
   const persistUserData = useCallback(

@@ -57,7 +57,10 @@ export function useProMembership() {
 
   useEffect(() => {
     if (authLoading) return;
-    void refresh();
+    const timer = window.setTimeout(() => {
+      void refresh();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [authLoading, refresh]);
 
   return {

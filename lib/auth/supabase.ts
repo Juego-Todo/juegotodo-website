@@ -1,5 +1,5 @@
 import { adminFetch } from "@/lib/auth/admin-fetch";
-import { buildFullName, validateDateOfBirth } from "@/lib/auth/name";
+import { validateDateOfBirth } from "@/lib/auth/name";
 import { resolveRoleForEmail } from "@/lib/auth/platform-owners";
 import { deriveUsernameSeed, normalizeUsername, validateUsername } from "@/lib/auth/username";
 import { mapProfileRow, upsertProfileFromRegisterInputClient } from "@/lib/auth/profile-sync";

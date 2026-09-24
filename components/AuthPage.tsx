@@ -114,7 +114,18 @@ export function AuthPage() {
   const [error, setError] = useState<string | null>(() => searchParams.get("authError"));
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [invalidField, setInvalidField] = useState<string | null>(null);
   const resolvedEmail = (mode === "reset" || mode === "change-password") && user?.email ? user.email : email;
+
+  function markInvalidField(field: string) {
+    setInvalidField(field);
+    requestAnimationFrame(() => {
+      const target = document.querySelector<HTMLElement>(`[data-auth-field="${field}"]`);
+      target?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const focusable = target?.querySelector<HTMLElement>("button, input, select, textarea");
+      focusable?.focus();
+    });
+  }
 
   const usernameValidationError =
     mode === "register" && username.trim() ? getUsernameValidationError(username) : null;
@@ -235,27 +246,33 @@ export function AuthPage() {
     event.preventDefault();
     setError(null);
     setSuccess(null);
+    setInvalidField(null);
     setSubmitting(true);
 
     try {
       if (mode === "register") {
         if (password !== confirmPassword) {
+          markInvalidField("confirmPassword");
           throw new Error("Passwords do not match.");
         }
 
         if (!acceptedAccountTerms) {
+          markInvalidField("terms");
           throw new Error("Please confirm your information and agree to account data protection terms.");
         }
 
         if (!firstName.trim()) {
+          markInvalidField("firstName");
           throw new Error("First name is required.");
         }
 
         if (!lastName.trim()) {
+          markInvalidField("lastName");
           throw new Error("Last name is required.");
         }
 
         if (!gender) {
+          markInvalidField("gender");
           throw new Error("Please select a gender.");
         }
 
@@ -473,8 +490,13 @@ export function AuthPage() {
                     <div className="grid gap-4 sm:grid-cols-3">
                       <AuthField
                         autoComplete="given-name"
+                        fieldId="firstName"
+                        invalid={invalidField === "firstName"}
                         label="First name"
-                        onChange={setFirstName}
+                        onChange={(value) => {
+                          setFirstName(value);
+                          if (invalidField === "firstName") setInvalidField(null);
+                        }}
                         placeholder="First name"
                         required
                         value={firstName}
@@ -488,16 +510,25 @@ export function AuthPage() {
                       />
                       <AuthField
                         autoComplete="family-name"
+                        fieldId="lastName"
+                        invalid={invalidField === "lastName"}
                         label="Last name"
-                        onChange={setLastName}
+                        onChange={(value) => {
+                          setLastName(value);
+                          if (invalidField === "lastName") setInvalidField(null);
+                        }}
                         placeholder="Last name"
                         required
                         value={lastName}
                       />
                     </div>
                     <AuthGenderChoiceField
+                      invalid={invalidField === "gender"}
                       label="Gender"
-                      onChange={setGender}
+                      onChange={(value) => {
+                        setGender(value);
+                        if (invalidField === "gender") setInvalidField(null);
+                      }}
                       options={registerGenderOptions}
                       required
                       value={gender}
@@ -566,8 +597,13 @@ export function AuthPage() {
                 {mode === "register" || mode === "reset" || mode === "change-password" ? (
                   <AuthPasswordField
                     autoComplete="new-password"
+                    fieldId="confirmPassword"
+                    invalid={invalidField === "confirmPassword"}
                     label="Confirm password"
-                    onChange={setConfirmPassword}
+                    onChange={(value) => {
+                      setConfirmPassword(value);
+                      if (invalidField === "confirmPassword") setInvalidField(null);
+                    }}
                     onToggleVisibility={() => setShowConfirmPassword((value) => !value)}
                     placeholder="Repeat your password"
                     required
@@ -604,11 +640,21 @@ export function AuthPage() {
                 ) : null}
 
                 {mode === "register" ? (
-                  <label className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                  <label
+                    className={`flex items-start gap-3 rounded-2xl border px-4 py-3 ${
+                      invalidField === "terms"
+                        ? "border-red-500/50 bg-red-500/10 ring-2 ring-red-500/25"
+                        : "border-white/10 bg-black/30"
+                    }`}
+                    data-auth-field="terms"
+                  >
                     <input
                       checked={acceptedAccountTerms}
                       className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/20 bg-black text-red-600 focus:ring-red-500/40"
-                      onChange={(event) => setAcceptedAccountTerms(event.target.checked)}
+                      onChange={(event) => {
+                        setAcceptedAccountTerms(event.target.checked);
+                        if (invalidField === "terms") setInvalidField(null);
+                      }}
                       required
                       type="checkbox"
                     />
@@ -834,16 +880,24 @@ function AuthGenderChoiceField({
   onChange,
   options,
   required = false,
+  invalid = false,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: readonly string[];
   required?: boolean;
+  invalid?: boolean;
 }) {
   return (
-    <fieldset className="block">
-      <legend className={authLabelClassName}>{label}</legend>
+    <fieldset
+      className={`block rounded-2xl ${invalid ? "ring-2 ring-red-500/40 ring-offset-2 ring-offset-black" : ""}`}
+      data-auth-field="gender"
+    >
+      <legend className={authLabelClassName}>
+        {label}
+        {required ? <span className="text-red-400"> *</span> : null}
+      </legend>
       <div aria-label={label} className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-2.5" role="radiogroup">
         {options.map((option) => {
           const selected = value === option;
@@ -854,7 +908,9 @@ function AuthGenderChoiceField({
               className={`min-h-11 rounded-2xl border px-3 py-3.5 text-center text-sm font-semibold leading-snug transition ${
                 selected
                   ? "border-red-500/45 bg-red-500/10 text-white shadow-[0_0_18px_rgba(229,9,20,0.12)]"
-                  : "border-white/10 bg-black/50 text-zinc-300 hover:border-white/20 hover:bg-white/[0.04] hover:text-white"
+                  : invalid
+                    ? "border-red-500/35 bg-red-500/5 text-zinc-300 hover:border-red-400/50 hover:text-white"
+                    : "border-white/10 bg-black/50 text-zinc-300 hover:border-white/20 hover:bg-white/[0.04] hover:text-white"
               }`}
               key={option}
               onClick={() => onChange(option)}
@@ -866,6 +922,9 @@ function AuthGenderChoiceField({
           );
         })}
       </div>
+      {invalid ? (
+        <p className="mt-2 text-xs font-semibold text-red-300">Select Male, Female, or Prefer not to say.</p>
+      ) : null}
       {required ? (
         <input
           aria-hidden
@@ -891,6 +950,8 @@ function AuthField({
   readOnly = false,
   min,
   max,
+  fieldId,
+  invalid = false,
 }: {
   label: string;
   value: string;
@@ -902,13 +963,17 @@ function AuthField({
   readOnly?: boolean;
   min?: string;
   max?: string;
+  fieldId?: string;
+  invalid?: boolean;
 }) {
   return (
-    <label className="block">
+    <label className="block" data-auth-field={fieldId}>
       <span className={authLabelClassName}>{label}</span>
       <input
         autoComplete={autoComplete}
-        className={`${authInputClassName}${type === "date" ? " [color-scheme:dark]" : ""}`}
+        className={`${authInputClassName}${type === "date" ? " [color-scheme:dark]" : ""}${
+          invalid ? " border-red-500/50 ring-2 ring-red-500/25" : ""
+        }`}
         disabled={readOnly}
         max={max}
         min={min}
@@ -932,6 +997,8 @@ function AuthPasswordField({
   autoComplete,
   showPassword,
   onToggleVisibility,
+  fieldId,
+  invalid = false,
 }: {
   label: string;
   value: string;
@@ -941,14 +1008,16 @@ function AuthPasswordField({
   autoComplete?: string;
   showPassword: boolean;
   onToggleVisibility: () => void;
+  fieldId?: string;
+  invalid?: boolean;
 }) {
   return (
-    <label className="block">
+    <label className="block" data-auth-field={fieldId}>
       <span className={authLabelClassName}>{label}</span>
       <div className="relative">
         <input
           autoComplete={autoComplete}
-          className={`${authInputClassName} pr-12`}
+          className={`${authInputClassName} pr-12${invalid ? " border-red-500/50 ring-2 ring-red-500/25" : ""}`}
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
           required={required}

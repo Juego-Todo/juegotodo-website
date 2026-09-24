@@ -25,11 +25,6 @@ import {
   setRememberedEmail,
 } from "@/lib/auth/storage";
 import { getUsernameValidationError, normalizeUsername, validateUsername } from "@/lib/auth/username";
-import {
-  consumePendingWelcomeChooser,
-  markPendingWelcomeChooser,
-} from "@/lib/auth/welcome";
-import { shouldSkipWelcomeChooser } from "@/data/welcome-paths";
 
 type AuthMode = "login" | "register" | "forgot" | "reset" | "change-password";
 type UsernameCheckStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "error";
@@ -56,20 +51,13 @@ function resolveAuthMode(value: string | null): AuthMode {
 }
 
 function resolveSafeNextPath(value: string | null) {
-  const next = value ?? "/profile";
+  const next = (value ?? "/profile").trim() || "/profile";
+  if (next === "/welcome" || next.startsWith("/welcome?")) {
+    return "/profile";
+  }
   return next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")
     ? next
     : "/profile";
-}
-
-function resolvePostAuthPath(nextPath: string, options?: { preferWelcome?: boolean }) {
-  if (shouldSkipWelcomeChooser(nextPath)) {
-    return nextPath;
-  }
-  if (options?.preferWelcome) {
-    return "/welcome";
-  }
-  return nextPath;
 }
 
 export function AuthPage() {

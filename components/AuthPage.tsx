@@ -300,10 +300,7 @@ export function AuthPage() {
           country,
           city,
         });
-        if (!shouldSkipWelcomeChooser(nextPath)) {
-          markPendingWelcomeChooser();
-        }
-        router.push(resolvePostAuthPath(nextPath, { preferWelcome: true }));
+        router.push(nextPath);
         return;
       }
 
@@ -362,14 +359,10 @@ export function AuthPage() {
         return;
       }
 
-      const preferWelcome = consumePendingWelcomeChooser();
-      router.push(resolvePostAuthPath(nextPath, { preferWelcome }));
+      router.push(nextPath);
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "Something went wrong.";
       if (message.startsWith("Account created.")) {
-        if (!shouldSkipWelcomeChooser(nextPath)) {
-          markPendingWelcomeChooser();
-        }
         switchMode("login");
         setSuccess(message);
         return;

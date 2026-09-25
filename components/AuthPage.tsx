@@ -1,8 +1,9 @@
 "use client";
 
 import { ArrowRight, Check, Eye, EyeOff, Loader2, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { PageNavigation } from "@/components/PageNavigation";
 import {
@@ -15,6 +16,7 @@ import { defaultRegistrationCountry, registrationCountryNames } from "@/data/cou
 import {
   getLatestAllowedBirthDate,
   getEarliestAllowedBirthDate,
+  buildFullName,
   registerGenderOptions,
   validateDateOfBirth,
 } from "@/lib/auth/name";
@@ -31,31 +33,19 @@ import { getUsernameValidationError, normalizeUsername, validateUsername } from 
 
 type AuthMode = "login" | "register" | "forgot" | "reset" | "change-password";
 type UsernameCheckStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "error";
+type RegisterStep = 1 | 2 | 3 | 4;
+
+const REGISTER_STEPS = [
+  { id: 1 as const, label: "Account", short: "Account" },
+  { id: 2 as const, label: "About You", short: "About" },
+  { id: 3 as const, label: "Contact", short: "Contact" },
+  { id: 4 as const, label: "Review", short: "Review" },
+];
 
 const authInputClassName =
   "w-full rounded-xl border border-white/[0.08] bg-black/40 px-4 py-3.5 text-[0.95rem] text-white outline-none transition placeholder:text-zinc-600 hover:border-white/15 focus:border-red-500/45 focus:bg-black/55 focus:ring-2 focus:ring-red-500/15 disabled:opacity-70";
 
 const authLabelClassName = "mb-1.5 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-zinc-500";
-
-function FormSection({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="space-y-4 border-t border-white/[0.06] pt-8 first:border-t-0 first:pt-0">
-      <div>
-        <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-zinc-500">{title}</h2>
-        {description ? <p className="mt-1.5 text-sm leading-6 text-zinc-500">{description}</p> : null}
-      </div>
-      <div className="space-y-4">{children}</div>
-    </section>
-  );
-}
 
 function resolveAuthMode(value: string | null): AuthMode {
   if (value === "register") {
@@ -128,6 +118,7 @@ export function AuthPage() {
     marketingOptIn: false,
   });
   const [showLegalValidation, setShowLegalValidation] = useState(false);
+  const [registerStep, setRegisterStep] = useState<RegisterStep>(1);
   const [error, setError] = useState<string | null>(() => searchParams.get("authError"));
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -258,6 +249,97 @@ export function AuthPage() {
         marketingOptIn: false,
       });
       setShowLegalValidation(false);
+      setRegisterStep(1);
+    }
+    if (nextMode === "register") {
+      setRegisterStep(1);
+    }
+  }
+
+  function validateRegisterStep(step: RegisterStep): string | null {
+    setInvalidField(null);
+    setError(null);
+
+    if (step === 1) {
+      if (!username.trim()) {
+        markInvalidField("username");
+        return "Choose a username to continue.";
+      }
+      const usernameError = getUsernameValidationError(username);
+      if (usernameError) {
+        markInvalidField("username");
+        return usernameError;
+      }
+      if (usernameCheckStatus === "checking") {
+        return "Please wait while we check username availability.";
+      }
+      if (usernameCheckStatus === "taken") {
+        markInvalidField("username");
+        return "Username is already taken. Try another.";
+      }
+      if (!email.trim()) {
+        return "Email address is required.";
+      }
+      if (password.length < 8) {
+        return "Password must be at least 8 characters.";
+      }
+      if (password !== confirmPassword) {
+        markInvalidField("confirmPassword");
+        return "Passwords do not match.";
+      }
+      return null;
+    }
+
+    if (step === 2) {
+      if (!firstName.trim()) {
+        markInvalidField("firstName");
+        return "First name is required.";
+      }
+      if (!lastName.trim()) {
+        markInvalidField("lastName");
+        return "Last name is required.";
+      }
+      if (!gender) {
+        markInvalidField("gender");
+        return "Please select a gender.";
+      }
+      try {
+        validateDateOfBirth(dateOfBirth);
+      } catch (caught) {
+        return caught instanceof Error ? caught.message : "Enter a valid date of birth.";
+      }
+      return null;
+    }
+
+    if (step === 3) {
+      if (!country.trim()) {
+        return "Country is required.";
+      }
+      try {
+        validateRegistrationPhone(country, phone);
+      } catch (caught) {
+        return caught instanceof Error ? caught.message : "Enter a valid phone number.";
+      }
+      return null;
+    }
+
+    return null;
+  }
+
+  function goToRegisterStep(step: RegisterStep) {
+    setError(null);
+    setInvalidField(null);
+    setRegisterStep(step);
+  }
+
+  function continueRegisterStep() {
+    const message = validateRegisterStep(registerStep);
+    if (message) {
+      setError(message);
+      return;
+    }
+    if (registerStep < 4) {
+      setRegisterStep((current) => (current + 1) as RegisterStep);
     }
   }
 
@@ -266,6 +348,12 @@ export function AuthPage() {
     setError(null);
     setSuccess(null);
     setInvalidField(null);
+
+    if (mode === "register" && registerStep !== 4) {
+      continueRegisterStep();
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -423,11 +511,30 @@ export function AuthPage() {
 
   const isCheckoutReturn = nextPath.startsWith("/checkout");
 
+  const registerHeadings: Record<RegisterStep, { title: string; subtitle: string }> = {
+    1: {
+      title: isCheckoutReturn ? "Create account to checkout" : "Create your account",
+      subtitle: isCheckoutReturn
+        ? "Start with your login details. Your cart will stay saved."
+        : "Start with your login details.",
+    },
+    2: {
+      title: "Tell us about yourself",
+      subtitle: "Create your member profile.",
+    },
+    3: {
+      title: "Where can we reach you?",
+      subtitle: "Keep your contact and location information up to date.",
+    },
+    4: {
+      title: "Review your account",
+      subtitle: "You're almost ready to join Juego Todo.",
+    },
+  };
+
   const heading =
     mode === "register"
-      ? isCheckoutReturn
-        ? "Create account to checkout"
-        : "Create your account"
+      ? registerHeadings[registerStep].title
       : mode === "forgot"
         ? "Reset your password"
         : mode === "reset" || mode === "change-password"
@@ -438,9 +545,7 @@ export function AuthPage() {
 
   const description =
     mode === "register"
-      ? isCheckoutReturn
-        ? "Create your Juego Todo account to continue checkout. Your cart will stay saved while you register."
-        : "Join Juego Todo and create your member profile."
+      ? registerHeadings[registerStep].subtitle
       : mode === "forgot"
         ? "Enter the email tied to your JTGC account and we will send password reset instructions."
         : mode === "change-password"
@@ -451,20 +556,41 @@ export function AuthPage() {
               ? "Sign in to continue checkout. Your cart items will still be there."
               : "Sign in to access your profile, tickets, and membership.";
 
-  const usernameBlocksSubmit =
-    mode === "register" &&
-    (usernameCheckStatus === "checking" ||
-      usernameCheckStatus === "taken" ||
-      usernameCheckStatus === "invalid" ||
-      !username.trim());
+  const usernameBlocksContinue =
+    usernameCheckStatus === "checking" ||
+    usernameCheckStatus === "taken" ||
+    usernameCheckStatus === "invalid" ||
+    !username.trim();
+
+  const reviewFullName = buildFullName({
+    firstName: firstName.trim() || "—",
+    middleName: middleName.trim(),
+    lastName: lastName.trim() || "—",
+  });
+  const reviewPhone = phone.trim()
+    ? `${getPhoneDialCode(country)} ${phone.trim()}`
+    : "—";
 
   return (
     <main className="px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
-      <section className="relative mx-auto max-w-xl py-10 sm:py-14">
+      <section className="relative mx-auto max-w-6xl py-8 sm:py-12">
         <PageNavigation currentLabel="Register & Login" />
 
-        <MotionSection className="mt-6">
-          <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-[#0a0a0a]/80 p-5 sm:p-7">
+        <div className="mt-6 grid items-stretch gap-5 lg:grid-cols-[minmax(0,34rem)_minmax(0,1fr)] lg:gap-6">
+          <MotionSection>
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-[#0a0a0a]/90 p-5 sm:p-7">
+              {/* Mobile visual strip */}
+              <div className="relative mb-5 aspect-[2.2/1] overflow-hidden rounded-xl lg:hidden">
+                <Image
+                  alt="Juego Todo fighters in competition"
+                  className="object-cover object-[center_30%]"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 0px"
+                  src="/auth-fighters-background.png"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-black/20 to-transparent" />
+              </div>
             {mode === "login" || mode === "register" ? (
               <AuthModeToggle
                 mode={mode}
@@ -500,6 +626,15 @@ export function AuthPage() {
               </div>
             )}
 
+            {mode === "register" ? (
+              <>
+                <RegistrationProgress current={registerStep} />
+                <p className="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-zinc-500 sm:hidden">
+                  Step {registerStep} of 4
+                </p>
+              </>
+            ) : null}
+
             <div className="mt-6">
               <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]">
                 {heading}
@@ -509,156 +644,178 @@ export function AuthPage() {
               ) : null}
             </div>
 
-            <form className="mt-8 space-y-0" onSubmit={handleSubmit}>
+            <form className="mt-8" onSubmit={handleSubmit}>
               {mode === "register" ? (
-                <>
-                  <FormSection
-                    description="Set up your login and public identity."
-                    title="Account"
-                  >
-                    <AuthUsernameField
-                      message={usernameCheckMessage}
-                      onChange={handleUsernameChange}
-                      status={usernameCheckStatus}
-                      value={username}
-                    />
-                    <AuthField
-                      autoComplete="email"
-                      label="Email address"
-                      onChange={setEmail}
-                      placeholder="you@email.com"
-                      required
-                      type="email"
-                      value={resolvedEmail}
-                    />
-                    <AuthPasswordField
-                      autoComplete="new-password"
-                      label="Password"
-                      onChange={setPassword}
-                      onToggleVisibility={() => setShowPassword((value) => !value)}
-                      placeholder="At least 8 characters"
-                      required
-                      showPassword={showPassword}
-                      value={password}
-                    />
-                    <AuthPasswordField
-                      autoComplete="new-password"
-                      fieldId="confirmPassword"
-                      invalid={invalidField === "confirmPassword"}
-                      label="Confirm password"
-                      onChange={(value) => {
-                        setConfirmPassword(value);
-                        if (invalidField === "confirmPassword") setInvalidField(null);
-                      }}
-                      onToggleVisibility={() => setShowConfirmPassword((value) => !value)}
-                      placeholder="Repeat your password"
-                      required
-                      showPassword={showConfirmPassword}
-                      value={confirmPassword}
-                    />
-                  </FormSection>
-
-                  <FormSection
-                    description="Tell us a little about yourself."
-                    title="Personal information"
-                  >
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      <AuthField
-                        autoComplete="given-name"
-                        fieldId="firstName"
-                        invalid={invalidField === "firstName"}
-                        label="First name"
-                        onChange={(value) => {
-                          setFirstName(value);
-                          if (invalidField === "firstName") setInvalidField(null);
-                        }}
-                        placeholder="First name"
-                        required
-                        value={firstName}
+                <div className="space-y-5">
+                  {registerStep === 1 ? (
+                    <>
+                      <AuthUsernameField
+                        message={usernameCheckMessage}
+                        onChange={handleUsernameChange}
+                        status={usernameCheckStatus}
+                        value={username}
                       />
                       <AuthField
-                        autoComplete="additional-name"
-                        label="Middle name"
-                        onChange={setMiddleName}
+                        autoComplete="email"
+                        label="Email address"
+                        onChange={setEmail}
+                        placeholder="you@email.com"
+                        required
+                        type="email"
+                        value={resolvedEmail}
+                      />
+                      <AuthPasswordField
+                        autoComplete="new-password"
+                        label="Password"
+                        onChange={setPassword}
+                        onToggleVisibility={() => setShowPassword((value) => !value)}
+                        placeholder="At least 8 characters"
+                        required
+                        showPassword={showPassword}
+                        value={password}
+                      />
+                      <AuthPasswordField
+                        autoComplete="new-password"
+                        fieldId="confirmPassword"
+                        invalid={invalidField === "confirmPassword"}
+                        label="Confirm password"
+                        onChange={(value) => {
+                          setConfirmPassword(value);
+                          if (invalidField === "confirmPassword") setInvalidField(null);
+                        }}
+                        onToggleVisibility={() => setShowConfirmPassword((value) => !value)}
+                        placeholder="Repeat your password"
+                        required
+                        showPassword={showConfirmPassword}
+                        value={confirmPassword}
+                      />
+                    </>
+                  ) : null}
+
+                  {registerStep === 2 ? (
+                    <>
+                      <div className="grid gap-4 sm:grid-cols-3">
+                        <AuthField
+                          autoComplete="given-name"
+                          fieldId="firstName"
+                          invalid={invalidField === "firstName"}
+                          label="First name"
+                          onChange={(value) => {
+                            setFirstName(value);
+                            if (invalidField === "firstName") setInvalidField(null);
+                          }}
+                          placeholder="First name"
+                          required
+                          value={firstName}
+                        />
+                        <AuthField
+                          autoComplete="additional-name"
+                          label="Middle name"
+                          onChange={setMiddleName}
+                          placeholder="Optional"
+                          value={middleName}
+                        />
+                        <AuthField
+                          autoComplete="family-name"
+                          fieldId="lastName"
+                          invalid={invalidField === "lastName"}
+                          label="Last name"
+                          onChange={(value) => {
+                            setLastName(value);
+                            if (invalidField === "lastName") setInvalidField(null);
+                          }}
+                          placeholder="Last name"
+                          required
+                          value={lastName}
+                        />
+                      </div>
+                      <AuthGenderChoiceField
+                        invalid={invalidField === "gender"}
+                        label="Gender"
+                        onChange={(value) => {
+                          setGender(value);
+                          if (invalidField === "gender") setInvalidField(null);
+                        }}
+                        options={registerGenderOptions}
+                        required
+                        value={gender}
+                      />
+                      <AuthField
+                        autoComplete="bday"
+                        label="Date of birth"
+                        max={getLatestAllowedBirthDate()}
+                        min={getEarliestAllowedBirthDate()}
+                        onChange={setDateOfBirth}
+                        required
+                        type="date"
+                        value={dateOfBirth}
+                      />
+                    </>
+                  ) : null}
+
+                  {registerStep === 3 ? (
+                    <>
+                      <AuthCountrySelectField
+                        label="Country"
+                        onChange={setCountry}
+                        options={registrationCountryNames}
+                        required
+                        value={country}
+                      />
+                      <AuthPhoneField country={country} label="Phone" onChange={setPhone} value={phone} />
+                      <AuthField
+                        label="City / region"
+                        onChange={setCity}
                         placeholder="Optional"
-                        value={middleName}
+                        value={city}
                       />
-                      <AuthField
-                        autoComplete="family-name"
-                        fieldId="lastName"
-                        invalid={invalidField === "lastName"}
-                        label="Last name"
-                        onChange={(value) => {
-                          setLastName(value);
-                          if (invalidField === "lastName") setInvalidField(null);
-                        }}
-                        placeholder="Last name"
-                        required
-                        value={lastName}
+                    </>
+                  ) : null}
+
+                  {registerStep === 4 ? (
+                    <>
+                      <ReviewGroup
+                        onEdit={() => goToRegisterStep(1)}
+                        rows={[
+                          { label: "Username", value: username ? `@${username}` : "—" },
+                          { label: "Email", value: email || "—" },
+                        ]}
+                        title="Account"
                       />
-                    </div>
-                    <AuthGenderChoiceField
-                      invalid={invalidField === "gender"}
-                      label="Gender"
-                      onChange={(value) => {
-                        setGender(value);
-                        if (invalidField === "gender") setInvalidField(null);
-                      }}
-                      options={registerGenderOptions}
-                      required
-                      value={gender}
-                    />
-                    <AuthField
-                      autoComplete="bday"
-                      label="Date of birth"
-                      max={getLatestAllowedBirthDate()}
-                      min={getEarliestAllowedBirthDate()}
-                      onChange={setDateOfBirth}
-                      required
-                      type="date"
-                      value={dateOfBirth}
-                    />
-                  </FormSection>
-
-                  <FormSection
-                    description="Help us keep your contact and location information accurate."
-                    title="Location & contact"
-                  >
-                    <AuthCountrySelectField
-                      label="Country"
-                      onChange={setCountry}
-                      options={registrationCountryNames}
-                      required
-                      value={country}
-                    />
-                    <AuthPhoneField
-                      country={country}
-                      label="Phone"
-                      onChange={setPhone}
-                      value={phone}
-                    />
-                    <AuthField
-                      label="City / region"
-                      onChange={setCity}
-                      placeholder="Optional"
-                      value={city}
-                    />
-                  </FormSection>
-
-                  <div className="border-t border-white/[0.06] pt-8">
-                    <RegistrationLegalAcknowledgments
-                      onChange={(next) => {
-                        setAcceptedLegal(next);
-                        if (registrationLegalIsComplete(next)) {
-                          setShowLegalValidation(false);
-                          if (invalidField === "legal") setInvalidField(null);
-                        }
-                      }}
-                      showValidation={showLegalValidation}
-                      value={acceptedLegal}
-                    />
-                  </div>
-                </>
+                      <ReviewGroup
+                        onEdit={() => goToRegisterStep(2)}
+                        rows={[
+                          { label: "Name", value: reviewFullName },
+                          { label: "Gender", value: gender || "—" },
+                          { label: "Date of birth", value: dateOfBirth || "—" },
+                        ]}
+                        title="Profile"
+                      />
+                      <ReviewGroup
+                        onEdit={() => goToRegisterStep(3)}
+                        rows={[
+                          { label: "Country", value: country || "—" },
+                          { label: "Phone", value: reviewPhone },
+                          { label: "City / region", value: city.trim() || "—" },
+                        ]}
+                        title="Contact"
+                      />
+                      <div className="border-t border-white/[0.06] pt-6">
+                        <RegistrationLegalAcknowledgments
+                          onChange={(next) => {
+                            setAcceptedLegal(next);
+                            if (registrationLegalIsComplete(next)) {
+                              setShowLegalValidation(false);
+                              if (invalidField === "legal") setInvalidField(null);
+                            }
+                          }}
+                          showValidation={showLegalValidation}
+                          value={acceptedLegal}
+                        />
+                      </div>
+                    </>
+                  ) : null}
+                </div>
               ) : (
                 <div className="space-y-4">
                   <AuthField
@@ -719,9 +876,7 @@ export function AuthPage() {
                           onChange={(event) => {
                             const checked = event.target.checked;
                             setRememberMe(checked);
-                            if (!checked) {
-                              clearRememberedEmail();
-                            }
+                            if (!checked) clearRememberedEmail();
                           }}
                           type="checkbox"
                         />
@@ -750,35 +905,165 @@ export function AuthPage() {
                 </p>
               ) : null}
 
-              <button
-                className="group mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#FF1010] px-6 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2a2a] disabled:cursor-not-allowed disabled:opacity-55"
-                disabled={
-                  submitting ||
-                  (mode === "register" && !registrationLegalIsComplete(acceptedLegal)) ||
-                  usernameBlocksSubmit
-                }
-                type="submit"
-              >
-                {submitting
-                  ? "Please wait..."
-                  : mode === "register"
-                    ? "Create Account"
+              {mode === "register" ? (
+                <div className="mt-8 space-y-3">
+                  {registerStep < 4 ? (
+                    <button
+                      className="group inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#FF1010] px-6 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2a2a] disabled:cursor-not-allowed disabled:opacity-55"
+                      disabled={registerStep === 1 && usernameBlocksContinue}
+                      onClick={continueRegisterStep}
+                      type="button"
+                    >
+                      Continue
+                      <ArrowRight className="ml-2 transition group-hover:translate-x-0.5" size={16} aria-hidden />
+                    </button>
+                  ) : (
+                    <button
+                      className="group inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#FF1010] px-6 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2a2a] disabled:cursor-not-allowed disabled:opacity-55"
+                      disabled={submitting || !registrationLegalIsComplete(acceptedLegal)}
+                      type="submit"
+                    >
+                      {submitting ? "Please wait..." : "Create Account"}
+                      <ArrowRight className="ml-2 transition group-hover:translate-x-0.5" size={16} aria-hidden />
+                    </button>
+                  )}
+
+                  {registerStep > 1 ? (
+                    <button
+                      className="inline-flex min-h-11 w-full items-center justify-center text-sm font-medium text-zinc-400 transition hover:text-white"
+                      onClick={() => goToRegisterStep((registerStep - 1) as RegisterStep)}
+                      type="button"
+                    >
+                      ← Back
+                    </button>
+                  ) : (
+                    <p className="text-center text-sm text-zinc-500">
+                      Already have an account?{" "}
+                      <button
+                        className="font-medium text-red-200 transition hover:text-white"
+                        onClick={() => switchMode("login")}
+                        type="button"
+                      >
+                        Log in
+                      </button>
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <button
+                  className="group mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#FF1010] px-6 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2a2a] disabled:cursor-not-allowed disabled:opacity-55"
+                  disabled={submitting}
+                  type="submit"
+                >
+                  {submitting
+                    ? "Please wait..."
                     : mode === "forgot"
                       ? "Send Reset Link"
                       : mode === "reset" || mode === "change-password"
                         ? "Update Password"
                         : "Login"}
-                <ArrowRight
-                  className="ml-2 transition group-hover:translate-x-0.5"
-                  size={16}
-                  aria-hidden
-                />
-              </button>
+                  <ArrowRight className="ml-2 transition group-hover:translate-x-0.5" size={16} aria-hidden />
+                </button>
+              )}
             </form>
           </div>
-        </MotionSection>
+          </MotionSection>
+
+          <aside className="relative hidden min-h-[36rem] overflow-hidden rounded-[1.5rem] border border-white/[0.08] lg:block">
+            <Image
+              alt="Juego Todo fighters in competition"
+              className="object-cover object-[center_35%]"
+              fill
+              priority
+              sizes="(min-width: 1024px) 50vw, 0px"
+              src="/auth-fighters-background.png"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-black/30" />
+            <div className="absolute inset-x-0 bottom-0 p-7">
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#FF1010]">
+                Juego Todo
+              </p>
+              <p className="mt-2 max-w-sm text-2xl font-semibold leading-tight tracking-tight text-white">
+                The evolution of Filipino combat sports.
+              </p>
+            </div>
+          </aside>
+        </div>
       </section>
     </main>
+  );
+}
+
+function RegistrationProgress({ current }: { current: RegisterStep }) {
+  return (
+    <nav aria-label="Registration progress" className="mt-5 hidden sm:block">
+      <ol className="flex items-center gap-2">
+        {REGISTER_STEPS.map((step, index) => {
+          const active = step.id === current;
+          const complete = step.id < current;
+          return (
+            <li className="flex min-w-0 flex-1 items-center gap-2" key={step.id}>
+              <div className="flex min-w-0 items-center gap-2">
+                <span
+                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[0.65rem] font-semibold ${
+                    active
+                      ? "bg-[#FF1010] text-white"
+                      : complete
+                        ? "bg-white/15 text-white"
+                        : "bg-white/[0.06] text-zinc-500"
+                  }`}
+                >
+                  {complete ? <Check size={12} aria-hidden /> : step.id}
+                </span>
+                <span
+                  className={`truncate text-xs font-medium ${
+                    active ? "text-white" : complete ? "text-zinc-300" : "text-zinc-500"
+                  }`}
+                >
+                  {step.label}
+                </span>
+              </div>
+              {index < REGISTER_STEPS.length - 1 ? (
+                <span className="h-px flex-1 bg-white/10" aria-hidden />
+              ) : null}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+
+function ReviewGroup({
+  title,
+  rows,
+  onEdit,
+}: {
+  title: string;
+  rows: Array<{ label: string; value: string }>;
+  onEdit: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-white/[0.08] bg-black/25 px-4 py-3.5">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-zinc-500">{title}</p>
+        <button
+          className="text-xs font-medium text-red-200 transition hover:text-white"
+          onClick={onEdit}
+          type="button"
+        >
+          Edit
+        </button>
+      </div>
+      <dl className="space-y-2">
+        {rows.map((row) => (
+          <div className="flex items-start justify-between gap-4" key={row.label}>
+            <dt className="text-sm text-zinc-500">{row.label}</dt>
+            <dd className="text-right text-sm text-zinc-200">{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 

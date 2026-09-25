@@ -25,7 +25,7 @@ const privacySummary = legalPages.privacy.sections
   }));
 
 const linkClassName =
-  "font-medium text-red-200 underline-offset-2 transition hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black";
+  "shrink-0 text-sm font-medium text-red-200 underline-offset-2 transition hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black";
 
 const checkboxClassName =
   "mt-0.5 h-4 w-4 shrink-0 rounded border-white/25 bg-transparent accent-[#FF1010] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black";
@@ -36,33 +36,51 @@ function ConsentRow({
   children,
   invalid,
   fieldId,
+  links,
 }: {
   checked: boolean;
   onChange: (checked: boolean) => void;
   children: ReactNode;
   invalid?: boolean;
   fieldId: string;
+  links?: Array<{ href: string; label: string }>;
 }) {
   const inputId = useId();
 
   return (
     <div data-auth-field={fieldId}>
-      <label
-        className={`flex cursor-pointer items-start gap-3 rounded-lg py-1 ${
+      <div
+        className={`flex items-start gap-3 rounded-lg py-1 ${
           invalid ? "text-red-100" : "text-zinc-300"
         }`}
-        htmlFor={inputId}
       >
-        <input
-          aria-invalid={invalid || undefined}
-          checked={checked}
-          className={checkboxClassName}
-          id={inputId}
-          onChange={(event) => onChange(event.target.checked)}
-          type="checkbox"
-        />
-        <span className="text-sm leading-6">{children}</span>
-      </label>
+        <label className="flex min-w-0 flex-1 cursor-pointer items-start gap-3" htmlFor={inputId}>
+          <input
+            aria-invalid={invalid || undefined}
+            checked={checked}
+            className={checkboxClassName}
+            id={inputId}
+            onChange={(event) => onChange(event.target.checked)}
+            type="checkbox"
+          />
+          <span className="text-sm leading-6">{children}</span>
+        </label>
+        {links && links.length > 0 ? (
+          <div className="flex shrink-0 flex-col items-end gap-1.5 pt-0.5 sm:flex-row sm:items-start sm:gap-3">
+            {links.map((link) => (
+              <Link
+                className={linkClassName}
+                href={link.href}
+                key={link.href}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        ) : null}
+      </div>
       {invalid ? (
         <p className="mt-1 pl-7 text-xs text-red-300">This confirmation is required.</p>
       ) : null}
@@ -120,38 +138,24 @@ export function RegistrationLegalAcknowledgments({
           checked={value.privacyAcknowledged}
           fieldId="privacyAcknowledged"
           invalid={showValidation && !value.privacyAcknowledged}
+          links={[
+            { href: "/privacy", label: "Privacy Policy" },
+            { href: "/cookies", label: "Cookie Policy" },
+          ]}
           onChange={(checked) => update("privacyAcknowledged", checked)}
         >
-          I have read and understood the{" "}
-          <Link
-            className={linkClassName}
-            href="/privacy"
-            onClick={(event) => event.stopPropagation()}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Privacy Policy
-          </Link>{" "}
-          and understand how Juego Todo handles my personal information.
+          I have read and understood the Privacy Policy and understand how Juego Todo handles my personal
+          information.
         </ConsentRow>
 
         <ConsentRow
           checked={value.termsAccepted}
           fieldId="termsAccepted"
           invalid={showValidation && !value.termsAccepted}
+          links={[{ href: "/terms", label: "Terms of Service" }]}
           onChange={(checked) => update("termsAccepted", checked)}
         >
-          I agree to the{" "}
-          <Link
-            className={linkClassName}
-            href="/terms"
-            onClick={(event) => event.stopPropagation()}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Terms of Service
-          </Link>
-          .
+          I agree to the Terms of Service.
         </ConsentRow>
       </div>
 
@@ -209,27 +213,8 @@ export function RegistrationLegalAcknowledgments({
                 </ul>
               </div>
             ))}
-            <p className="text-sm text-zinc-500">
-              Full details are in the{" "}
-              <Link className={linkClassName} href="/privacy">
-                Privacy Policy
-              </Link>
-              .
-            </p>
           </div>
         ) : null}
-      </div>
-
-      <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-        <Link className={linkClassName} href="/privacy">
-          Privacy Policy →
-        </Link>
-        <Link className={linkClassName} href="/terms">
-          Terms of Service →
-        </Link>
-        <Link className={linkClassName} href="/cookies">
-          Cookie Policy →
-        </Link>
       </div>
 
       {incomplete ? (

@@ -39,6 +39,12 @@ export type RegisterInput = {
   country?: string;
   city?: string;
   bio?: string;
+  /** Client + server: required registration acknowledgments */
+  accuracyConfirmed?: boolean;
+  privacyAcknowledged?: boolean;
+  termsAccepted?: boolean;
+  /** Optional marketing preference — must never block registration */
+  marketingOptIn?: boolean;
 };
 
 export type ProfileUpdateInput = {

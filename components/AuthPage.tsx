@@ -2,11 +2,15 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, Check, Eye, EyeOff, Loader2, X } from "lucide-react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { PageNavigation } from "@/components/PageNavigation";
+import {
+  RegistrationLegalAcknowledgments,
+  registrationLegalIsComplete,
+  type RegistrationLegalState,
+} from "@/components/auth/RegistrationLegalAcknowledgments";
 import { useAuth } from "@/lib/auth/context";
 import { defaultRegistrationCountry, registrationCountryNames } from "@/data/countries";
 import {
@@ -98,7 +102,13 @@ export function AuthPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [acceptedAccountTerms, setAcceptedAccountTerms] = useState(false);
+  const [acceptedLegal, setAcceptedLegal] = useState<RegistrationLegalState>({
+    accuracyConfirmed: false,
+    privacyAcknowledged: false,
+    termsAccepted: false,
+    marketingOptIn: false,
+  });
+  const [showLegalValidation, setShowLegalValidation] = useState(false);
   const [error, setError] = useState<string | null>(() => searchParams.get("authError"));
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -226,7 +236,13 @@ export function AuthPage() {
       setPhone("");
       setCountry(defaultRegistrationCountry.name);
       setCity("");
-      setAcceptedAccountTerms(false);
+      setAcceptedLegal({
+        accuracyConfirmed: false,
+        privacyAcknowledged: false,
+        termsAccepted: false,
+        marketingOptIn: false,
+      });
+      setShowLegalValidation(false);
     }
   }
 
@@ -244,9 +260,10 @@ export function AuthPage() {
           throw new Error("Passwords do not match.");
         }
 
-        if (!acceptedAccountTerms) {
-          markInvalidField("terms");
-          throw new Error("Please confirm your information and agree to account data protection terms.");
+        if (!registrationLegalIsComplete(acceptedLegal)) {
+          setShowLegalValidation(true);
+          markInvalidField("legal");
+          throw new Error("Please complete the required confirmations before continuing.");
         }
 
         if (!firstName.trim()) {
@@ -287,6 +304,10 @@ export function AuthPage() {
           phone: normalizedPhone,
           country,
           city,
+          accuracyConfirmed: acceptedLegal.accuracyConfirmed,
+          privacyAcknowledged: acceptedLegal.privacyAcknowledged,
+          termsAccepted: acceptedLegal.termsAccepted,
+          marketingOptIn: acceptedLegal.marketingOptIn,
         });
         router.push(nextPath);
         return;
@@ -621,33 +642,17 @@ export function AuthPage() {
                 ) : null}
 
                 {mode === "register" ? (
-                  <label
-                    className={`flex items-start gap-3 rounded-2xl border px-4 py-3 ${
-                      invalidField === "terms"
-                        ? "border-red-500/50 bg-red-500/10 ring-2 ring-red-500/25"
-                        : "border-white/10 bg-black/30"
-                    }`}
-                    data-auth-field="terms"
-                  >
-                    <input
-                      checked={acceptedAccountTerms}
-                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/20 bg-black text-red-600 focus:ring-red-500/40"
-                      onChange={(event) => {
-                        setAcceptedAccountTerms(event.target.checked);
-                        if (invalidField === "terms") setInvalidField(null);
-                      }}
-                      required
-                      type="checkbox"
-                    />
-                    <span className="text-sm leading-6 text-zinc-300">
-                      I confirm that the information I provide is accurate and complete, and I agree to Juego
-                      Todo&apos;s handling of my account data in accordance with the{" "}
-                      <Link className="font-semibold text-red-200 underline-offset-2 hover:text-white hover:underline" href="/privacy">
-                        Privacy Policy
-                      </Link>
-                      .
-                    </span>
-                  </label>
+                  <RegistrationLegalAcknowledgments
+                    onChange={(next) => {
+                      setAcceptedLegal(next);
+                      if (registrationLegalIsComplete(next)) {
+                        setShowLegalValidation(false);
+                        if (invalidField === "legal") setInvalidField(null);
+                      }
+                    }}
+                    showValidation={showLegalValidation}
+                    value={acceptedLegal}
+                  />
                 ) : null}
 
                 {success ? (
@@ -665,7 +670,7 @@ export function AuthPage() {
                   className="group inline-flex min-h-[3.25rem] w-full items-center justify-center rounded-full bg-gradient-to-r from-[#FF1010] to-red-600 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white shadow-[0_12px_32px_rgba(255,16,16,0.22)] transition hover:from-red-500 hover:to-[#ff2828] disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={
                     submitting ||
-                    (mode === "register" && !acceptedAccountTerms) ||
+                    (mode === "register" && !registrationLegalIsComplete(acceptedLegal)) ||
                     usernameBlocksSubmit
                   }
                   type="submit"

@@ -5,6 +5,7 @@ import { buildProfileUpsertFromRegisterInput } from "@/lib/auth/profile-sync";
 import { withTimeout } from "@/lib/auth/timeout";
 import type { RegisterInput } from "@/lib/auth/types";
 import { validateUsername } from "@/lib/auth/username";
+import { legalPages } from "@/data/legal-pages";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -42,6 +43,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Incomplete registration details." }, { status: 400 });
     }
 
+    if (!body.accuracyConfirmed || !body.privacyAcknowledged || !body.termsAccepted) {
+      return NextResponse.json(
+        {
+          error:
+            "Please confirm information accuracy, acknowledge the Privacy Policy, and accept the Terms of Service.",
+        },
+        { status: 400 },
+      );
+    }
+
     if (body.password.length < 8) {
       return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
     }
@@ -56,6 +67,10 @@ export async function POST(request: Request) {
     });
     const country = body.country?.trim() || "Philippines";
     const phone = validateRegistrationPhone(country, body.phone ?? "");
+    const marketingOptIn = Boolean(body.marketingOptIn);
+    const acknowledgedAt = new Date().toISOString();
+    const privacyVersion = legalPages.privacy.lastUpdated;
+    const termsVersion = legalPages.terms.lastUpdated;
 
     const registerInput: RegisterInput = {
       firstName: body.firstName.trim(),
@@ -70,6 +85,10 @@ export async function POST(request: Request) {
       phone,
       country,
       city: body.city?.trim() ?? "",
+      accuracyConfirmed: true,
+      privacyAcknowledged: true,
+      termsAccepted: true,
+      marketingOptIn,
     };
 
     const { data: usernameTaken, error: usernameError } = await withTimeout(
@@ -101,6 +120,13 @@ export async function POST(request: Request) {
           city: registerInput.city,
           phone,
           country,
+          accuracy_confirmed: true,
+          privacy_acknowledged: true,
+          terms_accepted: true,
+          marketing_opt_in: marketingOptIn,
+          legal_acknowledged_at: acknowledgedAt,
+          privacy_policy_version: privacyVersion,
+          terms_version: termsVersion,
         },
       }),
       15000,

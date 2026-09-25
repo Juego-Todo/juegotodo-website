@@ -161,6 +161,10 @@ function registerStoredUserLocal(input: RegisterInput): UserProfile {
     throw new Error("Last name is required.");
   }
 
+  if (!input.accuracyConfirmed || !input.privacyAcknowledged || !input.termsAccepted) {
+    throw new Error("Please complete the required confirmations before continuing.");
+  }
+
   if (!input.gender.trim()) {
     throw new Error("Please select a gender.");
   }

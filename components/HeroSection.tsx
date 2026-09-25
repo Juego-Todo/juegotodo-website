@@ -1,15 +1,13 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { CalendarDays, Clock3, MapPin, Swords } from "lucide-react";
+import { Swords } from "lucide-react";
 import Image from "next/image";
 import { AsSeenOnCarousel } from "@/components/AsSeenOnCarousel";
 import { EnergyParticles } from "@/components/EnergyParticles";
 import { MagneticButton } from "@/components/MagneticButton";
-import { barrioBrawlsEvent } from "@/data/shop-tickets";
 
-const heroFeaturedEvent = {
-  ...barrioBrawlsEvent,
+const heroFeaturedCard = {
   posterSrc: "/hero-featured-fighters.png",
   becomeFighterHref: "/login?mode=register&next=/register-for-license/fighter",
 };
@@ -76,7 +74,6 @@ export function HeroSection() {
                 legacy connected in one platform.
               </span>
             </p>
-
           </motion.div>
 
           <motion.div
@@ -95,25 +92,11 @@ export function HeroSection() {
                     fill
                     loading="eager"
                     sizes="(max-width: 640px) 72vw, (max-width: 1024px) 85vw, 27rem"
-                    src={heroFeaturedEvent.posterSrc}
+                    src={heroFeaturedCard.posterSrc}
                   />
                 </div>
-                <div className="mt-2.5 space-y-2.5 px-0.5 pb-0.5 sm:mt-3.5 sm:space-y-3 sm:px-1.5 sm:pb-1.5">
-                  <div className="space-y-1.5 text-center">
-                    <p className="flex items-start justify-center gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
-                      <CalendarDays className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF1010]" aria-hidden />
-                      <span>{heroFeaturedEvent.dateLabel}</span>
-                    </p>
-                    <p className="flex items-start justify-center gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
-                      <Clock3 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF1010]" aria-hidden />
-                      <span>{heroFeaturedEvent.timeLabel}</span>
-                    </p>
-                    <p className="flex items-start justify-center gap-2 text-[0.72rem] font-semibold leading-snug text-zinc-200 sm:text-[0.8rem]">
-                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF1010]" aria-hidden />
-                      <span>{heroFeaturedEvent.venue}</span>
-                    </p>
-                  </div>
-                  <MagneticButton className="w-full" href={heroFeaturedEvent.becomeFighterHref}>
+                <div className="mt-2.5 px-0.5 pb-0.5 sm:mt-3.5 sm:px-1.5 sm:pb-1.5">
+                  <MagneticButton className="w-full" href={heroFeaturedCard.becomeFighterHref}>
                     <Swords className="mr-2" size={16} aria-hidden />
                     Become A Fighter
                   </MagneticButton>

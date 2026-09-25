@@ -36,6 +36,7 @@ import {
   defaultMemberFilters,
   defaultMemberSort,
   filterMembers,
+  isTeamMember,
   memberDisplayName,
   memberHasUnlimitedPlan,
   planCaption,
@@ -118,12 +119,17 @@ function MembershipCell({ member }: { member: AdminMemberRecord }) {
   if (memberHasUnlimitedPlan(member)) {
     return <StatusPill tone="accent">Unlimited</StatusPill>;
   }
+  if (!member.proResolved) {
+    return <StatusPill tone="warn">Unknown</StatusPill>;
+  }
   if (!member.proEntitled && member.proStatus === "none") {
     return <StatusPill>Free</StatusPill>;
   }
   const tone =
-    member.proEntitled && member.proStatus === "active"
-      ? "success"
+    member.proEntitled && (member.proStatus === "active" || member.proStatus === "cancelled")
+      ? member.proStatus === "active"
+        ? "success"
+        : "warn"
       : member.proStatus === "expired" || member.proStatus === "past_due"
         ? "danger"
         : member.proStatus === "pending"
@@ -313,7 +319,7 @@ function downloadMembersCsv(rows: AdminMemberRecord[], filename: string) {
         member.lastName === "—" ? "" : member.lastName,
         member.username === "—" ? "" : member.username,
         member.email,
-        memberAccountKind(member) === "staff" ? "Staff" : "Fan",
+        memberAccountKind(member) === "staff" || isTeamMember(member) ? "Team" : "Fan",
         memberSystemAccess(member) === "admin" ? "Admin" : "User",
         planCaption(member),
         member.city,
@@ -351,6 +357,20 @@ function filtersForQuickView(view: QuickView): MemberDirectoryFilters {
   }
 }
 
+function useIsDesktopViewport(breakpointPx = 768): boolean | null {
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const media = window.matchMedia(`(min-width: ${breakpointPx}px)`);
+    const sync = () => setIsDesktop(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, [breakpointPx]);
+
+  return isDesktop;
+}
+
 function RowActions({
   member,
   open,
@@ -375,7 +395,6 @@ function RowActions({
   onDelete: () => void;
 }) {
   const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const [menuStyle, setMenuStyle] = useState<{ top: number; left: number } | null>(null);
 
   useEffect(() => {
@@ -387,8 +406,6 @@ function RowActions({
     function placeMenu() {
       if (!buttonRef.current) return;
       const rect = buttonRef.current.getBoundingClientRect();
-      // Mobile + desktop both mount RowActions; the CSS-hidden copy has a zero rect
-      // but its portal still lands on document.body — skip it so only one menu shows.
       if (rect.width === 0 || rect.height === 0) {
         setMenuStyle(null);
         return;
@@ -414,75 +431,83 @@ function RowActions({
   }, [open]);
 
   useEffect(() => {
-    if (!open) return;
-
-    function handlePointer(event: MouseEvent) {
-      const target = event.target as Node;
-      if (menuRef.current?.contains(target) || buttonRef.current?.contains(target)) {
-        return;
-      }
-      onClose();
-    }
+    if (!open || !menuStyle) return;
 
     function handleKey(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
     }
 
-    const timer = window.setTimeout(() => {
-      document.addEventListener("mousedown", handlePointer);
-      document.addEventListener("keydown", handleKey);
-    }, 0);
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [open, menuStyle, onClose]);
 
-    return () => {
-      window.clearTimeout(timer);
-      document.removeEventListener("mousedown", handlePointer);
-      document.removeEventListener("keydown", handleKey);
-    };
-  }, [open, onClose]);
+  function runAction(action: () => void) {
+    action();
+    onClose();
+  }
 
-  const menu = open && menuStyle
-    ? createPortal(
-        <div
-          className="fixed z-[90] w-48 overflow-hidden rounded-xl border border-white/10 bg-[#111] py-1 shadow-2xl"
-          ref={menuRef}
-          style={{ top: menuStyle.top, left: menuStyle.left }}
-        >
-          {[
-            { label: "View profile", action: onView },
-            { label: "Edit member", action: onEdit },
-            { label: "Manage membership", action: onPro },
-            { label: "Manage credentials", action: onTags },
-            { label: "Reset password", action: onReset },
-          ].map((item) => (
+  const menuItems = [
+    { label: "View profile", action: onView },
+    { label: "Edit member", action: onEdit },
+    { label: "Manage membership", action: onPro },
+    { label: "Manage credentials", action: onTags },
+    { label: "Reset password", action: onReset },
+  ];
+
+  const menu =
+    open && menuStyle
+      ? createPortal(
+          <>
             <button
-              className="block w-full px-3 py-2 text-left text-xs text-zinc-300 transition hover:bg-white/5 hover:text-white"
-              key={item.label}
-              onClick={(event) => {
+              aria-label="Close actions menu"
+              className="fixed inset-0 z-[89] cursor-default bg-transparent"
+              onPointerDown={(event) => {
+                event.preventDefault();
                 event.stopPropagation();
-                item.action();
                 onClose();
               }}
               type="button"
+            />
+            <div
+              className="fixed z-[90] w-48 overflow-hidden rounded-xl border border-white/10 bg-[#111] py-1 shadow-2xl"
+              role="menu"
+              style={{ top: menuStyle.top, left: menuStyle.left }}
+              onPointerDown={(event) => event.stopPropagation()}
             >
-              {item.label}
-            </button>
-          ))}
-          <div className="my-1 border-t border-white/10" />
-          <button
-            className="block w-full px-3 py-2 text-left text-xs text-red-300 transition hover:bg-red-500/10"
-            onClick={(event) => {
-              event.stopPropagation();
-              onDelete();
-              onClose();
-            }}
-            type="button"
-          >
-            Delete account
-          </button>
-        </div>,
-        document.body,
-      )
-    : null;
+              {menuItems.map((item) => (
+                <button
+                  className="block w-full px-3 py-2 text-left text-xs text-zinc-300 transition hover:bg-white/5 hover:text-white"
+                  key={item.label}
+                  onPointerDown={(event) => {
+                    // pointerdown beats outside-close listeners that run on mousedown/click.
+                    event.preventDefault();
+                    event.stopPropagation();
+                    runAction(item.action);
+                  }}
+                  role="menuitem"
+                  type="button"
+                >
+                  {item.label}
+                </button>
+              ))}
+              <div className="my-1 border-t border-white/10" />
+              <button
+                className="block w-full px-3 py-2 text-left text-xs text-red-300 transition hover:bg-red-500/10"
+                onPointerDown={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  runAction(onDelete);
+                }}
+                role="menuitem"
+                type="button"
+              >
+                Delete account
+              </button>
+            </div>
+          </>,
+          document.body,
+        )
+      : null;
 
   return (
     <>
@@ -530,24 +555,35 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   const searchValueRef = useRef(search);
   searchValueRef.current = search;
   const toolbarRef = useRef<HTMLDivElement | null>(null);
+  const refreshRequestIdRef = useRef(0);
+  const isDesktop = useIsDesktopViewport();
 
   const refreshMembers = useCallback(() => {
+    const requestId = ++refreshRequestIdRef.current;
     void getAllOrders()
       .then((orders) => fetchAdminMemberRecords(orders))
       .then(({ records, proLoadError: nextProLoadError }) => {
+        if (requestId !== refreshRequestIdRef.current) return;
+
         setProLoadError(nextProLoadError ?? "");
         setError("");
         setLoaded(true);
         setMembers((previous) => {
-          if (!nextProLoadError || previous.length === 0) {
+          if (!nextProLoadError) {
             return records;
           }
+          if (previous.length === 0) {
+            // First load failed — records already marked proResolved=false.
+            return records;
+          }
+          // Preserve previously known Pro fields when a later Pro fetch fails.
           const previousById = new Map(previous.map((member) => [member.userId, member]));
           return records.map((record) => {
             const prior = previousById.get(record.userId);
-            if (!prior) return record;
+            if (!prior?.proResolved) return record;
             return {
               ...record,
+              proResolved: true,
               proStatus: prior.proStatus,
               proEntitled: prior.proEntitled,
               proMembershipId: prior.proMembershipId,
@@ -558,14 +594,16 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
         });
         setDrawerMember((current) => {
           if (!current) return current;
+          if (requestId !== refreshRequestIdRef.current) return current;
           const next = records.find((record) => record.userId === current.userId);
           if (!next) {
             setDrawerOpen(false);
             return null;
           }
-          if (nextProLoadError) {
+          if (nextProLoadError && current.proResolved) {
             return {
               ...next,
+              proResolved: true,
               proStatus: current.proStatus,
               proEntitled: current.proEntitled,
               proMembershipId: current.proMembershipId,
@@ -577,10 +615,37 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
         });
       })
       .catch((caught) => {
+        if (requestId !== refreshRequestIdRef.current) return;
         setError(caught instanceof Error ? caught.message : "Unable to load member directory.");
         setLoaded(true);
       });
   }, []);
+
+  function openManage(member: AdminMemberRecord, mode: ManageMode) {
+    setDrawerOpen(false);
+    setDrawerMember(null);
+    setMenuUserId(null);
+    setManageMember(member);
+    setManageMode(mode);
+  }
+
+  function closeManage() {
+    setManageMember(null);
+    setManageMode(null);
+  }
+
+  function openDrawer(member: AdminMemberRecord) {
+    setManageMember(null);
+    setManageMode(null);
+    setDrawerMember(member);
+    setDrawerOpen(true);
+    setMenuUserId(null);
+  }
+
+  function closeDrawer() {
+    setDrawerOpen(false);
+    setDrawerMember(null);
+  }
 
   const createLeadershipAccounts = useCallback(async () => {
     setProvisioning(true);
@@ -691,23 +756,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
     });
   }
 
-  function openManage(member: AdminMemberRecord, mode: ManageMode) {
-    setManageMember(member);
-    setManageMode(mode);
-    setMenuUserId(null);
-  }
-
-  function closeManage() {
-    setManageMember(null);
-    setManageMode(null);
-  }
-
-  function openDrawer(member: AdminMemberRecord) {
-    setDrawerMember(member);
-    setDrawerOpen(true);
-    setMenuUserId(null);
-  }
-
   function clearFilters() {
     setFilters(defaultMemberFilters);
     setQuickView("all");
@@ -738,11 +786,11 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
     setMenuUserId(null);
   }
 
-  const quickViews: Array<{ id: QuickView; label: string; count: number }> = [
+  const quickViews: Array<{ id: QuickView; label: string; count: number | null }> = [
     { id: "all", label: "All Members", count: stats.total },
     { id: "team", label: "Team", count: stats.team },
     { id: "fans", label: "Fan Accounts", count: stats.fans },
-    { id: "pro", label: "Pro Plan", count: stats.pro },
+    { id: "pro", label: "Pro Plan", count: proLoadError ? null : stats.pro },
     { id: "unlimited", label: "Unlimited", count: stats.unlimited },
     { id: "licensed", label: "Licensed", count: stats.licensed },
   ];
@@ -804,10 +852,14 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
       <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
         {(
           [
-            { label: "Members", value: stats.total, view: "all" as QuickView },
-            { label: "Team", value: stats.team, view: "team" as QuickView },
-            { label: "Fan Accounts", value: stats.fans, view: "fans" as QuickView },
-            { label: "Pro Plan", value: stats.pro, view: "pro" as QuickView },
+            { label: "Members", value: loaded ? stats.total : null, view: "all" as QuickView },
+            { label: "Team", value: loaded ? stats.team : null, view: "team" as QuickView },
+            { label: "Fan Accounts", value: loaded ? stats.fans : null, view: "fans" as QuickView },
+            {
+              label: "Pro Plan",
+              value: !loaded || proLoadError ? null : stats.pro,
+              view: "pro" as QuickView,
+            },
           ] as const
         ).map((card) => (
           <button
@@ -821,7 +873,9 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
             type="button"
           >
             <p className="text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-zinc-500">{card.label}</p>
-            <p className="mt-1 text-2xl font-semibold tracking-tight text-white">{loaded ? card.value : "—"}</p>
+            <p className="mt-1 text-2xl font-semibold tracking-tight text-white">
+              {card.value === null ? "—" : card.value}
+            </p>
           </button>
         ))}
       </div>
@@ -839,7 +893,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
             type="button"
           >
             {view.label}
-            <span className="ml-1 text-zinc-600">{loaded ? view.count : "—"}</span>
+            <span className="ml-1 text-zinc-600">{!loaded || view.count === null ? "—" : view.count}</span>
           </button>
         ))}
       </div>
@@ -1105,7 +1159,14 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
             </p>
           </div>
 
-          <div className="space-y-2 md:hidden">
+          {isDesktop === null ? (
+            <div className="space-y-2">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div className="h-14 animate-pulse rounded-xl border border-white/5 bg-white/[0.03]" key={index} />
+              ))}
+            </div>
+          ) : !isDesktop ? (
+          <div className="space-y-2">
             {filteredMembers.map((member) => (
               <article className="rounded-xl border border-white/10 bg-black/30 p-3.5" key={member.userId}>
                 <div className="flex items-start gap-3">
@@ -1139,8 +1200,8 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
               </article>
             ))}
           </div>
-
-          <div className="hidden overflow-x-auto md:block">
+          ) : (
+          <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-white/10">
@@ -1224,12 +1285,13 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
               </tbody>
             </table>
           </div>
+          )}
         </div>
       )}
 
       <AdminMemberDetailDrawer
         member={drawerMember}
-        onClose={() => setDrawerOpen(false)}
+        onClose={closeDrawer}
         onDelete={() => {
           if (drawerMember) openManage(drawerMember, "delete");
         }}
@@ -1251,15 +1313,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
           mode={manageMode}
           onClose={closeManage}
           onSaved={() => {
-            const deletedId = manageMode === "delete" ? manageMember.userId : null;
-            if (deletedId) {
-              setDrawerOpen(false);
-              setDrawerMember((current) => (current?.userId === deletedId ? null : current));
-            }
             refreshMembers();
-            if (!deletedId) {
-              setDrawerOpen(Boolean(drawerMember && manageMember.userId === drawerMember.userId));
-            }
           }}
         />
       ) : null}

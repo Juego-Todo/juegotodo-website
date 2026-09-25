@@ -62,6 +62,8 @@ export type AdminMemberRecord = {
   licenseStatus: string | null;
   fullName: string;
   createdAt: string;
+  /** False when Pro API failed — do not treat as Free. */
+  proResolved: boolean;
   /** JuegoTodo Pro entitlement (separate from shop membership_tier). */
   proStatus: AdminProDisplayStatus;
   proEntitled: boolean;
@@ -144,12 +146,14 @@ export function buildAdminMemberRecord(
   license: LicenseApplication | null,
   orders: Order[],
   pro?: AdminProMembershipSummary | null,
+  options?: { proResolved?: boolean },
 ): AdminMemberRecord {
   const userOrders = orders.filter((order) => order.userId === user.id);
   const { firstName: splitFirst, lastName: splitLast } = splitFullName(user.fullName);
   const licenseFirst = license?.firstName?.trim();
   const licenseLast = license?.lastName?.trim();
   const tags = getAdminAssignedTags(user.id, user.assignedTags);
+  const proResolved = options?.proResolved ?? true;
 
   const proAccess = resolveProAccessState(
     pro
@@ -189,11 +193,12 @@ export function buildAdminMemberRecord(
     licenseStatus: license ? licenseApplicationStatusLabels[license.status] : null,
     fullName: user.fullName,
     createdAt: user.createdAt,
-    proStatus: pro?.displayStatus ?? proAccess.displayStatus,
-    proEntitled: pro?.entitled ?? proAccess.entitled,
-    proMembershipId: pro?.membershipId ?? null,
-    proExpiresAt: pro?.expiresAt ?? null,
-    proPaymentStatus: pro?.paymentStatus ?? null,
+    proResolved,
+    proStatus: proResolved ? (pro?.displayStatus ?? proAccess.displayStatus) : "none",
+    proEntitled: proResolved ? (pro?.entitled ?? proAccess.entitled) : false,
+    proMembershipId: proResolved ? (pro?.membershipId ?? null) : null,
+    proExpiresAt: proResolved ? (pro?.expiresAt ?? null) : null,
+    proPaymentStatus: proResolved ? (pro?.paymentStatus ?? null) : null,
   };
 }
 
@@ -256,11 +261,19 @@ export type FetchAdminMemberRecordsResult = {
 
 export async function fetchAdminMemberRecords(orders: Order[]): Promise<FetchAdminMemberRecordsResult> {
   const [users, proResult] = await Promise.all([getAllStoredUsers(), fetchProMembershipMap()]);
+  const proResolved = !proResult.error;
   const records = await Promise.all(
     users.map(async (user) => {
       const commerce = await getUserCommerceData(user.id);
       const license = await fetchLicenseApplicationByUserId(user.id);
-      return buildAdminMemberRecord(user, commerce, license, orders, proResult.map.get(user.id) ?? null);
+      return buildAdminMemberRecord(
+        user,
+        commerce,
+        license,
+        orders,
+        proResolved ? (proResult.map.get(user.id) ?? null) : null,
+        { proResolved },
+      );
     }),
   );
 

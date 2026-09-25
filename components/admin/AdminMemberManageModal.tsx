@@ -256,7 +256,7 @@ export function AdminMemberManageModal({
       <motion.button
         animate={{ opacity: 1 }}
         aria-label="Close dialog"
-        className="fixed inset-0 z-[70] bg-black/75 backdrop-blur-[2px]"
+        className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-[2px]"
         exit={{ opacity: 0 }}
         initial={{ opacity: 0 }}
         onClick={onClose}
@@ -265,7 +265,7 @@ export function AdminMemberManageModal({
       <motion.div
         animate={{ opacity: 1, y: 0 }}
         aria-modal="true"
-        className="fixed inset-x-3 top-[5vh] z-[71] mx-auto flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0c] shadow-[0_24px_80px_rgba(0,0,0,0.65)] sm:inset-x-auto"
+        className="fixed inset-x-3 top-[5vh] z-[101] mx-auto flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0c] shadow-[0_24px_80px_rgba(0,0,0,0.65)] sm:inset-x-auto"
         exit={{ opacity: 0, y: 12 }}
         initial={{ opacity: 0, y: 12 }}
         role="dialog"
@@ -527,24 +527,36 @@ export function AdminMemberManageModal({
                   </div>
                 ) : (
                   <>
+                    {!member.proResolved ? (
+                      <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.08] px-4 py-3 text-sm text-amber-50">
+                        <p className="font-semibold">Unable to determine current Pro status.</p>
+                        <p className="mt-1 text-amber-50/70">
+                          Directory Pro data failed to load. You can still upgrade; refresh afterward to sync the list.
+                        </p>
+                      </div>
+                    ) : null}
                     <div className="rounded-xl border border-white/[0.08] bg-zinc-950/50 px-4 py-4">
                       <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-zinc-500">
                         Current status
                       </p>
                       <p className="mt-2 text-lg font-semibold capitalize text-white">
-                        {member.proEntitled
-                          ? member.proStatus === "active"
-                            ? "Active"
-                            : member.proStatus
-                          : member.proStatus === "none"
-                            ? "Inactive"
-                            : member.proStatus}
+                        {!member.proResolved
+                          ? "Unknown"
+                          : member.proEntitled
+                            ? member.proStatus === "active"
+                              ? "Active"
+                              : member.proStatus === "cancelled"
+                                ? "Until expiry"
+                                : member.proStatus
+                            : member.proStatus === "none"
+                              ? "Inactive"
+                              : member.proStatus}
                       </p>
                       {member.proMembershipId ? (
                         <p className="mt-1 font-mono text-xs text-zinc-500">{member.proMembershipId}</p>
-                      ) : (
+                      ) : member.proResolved ? (
                         <p className="mt-1 text-sm text-zinc-500">No Pro membership yet</p>
-                      )}
+                      ) : null}
                       {member.proExpiresAt ? (
                         <div className="mt-3">
                           <ProCountdown entitled={member.proEntitled} expiresAt={member.proExpiresAt} />
@@ -577,7 +589,7 @@ export function AdminMemberManageModal({
                       </button>
                       <button
                         className="rounded-lg border border-white/12 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200 transition hover:border-white/25 disabled:opacity-60"
-                        disabled={busy || !member.proEntitled}
+                        disabled={busy || !member.proResolved || !member.proEntitled}
                         onClick={() => void handleProAction("extend")}
                         type="button"
                       >
@@ -585,7 +597,12 @@ export function AdminMemberManageModal({
                       </button>
                       <button
                         className="rounded-lg border border-red-500/25 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-red-200 transition hover:bg-red-500/10 disabled:opacity-60"
-                        disabled={busy || member.proStatus === "none" || member.proStatus === "cancelled"}
+                        disabled={
+                          busy ||
+                          !member.proResolved ||
+                          member.proStatus === "none" ||
+                          member.proStatus === "cancelled"
+                        }
                         onClick={() => void handleProAction("cancel")}
                         type="button"
                       >

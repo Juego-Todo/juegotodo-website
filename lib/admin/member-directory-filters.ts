@@ -107,16 +107,26 @@ export function memberHasUnlimitedPlan(member: AdminMemberRecord) {
   });
 }
 
-/** Active paid/comp Pro access — excludes Unlimited team accounts. */
+/**
+ * Canonical Pro access for directory UI — matches License Center:
+ * resolveProAccessState().entitled (active OR cancelled-with-future-expiry).
+ * Excludes Unlimited team accounts. Never true when Pro data failed to load.
+ */
+export function hasActiveProAccess(member: AdminMemberRecord) {
+  if (!member.proResolved) return false;
+  if (memberHasUnlimitedPlan(member)) return false;
+  return member.proEntitled;
+}
+
+/** @deprecated Prefer hasActiveProAccess — kept as alias for call sites. */
 export function isActiveProMember(member: AdminMemberRecord) {
-  return (
-    !memberHasUnlimitedPlan(member) &&
-    member.proEntitled &&
-    member.proStatus === "active"
-  );
+  return hasActiveProAccess(member);
 }
 
 export function memberPlanKind(member: AdminMemberRecord) {
+  if (!member.proResolved && !memberHasUnlimitedPlan(member)) {
+    return "free" as const; // UI should prefer Unknown via proResolved; kind unused for unresolved
+  }
   return resolveMemberPlanKind({
     unlimited: memberHasUnlimitedPlan(member),
     proEntitled: member.proEntitled,
@@ -167,10 +177,10 @@ export function credentialLabels(member: AdminMemberRecord): string[] {
 
 export function membershipBucket(member: AdminMemberRecord): MembershipFilter {
   if (memberHasUnlimitedPlan(member)) return "unlimited";
-  if (isActiveProMember(member)) return "pro";
+  if (!member.proResolved) return "free"; // unresolved — UI must check proResolved before showing Free
+  if (hasActiveProAccess(member)) return "pro";
   if (member.proStatus === "expired") return "expired";
   if (member.proStatus === "pending") return "pending";
-  if (member.proEntitled) return "pro";
   return "free";
 }
 
@@ -186,12 +196,12 @@ export function computeMemberStats(members: AdminMemberRecord[]) {
 
   for (const member of members) {
     if (memberHasUnlimitedPlan(member)) unlimited += 1;
-    else if (isActiveProMember(member)) pro += 1;
+    else if (hasActiveProAccess(member)) pro += 1;
     if (isTeamMember(member)) team += 1;
     else fans += 1;
     if (isLicensed(member)) licensed += 1;
     if (isPendingCredential(member)) pending += 1;
-    if (isActiveProMember(member) && member.proExpiresAt) {
+    if (hasActiveProAccess(member) && member.proExpiresAt) {
       if (resolveProTimer(member.proExpiresAt, now).inReminderWindow) expiring += 1;
     }
   }
@@ -237,7 +247,7 @@ export function filterMembers(
   const now = new Date();
 
   return members.filter((member) => {
-    if (input.quickView === "pro" && !isActiveProMember(member)) return false;
+    if (input.quickView === "pro" && !hasActiveProAccess(member)) return false;
     if (input.quickView === "unlimited" && !memberHasUnlimitedPlan(member)) return false;
     if (input.quickView === "team" && !isTeamMember(member)) return false;
     if (input.quickView === "fans" && !isFanAccount(member)) return false;
@@ -246,18 +256,23 @@ export function filterMembers(
     const { membership, account, credentials, role, joined } = input.filters;
 
     if (membership === "unlimited" && !memberHasUnlimitedPlan(member)) return false;
-    if (membership === "pro" && !isActiveProMember(member)) return false;
+    if (membership === "pro" && !hasActiveProAccess(member)) return false;
     if (membership === "free") {
-      if (member.proEntitled || memberHasUnlimitedPlan(member)) return false;
+      // Unresolved Pro status must not appear as Free.
+      if (!member.proResolved || member.proEntitled || memberHasUnlimitedPlan(member)) return false;
     }
-    if (membership === "expired" && (memberHasUnlimitedPlan(member) || member.proStatus !== "expired")) {
-      return false;
+    if (membership === "expired") {
+      if (!member.proResolved || memberHasUnlimitedPlan(member) || member.proStatus !== "expired") {
+        return false;
+      }
     }
-    if (membership === "pending" && (memberHasUnlimitedPlan(member) || member.proStatus !== "pending")) {
-      return false;
+    if (membership === "pending") {
+      if (!member.proResolved || memberHasUnlimitedPlan(member) || member.proStatus !== "pending") {
+        return false;
+      }
     }
     if (membership === "expiring") {
-      if (!isActiveProMember(member) || !member.proExpiresAt) return false;
+      if (!hasActiveProAccess(member) || !member.proExpiresAt) return false;
       if (!resolveProTimer(member.proExpiresAt, now).inReminderWindow) return false;
     }
 
@@ -297,6 +312,7 @@ export function filterMembers(
 }
 
 function planSortRank(member: AdminMemberRecord) {
+  if (!member.proResolved && !memberHasUnlimitedPlan(member)) return 6;
   const kind = memberPlanKind(member);
   switch (kind) {
     case "unlimited":
@@ -469,6 +485,7 @@ export function proStatusCaption(status: AdminProDisplayStatus, entitled: boolea
 }
 
 export function planCaption(member: AdminMemberRecord) {
+  if (!member.proResolved && !memberHasUnlimitedPlan(member)) return "Unknown";
   const kind = memberPlanKind(member);
   if (kind === "unlimited") return "Unlimited";
   if (kind === "pro") return "Pro · Active";

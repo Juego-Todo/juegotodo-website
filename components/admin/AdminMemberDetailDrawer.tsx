@@ -145,6 +145,23 @@ export function AdminMemberDetailDrawer({
                         No Pro checkout required. License Center stays unlocked for this account.
                       </p>
                     </>
+                  ) : !member.proResolved ? (
+                    <>
+                      <p className="text-sm font-semibold text-white">JuegoTodo Pro</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.12em] text-amber-200/90">
+                        Unable to determine status
+                      </p>
+                      <p className="mt-3 text-xs leading-relaxed text-zinc-400">
+                        Pro membership data failed to load. Retry from the directory banner before changing membership.
+                      </p>
+                      <button
+                        className="mt-4 inline-flex min-h-9 items-center rounded-lg border border-[#FFCF6A]/35 px-3.5 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-[#FFCF6A] transition hover:bg-[#FFCF6A]/10"
+                        onClick={onManagePro}
+                        type="button"
+                      >
+                        Manage membership
+                      </button>
+                    </>
                   ) : (
                     <>
                       <p className="text-sm font-semibold text-white">JuegoTodo Pro</p>

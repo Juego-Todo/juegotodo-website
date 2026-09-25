@@ -3,12 +3,18 @@
 import {
   ChevronDown,
   ChevronUp,
+  CreditCard,
   Download,
+  Eye,
   Filter,
+  KeyRound,
   MoreHorizontal,
+  Pencil,
   Plus,
   RefreshCw,
   Search,
+  Tags,
+  Trash2,
   X,
 } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -377,6 +383,7 @@ function useIsDesktopViewport(breakpointPx = 768): boolean | null {
 function RowActions({
   member,
   open,
+  mobile,
   onToggle,
   onClose,
   onView,
@@ -388,6 +395,7 @@ function RowActions({
 }: {
   member: AdminMemberRecord;
   open: boolean;
+  mobile: boolean;
   onToggle: () => void;
   onClose: () => void;
   onView: () => void;
@@ -398,10 +406,11 @@ function RowActions({
   onDelete: () => void;
 }) {
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const [menuStyle, setMenuStyle] = useState<{ top: number; left: number } | null>(null);
 
   useEffect(() => {
-    if (!open || !buttonRef.current) {
+    if (!open || mobile || !buttonRef.current) {
       setMenuStyle(null);
       return;
     }
@@ -413,101 +422,167 @@ function RowActions({
         setMenuStyle(null);
         return;
       }
-      const menuWidth = 192;
+
+      const menuWidth = 220;
+      const gap = 8;
+      const estimatedHeight = menuRef.current?.offsetHeight || 280;
+      const spaceBelow = window.innerHeight - rect.bottom - gap;
+      const spaceAbove = rect.top - gap;
+      const openUpward = spaceBelow < estimatedHeight && spaceAbove > spaceBelow;
+
+      const top = openUpward
+        ? Math.max(8, rect.top - estimatedHeight - gap)
+        : Math.min(rect.bottom + gap, window.innerHeight - estimatedHeight - 8);
+
       const left = Math.min(
         Math.max(8, rect.right - menuWidth),
         window.innerWidth - menuWidth - 8,
       );
-      setMenuStyle({
-        top: rect.bottom + 6,
-        left,
-      });
+
+      setMenuStyle({ top, left });
     }
 
     placeMenu();
+    // Re-measure after menu mounts so flip uses real height.
+    const frame = window.requestAnimationFrame(placeMenu);
     window.addEventListener("resize", placeMenu);
     window.addEventListener("scroll", placeMenu, true);
     return () => {
+      window.cancelAnimationFrame(frame);
       window.removeEventListener("resize", placeMenu);
       window.removeEventListener("scroll", placeMenu, true);
     };
-  }, [open]);
+  }, [open, mobile]);
 
   useEffect(() => {
-    if (!open || !menuStyle) return;
-
+    if (!open) return;
     function handleKey(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
     }
-
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
-  }, [open, menuStyle, onClose]);
+  }, [open, onClose]);
 
   function runAction(action: () => void) {
-    action();
     onClose();
+    action();
   }
 
-  const menuItems = [
-    { label: "View profile", action: onView },
-    { label: "Edit member", action: onEdit },
-    { label: "Manage membership", action: onPro },
-    { label: "Manage tags", action: onTags },
-    { label: "Reset password", action: onReset },
+  const manageItems = [
+    { label: "Edit member", action: onEdit, icon: Pencil },
+    { label: "Membership", action: onPro, icon: CreditCard },
+    { label: "Roles & tags", action: onTags, icon: Tags },
   ];
 
-  const menu =
-    open && menuStyle
+  const menuBody = (
+    <>
+      <p className="px-3 pb-1 pt-2 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-zinc-600">
+        View
+      </p>
+      <button
+        className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs text-zinc-300 transition hover:bg-white/5 hover:text-white"
+        onClick={() => runAction(onView)}
+        role="menuitem"
+        type="button"
+      >
+        <Eye size={14} className="shrink-0 text-zinc-500" aria-hidden />
+        View profile
+      </button>
+
+      <p className="px-3 pb-1 pt-2 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-zinc-600">
+        Manage
+      </p>
+      {manageItems.map((item) => (
+        <button
+          className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs text-zinc-300 transition hover:bg-white/5 hover:text-white"
+          key={item.label}
+          onClick={() => runAction(item.action)}
+          role="menuitem"
+          type="button"
+        >
+          <item.icon size={14} className="shrink-0 text-zinc-500" aria-hidden />
+          {item.label}
+        </button>
+      ))}
+
+      <p className="px-3 pb-1 pt-2 text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-zinc-600">
+        Account
+      </p>
+      <button
+        className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs text-zinc-300 transition hover:bg-white/5 hover:text-white"
+        onClick={() => runAction(onReset)}
+        role="menuitem"
+        type="button"
+      >
+        <KeyRound size={14} className="shrink-0 text-zinc-500" aria-hidden />
+        Reset password
+      </button>
+
+      <div className="my-1 border-t border-white/10" />
+      <button
+        className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-xs text-red-300 transition hover:bg-red-500/10"
+        onClick={() => runAction(onDelete)}
+        role="menuitem"
+        type="button"
+      >
+        <Trash2 size={14} className="shrink-0" aria-hidden />
+        Delete account
+      </button>
+    </>
+  );
+
+  const portal =
+    open && typeof document !== "undefined"
       ? createPortal(
-          <>
-            <button
-              aria-label="Close actions menu"
-              className="fixed inset-0 z-[89] cursor-default bg-transparent"
-              onPointerDown={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                onClose();
-              }}
-              type="button"
-            />
-            <div
-              className="fixed z-[90] w-48 overflow-hidden rounded-xl border border-white/10 bg-[#111] py-1 shadow-2xl"
-              role="menu"
-              style={{ top: menuStyle.top, left: menuStyle.left }}
-              onPointerDown={(event) => event.stopPropagation()}
-            >
-              {menuItems.map((item) => (
-                <button
-                  className="block w-full px-3 py-2 text-left text-xs text-zinc-300 transition hover:bg-white/5 hover:text-white"
-                  key={item.label}
-                  onPointerDown={(event) => {
-                    // pointerdown beats outside-close listeners that run on mousedown/click.
-                    event.preventDefault();
-                    event.stopPropagation();
-                    runAction(item.action);
-                  }}
-                  role="menuitem"
-                  type="button"
-                >
-                  {item.label}
-                </button>
-              ))}
-              <div className="my-1 border-t border-white/10" />
+          mobile ? (
+            <>
               <button
-                className="block w-full px-3 py-2 text-left text-xs text-red-300 transition hover:bg-red-500/10"
-                onPointerDown={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  runAction(onDelete);
-                }}
-                role="menuitem"
+                aria-label="Close actions"
+                className="fixed inset-0 z-[50] bg-black/60"
+                onClick={onClose}
                 type="button"
+              />
+              <div
+                className="fixed inset-x-0 bottom-0 z-[51] rounded-t-2xl border border-white/10 bg-[#111] pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-2xl"
+                role="menu"
               >
-                Delete account
-              </button>
-            </div>
-          </>,
+                <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15" aria-hidden />
+                <div className="px-4 pb-2">
+                  <p className="text-sm font-semibold text-white">{memberDisplayName(member)}</p>
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    @{member.username !== "—" ? member.username : "no-username"}
+                  </p>
+                </div>
+                <div className="max-h-[70vh] overflow-y-auto py-1">{menuBody}</div>
+                <div className="border-t border-white/10 px-4 py-3">
+                  <button
+                    className="inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-white/12 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-300"
+                    onClick={onClose}
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : menuStyle ? (
+            <>
+              <button
+                aria-label="Close actions menu"
+                className="fixed inset-0 z-[50] cursor-default bg-transparent"
+                onClick={onClose}
+                type="button"
+              />
+              <div
+                className="fixed z-[51] w-[13.75rem] overflow-hidden rounded-xl border border-white/10 bg-[#111] py-1 shadow-2xl"
+                ref={menuRef}
+                role="menu"
+                style={{ top: menuStyle.top, left: menuStyle.left }}
+              >
+                {menuBody}
+              </div>
+            </>
+          ) : null,
           document.body,
         )
       : null;
@@ -530,7 +605,7 @@ function RowActions({
       >
         <MoreHorizontal size={15} aria-hidden />
       </button>
-      {menu}
+      {portal}
     </>
   );
 }
@@ -546,6 +621,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   const [quickView, setQuickView] = useState<QuickView>("all");
   const [sort, setSort] = useState<MemberSort>(defaultMemberSort);
   const [menuUserId, setMenuUserId] = useState<string | null>(null);
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(() => new Set());
   const [drawerMember, setDrawerMember] = useState<AdminMemberRecord | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [profileMode, setProfileMode] = useState<MemberProfileMode>("view");
@@ -633,8 +709,10 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   }
 
   function openConfirm(member: AdminMemberRecord, mode: Exclude<ConfirmMode, null>) {
+    // Keep member for the confirm dialog, but close the drawer so we never stack
+    // drawer → modal (one primary surface at a time).
     setDrawerMember(member);
-    setDrawerOpen(true);
+    setDrawerOpen(false);
     setProfileMode("view");
     setConfirmMode(mode);
     setMenuUserId(null);
@@ -776,14 +854,67 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
     setSort((current) => toggleMemberSort(current, column));
   }
 
-  function exportMembers(scope: "view" | "all") {
-    const rows = scope === "view" ? filteredMembers : members;
+  function exportMembers(scope: "view" | "all" | "selected") {
+    const rows =
+      scope === "view"
+        ? filteredMembers
+        : scope === "selected"
+          ? filteredMembers.filter((member) => selectedUserIds.has(member.userId))
+          : members;
+    if (rows.length === 0) {
+      setOpenPopover(null);
+      return;
+    }
     downloadMembersCsv(
       rows,
-      scope === "view" ? "juegotodo-members-current-view.csv" : "juegotodo-members-all.csv",
+      scope === "view"
+        ? "juegotodo-members-current-view.csv"
+        : scope === "selected"
+          ? "juegotodo-members-selected.csv"
+          : "juegotodo-members-all.csv",
     );
     setOpenPopover(null);
   }
+
+  function toggleMemberSelected(userId: string) {
+    setSelectedUserIds((current) => {
+      const next = new Set(current);
+      if (next.has(userId)) next.delete(userId);
+      else next.add(userId);
+      return next;
+    });
+  }
+
+  function toggleSelectAllVisible() {
+    setSelectedUserIds((current) => {
+      const visibleIds = filteredMembers.map((member) => member.userId);
+      const allSelected = visibleIds.length > 0 && visibleIds.every((id) => current.has(id));
+      if (allSelected) {
+        const next = new Set(current);
+        for (const id of visibleIds) next.delete(id);
+        return next;
+      }
+      const next = new Set(current);
+      for (const id of visibleIds) next.add(id);
+      return next;
+    });
+  }
+
+  function clearSelection() {
+    setSelectedUserIds(new Set());
+  }
+
+  const selectedCount = useMemo(() => {
+    let count = 0;
+    for (const member of filteredMembers) {
+      if (selectedUserIds.has(member.userId)) count += 1;
+    }
+    return count;
+  }, [filteredMembers, selectedUserIds]);
+
+  const allVisibleSelected =
+    filteredMembers.length > 0 && filteredMembers.every((member) => selectedUserIds.has(member.userId));
+  const someVisibleSelected = selectedCount > 0 && !allVisibleSelected;
 
   function togglePopover(next: OpenPopover) {
     setOpenPopover((current) => (current === next ? null : next));
@@ -1076,7 +1207,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
           </div>
         </div>
 
-        {chips.length > 0 ? (
+        {chips.length > 0 && selectedCount === 0 ? (
           <div className="flex flex-wrap items-center gap-1.5">
             {chips.map((chip) => (
               <button
@@ -1104,6 +1235,30 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
               type="button"
             >
               Clear all
+            </button>
+          </div>
+        ) : null}
+
+        {selectedCount > 0 ? (
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-white/12 bg-white/[0.04] px-3.5 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
+            <p className="text-sm font-medium text-white">
+              {selectedCount} selected
+            </p>
+            <button
+              className="text-xs font-medium text-zinc-500 transition hover:text-white"
+              onClick={clearSelection}
+              type="button"
+            >
+              Clear
+            </button>
+            <div className="mx-1 hidden h-4 w-px bg-white/10 sm:block" aria-hidden />
+            <button
+              className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-white/12 px-3 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200 transition hover:border-white/25 hover:text-white"
+              onClick={() => exportMembers("selected")}
+              type="button"
+            >
+              <Download size={14} aria-hidden />
+              Export
             </button>
           </div>
         ) : null}
@@ -1190,6 +1345,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                   </button>
                   <RowActions
                     member={member}
+                    mobile
                     onClose={() => setMenuUserId(null)}
                     onDelete={() => openConfirm(member, "delete")}
                     onEdit={() => openProfile(member, "edit")}
@@ -1209,6 +1365,18 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-white/10">
+                  <th className="w-10 px-2 py-2.5">
+                    <input
+                      aria-label="Select all visible members"
+                      checked={allVisibleSelected}
+                      className="h-4 w-4 rounded border-white/20 bg-transparent accent-[#FF1010]"
+                      onChange={toggleSelectAllVisible}
+                      ref={(el) => {
+                        if (el) el.indeterminate = someVisibleSelected;
+                      }}
+                      type="checkbox"
+                    />
+                  </th>
                   {(
                     [
                       { label: "First Name", column: "firstName" },
@@ -1237,24 +1405,44 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
               <tbody>
                 {filteredMembers.map((member) => (
                   <tr
-                    className="cursor-pointer border-b border-white/5 transition hover:bg-white/[0.02]"
+                    className="border-b border-white/5 transition hover:bg-white/[0.02]"
                     key={member.userId}
-                    onClick={() => openDrawer(member)}
                   >
+                    <td className="px-2 py-3" onClick={(event) => event.stopPropagation()}>
+                      <input
+                        aria-label={`Select ${memberDisplayName(member)}`}
+                        checked={selectedUserIds.has(member.userId)}
+                        className="h-4 w-4 rounded border-white/20 bg-transparent accent-[#FF1010]"
+                        onChange={() => toggleMemberSelected(member.userId)}
+                        type="checkbox"
+                      />
+                    </td>
                     <td className="px-3 py-3">
-                      <p className="font-medium text-white">
+                      <button
+                        className="text-left font-medium text-white transition hover:text-[#FF1010]"
+                        onClick={() => openDrawer(member)}
+                        type="button"
+                      >
                         {member.firstName !== "—" ? member.firstName : "—"}
-                      </p>
+                      </button>
                     </td>
                     <td className="px-3 py-3">
-                      <p className="font-medium text-zinc-200">
+                      <button
+                        className="text-left font-medium text-zinc-200 transition hover:text-white"
+                        onClick={() => openDrawer(member)}
+                        type="button"
+                      >
                         {member.lastName !== "—" ? member.lastName : "—"}
-                      </p>
+                      </button>
                     </td>
                     <td className="px-3 py-3">
-                      <p className="text-sm text-zinc-400">
+                      <button
+                        className="text-left text-sm text-zinc-400 transition hover:text-zinc-200"
+                        onClick={() => openDrawer(member)}
+                        type="button"
+                      >
                         {member.username !== "—" ? `@${member.username}` : "—"}
-                      </p>
+                      </button>
                     </td>
                     <td className="px-3 py-3">
                       <AccountCell member={member} />
@@ -1270,6 +1458,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                       <div className="inline-flex justify-end">
                         <RowActions
                           member={member}
+                          mobile={false}
                           onClose={() => setMenuUserId(null)}
                           onDelete={() => openConfirm(member, "delete")}
                           onEdit={() => openProfile(member, "edit")}

@@ -207,7 +207,7 @@ export function AdminMemberDetailDrawer({
     view: "Member",
     edit: "Edit member",
     pro: unlimited ? "Plan · Unlimited" : "Manage membership",
-    tags: "Manage tags",
+    tags: "Roles & tags",
   };
 
   async function handleEditSubmit(event: FormEvent) {
@@ -266,7 +266,7 @@ export function AdminMemberDetailDrawer({
           <motion.button
             animate={{ opacity: 1 }}
             aria-label="Close member profile"
-            className="fixed inset-0 z-[100] bg-black/65 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-black/45"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
             onClick={() => {
@@ -303,6 +303,33 @@ export function AdminMemberDetailDrawer({
                 ) : (
                   <p className="mt-1.5 truncate text-sm text-zinc-400">{member.email}</p>
                 )}
+                {mode === "view" ? (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <button
+                      className="inline-flex min-h-8 items-center rounded-lg border border-white/12 px-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-zinc-300 transition hover:border-white/25 hover:text-white"
+                      onClick={() => onModeChange("edit")}
+                      type="button"
+                    >
+                      Edit
+                    </button>
+                    {!unlimited ? (
+                      <button
+                        className="inline-flex min-h-8 items-center rounded-lg border border-white/12 px-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-zinc-300 transition hover:border-white/25 hover:text-white"
+                        onClick={() => onModeChange("pro")}
+                        type="button"
+                      >
+                        Membership
+                      </button>
+                    ) : null}
+                    <button
+                      className="inline-flex min-h-8 items-center rounded-lg border border-white/12 px-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-zinc-300 transition hover:border-white/25 hover:text-white"
+                      onClick={() => onModeChange("tags")}
+                      type="button"
+                    >
+                      Roles & tags
+                    </button>
+                  </div>
+                ) : null}
               </div>
               <button
                 aria-label="Close"
@@ -326,16 +353,7 @@ export function AdminMemberDetailDrawer({
             {mode === "view" ? (
               <>
                 <div className="flex-1 space-y-1 overflow-y-auto px-5 py-5">
-                  <Section title="Identity">
-                    <Field label="Full name" value={memberDisplayName(member)} />
-                    <Field
-                      label="Username"
-                      value={member.username !== "—" ? `@${member.username}` : "—"}
-                    />
-                    <Field label="Bio" value={member.bio} />
-                  </Section>
-
-                  <Section title="Contact">
+                  <Section title="Account">
                     <Field label="Email" value={member.email} />
                     <Field label="Phone" value={member.phone} />
                     <div className="grid grid-cols-2 gap-3">
@@ -343,10 +361,7 @@ export function AdminMemberDetailDrawer({
                       <Field label="City" value={member.city} />
                     </div>
                     <Field label="Gym" value={member.gym} />
-                  </Section>
-
-                  <Section title="Account">
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1.5 pt-1">
                       <MemberBadge {...account} />
                       <MemberBadge {...access} />
                     </div>
@@ -397,7 +412,7 @@ export function AdminMemberDetailDrawer({
                           onClick={() => onModeChange("pro")}
                           type="button"
                         >
-                          Manage membership
+                          Manage membership →
                         </button>
                       ) : null}
                     </div>
@@ -406,35 +421,46 @@ export function AdminMemberDetailDrawer({
                     </p>
                   </Section>
 
-                  <Section title="Roles">
-                    {roles.length > 0 ? (
-                      <div className="flex flex-wrap gap-1.5">
-                        {roles.map((role) => (
-                          <MemberBadge
-                            fullLabel={role.fullLabel}
-                            key={role.id}
-                            label={role.fullLabel}
-                            variant={role.variant}
-                          />
-                        ))}
+                  <Section title="Roles & tags">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-[0.65rem] font-medium uppercase tracking-[0.12em] text-zinc-600">
+                          Assigned roles
+                        </p>
+                        {roles.length > 0 ? (
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {roles.map((role) => (
+                              <MemberBadge
+                                fullLabel={role.fullLabel}
+                                key={role.id}
+                                label={role.fullLabel}
+                                variant={role.variant}
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="mt-2 text-sm text-zinc-500">None</p>
+                        )}
                       </div>
-                    ) : (
-                      <p className="text-sm text-zinc-500">None</p>
-                    )}
+                      <div>
+                        <p className="text-[0.65rem] font-medium uppercase tracking-[0.12em] text-zinc-600">
+                          Account tags
+                        </p>
+                        <div className="mt-2">
+                          <TagList tags={member.tags} />
+                        </div>
+                      </div>
+                      <button
+                        className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-zinc-400 transition hover:text-white"
+                        onClick={() => onModeChange("tags")}
+                        type="button"
+                      >
+                        Manage →
+                      </button>
+                    </div>
                   </Section>
 
-                  <Section title="Tags">
-                    <TagList tags={member.tags} />
-                    <button
-                      className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-zinc-400 transition hover:text-white"
-                      onClick={() => onModeChange("tags")}
-                      type="button"
-                    >
-                      Manage tags →
-                    </button>
-                  </Section>
-
-                  <Section title="Credentials / Licenses">
+                  <Section title="Licenses">
                     {credentials.length > 0 ? (
                       <ul className="space-y-1.5">
                         {credentials.map((item) => (
@@ -448,14 +474,14 @@ export function AdminMemberDetailDrawer({
                       <p className="text-sm text-zinc-400">
                         {member.licenseStatus && isPendingCredential(member)
                           ? `Application: ${member.licenseStatus}`
-                          : "No active credentials"}
+                          : "No active licenses"}
                       </p>
                     )}
                     <Link
                       className="inline-flex text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-[#FF1010] hover:text-[#ff3a3a]"
                       href="/admin/license-approvals"
                     >
-                      View license center →
+                      View License Center →
                     </Link>
                   </Section>
 
@@ -463,8 +489,8 @@ export function AdminMemberDetailDrawer({
                     <div className="grid grid-cols-2 gap-3">
                       <Field label="Joined" value={member.memberSince} />
                       <Field
-                        label="Shop activity"
-                        value={`${member.orders} orders · ${formatCurrency(member.lifetimeSpent)}`}
+                        label="Orders"
+                        value={`${member.orders} · ${formatCurrency(member.lifetimeSpent)}`}
                       />
                     </div>
                   </Section>
@@ -775,7 +801,7 @@ export function AdminMemberDetailDrawer({
               <div className="flex min-h-0 flex-1 flex-col">
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
                   <p className="mb-4 text-sm leading-relaxed text-zinc-400">
-                    Account tags classify organizational roles and team types. They are not licenses.
+                    Roles and tags classify organizational access and team types. They are not licenses.
                   </p>
                   <AdminAccountTagEditor
                     compact
@@ -975,10 +1001,12 @@ export function AdminMemberConfirmDialog({
           <div>
             <div className="space-y-4 px-5 py-5">
               <div className="rounded-xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3.5">
-                <p className="text-sm font-medium text-red-100">This action cannot be undone</p>
+                <p className="text-sm font-medium text-red-100">Permanent deletion</p>
                 <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">
-                  Permanently removes the member account and associated data according to the existing deletion
-                  behavior for <span className="text-zinc-200">{member.email}</span>.
+                  This permanently removes the auth account for{" "}
+                  <span className="text-zinc-200">{member.email}</span> via the existing delete path. There is
+                  currently no 30-day recovery window in the schema — deleted accounts cannot be restored
+                  from this admin UI.
                 </p>
               </div>
             </div>
@@ -997,7 +1025,7 @@ export function AdminMemberConfirmDialog({
                 onClick={() => void handleDeleteConfirm()}
                 type="button"
               >
-                {busy ? "Working…" : "Delete member"}
+                {busy ? "Deleting…" : "Delete permanently"}
               </button>
             </div>
           </div>

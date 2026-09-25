@@ -1,18 +1,17 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, CalendarDays, Clock3, MapPin, Ticket } from "lucide-react";
+import { CalendarDays, Clock3, MapPin, Swords } from "lucide-react";
 import Image from "next/image";
-import { CountdownTimer } from "@/components/CountdownTimer";
 import { AsSeenOnCarousel } from "@/components/AsSeenOnCarousel";
 import { EnergyParticles } from "@/components/EnergyParticles";
 import { MagneticButton } from "@/components/MagneticButton";
-import { barrioBrawlsEvent, barrioBrawlsEventPosterSrc, barrioBrawlsTicketCheckoutUrl } from "@/data/shop-tickets";
+import { barrioBrawlsEvent } from "@/data/shop-tickets";
 
 const heroFeaturedEvent = {
   ...barrioBrawlsEvent,
-  checkoutUrl: barrioBrawlsTicketCheckoutUrl,
-  posterSrc: barrioBrawlsEventPosterSrc,
+  posterSrc: "/hero-featured-fighters.png",
+  becomeFighterHref: "/login?mode=register&next=/register-for-license/fighter",
 };
 
 export function HeroSection() {
@@ -78,12 +77,6 @@ export function HeroSection() {
               </span>
             </p>
 
-            <div className="mt-5 flex flex-wrap justify-center gap-3 sm:mt-8 lg:justify-start">
-              <MagneticButton href="/login?mode=register">
-                Register Now
-                <ArrowRight className="ml-2 transition group-hover:translate-x-1" size={18} aria-hidden />
-              </MagneticButton>
-            </div>
           </motion.div>
 
           <motion.div
@@ -97,7 +90,7 @@ export function HeroSection() {
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF1010]/60 to-transparent" />
                 <div className="relative mx-auto aspect-[3/4] max-h-[min(48vh,22rem)] overflow-hidden rounded-[0.9rem] sm:max-h-none sm:rounded-[1.15rem]">
                   <Image
-                    alt={`${heroFeaturedEvent.series} ${heroFeaturedEvent.title} official event poster`}
+                    alt="Juego Todo fighters training in Filipino Martial Arts"
                     className="object-cover object-center"
                     fill
                     loading="eager"
@@ -120,10 +113,9 @@ export function HeroSection() {
                       <span>{heroFeaturedEvent.venue}</span>
                     </p>
                   </div>
-                  <CountdownTimer target={heroFeaturedEvent.target} />
-                  <MagneticButton className="w-full" href={heroFeaturedEvent.checkoutUrl}>
-                    <Ticket className="mr-2" size={16} aria-hidden />
-                    Buy Tickets Now
+                  <MagneticButton className="w-full" href={heroFeaturedEvent.becomeFighterHref}>
+                    <Swords className="mr-2" size={16} aria-hidden />
+                    Become A Fighter
                   </MagneticButton>
                 </div>
               </div>

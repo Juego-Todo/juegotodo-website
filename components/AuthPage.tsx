@@ -1,9 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ArrowRight, Check, Eye, EyeOff, Loader2, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { MotionSection } from "@/components/MotionSection";
 import { PageNavigation } from "@/components/PageNavigation";
 import {
@@ -34,9 +33,29 @@ type AuthMode = "login" | "register" | "forgot" | "reset" | "change-password";
 type UsernameCheckStatus = "idle" | "checking" | "available" | "taken" | "invalid" | "error";
 
 const authInputClassName =
-  "w-full rounded-2xl border border-white/[0.08] bg-black/55 px-4 py-3.5 text-white outline-none transition placeholder:text-zinc-600 focus:border-red-500/40 focus:bg-black/70 focus:ring-4 focus:ring-red-500/15 disabled:opacity-70";
+  "w-full rounded-xl border border-white/[0.08] bg-black/40 px-4 py-3.5 text-[0.95rem] text-white outline-none transition placeholder:text-zinc-600 hover:border-white/15 focus:border-red-500/45 focus:bg-black/55 focus:ring-2 focus:ring-red-500/15 disabled:opacity-70";
 
-const authLabelClassName = "mb-2.5 block text-[0.68rem] font-black uppercase tracking-[0.2em] text-zinc-500";
+const authLabelClassName = "mb-1.5 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-zinc-500";
+
+function FormSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="space-y-4 border-t border-white/[0.06] pt-8 first:border-t-0 first:pt-0">
+      <div>
+        <h2 className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-zinc-500">{title}</h2>
+        {description ? <p className="mt-1.5 text-sm leading-6 text-zinc-500">{description}</p> : null}
+      </div>
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
 
 function resolveAuthMode(value: string | null): AuthMode {
   if (value === "register") {
@@ -407,21 +426,21 @@ export function AuthPage() {
   const heading =
     mode === "register"
       ? isCheckoutReturn
-        ? "Create Account To Checkout"
-        : "Create Your Account"
+        ? "Create account to checkout"
+        : "Create your account"
       : mode === "forgot"
-        ? "Reset Your Password"
+        ? "Reset your password"
         : mode === "reset" || mode === "change-password"
-          ? "Choose A New Password"
+          ? "Choose a new password"
           : isCheckoutReturn
-            ? "Login To Checkout"
-            : "Login To Your Account";
+            ? "Login to checkout"
+            : "Welcome back";
 
   const description =
     mode === "register"
       ? isCheckoutReturn
         ? "Create your Juego Todo account to continue checkout. Your cart will stay saved while you register."
-        : ""
+        : "Join Juego Todo and create your member profile."
       : mode === "forgot"
         ? "Enter the email tied to your JTGC account and we will send password reset instructions."
         : mode === "change-password"
@@ -430,7 +449,7 @@ export function AuthPage() {
             ? "Create a new password for your account. Use at least 8 characters."
             : isCheckoutReturn
               ? "Sign in to continue checkout. Your cart items will still be there."
-              : "";
+              : "Sign in to access your profile, tickets, and membership.";
 
   const usernameBlocksSubmit =
     mode === "register" &&
@@ -440,75 +459,109 @@ export function AuthPage() {
       !username.trim());
 
   return (
-    <main className="overflow-hidden px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
-      <section className="relative mx-auto max-w-6xl py-10 sm:py-14">
-        <div className="cinematic-grid absolute inset-0 opacity-30" aria-hidden />
-        <div className="relative grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <motion.div
-            animate={{ opacity: 1, y: 0 }}
-            initial={{ opacity: 0, y: 24 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <PageNavigation currentLabel="Register & Login" />
-            <h1 className="font-display mt-3 text-[clamp(3rem,12vw,5rem)] uppercase leading-[0.9] text-white sm:mt-4">
-              {heading}
-            </h1>
-            {description ? (
-              <p className="mt-5 max-w-xl text-base leading-7 text-zinc-300 sm:text-lg">{description}</p>
-            ) : null}
-          </motion.div>
+    <main className="px-4 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
+      <section className="relative mx-auto max-w-xl py-10 sm:py-14">
+        <PageNavigation currentLabel="Register & Login" />
 
-          <MotionSection>
-            <div className="glass-panel relative overflow-hidden rounded-[1.75rem] border border-white/[0.08] p-6 sm:p-8">
-              <div
-                className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF1010]/70 to-transparent"
-                aria-hidden
+        <MotionSection className="mt-6">
+          <div className="relative overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-[#0a0a0a]/80 p-5 sm:p-7">
+            {mode === "login" || mode === "register" ? (
+              <AuthModeToggle
+                mode={mode}
+                onLogin={() => switchMode("login")}
+                onRegister={() => switchMode("register")}
               />
+            ) : (
+              <div className="rounded-xl border border-white/[0.08] bg-black/30 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-red-300">
+                  {mode === "forgot"
+                    ? "Forgot Password"
+                    : mode === "change-password"
+                      ? "First Login"
+                      : "Password Recovery"}
+                </p>
+                {mode === "change-password" ? (
+                  <button
+                    className="mt-2 text-xs font-medium text-zinc-400 transition hover:text-white"
+                    onClick={() => void logout()}
+                    type="button"
+                  >
+                    Sign out
+                  </button>
+                ) : (
+                  <button
+                    className="mt-2 text-xs font-medium text-zinc-400 transition hover:text-white"
+                    onClick={() => switchMode("login")}
+                    type="button"
+                  >
+                    ← Back to login
+                  </button>
+                )}
+              </div>
+            )}
 
-              {mode === "login" || mode === "register" ? (
-                <AuthModeToggle
-                  mode={mode}
-                  onLogin={() => switchMode("login")}
-                  onRegister={() => switchMode("register")}
-                />
-              ) : (
-                <div className="rounded-2xl border border-white/[0.08] bg-black/45 px-4 py-3.5">
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
-                    {mode === "forgot"
-                      ? "Forgot Password"
-                      : mode === "change-password"
-                        ? "First Login"
-                        : "Password Recovery"}
-                  </p>
-                  {mode === "change-password" ? (
-                    <button
-                      className="mt-2 text-xs font-semibold text-zinc-400 transition hover:text-white"
-                      onClick={() => void logout()}
-                      type="button"
-                    >
-                      Sign out
-                    </button>
-                  ) : (
-                    <button
-                      className="mt-2 text-xs font-semibold text-zinc-400 transition hover:text-white"
-                      onClick={() => switchMode("login")}
-                      type="button"
-                    >
-                      ← Back to login
-                    </button>
-                  )}
-                </div>
-              )}
+            <div className="mt-6">
+              <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]">
+                {heading}
+              </h1>
+              {description ? (
+                <p className="mt-2 text-sm leading-6 text-zinc-400 sm:text-[0.95rem]">{description}</p>
+              ) : null}
+            </div>
 
-              <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
-                {mode === "register" ? (
-                  <>
+            <form className="mt-8 space-y-0" onSubmit={handleSubmit}>
+              {mode === "register" ? (
+                <>
+                  <FormSection
+                    description="Set up your login and public identity."
+                    title="Account"
+                  >
                     <AuthUsernameField
                       message={usernameCheckMessage}
                       onChange={handleUsernameChange}
                       status={usernameCheckStatus}
                       value={username}
                     />
+                    <AuthField
+                      autoComplete="email"
+                      label="Email address"
+                      onChange={setEmail}
+                      placeholder="you@email.com"
+                      required
+                      type="email"
+                      value={resolvedEmail}
+                    />
+                    <AuthPasswordField
+                      autoComplete="new-password"
+                      label="Password"
+                      onChange={setPassword}
+                      onToggleVisibility={() => setShowPassword((value) => !value)}
+                      placeholder="At least 8 characters"
+                      required
+                      showPassword={showPassword}
+                      value={password}
+                    />
+                    <AuthPasswordField
+                      autoComplete="new-password"
+                      fieldId="confirmPassword"
+                      invalid={invalidField === "confirmPassword"}
+                      label="Confirm password"
+                      onChange={(value) => {
+                        setConfirmPassword(value);
+                        if (invalidField === "confirmPassword") setInvalidField(null);
+                      }}
+                      onToggleVisibility={() => setShowConfirmPassword((value) => !value)}
+                      placeholder="Repeat your password"
+                      required
+                      showPassword={showConfirmPassword}
+                      value={confirmPassword}
+                    />
+                  </FormSection>
+
+                  <FormSection
+                    description="Tell us a little about yourself."
+                    title="Personal information"
+                  >
                     <div className="grid gap-4 sm:grid-cols-3">
                       <AuthField
                         autoComplete="given-name"
@@ -565,6 +618,12 @@ export function AuthPage() {
                       type="date"
                       value={dateOfBirth}
                     />
+                  </FormSection>
+
+                  <FormSection
+                    description="Help us keep your contact and location information accurate."
+                    title="Location & contact"
+                  >
                     <AuthCountrySelectField
                       label="Country"
                       onChange={setCountry}
@@ -584,136 +643,140 @@ export function AuthPage() {
                       placeholder="Optional"
                       value={city}
                     />
-                  </>
-                ) : null}
+                  </FormSection>
 
-                <AuthField
-                  autoComplete="email"
-                  label="Email address"
-                  onChange={
-                    (mode === "reset" || mode === "change-password") && user?.email ? () => undefined : setEmail
-                  }
-                  placeholder="you@email.com"
-                  readOnly={
-                    (mode === "reset" || mode === "change-password") &&
-                    Boolean(user?.email || getPendingPasswordResetEmail())
-                  }
-                  required
-                  type="email"
-                  value={resolvedEmail}
-                />
-
-                {mode === "login" || mode === "register" || mode === "reset" || mode === "change-password" ? (
-                  <AuthPasswordField
-                    autoComplete={mode === "login" ? "current-password" : "new-password"}
-                    label={mode === "reset" || mode === "change-password" ? "New password" : "Password"}
-                    onChange={setPassword}
-                    onToggleVisibility={() => setShowPassword((value) => !value)}
-                    placeholder={mode === "login" ? "Your password" : "At least 8 characters"}
-                    required
-                    showPassword={showPassword}
-                    value={password}
-                  />
-                ) : null}
-
-                {mode === "register" || mode === "reset" || mode === "change-password" ? (
-                  <AuthPasswordField
-                    autoComplete="new-password"
-                    fieldId="confirmPassword"
-                    invalid={invalidField === "confirmPassword"}
-                    label="Confirm password"
-                    onChange={(value) => {
-                      setConfirmPassword(value);
-                      if (invalidField === "confirmPassword") setInvalidField(null);
-                    }}
-                    onToggleVisibility={() => setShowConfirmPassword((value) => !value)}
-                    placeholder="Repeat your password"
-                    required
-                    showPassword={showConfirmPassword}
-                    value={confirmPassword}
-                  />
-                ) : null}
-
-                {mode === "login" ? (
-                  <div className="flex flex-col gap-3 border-t border-white/[0.06] pt-1 sm:flex-row sm:items-center sm:justify-between">
-                    <label className="flex min-h-11 cursor-pointer items-center gap-2.5">
-                      <input
-                        checked={rememberMe}
-                        className="h-4 w-4 rounded border-white/20 bg-transparent accent-[#FF1010] focus:ring-red-500/40"
-                        onChange={(event) => {
-                          const checked = event.target.checked;
-                          setRememberMe(checked);
-                          if (!checked) {
-                            clearRememberedEmail();
-                          }
-                        }}
-                        type="checkbox"
-                      />
-                      <span className="text-sm text-zinc-400">Remember my email on this device</span>
-                    </label>
-                    <button
-                      className="inline-flex min-h-11 items-center text-left text-sm font-semibold text-red-300 transition hover:text-white sm:text-right"
-                      onClick={() => switchMode("forgot")}
-                      type="button"
-                    >
-                      Forgot password?
-                    </button>
+                  <div className="border-t border-white/[0.06] pt-8">
+                    <RegistrationLegalAcknowledgments
+                      onChange={(next) => {
+                        setAcceptedLegal(next);
+                        if (registrationLegalIsComplete(next)) {
+                          setShowLegalValidation(false);
+                          if (invalidField === "legal") setInvalidField(null);
+                        }
+                      }}
+                      showValidation={showLegalValidation}
+                      value={acceptedLegal}
+                    />
                   </div>
-                ) : null}
-
-                {mode === "register" ? (
-                  <RegistrationLegalAcknowledgments
-                    onChange={(next) => {
-                      setAcceptedLegal(next);
-                      if (registrationLegalIsComplete(next)) {
-                        setShowLegalValidation(false);
-                        if (invalidField === "legal") setInvalidField(null);
-                      }
-                    }}
-                    showValidation={showLegalValidation}
-                    value={acceptedLegal}
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <AuthField
+                    autoComplete="email"
+                    label="Email address"
+                    onChange={
+                      (mode === "reset" || mode === "change-password") && user?.email
+                        ? () => undefined
+                        : setEmail
+                    }
+                    placeholder="you@email.com"
+                    readOnly={
+                      (mode === "reset" || mode === "change-password") &&
+                      Boolean(user?.email || getPendingPasswordResetEmail())
+                    }
+                    required
+                    type="email"
+                    value={resolvedEmail}
                   />
-                ) : null}
 
-                {success ? (
-                  <p className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-                    {success}
-                  </p>
-                ) : null}
-                {error ? (
-                  <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                    {error}
-                  </p>
-                ) : null}
+                  {mode === "login" || mode === "reset" || mode === "change-password" ? (
+                    <AuthPasswordField
+                      autoComplete={mode === "login" ? "current-password" : "new-password"}
+                      label={mode === "reset" || mode === "change-password" ? "New password" : "Password"}
+                      onChange={setPassword}
+                      onToggleVisibility={() => setShowPassword((value) => !value)}
+                      placeholder={mode === "login" ? "Your password" : "At least 8 characters"}
+                      required
+                      showPassword={showPassword}
+                      value={password}
+                    />
+                  ) : null}
 
-                <button
-                  className="group inline-flex min-h-[3.25rem] w-full items-center justify-center rounded-full bg-gradient-to-r from-[#FF1010] to-red-600 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-white shadow-[0_12px_32px_rgba(255,16,16,0.22)] transition hover:from-red-500 hover:to-[#ff2828] disabled:cursor-not-allowed disabled:opacity-60"
-                  disabled={
-                    submitting ||
-                    (mode === "register" && !registrationLegalIsComplete(acceptedLegal)) ||
-                    usernameBlocksSubmit
-                  }
-                  type="submit"
-                >
-                  {submitting
-                    ? "Please wait..."
-                    : mode === "register"
-                      ? "Create Account"
-                      : mode === "forgot"
-                        ? "Send Reset Link"
-                        : mode === "reset" || mode === "change-password"
-                          ? "Update Password"
-                          : "Login"}
-                  <ArrowRight
-                    className="ml-2 transition group-hover:translate-x-0.5"
-                    size={18}
-                    aria-hidden
-                  />
-                </button>
-              </form>
-            </div>
-          </MotionSection>
-        </div>
+                  {mode === "reset" || mode === "change-password" ? (
+                    <AuthPasswordField
+                      autoComplete="new-password"
+                      fieldId="confirmPassword"
+                      invalid={invalidField === "confirmPassword"}
+                      label="Confirm password"
+                      onChange={(value) => {
+                        setConfirmPassword(value);
+                        if (invalidField === "confirmPassword") setInvalidField(null);
+                      }}
+                      onToggleVisibility={() => setShowConfirmPassword((value) => !value)}
+                      placeholder="Repeat your password"
+                      required
+                      showPassword={showConfirmPassword}
+                      value={confirmPassword}
+                    />
+                  ) : null}
+
+                  {mode === "login" ? (
+                    <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
+                      <label className="flex min-h-11 cursor-pointer items-center gap-2.5">
+                        <input
+                          checked={rememberMe}
+                          className="h-4 w-4 rounded border-white/20 bg-transparent accent-[#FF1010] focus:ring-red-500/40"
+                          onChange={(event) => {
+                            const checked = event.target.checked;
+                            setRememberMe(checked);
+                            if (!checked) {
+                              clearRememberedEmail();
+                            }
+                          }}
+                          type="checkbox"
+                        />
+                        <span className="text-sm text-zinc-400">Remember my email on this device</span>
+                      </label>
+                      <button
+                        className="inline-flex min-h-11 items-center text-left text-sm font-medium text-red-300 transition hover:text-white sm:text-right"
+                        onClick={() => switchMode("forgot")}
+                        type="button"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              )}
+
+              {success ? (
+                <p className="mt-6 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.08] px-4 py-3 text-sm text-emerald-200">
+                  {success}
+                </p>
+              ) : null}
+              {error ? (
+                <p className="mt-6 rounded-xl border border-red-500/25 bg-red-500/[0.08] px-4 py-3 text-sm text-red-200">
+                  {error}
+                </p>
+              ) : null}
+
+              <button
+                className="group mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#FF1010] px-6 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#ff2a2a] disabled:cursor-not-allowed disabled:opacity-55"
+                disabled={
+                  submitting ||
+                  (mode === "register" && !registrationLegalIsComplete(acceptedLegal)) ||
+                  usernameBlocksSubmit
+                }
+                type="submit"
+              >
+                {submitting
+                  ? "Please wait..."
+                  : mode === "register"
+                    ? "Create Account"
+                    : mode === "forgot"
+                      ? "Send Reset Link"
+                      : mode === "reset" || mode === "change-password"
+                        ? "Update Password"
+                        : "Login"}
+                <ArrowRight
+                  className="ml-2 transition group-hover:translate-x-0.5"
+                  size={16}
+                  aria-hidden
+                />
+              </button>
+            </form>
+          </div>
+        </MotionSection>
       </section>
     </main>
   );
@@ -729,11 +792,11 @@ function AuthModeToggle({
   onRegister: () => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-1 rounded-2xl border border-white/[0.08] bg-black/45 p-1">
+    <div className="grid grid-cols-2 gap-1 rounded-xl border border-white/[0.08] bg-black/30 p-1">
       <button
-        className={`min-h-11 rounded-[0.85rem] px-3 py-2.5 text-[0.68rem] font-black uppercase tracking-[0.16em] transition sm:text-xs sm:tracking-[0.18em] ${
+        className={`min-h-10 rounded-lg px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.14em] transition ${
           mode === "login"
-            ? "bg-[#FF1010] text-white shadow-[0_8px_24px_rgba(255,16,16,0.28)]"
+            ? "bg-[#FF1010] text-white"
             : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-200"
         }`}
         onClick={onLogin}
@@ -742,16 +805,15 @@ function AuthModeToggle({
         Login
       </button>
       <button
-        className={`min-h-11 rounded-[0.85rem] px-3 py-2.5 text-[0.68rem] font-black uppercase tracking-[0.16em] transition sm:text-xs sm:tracking-[0.18em] ${
+        className={`min-h-10 rounded-lg px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.14em] transition ${
           mode === "register"
-            ? "bg-[#FF1010] text-white shadow-[0_8px_24px_rgba(255,16,16,0.28)]"
+            ? "bg-[#FF1010] text-white"
             : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-200"
         }`}
         onClick={onRegister}
         type="button"
       >
-        <span className="sm:hidden">Register</span>
-        <span className="hidden sm:inline">Create Account</span>
+        Create Account
       </button>
     </div>
   );
@@ -813,25 +875,21 @@ function AuthUsernameField({
       <label className={authLabelClassName} htmlFor={inputId}>
         Username
       </label>
-
-      <p className="mt-2 text-[0.95rem] font-semibold leading-6 text-white">
-        Choose your unique username
-      </p>
-      <p className="mt-1 text-sm leading-6 text-zinc-400">
-        This is how people will find and identify you on Juego Todo.
+      <p className="mb-2 text-sm text-zinc-400">
+        Choose your unique username. This is how people will find you on Juego Todo.
       </p>
 
       <div
-        className={`mt-3.5 flex min-h-[3.35rem] items-center gap-3 rounded-2xl border bg-black/55 px-4 transition focus-within:bg-black/70 focus-within:ring-4 ${borderTone}`}
+        className={`flex min-h-12 items-center gap-2.5 rounded-xl border bg-black/40 px-4 transition focus-within:bg-black/55 focus-within:ring-2 ${borderTone}`}
       >
-        <span aria-hidden className="select-none text-lg font-semibold text-zinc-500">
+        <span aria-hidden className="select-none text-base font-medium text-zinc-500">
           @
         </span>
         <input
           aria-describedby={`${helpId}${displayMessage ? ` ${statusId}` : ""}`}
           aria-invalid={status === "taken" || status === "invalid" || status === "error" || undefined}
           autoComplete="username"
-          className="min-w-0 flex-1 bg-transparent py-3.5 text-base text-white outline-none placeholder:text-zinc-600"
+          className="min-w-0 flex-1 bg-transparent py-3 text-[0.95rem] text-white outline-none placeholder:text-zinc-600"
           id={inputId}
           onChange={(event) => onChange(event.target.value)}
           placeholder="Arnisador"
@@ -857,22 +915,13 @@ function AuthUsernameField({
         </span>
       </div>
 
-      <div className="mt-2.5 space-y-1.5" aria-live="polite">
+      <div className="mt-2 space-y-1" aria-live="polite">
         {displayMessage ? (
-          <p className={`flex items-start gap-2 text-sm leading-5 ${statusTone}`} id={statusId}>
-            {status === "available" ? (
-              <Check className="mt-0.5 shrink-0" size={14} aria-hidden />
-            ) : null}
-            {status === "taken" || status === "invalid" || status === "error" ? (
-              <X className="mt-0.5 shrink-0" size={14} aria-hidden />
-            ) : null}
-            {status === "checking" ? (
-              <Loader2 className="mt-0.5 shrink-0 animate-spin" size={14} aria-hidden />
-            ) : null}
-            <span>{displayMessage}</span>
+          <p className={`text-sm leading-5 ${statusTone}`} id={statusId}>
+            {displayMessage}
           </p>
         ) : null}
-        <p className="text-sm leading-5 text-zinc-500" id={helpId}>
+        <p className="text-xs leading-5 text-zinc-500" id={helpId}>
           6–20 characters · Letters, numbers, and underscores
         </p>
       </div>
@@ -930,7 +979,7 @@ function AuthPhoneField({
     <label className="block">
       <span className={authLabelClassName}>{label}</span>
       <div className="flex gap-2">
-        <div className="flex min-w-[4.75rem] shrink-0 items-center justify-center rounded-2xl border border-white/[0.08] bg-black/55 px-3 py-3.5 text-sm font-semibold text-zinc-200">
+        <div className="flex min-w-[4.75rem] shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-black/40 px-3 py-3.5 text-sm font-medium text-zinc-200">
           {dialCode}
         </div>
         <input
@@ -943,7 +992,7 @@ function AuthPhoneField({
           value={value}
         />
       </div>
-      <p className="mt-2 text-xs text-zinc-600">Country code is added automatically from your selected country.</p>
+      <p className="mt-2 text-xs text-zinc-500">Country code is added automatically from your selected country.</p>
     </label>
   );
 }
@@ -965,26 +1014,30 @@ function AuthGenderChoiceField({
 }) {
   return (
     <fieldset
-      className={`block rounded-2xl ${invalid ? "ring-2 ring-red-500/40 ring-offset-2 ring-offset-black" : ""}`}
+      className={`block ${invalid ? "rounded-xl ring-2 ring-red-500/35" : ""}`}
       data-auth-field="gender"
     >
       <legend className={authLabelClassName}>
         {label}
         {required ? <span className="text-red-400"> *</span> : null}
       </legend>
-      <div aria-label={label} className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-2.5" role="radiogroup">
+      <div
+        aria-label={label}
+        className="grid grid-cols-1 gap-2 sm:grid-cols-3"
+        role="radiogroup"
+      >
         {options.map((option) => {
           const selected = value === option;
 
           return (
             <button
               aria-checked={selected}
-              className={`min-h-11 rounded-2xl border px-3 py-3.5 text-center text-sm font-semibold leading-snug transition ${
+              className={`min-h-11 rounded-xl border px-3 py-3 text-center text-sm font-medium leading-snug transition ${
                 selected
-                  ? "border-red-500/45 bg-red-500/10 text-white shadow-[0_0_18px_rgba(229,9,20,0.12)]"
+                  ? "border-[#FF1010]/50 bg-[#FF1010]/10 text-white"
                   : invalid
-                    ? "border-red-500/35 bg-red-500/5 text-zinc-300 hover:border-red-400/50 hover:text-white"
-                    : "border-white/10 bg-black/50 text-zinc-300 hover:border-white/20 hover:bg-white/[0.04] hover:text-white"
+                    ? "border-red-500/30 bg-transparent text-zinc-300 hover:border-red-400/45"
+                    : "border-white/10 bg-transparent text-zinc-300 hover:border-white/20 hover:text-white"
               }`}
               key={option}
               onClick={() => onChange(option)}
@@ -997,17 +1050,10 @@ function AuthGenderChoiceField({
         })}
       </div>
       {invalid ? (
-        <p className="mt-2 text-xs font-semibold text-red-300">Select Male, Female, or Prefer not to say.</p>
+        <p className="mt-2 text-xs text-red-300">Select Male, Female, or Prefer not to say.</p>
       ) : null}
       {required ? (
-        <input
-          aria-hidden
-          className="sr-only"
-          readOnly
-          required
-          tabIndex={-1}
-          value={value}
-        />
+        <input aria-hidden className="sr-only" readOnly required tabIndex={-1} value={value} />
       ) : null}
     </fieldset>
   );

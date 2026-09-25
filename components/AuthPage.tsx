@@ -287,6 +287,23 @@ export function AuthPage() {
           }
         }
 
+        const consentPayload = {
+          accuracyConfirmed: acceptedLegal.accuracyConfirmed === true,
+          privacyAcknowledged: acceptedLegal.privacyAcknowledged === true,
+          termsAccepted: acceptedLegal.termsAccepted === true,
+          marketingOptIn: acceptedLegal.marketingOptIn === true,
+        };
+
+        if (
+          !consentPayload.accuracyConfirmed ||
+          !consentPayload.privacyAcknowledged ||
+          !consentPayload.termsAccepted
+        ) {
+          setShowLegalValidation(true);
+          markInvalidField("legal");
+          throw new Error("Please complete the required confirmations before continuing.");
+        }
+
         await register({
           firstName: firstName.trim(),
           middleName: middleName.trim(),
@@ -300,10 +317,7 @@ export function AuthPage() {
           phone: normalizedPhone,
           country,
           city,
-          accuracyConfirmed: acceptedLegal.accuracyConfirmed,
-          privacyAcknowledged: acceptedLegal.privacyAcknowledged,
-          termsAccepted: acceptedLegal.termsAccepted,
-          marketingOptIn: acceptedLegal.marketingOptIn,
+          ...consentPayload,
         });
         router.push(nextPath);
         return;
@@ -371,6 +385,16 @@ export function AuthPage() {
         switchMode("login");
         setSuccess(message);
         return;
+      }
+      if (
+        mode === "register" &&
+        (/Privacy Policy/i.test(message) ||
+          /Terms of Service/i.test(message) ||
+          /required confirmation/i.test(message) ||
+          /information accuracy/i.test(message))
+      ) {
+        setShowLegalValidation(true);
+        markInvalidField("legal");
       }
       setError(message);
     } finally {
@@ -790,17 +814,17 @@ function AuthUsernameField({
         Username
       </label>
 
-      <div className="mt-1 space-y-1">
-        <p className="text-sm font-medium text-zinc-200">Choose your unique username</p>
-        <p className="text-sm leading-6 text-zinc-500">
-          This is how people will find and identify you on Juego Todo.
-        </p>
-      </div>
+      <p className="mt-2 text-[0.95rem] font-semibold leading-6 text-white">
+        Choose your unique username
+      </p>
+      <p className="mt-1 text-sm leading-6 text-zinc-400">
+        This is how people will find and identify you on Juego Todo.
+      </p>
 
       <div
-        className={`mt-3 flex min-h-[3.25rem] items-center gap-2.5 rounded-2xl border bg-black/55 px-4 transition focus-within:bg-black/70 focus-within:ring-4 ${borderTone}`}
+        className={`mt-3.5 flex min-h-[3.35rem] items-center gap-3 rounded-2xl border bg-black/55 px-4 transition focus-within:bg-black/70 focus-within:ring-4 ${borderTone}`}
       >
-        <span aria-hidden className="select-none text-base font-semibold text-zinc-500">
+        <span aria-hidden className="select-none text-lg font-semibold text-zinc-500">
           @
         </span>
         <input
@@ -848,7 +872,7 @@ function AuthUsernameField({
             <span>{displayMessage}</span>
           </p>
         ) : null}
-        <p className="text-xs leading-5 text-zinc-600" id={helpId}>
+        <p className="text-sm leading-5 text-zinc-500" id={helpId}>
           6–20 characters · Letters, numbers, and underscores
         </p>
       </div>

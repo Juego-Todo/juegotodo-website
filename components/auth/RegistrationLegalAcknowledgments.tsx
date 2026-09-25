@@ -54,17 +54,21 @@ function LegalCheckbox({
       className={`rounded-2xl border px-4 py-3.5 transition ${
         invalid
           ? "border-red-500/50 bg-red-500/10 ring-2 ring-red-500/25"
-          : "border-white/[0.08] bg-black/35"
+          : checked
+            ? "border-white/15 bg-black/40"
+            : "border-white/[0.08] bg-black/35"
       }`}
       data-auth-field={fieldId}
     >
       <div className="mb-2 flex items-center justify-between gap-3">
         <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-zinc-500">{title}</p>
-        {optional ? (
-          <span className="text-[0.58rem] font-semibold uppercase tracking-[0.14em] text-zinc-600">
-            Optional
-          </span>
-        ) : null}
+        <span
+          className={`text-[0.58rem] font-semibold uppercase tracking-[0.14em] ${
+            optional ? "text-zinc-600" : "text-zinc-500"
+          }`}
+        >
+          {optional ? "Optional" : "Required"}
+        </span>
       </div>
       <label className="flex cursor-pointer items-start gap-3" htmlFor={inputId}>
         <input
@@ -93,6 +97,11 @@ export function RegistrationLegalAcknowledgments({
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const detailsId = useId();
   const incomplete = showValidation && !registrationLegalIsComplete(value);
+  const missingCount = [
+    value.accuracyConfirmed,
+    value.privacyAcknowledged,
+    value.termsAccepted,
+  ].filter((entry) => !entry).length;
 
   function update<K extends keyof RegistrationLegalState>(key: K, nextValue: RegistrationLegalState[K]) {
     onChange({ ...value, [key]: nextValue });
@@ -109,6 +118,9 @@ export function RegistrationLegalAcknowledgments({
         </p>
         <p className="mt-2 text-sm leading-6 text-zinc-400">
           Make sure your information is accurate and review how your account information is handled.
+        </p>
+        <p className="mt-1.5 text-xs leading-5 text-zinc-500">
+          Three required confirmations · Communications is optional
         </p>
       </div>
 
@@ -135,8 +147,8 @@ export function RegistrationLegalAcknowledgments({
             className={linkClassName}
             href="/privacy"
             onClick={(event) => event.stopPropagation()}
-            target="_blank"
             rel="noopener noreferrer"
+            target="_blank"
           >
             Privacy Policy
           </Link>{" "}
@@ -155,8 +167,8 @@ export function RegistrationLegalAcknowledgments({
             className={linkClassName}
             href="/terms"
             onClick={(event) => event.stopPropagation()}
-            target="_blank"
             rel="noopener noreferrer"
+            target="_blank"
           >
             Terms of Service
           </Link>
@@ -239,7 +251,8 @@ export function RegistrationLegalAcknowledgments({
 
       {incomplete ? (
         <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200" role="alert">
-          Please complete the required confirmations before continuing.
+          Please complete the {missingCount} required confirmation{missingCount === 1 ? "" : "s"} before
+          continuing.
         </p>
       ) : null}
     </section>

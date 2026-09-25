@@ -276,6 +276,10 @@ export async function registerSupabaseUser(input: RegisterInput): Promise<UserPr
         lastName: input.lastName.trim(),
         middleName: input.middleName?.trim() ?? "",
         gender: input.gender.trim(),
+        accuracyConfirmed: Boolean(input.accuracyConfirmed),
+        privacyAcknowledged: Boolean(input.privacyAcknowledged),
+        termsAccepted: Boolean(input.termsAccepted),
+        marketingOptIn: Boolean(input.marketingOptIn),
       }),
       signal: controller.signal,
     });

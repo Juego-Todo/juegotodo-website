@@ -136,7 +136,7 @@ export function AuthPage() {
 
     const requestId = ++usernameCheckRequestRef.current;
     setUsernameAvailabilityStatus("checking");
-    setUsernameAvailabilityMessage("Checking availability...");
+    setUsernameAvailabilityMessage("Checking…");
 
     try {
       const result = await checkUsernameAvailability(value);
@@ -205,11 +205,7 @@ export function AuthPage() {
   const usernameCheckMessage =
     usernameValidationError ??
     usernameAvailabilityMessage ??
-    (usernameIsPendingCheck
-      ? "Checking availability..."
-      : username.trim()
-        ? ""
-        : "Choose your handle first. Usernames must be respectful and are checked automatically.");
+    (usernameIsPendingCheck ? "Checking…" : "");
 
   function switchMode(nextMode: AuthMode) {
     const params = new URLSearchParams(searchParams.toString());
@@ -748,44 +744,112 @@ function AuthUsernameField({
   status: UsernameCheckStatus;
   message: string;
 }) {
-  const statusClassName =
+  const inputId = "auth-username";
+  const statusId = "auth-username-status";
+  const helpId = "auth-username-help";
+
+  const statusTone =
     status === "available"
       ? "text-emerald-300"
       : status === "taken" || status === "invalid" || status === "error"
         ? "text-red-300"
         : "text-zinc-500";
 
+  const borderTone =
+    status === "available"
+      ? "border-emerald-500/35 focus-within:border-emerald-500/50 focus-within:ring-emerald-500/15"
+      : status === "taken" || status === "invalid" || status === "error"
+        ? "border-red-500/40 focus-within:border-red-500/50 focus-within:ring-red-500/15"
+        : "border-white/[0.08] focus-within:border-red-500/40 focus-within:ring-red-500/15";
+
+  const displayMessage =
+    status === "available"
+      ? "Username is available"
+      : status === "taken"
+        ? "Username is already taken. Try another."
+        : status === "checking"
+          ? "Checking…"
+          : status === "invalid" || status === "error"
+            ? message
+            : "";
+
+  const statusLabel =
+    status === "available"
+      ? "Username is available"
+      : status === "taken"
+        ? "Username is unavailable"
+        : status === "checking"
+          ? "Checking username availability"
+          : status === "invalid" || status === "error"
+            ? message || "Username is invalid"
+            : undefined;
+
   return (
-    <div className="block">
-      <span className={authLabelClassName}>Username</span>
-      <div className="relative">
-        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-zinc-500">
+    <div className="block" data-auth-field="username">
+      <label className={authLabelClassName} htmlFor={inputId}>
+        Username
+      </label>
+
+      <div className="mt-1 space-y-1">
+        <p className="text-sm font-medium text-zinc-200">Choose your unique username</p>
+        <p className="text-sm leading-6 text-zinc-500">
+          This is how people will find and identify you on Juego Todo.
+        </p>
+      </div>
+
+      <div
+        className={`mt-3 flex min-h-[3.25rem] items-center gap-2.5 rounded-2xl border bg-black/55 px-4 transition focus-within:bg-black/70 focus-within:ring-4 ${borderTone}`}
+      >
+        <span aria-hidden className="select-none text-base font-semibold text-zinc-500">
           @
         </span>
         <input
+          aria-describedby={`${helpId}${displayMessage ? ` ${statusId}` : ""}`}
+          aria-invalid={status === "taken" || status === "invalid" || status === "error" || undefined}
           autoComplete="username"
-          className={`${authInputClassName} pl-8 ${
-            status === "available"
-              ? "border-emerald-500/40"
-              : status === "taken" || status === "invalid" || status === "error"
-                ? "border-red-500/40"
-                : ""
-          }`}
+          className="min-w-0 flex-1 bg-transparent py-3.5 text-base text-white outline-none placeholder:text-zinc-600"
+          id={inputId}
           onChange={(event) => onChange(event.target.value)}
-          placeholder="yourname"
+          placeholder="Arnisador"
           required
+          spellCheck={false}
           value={value}
         />
+        <span
+          aria-hidden={status === "idle"}
+          aria-label={statusLabel}
+          className={`inline-flex min-w-[1.25rem] shrink-0 items-center justify-end transition-opacity duration-200 ${
+            status === "idle" ? "opacity-0" : "opacity-100"
+          }`}
+          role={status === "idle" ? undefined : "status"}
+        >
+          {status === "checking" ? (
+            <Loader2 className="animate-spin text-zinc-400" size={16} />
+          ) : null}
+          {status === "available" ? <Check className="text-emerald-300" size={16} /> : null}
+          {status === "taken" || status === "invalid" || status === "error" ? (
+            <X className="text-red-300" size={16} />
+          ) : null}
+        </span>
       </div>
-      <div className="mt-2 flex items-start gap-2">
-        {status === "checking" ? <Loader2 className="mt-0.5 shrink-0 animate-spin text-zinc-400" size={14} aria-hidden /> : null}
-        {status === "available" ? <Check className="mt-0.5 shrink-0 text-emerald-300" size={14} aria-hidden /> : null}
-        {status === "taken" || status === "invalid" || status === "error" ? (
-          <X className="mt-0.5 shrink-0 text-red-300" size={14} aria-hidden />
+
+      <div className="mt-2.5 space-y-1.5" aria-live="polite">
+        {displayMessage ? (
+          <p className={`flex items-start gap-2 text-sm leading-5 ${statusTone}`} id={statusId}>
+            {status === "available" ? (
+              <Check className="mt-0.5 shrink-0" size={14} aria-hidden />
+            ) : null}
+            {status === "taken" || status === "invalid" || status === "error" ? (
+              <X className="mt-0.5 shrink-0" size={14} aria-hidden />
+            ) : null}
+            {status === "checking" ? (
+              <Loader2 className="mt-0.5 shrink-0 animate-spin" size={14} aria-hidden />
+            ) : null}
+            <span>{displayMessage}</span>
+          </p>
         ) : null}
-        <p className={`text-xs leading-5 ${statusClassName}`}>
-          {message ||
-            "6–20 characters. Letters, numbers, and underscores only. Availability is checked automatically."}
+        <p className="text-xs leading-5 text-zinc-600" id={helpId}>
+          6–20 characters · Letters, numbers, and underscores
         </p>
       </div>
     </div>

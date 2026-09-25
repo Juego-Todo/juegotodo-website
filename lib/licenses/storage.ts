@@ -16,6 +16,7 @@ import {
   fetchLicenseApplicationByIdSupabase,
   fetchLicenseApplicationByUserAndProgramSupabase,
   fetchLicenseApplicationByUserIdSupabase,
+  fetchLicenseApplicationsByUserIdSupabase,
   fetchPendingLicenseApplicationCountSupabase,
   reviewLicenseApplicationSupabase,
   saveLicenseApplicationSupabase,
@@ -213,6 +214,15 @@ export async function fetchLicenseApplicationByUserId(userId: string) {
     return fetchLicenseApplicationByUserIdSupabase(userId);
   }
   return getLicenseApplicationByUserId(userId);
+}
+
+export async function fetchLicenseApplicationsByUserId(userId: string) {
+  if (isSupabaseConfigured()) {
+    return fetchLicenseApplicationsByUserIdSupabase(userId);
+  }
+  return readApplications()
+    .filter((application) => application.userId === userId)
+    .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
 }
 
 export async function fetchLicenseApplicationByUserAndProgram(

@@ -13,8 +13,11 @@ import {
 } from "lucide-react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { AdminMemberDetailDrawer } from "@/components/admin/AdminMemberDetailDrawer";
-import { AdminMemberManageModal } from "@/components/admin/AdminMemberManageModal";
+import {
+  AdminMemberConfirmDialog,
+  AdminMemberDetailDrawer,
+  type MemberProfileMode,
+} from "@/components/admin/AdminMemberDetailDrawer";
 import { AdminPortalHeader } from "@/components/admin/AdminPortalShell";
 import { MemberBadge, MemberBadgeList } from "@/components/admin/MemberBadge";
 import { leadershipStaffAccounts } from "@/data/leadership-staff-accounts";
@@ -55,7 +58,7 @@ import {
 } from "@/lib/admin/member-directory-filters";
 import { getAllOrders } from "@/lib/commerce/storage";
 
-type ManageMode = "edit" | "reset" | "delete" | "pro" | "tags";
+type ConfirmMode = "reset" | "delete" | null;
 type OpenPopover = "filter" | "export" | "more" | "add" | null;
 
 const ROLE_FILTER_OPTIONS: Array<{ value: RoleFilter; label: string }> = [
@@ -450,7 +453,7 @@ function RowActions({
     { label: "View profile", action: onView },
     { label: "Edit member", action: onEdit },
     { label: "Manage membership", action: onPro },
-    { label: "Manage credentials", action: onTags },
+    { label: "Manage tags", action: onTags },
     { label: "Reset password", action: onReset },
   ];
 
@@ -545,8 +548,8 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   const [menuUserId, setMenuUserId] = useState<string | null>(null);
   const [drawerMember, setDrawerMember] = useState<AdminMemberRecord | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [manageMember, setManageMember] = useState<AdminMemberRecord | null>(null);
-  const [manageMode, setManageMode] = useState<ManageMode | null>(null);
+  const [profileMode, setProfileMode] = useState<MemberProfileMode>("view");
+  const [confirmMode, setConfirmMode] = useState<ConfirmMode>(null);
   const [provisionStatus, setProvisionStatus] = useState("");
   const [provisioning, setProvisioning] = useState(false);
   const [openPopover, setOpenPopover] = useState<OpenPopover>(null);
@@ -621,30 +624,31 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
       });
   }, []);
 
-  function openManage(member: AdminMemberRecord, mode: ManageMode) {
-    setDrawerOpen(false);
-    setDrawerMember(null);
-    setMenuUserId(null);
-    setManageMember(member);
-    setManageMode(mode);
-  }
-
-  function closeManage() {
-    setManageMember(null);
-    setManageMode(null);
-  }
-
-  function openDrawer(member: AdminMemberRecord) {
-    setManageMember(null);
-    setManageMode(null);
+  function openProfile(member: AdminMemberRecord, mode: MemberProfileMode = "view") {
+    setConfirmMode(null);
     setDrawerMember(member);
     setDrawerOpen(true);
+    setProfileMode(mode);
+    setMenuUserId(null);
+  }
+
+  function openConfirm(member: AdminMemberRecord, mode: Exclude<ConfirmMode, null>) {
+    setDrawerMember(member);
+    setDrawerOpen(true);
+    setProfileMode("view");
+    setConfirmMode(mode);
     setMenuUserId(null);
   }
 
   function closeDrawer() {
     setDrawerOpen(false);
     setDrawerMember(null);
+    setProfileMode("view");
+    setConfirmMode(null);
+  }
+
+  function openDrawer(member: AdminMemberRecord) {
+    openProfile(member, "view");
   }
 
   const createLeadershipAccounts = useCallback(async () => {
@@ -1187,11 +1191,11 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                   <RowActions
                     member={member}
                     onClose={() => setMenuUserId(null)}
-                    onDelete={() => openManage(member, "delete")}
-                    onEdit={() => openManage(member, "edit")}
-                    onPro={() => openManage(member, "pro")}
-                    onReset={() => openManage(member, "reset")}
-                    onTags={() => openManage(member, "tags")}
+                    onDelete={() => openConfirm(member, "delete")}
+                    onEdit={() => openProfile(member, "edit")}
+                    onPro={() => openProfile(member, "pro")}
+                    onReset={() => openConfirm(member, "reset")}
+                    onTags={() => openProfile(member, "tags")}
                     onToggle={() => setMenuUserId((current) => (current === member.userId ? null : member.userId))}
                     onView={() => openDrawer(member)}
                     open={menuUserId === member.userId}
@@ -1267,11 +1271,11 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
                         <RowActions
                           member={member}
                           onClose={() => setMenuUserId(null)}
-                          onDelete={() => openManage(member, "delete")}
-                          onEdit={() => openManage(member, "edit")}
-                          onPro={() => openManage(member, "pro")}
-                          onReset={() => openManage(member, "reset")}
-                          onTags={() => openManage(member, "tags")}
+                          onDelete={() => openConfirm(member, "delete")}
+                          onEdit={() => openProfile(member, "edit")}
+                          onPro={() => openProfile(member, "pro")}
+                          onReset={() => openConfirm(member, "reset")}
+                          onTags={() => openProfile(member, "tags")}
                           onToggle={() =>
                             setMenuUserId((current) => (current === member.userId ? null : member.userId))
                           }
@@ -1291,32 +1295,33 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
 
       <AdminMemberDetailDrawer
         member={drawerMember}
+        mode={profileMode}
         onClose={closeDrawer}
         onDelete={() => {
-          if (drawerMember) openManage(drawerMember, "delete");
+          if (drawerMember) openConfirm(drawerMember, "delete");
         }}
-        onEdit={() => {
-          if (drawerMember) openManage(drawerMember, "edit");
-        }}
-        onManagePro={() => {
-          if (drawerMember) openManage(drawerMember, "pro");
-        }}
+        onModeChange={setProfileMode}
         onReset={() => {
-          if (drawerMember) openManage(drawerMember, "reset");
+          if (drawerMember) openConfirm(drawerMember, "reset");
+        }}
+        onSaved={() => {
+          refreshMembers();
         }}
         open={drawerOpen}
       />
 
-      {manageMember && manageMode ? (
-        <AdminMemberManageModal
-          member={manageMember}
-          mode={manageMode}
-          onClose={closeManage}
-          onSaved={() => {
-            refreshMembers();
-          }}
-        />
-      ) : null}
+      <AdminMemberConfirmDialog
+        member={confirmMode ? drawerMember : null}
+        mode={confirmMode}
+        onClose={() => setConfirmMode(null)}
+        onDeleted={() => {
+          closeDrawer();
+          refreshMembers();
+        }}
+        onSaved={() => {
+          refreshMembers();
+        }}
+      />
     </div>
   );
 }

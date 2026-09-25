@@ -14,6 +14,8 @@ export function useProMembership() {
   const [displayStatus, setDisplayStatus] = useState<MembershipStatusDisplay>("none");
   const [membership, setMembership] = useState<ProMembershipRow | null>(null);
   const [plan, setPlan] = useState<"unlimited" | "pro" | "free">("free");
+  const [resolved, setResolved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user) {
@@ -21,6 +23,8 @@ export function useProMembership() {
       setDisplayStatus("none");
       setMembership(null);
       setPlan("free");
+      setResolved(true);
+      setError(null);
       setLoading(false);
       return;
     }
@@ -36,11 +40,14 @@ export function useProMembership() {
       setDisplayStatus("active");
       setMembership(null);
       setPlan("unlimited");
+      setResolved(true);
+      setError(null);
       setLoading(false);
       return;
     }
 
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch("/api/pro/status", { cache: "no-store" });
       if (!response.ok) {
@@ -48,6 +55,8 @@ export function useProMembership() {
         setDisplayStatus("none");
         setMembership(null);
         setPlan("free");
+        setResolved(false);
+        setError("Unable to verify Pro membership.");
         return;
       }
       const payload = (await response.json()) as {
@@ -60,11 +69,15 @@ export function useProMembership() {
       setEntitled(payload.entitled);
       setDisplayStatus(payload.displayStatus);
       setPlan(payload.plan ?? (payload.entitled ? "pro" : "free"));
+      setResolved(true);
+      setError(null);
     } catch {
       setEntitled(false);
       setDisplayStatus("none");
       setMembership(null);
       setPlan("free");
+      setResolved(false);
+      setError("Unable to verify Pro membership.");
     } finally {
       setLoading(false);
     }
@@ -84,6 +97,9 @@ export function useProMembership() {
     displayStatus,
     membership,
     plan,
+    /** False when Pro status could not be verified (API failure). Never treat as Free. */
+    resolved,
+    error,
     refresh,
   };
 }

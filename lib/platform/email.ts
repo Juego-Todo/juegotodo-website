@@ -77,3 +77,32 @@ export async function sendLicenseSubmissionEmail(userId: string, email: string, 
     metadata: { userId },
   });
 }
+
+export async function sendFighterClaimInviteEmail(input: {
+  toEmail: string;
+  fighterName: string;
+  acceptUrl: string;
+  existingAccount: boolean;
+  isMinor: boolean;
+  expiresAt: string;
+}) {
+  const greetingName = input.existingAccount ? "there" : "there";
+  const accountLine = input.existingAccount
+    ? "Sign in to your Juego Todo account with this email, then open the link below to claim the record."
+    : "Create your Juego Todo account with this email (Register & Sign In), then open the link below to claim the record.";
+  const minorLine = input.isMinor
+    ? "\n\nThis is a youth athlete record. After signing in, submit a guardian request with proof — a direct claim is not available."
+    : "\n\nOnce signed in on the matching email, you can accept the invitation in one click.";
+
+  return queueEmail({
+    toEmail: input.toEmail,
+    subject: `Juego Todo — Claim your Latayanology record (${input.fighterName})`,
+    body: `Hi ${greetingName},\n\nJuego Todo invited you to claim the Latayanology fighter record for ${input.fighterName}.\n\n${accountLine}${minorLine}\n\nAccept here:\n${input.acceptUrl}\n\nThis invite expires on ${new Date(input.expiresAt).toUTCString()}.\n\n— Juego Todo`,
+    template: "fighter_claim_invite",
+    metadata: {
+      fighterName: input.fighterName,
+      existingAccount: input.existingAccount,
+      isMinor: input.isMinor,
+    },
+  });
+}

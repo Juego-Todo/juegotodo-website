@@ -632,7 +632,6 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
   const autoProvisionedRef = useRef(false);
   const searchRef = useRef<HTMLInputElement | null>(null);
   const searchValueRef = useRef(search);
-  searchValueRef.current = search;
   const toolbarRef = useRef<HTMLDivElement | null>(null);
   const refreshRequestIdRef = useRef(0);
   const isDesktop = useIsDesktopViewport();
@@ -759,6 +758,10 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
       setProvisioning(false);
     }
   }, [refreshMembers]);
+
+  useEffect(() => {
+    searchValueRef.current = search;
+  }, [search]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => refreshMembers(), 0);

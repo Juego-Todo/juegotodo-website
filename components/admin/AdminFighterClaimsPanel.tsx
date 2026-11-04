@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { adminFetch } from "@/lib/auth/admin-fetch";
 
 type ClaimRow = {
   id: string;
@@ -29,33 +30,78 @@ type GuardianRow = {
   createdAt: string;
 };
 
+type InviteRow = {
+  id: string;
+  fighterId: string;
+  fighterName: string;
+  fighterSlug: string;
+  isMinor: boolean;
+  invitedEmail: string;
+  invitedUserId: string | null;
+  expiresAt: string;
+  usedAt: string | null;
+  createdAt: string;
+  status: "pending" | "used" | "expired" | string;
+};
+
+type FighterOption = {
+  id: string;
+  slug: string;
+  displayName: string;
+  nickname: string;
+  gym: string;
+  claimStatus: string;
+  isMinor: boolean;
+};
+
+const fieldClassName =
+  "w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none ring-[#FF1010]/30 placeholder:text-zinc-500 focus:ring-2";
+
 export function AdminFighterClaimsPanel() {
   const [claims, setClaims] = useState<ClaimRow[]>([]);
   const [guardians, setGuardians] = useState<GuardianRow[]>([]);
+  const [invites, setInvites] = useState<InviteRow[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [busyId, setBusyId] = useState("");
-  const [inviteFighterId, setInviteFighterId] = useState("");
-  const [inviteToken, setInviteToken] = useState("");
+  const [inviteBusy, setInviteBusy] = useState(false);
+
+  const [fighterQuery, setFighterQuery] = useState("");
+  const [fighterResults, setFighterResults] = useState<FighterOption[]>([]);
+  const [fighterSearchLoading, setFighterSearchLoading] = useState(false);
+  const [selectedFighter, setSelectedFighter] = useState<FighterOption | null>(null);
+  const [inviteEmail, setInviteEmail] = useState("");
 
   const refresh = useCallback(() => {
     setLoaded(false);
     void Promise.all([
-      fetch("/api/admin/fighter-claims").then(async (response) => {
+      adminFetch("/api/admin/fighter-claims").then(async (response) => {
         const payload = (await response.json().catch(() => null)) as { error?: string; claims?: ClaimRow[] } | null;
         if (!response.ok) throw new Error(payload?.error || "Unable to load claims.");
         return payload?.claims ?? [];
       }),
-      fetch("/api/admin/fighter-guardians").then(async (response) => {
-        const payload = (await response.json().catch(() => null)) as { error?: string; guardians?: GuardianRow[] } | null;
+      adminFetch("/api/admin/fighter-guardians").then(async (response) => {
+        const payload = (await response.json().catch(() => null)) as {
+          error?: string;
+          guardians?: GuardianRow[];
+        } | null;
         if (!response.ok) throw new Error(payload?.error || "Unable to load guardians.");
         return payload?.guardians ?? [];
       }),
+      adminFetch("/api/admin/fighter-claim-invites?view=invites").then(async (response) => {
+        const payload = (await response.json().catch(() => null)) as {
+          error?: string;
+          invites?: InviteRow[];
+        } | null;
+        if (!response.ok) throw new Error(payload?.error || "Unable to load invites.");
+        return payload?.invites ?? [];
+      }),
     ])
-      .then(([nextClaims, nextGuardians]) => {
+      .then(([nextClaims, nextGuardians, nextInvites]) => {
         setClaims(nextClaims);
         setGuardians(nextGuardians);
+        setInvites(nextInvites);
         setError("");
       })
       .catch((caught: unknown) => {
@@ -69,13 +115,33 @@ export function AdminFighterClaimsPanel() {
     return () => window.clearTimeout(timer);
   }, [refresh]);
 
+  useEffect(() => {
+    if (selectedFighter) return;
+    const timer = window.setTimeout(() => {
+      setFighterSearchLoading(true);
+      void adminFetch(
+        `/api/admin/fighter-claim-invites?view=fighters&q=${encodeURIComponent(fighterQuery)}`,
+      )
+        .then(async (response) => {
+          const payload = (await response.json().catch(() => null)) as {
+            error?: string;
+            fighters?: FighterOption[];
+          } | null;
+          if (!response.ok) throw new Error(payload?.error || "Unable to search fighters.");
+          setFighterResults(payload?.fighters ?? []);
+        })
+        .catch(() => setFighterResults([]))
+        .finally(() => setFighterSearchLoading(false));
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [fighterQuery, selectedFighter]);
+
   async function updateClaim(id: string, action: "approve" | "reject") {
     setBusyId(id);
     setStatus("");
     setError("");
-    const response = await fetch("/api/admin/fighter-claims", {
+    const response = await adminFetch("/api/admin/fighter-claims", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, action }),
     });
     const payload = (await response.json().catch(() => null)) as { error?: string } | null;
@@ -92,9 +158,8 @@ export function AdminFighterClaimsPanel() {
     setBusyId(id);
     setStatus("");
     setError("");
-    const response = await fetch("/api/admin/fighter-guardians", {
+    const response = await adminFetch("/api/admin/fighter-guardians", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, action }),
     });
     const payload = (await response.json().catch(() => null)) as { error?: string } | null;
@@ -107,28 +172,51 @@ export function AdminFighterClaimsPanel() {
     refresh();
   }
 
-  async function createInvite(event: FormEvent<HTMLFormElement>) {
+  async function sendInvite(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!selectedFighter) {
+      setError("Select a fighter first.");
+      return;
+    }
+    setInviteBusy(true);
     setStatus("");
     setError("");
-    setInviteToken("");
-    const response = await fetch("/api/admin/fighter-claim-invites", {
+    const response = await adminFetch("/api/admin/fighter-claim-invites", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fighterId: inviteFighterId.trim() }),
+      body: JSON.stringify({ fighterId: selectedFighter.id, email: inviteEmail.trim() }),
     });
     const payload = (await response.json().catch(() => null)) as {
       error?: string;
-      token?: string;
-      claimPath?: string;
       message?: string;
+      sentTo?: string;
+      existingAccount?: boolean;
     } | null;
-    if (!response.ok || !payload?.token) {
-      setError(payload?.error || "Unable to create invite.");
+    setInviteBusy(false);
+    if (!response.ok) {
+      setError(payload?.error || "Unable to send claim invite.");
       return;
     }
-    setInviteToken(payload.claimPath || payload.token);
-    setStatus(payload.message || "Invite created.");
+    setStatus(payload?.message || `Invite sent to ${payload?.sentTo || inviteEmail}.`);
+    setInviteEmail("");
+    refresh();
+  }
+
+  async function resendInvite(invite: InviteRow) {
+    setInviteBusy(true);
+    setStatus("");
+    setError("");
+    const response = await adminFetch("/api/admin/fighter-claim-invites", {
+      method: "POST",
+      body: JSON.stringify({ fighterId: invite.fighterId, email: invite.invitedEmail }),
+    });
+    const payload = (await response.json().catch(() => null)) as { error?: string; message?: string } | null;
+    setInviteBusy(false);
+    if (!response.ok) {
+      setError(payload?.error || "Unable to resend invite.");
+      return;
+    }
+    setStatus(payload?.message || "Invite resent.");
+    refresh();
   }
 
   return (
@@ -142,25 +230,126 @@ export function AdminFighterClaimsPanel() {
         </div>
       ) : null}
 
-      <form className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-4" onSubmit={createInvite}>
-        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Claim invite</h3>
-        <p className="mt-2 text-sm text-zinc-400">Creates a one-time token that expires in 7 days. Only the hash is stored.</p>
-        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-          <input
-            className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none ring-[#FF1010]/30 focus:ring-2"
-            onChange={(event) => setInviteFighterId(event.target.value)}
-            placeholder="Fighter id"
-            value={inviteFighterId}
-          />
-          <button
-            className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/10 px-4 text-[0.68rem] font-black uppercase tracking-[0.14em] text-zinc-200"
-            type="submit"
-          >
-            Create invite
-          </button>
+      <form className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-4" onSubmit={sendInvite}>
+        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Email claim invite</h3>
+        <p className="mt-2 text-sm text-zinc-400">
+          Send an email-bound invite. Matching signed-in adults accept in one click. Minors still need a guardian
+          request with proof.
+        </p>
+
+        <div className="mt-4 space-y-3">
+          {selectedFighter ? (
+            <div className="flex items-start justify-between gap-3 rounded-2xl border border-white/10 bg-black/30 px-3 py-3">
+              <div className="min-w-0">
+                <p className="font-semibold text-white">{selectedFighter.displayName}</p>
+                <p className="mt-0.5 text-xs text-zinc-500">
+                  {selectedFighter.claimStatus}
+                  {selectedFighter.isMinor ? " · minor" : ""} · {selectedFighter.gym || "Independent"}
+                </p>
+              </div>
+              <button
+                className="rounded-full border border-white/10 px-3 py-1.5 text-[0.55rem] font-black uppercase tracking-[0.12em] text-zinc-400"
+                onClick={() => setSelectedFighter(null)}
+                type="button"
+              >
+                Change
+              </button>
+            </div>
+          ) : (
+            <label className="block">
+              <span className="mb-1.5 block text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">
+                Fighter
+              </span>
+              <input
+                className={fieldClassName}
+                onChange={(event) => setFighterQuery(event.target.value)}
+                placeholder="Search Latayanology fighters..."
+                value={fighterQuery}
+              />
+              <div className="mt-2 max-h-44 space-y-1 overflow-y-auto">
+                {fighterSearchLoading ? <p className="px-2 py-2 text-xs text-zinc-500">Searching...</p> : null}
+                {!fighterSearchLoading && fighterResults.length === 0 ? (
+                  <p className="px-2 py-2 text-xs text-zinc-500">No fighters found.</p>
+                ) : null}
+                {fighterResults.map((fighter) => (
+                  <button
+                    className="flex w-full items-center justify-between gap-2 rounded-xl border border-transparent px-2 py-2 text-left hover:border-white/10 hover:bg-white/[0.03]"
+                    key={fighter.id}
+                    onClick={() => {
+                      setSelectedFighter(fighter);
+                      setFighterQuery("");
+                    }}
+                    type="button"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-semibold text-white">{fighter.displayName}</span>
+                      <span className="block truncate text-xs text-zinc-500">
+                        {fighter.claimStatus}
+                        {fighter.isMinor ? " · minor" : ""} · {fighter.gym || "Independent"}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </label>
+          )}
+
+          <label className="block">
+            <span className="mb-1.5 block text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">
+              {selectedFighter?.isMinor ? "Guardian email" : "Fighter email"}
+            </span>
+            <input
+              className={fieldClassName}
+              onChange={(event) => setInviteEmail(event.target.value)}
+              placeholder="name@email.com"
+              required
+              type="email"
+              value={inviteEmail}
+            />
+          </label>
         </div>
-        {inviteToken ? <p className="mt-3 break-all text-sm text-zinc-200">{inviteToken}</p> : null}
+
+        <button
+          className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-[#FF1010] px-5 text-[0.68rem] font-black uppercase tracking-[0.14em] text-white disabled:opacity-60"
+          disabled={inviteBusy || !selectedFighter || !inviteEmail.trim()}
+          type="submit"
+        >
+          {inviteBusy ? "Sending..." : "Send claim invite"}
+        </button>
       </form>
+
+      <section className="space-y-3">
+        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Invite history</h3>
+        {!loaded ? <p className="text-sm text-zinc-400">Loading invites...</p> : null}
+        {loaded && invites.length === 0 ? <p className="text-sm text-zinc-400">No email invites yet.</p> : null}
+        {invites.map((invite) => (
+          <article className="rounded-[1.35rem] border border-white/10 bg-black/30 p-4" key={invite.id}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-semibold text-white">{invite.fighterName}</p>
+                <p className="mt-1 text-sm text-zinc-400">
+                  {invite.invitedEmail}
+                  {invite.invitedUserId ? " · existing account" : " · needs signup"}
+                  {invite.isMinor ? " · minor / guardian" : ""}
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {invite.status} · expires {new Date(invite.expiresAt).toLocaleString()}
+                </p>
+              </div>
+              {invite.status !== "used" ? (
+                <button
+                  className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/10 px-4 text-[0.62rem] font-black uppercase tracking-[0.14em] text-zinc-300 disabled:opacity-60"
+                  disabled={inviteBusy}
+                  onClick={() => void resendInvite(invite)}
+                  type="button"
+                >
+                  Resend
+                </button>
+              ) : null}
+            </div>
+          </article>
+        ))}
+      </section>
 
       {!loaded ? (
         <div className="rounded-[1.5rem] border border-white/10 px-5 py-10 text-center text-sm text-zinc-400">
@@ -180,7 +369,9 @@ export function AdminFighterClaimsPanel() {
                     {claim.memberName || "Member"} {claim.memberEmail ? `· ${claim.memberEmail}` : ""}
                   </p>
                   {claim.isMinor ? (
-                    <p className="mt-2 text-sm text-amber-200">Minor fighter. Approve a guardian request instead of this claim.</p>
+                    <p className="mt-2 text-sm text-amber-200">
+                      Minor fighter. Approve a guardian request instead of this claim.
+                    </p>
                   ) : null}
                   {claim.note ? <p className="mt-2 text-sm text-zinc-300">{claim.note}</p> : null}
                   <p className="mt-2 break-all text-xs text-zinc-500">{claim.evidencePath}</p>

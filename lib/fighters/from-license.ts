@@ -48,7 +48,8 @@ export function buildFighterFromLicense(application: LicenseApplication): Enrich
   const parsed = parseRecord(recordMatch ? `${recordMatch[1]}-${recordMatch[2]}` : "0-0");
   const style = answers.primaryDiscipline?.trim() || answers.stance?.trim() || "Juego Todo";
   const country = application.nationality?.trim() || "Philippines";
-  const region = application.addressCity?.trim() || application.addressProvince?.trim() || country;
+  // City/province stay private until product explicitly approves publishing them.
+  const region = country;
   const highlight =
     answers.notableAchievements?.trim() ||
     `${name} is a licensed JTGC ${division} fighter representing ${gym}.`;

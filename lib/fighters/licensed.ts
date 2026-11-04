@@ -1,38 +1,16 @@
 import {
   isFighterLicenseApplication,
-  normalizeLicenseApplication,
   type LicenseApplication,
-  type LicenseApplicationStatus,
 } from "@/data/license-applications";
 import { resolveFighterUserIdBySlug } from "@/lib/fighters/fighter-slug-server";
 import { buildFighterFromLicense } from "@/lib/fighters/from-license";
 import type { EnrichedFighterProfile } from "@/lib/fighters/profile";
+import {
+  mapPublicFighterLicense,
+  PUBLIC_FIGHTER_LICENSE_COLUMNS,
+} from "@/lib/fighters/public-license";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
-import type { LicenseApplicationRow } from "@/lib/supabase/types";
-
-function mapLicenseApplication(row: LicenseApplicationRow, fighterSlug?: string | null): LicenseApplication {
-  const payload = (row.payload ?? {}) as LicenseApplication;
-
-  return normalizeLicenseApplication({
-    ...payload,
-    id: row.id,
-    userId: row.user_id,
-    userEmail: row.user_email,
-    status: row.status as LicenseApplicationStatus,
-    applicationProgram: (row.application_program ||
-      payload.applicationProgram ||
-      "jt1_member") as LicenseApplication["applicationProgram"],
-    restrictionCode: (row.restriction_code ||
-      payload.restrictionCode ||
-      "JT1") as LicenseApplication["restrictionCode"],
-    fullName: row.full_name || payload.fullName || "",
-    idNumber: row.id_number || payload.idNumber || "",
-    submittedAt: row.submitted_at || payload.submittedAt,
-    reviewedAt: row.reviewed_at ?? payload.reviewedAt ?? null,
-    fighterSlug: fighterSlug || payload.fighterSlug,
-  });
-}
 
 async function loadProfileFighterSlugs(
   serviceClient: NonNullable<ReturnType<typeof createSupabaseServiceClient>>,
@@ -69,7 +47,7 @@ export async function fetchApprovedFighterLicensesServer(): Promise<LicenseAppli
 
   const { data, error } = await serviceClient
     .from("license_applications")
-    .select("*")
+    .select(PUBLIC_FIGHTER_LICENSE_COLUMNS)
     .eq("status", "approved")
     .or("application_program.eq.fighter_license,restriction_code.eq.JT11")
     .order("reviewed_at", { ascending: false });
@@ -86,11 +64,8 @@ export async function fetchApprovedFighterLicensesServer(): Promise<LicenseAppli
 
   const byUserId = new Map<string, LicenseApplication>();
   for (const row of rows) {
-    const application = mapLicenseApplication(row, slugByUserId.get(row.user_id));
-    if (!isFighterLicenseApplication(application) || application.status !== "approved") {
-      continue;
-    }
-    if (!slugByUserId.has(row.user_id)) {
+    const application = mapPublicFighterLicense(row, slugByUserId.get(row.user_id));
+    if (!application || !slugByUserId.has(row.user_id)) {
       continue;
     }
     if (!byUserId.has(row.user_id)) {
@@ -138,7 +113,7 @@ export async function getLicensedFighterBySlugServer(slug: string): Promise<Enri
 
   const { data, error } = await serviceClient
     .from("license_applications")
-    .select("*")
+    .select(PUBLIC_FIGHTER_LICENSE_COLUMNS)
     .eq("user_id", userId)
     .eq("status", "approved")
     .or("application_program.eq.fighter_license,restriction_code.eq.JT11")
@@ -159,8 +134,8 @@ export async function getLicensedFighterBySlugServer(slug: string): Promise<Enri
     .eq("id", userId)
     .maybeSingle();
 
-  const application = mapLicenseApplication(data, profile?.fighter_slug ?? slug);
-  return buildFighterFromLicense(application);
+  const application = mapPublicFighterLicense(data, profile?.fighter_slug ?? slug);
+  return application ? buildFighterFromLicense(application) : null;
 }
 
 /** Client-side loader for Search Fighter — approved licenses only. */

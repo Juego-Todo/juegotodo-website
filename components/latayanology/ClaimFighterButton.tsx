@@ -154,8 +154,8 @@ export function ClaimFighterButton({
       <div className="space-y-3">
         <p className="max-w-md text-sm leading-6 text-zinc-300">
           {inviteEmail
-            ? `You were invited to claim ${fighterName}. Sign in or create an account with ${inviteEmail}.`
-            : `You were invited to claim ${fighterName}. Sign in or create an account to continue.`}
+            ? `Your Juego Todo account for ${fighterName} is ready. Sign in with ${inviteEmail} (use the temporary password from your invite email), then accept the claim.`
+            : `Your Juego Todo account for ${fighterName} is ready. Sign in with the credentials from your invite email, then accept the claim.`}
         </p>
         <Link
           className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#FF1010] px-5 text-[0.68rem] font-black uppercase tracking-[0.16em] text-white transition hover:bg-[#ff2828]"

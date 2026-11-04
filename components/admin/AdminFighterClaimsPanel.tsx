@@ -231,10 +231,10 @@ export function AdminFighterClaimsPanel() {
       ) : null}
 
       <form className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-4" onSubmit={sendInvite}>
-        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Email claim invite</h3>
+        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Provision account + claim invite</h3>
         <p className="mt-2 text-sm text-zinc-400">
-          Send an email-bound invite. Matching signed-in adults accept in one click. Minors still need a guardian
-          request with proof.
+          Creates the fighter&apos;s website login if it does not exist yet, then emails them to sign in and claim
+          their Latayanology record. Adults accept in one click. Minors still need a guardian request with proof.
         </p>
 
         <div className="mt-4 space-y-3">
@@ -314,7 +314,7 @@ export function AdminFighterClaimsPanel() {
           disabled={inviteBusy || !selectedFighter || !inviteEmail.trim()}
           type="submit"
         >
-          {inviteBusy ? "Sending..." : "Send claim invite"}
+          {inviteBusy ? "Provisioning..." : "Create account & send invite"}
         </button>
       </form>
 

@@ -82,26 +82,31 @@ export async function sendFighterClaimInviteEmail(input: {
   toEmail: string;
   fighterName: string;
   acceptUrl: string;
+  loginUrl: string;
   existingAccount: boolean;
+  accountCreated: boolean;
+  temporaryPassword?: string | null;
   isMinor: boolean;
   expiresAt: string;
 }) {
-  const greetingName = input.existingAccount ? "there" : "there";
-  const accountLine = input.existingAccount
-    ? "Sign in to your Juego Todo account with this email, then open the link below to claim the record."
-    : "Create your Juego Todo account with this email (Register & Sign In), then open the link below to claim the record.";
-  const minorLine = input.isMinor
-    ? "\n\nThis is a youth athlete record. After signing in, submit a guardian request with proof — a direct claim is not available."
-    : "\n\nOnce signed in on the matching email, you can accept the invitation in one click.";
+  const passwordBlock =
+    input.accountCreated && input.temporaryPassword
+      ? `\n\nYour Juego Todo account is ready:\nEmail: ${input.toEmail}\nTemporary password: ${input.temporaryPassword}\n\nSign in here:\n${input.loginUrl}\n\nYou will be asked to set a new password after sign-in.`
+      : `\n\nSign in to your Juego Todo account (${input.toEmail}):\n${input.loginUrl}`;
+
+  const claimLine = input.isMinor
+    ? "\n\nThis is a youth athlete record. After signing in, open the link below and submit a guardian request with proof."
+    : "\n\nAfter signing in, open the link below and accept the invitation to link your Latayanology record.";
 
   return queueEmail({
     toEmail: input.toEmail,
-    subject: `Juego Todo — Claim your Latayanology record (${input.fighterName})`,
-    body: `Hi ${greetingName},\n\nJuego Todo invited you to claim the Latayanology fighter record for ${input.fighterName}.\n\n${accountLine}${minorLine}\n\nAccept here:\n${input.acceptUrl}\n\nThis invite expires on ${new Date(input.expiresAt).toUTCString()}.\n\n— Juego Todo`,
+    subject: `Juego Todo — Your fighter account (${input.fighterName})`,
+    body: `Hi there,\n\nJuego Todo set up access for the Latayanology fighter record for ${input.fighterName}.${passwordBlock}${claimLine}\n\nClaim / accept here:\n${input.acceptUrl}\n\nThis invite expires on ${new Date(input.expiresAt).toUTCString()}.\n\n— Juego Todo`,
     template: "fighter_claim_invite",
     metadata: {
       fighterName: input.fighterName,
       existingAccount: input.existingAccount,
+      accountCreated: input.accountCreated,
       isMinor: input.isMinor,
     },
   });

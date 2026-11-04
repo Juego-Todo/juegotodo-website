@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { provisionFighterClaimAccount } from "@/lib/fight-records/provision-claim-account";
 import type { Database, Json } from "@/lib/supabase/types";
 
 export type FightRecordsClient = SupabaseClient<Database>;
@@ -266,11 +267,18 @@ export async function createFighterClaimInvite(
     throw new Error("This fighter record is already claimed.");
   }
 
-  const { data: existingProfile } = await client
-    .from("profiles")
-    .select("id, email, full_name")
-    .ilike("email", invitedEmail)
+  const { data: fighterPrivate } = await client
+    .from("fighters")
+    .select("date_of_birth")
+    .eq("id", fighterId)
     .maybeSingle();
+
+  const provision = await provisionFighterClaimAccount(client, {
+    email: invitedEmail,
+    fighterName: fighter.display_name,
+    fighterDateOfBirth: fighterPrivate?.date_of_birth ?? null,
+    isMinor: Boolean(fighter.is_minor),
+  });
 
   // Invalidate prior unused invites for the same fighter + email (resend).
   const nowIso = new Date().toISOString();
@@ -291,7 +299,7 @@ export async function createFighterClaimInvite(
       created_by: createdBy,
       expires_at: expiresAt,
       invited_email: invitedEmail,
-      invited_user_id: existingProfile?.id ?? null,
+      invited_user_id: provision.userId,
     })
     .select("id, expires_at, invited_email, invited_user_id")
     .single();
@@ -306,8 +314,10 @@ export async function createFighterClaimInvite(
     isMinor: Boolean(fighter.is_minor),
     invitedEmail: data.invited_email,
     invitedUserId: data.invited_user_id,
-    existingAccount: Boolean(existingProfile),
-    existingFullName: existingProfile?.full_name?.trim() || "",
+    existingAccount: !provision.created,
+    accountCreated: provision.created,
+    temporaryPassword: provision.temporaryPassword,
+    existingFullName: provision.fullName,
   };
 }
 

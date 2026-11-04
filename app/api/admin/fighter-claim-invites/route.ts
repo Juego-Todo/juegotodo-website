@@ -55,12 +55,16 @@ export async function POST(request: Request) {
     const invite = await createFighterClaimInvite(admin.serviceClient, fighterId, admin.user.id, email);
     const claimPath = `/latayanology/fighters/${invite.fighterSlug}?invite=${invite.token}&accept=1`;
     const acceptUrl = absoluteUrl(claimPath);
+    const loginUrl = absoluteUrl(`/login?next=${encodeURIComponent(claimPath)}`);
 
     const delivery = await sendFighterClaimInviteEmail({
       toEmail: invite.invitedEmail,
       fighterName: invite.fighterName,
       acceptUrl,
+      loginUrl,
       existingAccount: invite.existingAccount,
+      accountCreated: invite.accountCreated,
+      temporaryPassword: invite.temporaryPassword,
       isMinor: invite.isMinor,
       expiresAt: invite.expiresAt,
     });
@@ -70,14 +74,17 @@ export async function POST(request: Request) {
       expiresAt: invite.expiresAt,
       sentTo: invite.invitedEmail,
       existingAccount: invite.existingAccount,
+      accountCreated: invite.accountCreated,
       fighterName: invite.fighterName,
       isMinor: invite.isMinor,
       delivery: delivery.delivery,
-      message: invite.isMinor
-        ? `Invite emailed to ${invite.invitedEmail}. Minors still require a guardian request with proof after sign-in.`
-        : invite.existingAccount
-          ? `Invite emailed to ${invite.invitedEmail}. They can sign in and accept in one click.`
-          : `Invite emailed to ${invite.invitedEmail}. They should create an account with that email, then accept.`,
+      message: invite.accountCreated
+        ? invite.isMinor
+          ? `Created guardian account for ${invite.invitedEmail} and emailed login + claim link. Guardian proof is still required.`
+          : `Created fighter account for ${invite.invitedEmail} and emailed login + temporary password + claim link.`
+        : invite.isMinor
+          ? `Invite emailed to existing account ${invite.invitedEmail}. Guardian proof is still required after sign-in.`
+          : `Invite emailed to existing account ${invite.invitedEmail}. They can sign in and accept in one click.`,
     });
   } catch (error) {
     return NextResponse.json(

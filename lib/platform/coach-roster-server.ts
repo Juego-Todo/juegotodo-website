@@ -1,9 +1,11 @@
+import { resolveFighterUserIdBySlug } from "@/lib/fighters/fighter-slug-server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export type CoachRosterLink = {
   id: string;
   coachUserId: string;
+  fighterUserId: string | null;
   fighterName: string;
   fighterSlug: string;
   status: string;
@@ -29,6 +31,7 @@ export async function listCoachRoster(coachUserId: string): Promise<CoachRosterL
 function mapRow(row: {
   id: string;
   coach_user_id: string;
+  fighter_user_id: string | null;
   fighter_name: string;
   fighter_slug: string;
   status: string;
@@ -38,6 +41,7 @@ function mapRow(row: {
   return {
     id: row.id,
     coachUserId: row.coach_user_id,
+    fighterUserId: row.fighter_user_id,
     fighterName: row.fighter_name,
     fighterSlug: row.fighter_slug,
     status: row.status,
@@ -51,15 +55,20 @@ export async function upsertCoachRosterLink(input: {
   fighterName: string;
   fighterSlug: string;
   notes?: string;
+  fighterUserId?: string | null;
 }) {
   const service = createSupabaseServiceClient();
   if (!service) throw new Error("Coach roster requires Supabase.");
+
+  const fighterUserId =
+    input.fighterUserId ?? (await resolveFighterUserIdBySlug(service, input.fighterSlug.trim()));
 
   const { data, error } = await service
     .from("coach_roster_links")
     .upsert(
       {
         coach_user_id: input.coachUserId,
+        fighter_user_id: fighterUserId,
         fighter_name: input.fighterName.trim(),
         fighter_slug: input.fighterSlug.trim(),
         notes: input.notes?.trim() ?? "",
@@ -82,5 +91,6 @@ export async function removeCoachRosterLink(id: string, coachUserId: string) {
     .delete()
     .eq("id", id)
     .eq("coach_user_id", coachUserId);
+
   if (error) throw new Error(error.message);
 }

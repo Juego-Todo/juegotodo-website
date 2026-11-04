@@ -452,6 +452,8 @@ type FighterClaimInviteRow = {
   expires_at: string;
   used_at: string | null;
   used_by: string | null;
+  invited_email: string;
+  invited_user_id: string | null;
   created_at: string;
 };
 

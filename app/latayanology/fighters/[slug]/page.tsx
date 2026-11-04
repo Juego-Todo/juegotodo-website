@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ invite?: string }>;
+  searchParams: Promise<{ invite?: string; accept?: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -108,6 +108,7 @@ export default async function LatayanologyFighterPage({ params, searchParams }: 
               {fighter.claimStatus === "unclaimed" ? (
                 <div className="mt-6">
                   <ClaimFighterButton
+                    acceptIntent={query.accept === "1"}
                     fighterId={fighter.id}
                     fighterName={fighter.displayName}
                     inviteToken={query.invite}

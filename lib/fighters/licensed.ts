@@ -4,13 +4,14 @@ import {
   type LicenseApplication,
   type LicenseApplicationStatus,
 } from "@/data/license-applications";
+import { resolveFighterUserIdBySlug } from "@/lib/fighters/fighter-slug-server";
 import { buildFighterFromLicense } from "@/lib/fighters/from-license";
 import type { EnrichedFighterProfile } from "@/lib/fighters/profile";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { LicenseApplicationRow } from "@/lib/supabase/types";
 
-function mapLicenseApplication(row: LicenseApplicationRow): LicenseApplication {
+function mapLicenseApplication(row: LicenseApplicationRow, fighterSlug?: string | null): LicenseApplication {
   const payload = (row.payload ?? {}) as LicenseApplication;
 
   return normalizeLicenseApplication({
@@ -29,8 +30,31 @@ function mapLicenseApplication(row: LicenseApplicationRow): LicenseApplication {
     idNumber: row.id_number || payload.idNumber || "",
     submittedAt: row.submitted_at || payload.submittedAt,
     reviewedAt: row.reviewed_at ?? payload.reviewedAt ?? null,
-    fighterSlug: payload.fighterSlug,
+    fighterSlug: fighterSlug || payload.fighterSlug,
   });
+}
+
+async function loadProfileFighterSlugs(
+  serviceClient: NonNullable<ReturnType<typeof createSupabaseServiceClient>>,
+  userIds: string[],
+) {
+  if (userIds.length === 0) {
+    return new Map<string, string>();
+  }
+
+  const { data, error } = await serviceClient.from("profiles").select("id, fighter_slug").in("id", userIds);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const slugByUserId = new Map<string, string>();
+  for (const row of data ?? []) {
+    if (row.fighter_slug?.trim()) {
+      slugByUserId.set(row.id, row.fighter_slug.trim());
+    }
+  }
+  return slugByUserId;
 }
 
 export async function fetchApprovedFighterLicensesServer(): Promise<LicenseApplication[]> {
@@ -54,9 +78,27 @@ export async function fetchApprovedFighterLicensesServer(): Promise<LicenseAppli
     throw new Error(error.message);
   }
 
-  return (data ?? [])
-    .map(mapLicenseApplication)
-    .filter((application) => isFighterLicenseApplication(application) && application.status === "approved");
+  const rows = data ?? [];
+  const slugByUserId = await loadProfileFighterSlugs(
+    serviceClient,
+    [...new Set(rows.map((row) => row.user_id))],
+  );
+
+  const byUserId = new Map<string, LicenseApplication>();
+  for (const row of rows) {
+    const application = mapLicenseApplication(row, slugByUserId.get(row.user_id));
+    if (!isFighterLicenseApplication(application) || application.status !== "approved") {
+      continue;
+    }
+    if (!slugByUserId.has(row.user_id)) {
+      continue;
+    }
+    if (!byUserId.has(row.user_id)) {
+      byUserId.set(row.user_id, application);
+    }
+  }
+
+  return [...byUserId.values()];
 }
 
 export function mapApprovedLicensesToFighters(applications: LicenseApplication[]): EnrichedFighterProfile[] {
@@ -80,8 +122,45 @@ export async function getLicensedEnrichedFightersServer(): Promise<EnrichedFight
 }
 
 export async function getLicensedFighterBySlugServer(slug: string): Promise<EnrichedFighterProfile | null> {
-  const fighters = await getLicensedEnrichedFightersServer();
-  return fighters.find((fighter) => fighter.slug === slug) ?? null;
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const serviceClient = createSupabaseServiceClient();
+  if (!serviceClient) {
+    return null;
+  }
+
+  const userId = await resolveFighterUserIdBySlug(serviceClient, slug);
+  if (!userId) {
+    return null;
+  }
+
+  const { data, error } = await serviceClient
+    .from("license_applications")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("status", "approved")
+    .or("application_program.eq.fighter_license,restriction_code.eq.JT11")
+    .order("reviewed_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  if (!data) {
+    return null;
+  }
+
+  const { data: profile } = await serviceClient
+    .from("profiles")
+    .select("fighter_slug")
+    .eq("id", userId)
+    .maybeSingle();
+
+  const application = mapLicenseApplication(data, profile?.fighter_slug ?? slug);
+  return buildFighterFromLicense(application);
 }
 
 /** Client-side loader for Search Fighter — approved licenses only. */

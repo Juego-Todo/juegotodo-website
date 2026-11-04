@@ -10,7 +10,8 @@ export function slugifyFighterName(value: string) {
     .slice(0, 80);
 }
 
-export function buildFighterSlugFromLicense(application: Pick<LicenseApplication, "fullName" | "firstName" | "lastName" | "id" | "fighterSlug" | "backgroundAnswers">) {
+/** Preferred public slug base from a license (before uniqueness suffix). */
+export function buildFighterSlugFromLicense(application: Pick<LicenseApplication, "fullName" | "firstName" | "lastName" | "id" | "fighterSlug" | "backgroundAnswers" | "userId">) {
   if (application.fighterSlug?.trim()) {
     return slugifyFighterName(application.fighterSlug);
   }
@@ -26,7 +27,15 @@ export function buildFighterSlugFromLicense(application: Pick<LicenseApplication
     return base;
   }
 
-  return `fighter-${application.id.slice(0, 8)}`;
+  const fallbackId = application.userId?.slice(0, 8) || application.id.slice(0, 8);
+  return `fighter-${fallbackId}`;
+}
+
+/** Name-derived base only — ignores an existing fighterSlug so collisions can be re-suffixed. */
+export function buildBaseFighterSlugFromLicense(
+  application: Pick<LicenseApplication, "fullName" | "firstName" | "lastName" | "id" | "backgroundAnswers" | "userId">,
+) {
+  return buildFighterSlugFromLicense({ ...application, fighterSlug: undefined });
 }
 
 export function buildFighterInitials(fullName: string) {

@@ -16,6 +16,7 @@ type ProfileRow = {
   country: string;
   membership_tier: string;
   assigned_tags: string[];
+  fighter_slug: string | null;
   created_at: string;
   updated_at: string;
 };

@@ -6,7 +6,12 @@ import {
   type LicenseApplicationStatus,
 } from "@/data/license-applications";
 import { resolveLicenseTag } from "@/data/user-type-tags";
+import {
+  allocateUniqueFighterSlug,
+  setProfileFighterSlug,
+} from "@/lib/fighters/fighter-slug-server";
 import { ensureApprovedFighterSlug } from "@/lib/fighters/from-license";
+import { buildBaseFighterSlugFromLicense } from "@/lib/fighters/slug";
 import type { LicenseApplicationRow, Json } from "@/lib/supabase/types";
 
 function mapLicenseApplication(row: LicenseApplicationRow): LicenseApplication {
@@ -145,7 +150,34 @@ export async function PATCH(request: Request) {
     };
 
     if (body.status === "approved") {
-      updated = ensureApprovedFighterSlug(updated);
+      const { data: existingProfile } = await auth.serviceClient
+        .from("profiles")
+        .select("fighter_slug, assigned_tags")
+        .eq("id", current.userId)
+        .maybeSingle();
+
+      const preferredSlug =
+        existingProfile?.fighter_slug?.trim() || buildBaseFighterSlugFromLicense(updated);
+      const uniqueSlug = await allocateUniqueFighterSlug(
+        auth.serviceClient,
+        preferredSlug,
+        current.userId,
+      );
+      updated = ensureApprovedFighterSlug({ ...updated, fighterSlug: uniqueSlug });
+      await setProfileFighterSlug(auth.serviceClient, current.userId, uniqueSlug);
+
+      const licenseTag = resolveLicenseTag(current.restrictionCode);
+      if (licenseTag) {
+        const existingTags = Array.isArray(existingProfile?.assigned_tags)
+          ? (existingProfile.assigned_tags as string[])
+          : [];
+        if (!existingTags.includes(licenseTag)) {
+          await auth.serviceClient
+            .from("profiles")
+            .update({ assigned_tags: [...existingTags, licenseTag] })
+            .eq("id", current.userId);
+        }
+      }
     }
 
     const row = toLicenseApplicationRow(updated);
@@ -165,27 +197,6 @@ export async function PATCH(request: Request) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    if (body.status === "approved") {
-      const licenseTag = resolveLicenseTag(current.restrictionCode);
-      if (licenseTag) {
-        const { data: profile } = await auth.serviceClient
-          .from("profiles")
-          .select("assigned_tags")
-          .eq("id", current.userId)
-          .maybeSingle();
-
-        const existingTags = Array.isArray(profile?.assigned_tags)
-          ? (profile.assigned_tags as string[])
-          : [];
-        if (!existingTags.includes(licenseTag)) {
-          await auth.serviceClient
-            .from("profiles")
-            .update({ assigned_tags: [...existingTags, licenseTag] })
-            .eq("id", current.userId);
-        }
-      }
     }
 
     await auth.serviceClient.from("notifications").insert({

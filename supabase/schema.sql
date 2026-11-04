@@ -19,6 +19,7 @@ create table if not exists public.profiles (
   country text not null default 'Philippines',
   membership_tier text not null default 'free',
   assigned_tags text[] not null default '{}'::text[],
+  fighter_slug text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -104,6 +105,9 @@ create index if not exists orders_user_id_idx on public.orders (user_id);
 create index if not exists orders_created_at_idx on public.orders (created_at desc);
 create index if not exists notifications_user_id_idx on public.notifications (user_id);
 create unique index if not exists profiles_username_lower_idx on public.profiles (lower(username));
+create unique index if not exists profiles_fighter_slug_unique_idx
+  on public.profiles (fighter_slug)
+  where fighter_slug is not null;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -131,7 +135,11 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  requested_username text;
 begin
+  requested_username := nullif(lower(trim(new.raw_user_meta_data ->> 'username')), '');
+
   insert into public.profiles (
     id,
     email,
@@ -150,8 +158,8 @@ begin
     coalesce(new.email, ''),
     coalesce(new.raw_user_meta_data ->> 'full_name', ''),
     coalesce(
-      nullif(lower(new.raw_user_meta_data ->> 'username'), ''),
-      split_part(coalesce(new.email, ''), '@', 1)
+      requested_username,
+      lower(split_part(coalesce(new.email, 'member'), '@', 1)) || '-' || left(new.id::text, 8)
     ),
     case
       when lower(coalesce(new.email, '')) in ('admin@juegotodo.com', 'kiran.aames@gmail.com') then 'admin'
@@ -175,6 +183,7 @@ begin
     phone = excluded.phone,
     country = excluded.country,
     updated_at = now();
+
   return new;
 end;
 $$;
@@ -191,15 +200,17 @@ stable
 security definer
 set search_path = public
 as $$
-  select exists (
-    select 1
-    from public.profiles
-    where id = auth.uid()
-      and (
-        role = 'admin'
-        or lower(email) in ('admin@juegotodo.com', 'kiran.aames@gmail.com')
-      )
-  );
+  select
+    lower(coalesce(auth.jwt() ->> 'email', '')) in ('admin@juegotodo.com', 'kiran.aames@gmail.com')
+    or exists (
+      select 1
+      from public.profiles
+      where id = auth.uid()
+        and (
+          role = 'admin'
+          or lower(email) in ('admin@juegotodo.com', 'kiran.aames@gmail.com')
+        )
+    );
 $$;
 
 create or replace function public.is_username_available(check_username text)
@@ -263,6 +274,22 @@ begin
 
     if new.role is distinct from old.role then
       raise exception 'You cannot change your own account role.';
+    end if;
+
+    if new.assigned_tags is distinct from old.assigned_tags then
+      raise exception 'Only administrators can change assigned tags.';
+    end if;
+
+    if new.account_type is distinct from old.account_type then
+      raise exception 'Only administrators can change account type.';
+    end if;
+
+    if new.membership_tier is distinct from old.membership_tier then
+      raise exception 'Only administrators can change membership tier.';
+    end if;
+
+    if new.fighter_slug is distinct from old.fighter_slug then
+      raise exception 'Only administrators can change fighter slug.';
     end if;
   end if;
 
@@ -331,8 +358,7 @@ create table if not exists public.license_applications (
   reviewed_at timestamptz,
   payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  unique (user_id)
+  updated_at timestamptz not null default now()
 );
 
 create index if not exists license_applications_status_idx on public.license_applications (status);
@@ -402,10 +428,30 @@ before update on public.license_applications
 for each row execute function public.guard_license_application_self_update();
 
 -- ---------------------------------------------------------------------------
--- Membership portal extensions (see migrations/20260820000000_membership_application_portal.sql)
--- Applied via ordered migration after 20260731000000. Do not re-define here;
--- keep schema.sql as the historical base and apply migrations for portal tables:
--- application_documents, application_payments, application_history,
--- private storage bucket application-documents, and lifecycle columns on
--- license_applications (application_number, application_status, payment_status, etc.).
+-- Later platform objects are owned by ordered migrations under supabase/migrations/.
+-- Apply those files after this base schema. Notable additions:
+--   20260820000000_membership_application_portal.sql
+--     application_documents, application_payments, application_history,
+--     license lifecycle columns, hardened self-update + license guards
+--   20260822000000_platform_completion.sql
+--     inquiries, calendar_events, announcements, member_documents,
+--     competition_entries, official_assignments, council_records,
+--     coach_roster_links, fight_records, shop_catalog_products, etc.
+--   20260925000000_pro_memberships.sql
+--     pro_memberships
+--   20261104000000_profiles_fighter_slug.sql
+--     profiles.fighter_slug unique (nullable) + approved-fighter backfill
+--   20261104000001_backfill_fighter_user_id.sql
+--     fight_records / coach_roster_links.fighter_user_id backfill + indexes
 -- ---------------------------------------------------------------------------
+
+create or replace function public.slugify_fighter_name(value text)
+returns text
+language sql
+immutable
+as $$
+  select left(
+    trim(both '-' from lower(regexp_replace(coalesce(value, ''), '[^a-zA-Z0-9]+', '-', 'g'))),
+    80
+  );
+$$;

@@ -106,7 +106,12 @@ const DETAIL_PARENTS: Record<string, { href: string; label: string; backLabel: s
 };
 
 export function resolvePageCategoryLabel(pathname: string, currentLabel?: string) {
-  if (pathname === "/fighters" || pathname.startsWith("/fighters/")) {
+  if (
+    pathname === "/fighters" ||
+    pathname.startsWith("/fighters/") ||
+    pathname === "/latayanology" ||
+    pathname.startsWith("/latayanology/")
+  ) {
     return "Latayanology";
   }
 
@@ -150,7 +155,7 @@ export function resolveBreadcrumbs(pathname: string, currentLabel?: string): Bre
 
   const parentSegment = segments[0];
 
-  if (parentSegment === "fighters") {
+  if (parentSegment === "fighters" || parentSegment === "latayanology") {
     crumbs.push({ label: "LATAYANOLOGY", href: "/latayanology" });
     crumbs.push({ label: currentLabel ?? formatSegment(segments[segments.length - 1]) });
     return crumbs;
@@ -214,6 +219,10 @@ export function resolveBackNavigation(pathname: string) {
 
   if (segments[0] === "orders" && segments.length === 3) {
     return { label: "Back to Orders", href: "/orders" };
+  }
+
+  if (segments[0] === "latayanology" && segments.length > 1) {
+    return { label: "Back to LATAYANOLOGY", href: "/latayanology" };
   }
 
   const parentSegment = segments[0];

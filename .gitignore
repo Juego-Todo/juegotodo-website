@@ -37,3 +37,6 @@ Thumbs.db
 
 # supabase CLI cache
 supabase/.temp/
+
+# local agent / IDE clutter
+.cursor/

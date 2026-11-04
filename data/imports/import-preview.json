@@ -1,0 +1,5230 @@
+{
+  "events": [
+    {
+      "name": "MARIKINA BARRIO BRAWLS-1",
+      "eventDate": "2025-08-31",
+      "venue": "TEODORE EVENTS PLACE",
+      "series": "Barrio Brawls",
+      "sourceKey": "marikina-barrio-brawls-1",
+      "sheetName": "Marikina Barrio Brawls -1",
+      "bouts": [
+        {
+          "boutOrder": 1,
+          "boutLabel": "BOUT #1 2-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "BANTAM WEIGHT DIVISION",
+          "weightClass": "135 lbs (Minor)",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "T.K.O/ Armbar",
+          "round": "3rd",
+          "timeRemaining": "29 Sec. Remaining",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-1-bout-1",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Cjaay",
+                "lastName": "Beringuela",
+                "displayName": "Cjaay Beringuela",
+                "nickname": "",
+                "gym": "Art of Juggler MMA",
+                "hometown": "Paranaque City,",
+                "height": "",
+                "weightClass": "135 lbs (Minor)",
+                "photoSourceUrl": "https://www.facebook.com/cjaay.beringuela",
+                "dateOfBirth": null,
+                "normalizedName": "cjaay beringuela",
+                "normalizedGym": "art of juggler mma"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Ronnel",
+                "lastName": "Losabia",
+                "displayName": "Ronnel Losabia",
+                "nickname": "The Honey Badger",
+                "gym": "AFG - MMA",
+                "hometown": "Rodriguez, Rizal",
+                "height": "5'3",
+                "weightClass": "135 lbs (Minor)",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1YBlXPzwZTFVb4kJZT892ruG_L60ky4cG",
+                "dateOfBirth": "2006-06-06",
+                "normalizedName": "ronnel losabia",
+                "normalizedGym": "afg mma"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 2,
+          "boutLabel": "BOUT #2 2-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "LIGHTHEAVY WEIGHT",
+          "weightClass": "190 LBS (Minors)",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "Split Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-1-bout-2",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Alexander",
+                "lastName": "Gaufo",
+                "displayName": "Alexander Gaufo",
+                "nickname": "The Great",
+                "gym": "AFG - MMA",
+                "hometown": "Rodriguez, Rizal",
+                "height": "5'6",
+                "weightClass": "190 LBS (Minors)",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1rYal4JfkB7usOGP_LsiuKYPkR3fk2VLJ",
+                "dateOfBirth": "2009-06-20",
+                "normalizedName": "alexander gaufo",
+                "normalizedGym": "afg mma"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Hydyne Howard",
+                "lastName": "Mina",
+                "displayName": "Hydyne Howard Mina",
+                "nickname": "MON",
+                "gym": "Hidden Blade MMA",
+                "hometown": "Angeles City, Pampanga, Philippines",
+                "height": "5'8",
+                "weightClass": "190 LBS (Minors)",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2008-02-20",
+                "normalizedName": "hydyne howard mina",
+                "normalizedGym": "hidden blade mma"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 3,
+          "boutLabel": "BOUT #3 2-MINS / 3-ROUNDS",
+          "category": "female",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "125 LBS (Minor)",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "T.K.O / Rear naked Choked",
+          "round": "3rd",
+          "timeRemaining": "44 Sec. Remaining",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-1-bout-3",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Aira",
+                "lastName": "Quinto",
+                "displayName": "Aira Quinto",
+                "nickname": "",
+                "gym": "",
+                "hometown": "Novaliches Quezon City",
+                "height": "5'5",
+                "weightClass": "125 LBS (Minor)",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2005-11-13",
+                "normalizedName": "aira quinto",
+                "normalizedGym": ""
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Christi",
+                "lastName": "Espolong",
+                "displayName": "Christi Espolong",
+                "nickname": "Castle",
+                "gym": "Pasig Combat Sports",
+                "hometown": "Manggahan, Pasig City",
+                "height": "5'5",
+                "weightClass": "125 LBS (Minor)",
+                "photoSourceUrl": "https://www.facebook.com/ChristiEspolong",
+                "dateOfBirth": "2007-04-04",
+                "normalizedName": "christi espolong",
+                "normalizedGym": "pasig combat sports"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 4,
+          "boutLabel": "BOUT #4 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "110 LBS",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Technical Knockout",
+          "round": "1st",
+          "timeRemaining": "48 Sec. Remaining",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-1-bout-4",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Justine",
+                "lastName": "Martija",
+                "displayName": "Justine Martija",
+                "nickname": "",
+                "gym": "AFG - MMA",
+                "hometown": "Rodriguez, Rizal",
+                "height": "5'3",
+                "weightClass": "110 LBS",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1cAs_KFIahSvBg_HPNqcduxp_6t4xUjLB",
+                "dateOfBirth": "2006-02-01",
+                "normalizedName": "justine martija",
+                "normalizedGym": "afg mma"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Micheal Jhon",
+                "lastName": "Subasos",
+                "displayName": "Micheal Jhon Subasos",
+                "nickname": "",
+                "gym": "Kyokushin Fight Academy Binangonan",
+                "hometown": "Morong, Rizal",
+                "height": "5'3",
+                "weightClass": "110 LBS",
+                "photoSourceUrl": "https://www.facebook.com/john.michael.abil",
+                "dateOfBirth": "2006-01-30",
+                "normalizedName": "micheal jhon subasos",
+                "normalizedGym": "kyokushin fight academy binangonan"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 5,
+          "boutLabel": "BOUT #5 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "125 LBS",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-1-bout-5",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Adrian",
+                "lastName": "Bulado",
+                "displayName": "Adrian Bulado",
+                "nickname": "Baki Hanma",
+                "gym": "Art of Juggler",
+                "hometown": "CAINTA RIZAL",
+                "height": "5'7",
+                "weightClass": "125 LBS",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1Inea_bUMU12PlGKiKebdYQa6LqByAEL_",
+                "dateOfBirth": "2001-06-18",
+                "normalizedName": "adrian bulado",
+                "normalizedGym": "art of juggler"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Cyrus Jonathan",
+                "lastName": "Cabautan",
+                "displayName": "Cyrus Jonathan Cabautan",
+                "nickname": "The Ferocious",
+                "gym": "KFA Binangonan",
+                "hometown": "Binangonan, Rizal",
+                "height": "5'5",
+                "weightClass": "125 LBS",
+                "photoSourceUrl": "https://drive.google.com/file/d/1XgBUujsyfKdqw94bMI33t1u9gC0gahRt/view?usp=drivesdk",
+                "dateOfBirth": "2006-05-05",
+                "normalizedName": "cyrus jonathan cabautan",
+                "normalizedGym": "kfa binangonan"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 6,
+          "boutLabel": "BOUT #3 2-MINS / 3-ROUNDS",
+          "category": "female",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "105 LBS",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "TKO/ Ground and Pound",
+          "round": "3rd",
+          "timeRemaining": "27 Sec. Remaining",
+          "referee": "Juvanie bacus",
+          "sourceKey": "marikina-barrio-brawls-1-bout-6",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Adeleon",
+                "lastName": "Vargas",
+                "displayName": "Adeleon Vargas",
+                "nickname": "",
+                "gym": "",
+                "hometown": "Taytay, Rizal",
+                "height": "5'2",
+                "weightClass": "105 LBS",
+                "photoSourceUrl": "https://drive.google.com/file/d/10QplxbNl_5pac_z6iqz3sjOjQ7VUqjU7/view?usp=drivesdk",
+                "dateOfBirth": "1994-07-25",
+                "normalizedName": "adeleon vargas",
+                "normalizedGym": ""
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Elealynanne",
+                "lastName": "Padollon",
+                "displayName": "Elealynanne Padollon",
+                "nickname": "EL Tempest",
+                "gym": "Ground Zero",
+                "hometown": "Nangka, Marikina City",
+                "height": "5'0",
+                "weightClass": "105 LBS",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1JJizG0CBO3LWlTObQ_TT2skAwm8HnldJ",
+                "dateOfBirth": "2003-04-26",
+                "normalizedName": "elealynanne padollon",
+                "normalizedGym": "ground zero"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 7,
+          "boutLabel": "BOUT #7 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "FEATHERWEIGHT DIVISION",
+          "weightClass": "140 LBS",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-1-bout-7",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Mohammar",
+                "lastName": "Sobair",
+                "displayName": "Mohammar Sobair",
+                "nickname": "The Fearless",
+                "gym": "Hidden Blade MMA",
+                "hometown": "Agapito Del Rosario, Pampanga",
+                "height": "5'7",
+                "weightClass": "140 LBS",
+                "photoSourceUrl": "https://www.facebook.com/mohamar.sobair.1",
+                "dateOfBirth": "2002-08-07",
+                "normalizedName": "mohammar sobair",
+                "normalizedGym": "hidden blade mma"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Dennis",
+                "lastName": "Quiñonero",
+                "displayName": "Dennis Quiñonero",
+                "nickname": "The Cannon",
+                "gym": "Dojo De Quiñonero",
+                "hometown": "Davao Oriental",
+                "height": "5'5",
+                "weightClass": "140 LBS",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1dn_c8CxovKIXZPAZ88ZWa5K9sC0aLQVc",
+                "dateOfBirth": "1983-05-08",
+                "normalizedName": "dennis quiñonero",
+                "normalizedGym": "dojo de quiñonero"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 8,
+          "boutLabel": "BOUT #8 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "135 lbs",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie bacus",
+          "sourceKey": "marikina-barrio-brawls-1-bout-8",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Monsod",
+                "lastName": "Cadalso",
+                "displayName": "Monsod Cadalso",
+                "nickname": "Boyka",
+                "gym": "Hidden Blade MMA",
+                "hometown": "Mabalacat City, Pampanga",
+                "height": "5'4",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1e5CEoYjGufM-VqLIfI0A5bAZxwLIwjw7",
+                "dateOfBirth": "1992-08-24",
+                "normalizedName": "monsod cadalso",
+                "normalizedGym": "hidden blade mma"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Marwin",
+                "lastName": "Landong",
+                "displayName": "Marwin Landong",
+                "nickname": "The Subano",
+                "gym": "KORIDAS MMA Gym",
+                "hometown": "San Mateo, Rizal",
+                "height": "5'7",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1SL24t8K2v31Ux16zluegPYMryEgO6xgp",
+                "dateOfBirth": "2000-05-19",
+                "normalizedName": "marwin landong",
+                "normalizedGym": "koridas mma gym"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MARIKINA BARRIO BRAWLS-2",
+      "eventDate": "2025-12-12",
+      "venue": "MARIKINA SPORTS CENTER",
+      "series": "Barrio Brawls",
+      "sourceKey": "marikina-barrio-brawls-2",
+      "sheetName": "Marikina Barrio Brawls -2",
+      "bouts": [
+        {
+          "boutOrder": 1,
+          "boutLabel": "BOUT #1 2-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "115 lbs (MINOR)",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "3rd",
+          "timeRemaining": "",
+          "referee": "Alfredo Melendres",
+          "sourceKey": "marikina-barrio-brawls-2-bout-1",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "John Dustin",
+                "lastName": "Dela Cruz",
+                "displayName": "John Dustin Dela Cruz",
+                "nickname": "Rambo",
+                "gym": "AFG",
+                "hometown": "San Mateo Rizal",
+                "height": "",
+                "weightClass": "115 lbs (MINOR)",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/176oa8mmHLE-KRIBp2Bevc9IDAq6tPrfg",
+                "dateOfBirth": "2010-12-06",
+                "normalizedName": "john dustin dela cruz",
+                "normalizedGym": "afg"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Lan Gil",
+                "lastName": "Basa",
+                "displayName": "Lan Gil Basa",
+                "nickname": "The King Erector",
+                "gym": "DBJ koridas MMA",
+                "hometown": "San Mateo Rizal",
+                "height": "5'3",
+                "weightClass": "115 lbs (MINOR)",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2008-04-08",
+                "normalizedName": "lan gil basa",
+                "normalizedGym": "dbj koridas mma"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 2,
+          "boutLabel": "BOUT #2 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "LIGHTWEIGHT DIVISION",
+          "weightClass": "152 lbs",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "3rd",
+          "timeRemaining": "",
+          "referee": "Alfredo Melendres",
+          "sourceKey": "marikina-barrio-brawls-2-bout-2",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Adrian",
+                "lastName": "Mananggit",
+                "displayName": "Adrian Mananggit",
+                "nickname": "",
+                "gym": "Alab Kampilan Union of Martial Arts",
+                "hometown": "Nueva Ecija",
+                "height": "5'6",
+                "weightClass": "152 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2002-10-13",
+                "normalizedName": "adrian mananggit",
+                "normalizedGym": "alab kampilan union of martial arts"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Aljhon",
+                "lastName": "Juno",
+                "displayName": "Aljhon Juno",
+                "nickname": "The Beast",
+                "gym": "Naraphil",
+                "hometown": "Las Pinas CIty",
+                "height": "5'8",
+                "weightClass": "152 lbs",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1vTJIULmmQBOwnt-DmE8uPCeXq7E_35G4",
+                "dateOfBirth": "2001-02-14",
+                "normalizedName": "aljhon juno",
+                "normalizedGym": "naraphil"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 3,
+          "boutLabel": "BOUT #3 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "125 lbs",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "T.K.O/ Verbal Submission",
+          "round": "1st",
+          "timeRemaining": "",
+          "referee": "Juvanie bacus",
+          "sourceKey": "marikina-barrio-brawls-2-bout-3",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Joshua, De Guzman",
+                "lastName": "Fernandez",
+                "displayName": "Joshua, De Guzman Fernandez",
+                "nickname": "",
+                "gym": "Alab kampilan union of martial arts",
+                "hometown": "Pulo, San Isidro, Nueva Ecjia",
+                "height": "5'5",
+                "weightClass": "125 lbs",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1OWUWFqlBD_ypZLYsJOCZWt8Ox4o1AhwL",
+                "dateOfBirth": "2007-08-03",
+                "normalizedName": "joshua de guzman fernandez",
+                "normalizedGym": "alab kampilan union of martial arts"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Jhon",
+                "lastName": "Fernandez",
+                "displayName": "Jhon Fernandez",
+                "nickname": "Jhon \"\"Tyler\"\" ",
+                "gym": "Lionsden MMA Academy",
+                "hometown": "Legazpi City",
+                "height": "5'5",
+                "weightClass": "125 lbs",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/10N9XwfZgxDgAEevIiYh6TXRgkNGzpWqx",
+                "dateOfBirth": "2000-07-19",
+                "normalizedName": "jhon fernandez",
+                "normalizedGym": "lionsden mma academy"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 4,
+          "boutLabel": "BOUT #4 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "5'4",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Via Default",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-2-bout-4",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Jesus",
+                "lastName": "Cabalquinto",
+                "displayName": "Jesus Cabalquinto",
+                "nickname": "The Silent",
+                "gym": "Hidden Blade MMA",
+                "hometown": "Pampanga",
+                "height": "130 LBS",
+                "weightClass": "5'4",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1bVXVEbtmbITV4JTlFBo8bQV0x0Flduyd",
+                "dateOfBirth": "1993-12-03",
+                "normalizedName": "jesus cabalquinto",
+                "normalizedGym": "hidden blade mma"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Alberto",
+                "lastName": "Patindol",
+                "displayName": "Alberto Patindol",
+                "nickname": "The kamador",
+                "gym": "Art of Juggler",
+                "hometown": "Bacoor, Cavite",
+                "height": "130 LBS",
+                "weightClass": "5'5",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1997-11-24",
+                "normalizedName": "alberto patindol",
+                "normalizedGym": "art of juggler"
+              },
+              "result": "loss",
+              "recordAtTime": "BANNED"
+            }
+          ]
+        },
+        {
+          "boutOrder": 5,
+          "boutLabel": "BOUT #5 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "BANTAMWEIGHT DIVISION",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Technical Knockout",
+          "round": "2nd",
+          "timeRemaining": "15 Sec. Remaining",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-2-bout-5",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Adrian",
+                "lastName": "Bulado",
+                "displayName": "Adrian Bulado",
+                "nickname": "Baki Hanma",
+                "gym": "Art of Juggler",
+                "hometown": "Cainta Rizal",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1Inea_bUMU12PlGKiKebdYQa6LqByAEL_",
+                "dateOfBirth": "2001-06-18",
+                "normalizedName": "adrian bulado",
+                "normalizedGym": "art of juggler"
+              },
+              "result": "win",
+              "recordAtTime": "2-0-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Ferdinand",
+                "lastName": "Aquino",
+                "displayName": "Ferdinand Aquino",
+                "nickname": "The Psychopath",
+                "gym": "Team Psychopath MMA",
+                "hometown": "Cavite",
+                "height": "5'5",
+                "weightClass": "130 lbs",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1bDlJ0xFTQv4NdR-f5D8aXTZNKwRm0Jx7",
+                "dateOfBirth": "1996-01-12",
+                "normalizedName": "ferdinand aquino",
+                "normalizedGym": "team psychopath mma"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 6,
+          "boutLabel": "BOUT #6 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "135 lbs",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "3rd",
+          "timeRemaining": "",
+          "referee": "Juvanie bacus",
+          "sourceKey": "marikina-barrio-brawls-2-bout-6",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Genil",
+                "lastName": "Francisco",
+                "displayName": "Genil Francisco",
+                "nickname": "The Untamed",
+                "gym": "",
+                "hometown": "Antipolo City",
+                "height": "",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": null,
+                "normalizedName": "genil francisco",
+                "normalizedGym": ""
+              },
+              "result": "loss",
+              "recordAtTime": "BANNED"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Marwin",
+                "lastName": "Landong",
+                "displayName": "Marwin Landong",
+                "nickname": "The Subano",
+                "gym": "KORIDAS MMA Gym",
+                "hometown": "San Mateo, Rizal",
+                "height": "5'7",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "https://drive.google.com/drive/folders/1SL24t8K2v31Ux16zluegPYMryEgO6xgp",
+                "dateOfBirth": "2000-05-19",
+                "normalizedName": "marwin landong",
+                "normalizedGym": "koridas mma gym"
+              },
+              "result": "win",
+              "recordAtTime": "2-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 7,
+          "boutLabel": "BOUT #7 2-MINS / 2-ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "135 LBS",
+          "format": "2-MINS / 2-ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-2-bout-7",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Joel",
+                "lastName": "Licuna",
+                "displayName": "Joel Licuna",
+                "nickname": "Angelo",
+                "gym": "Hidden Blade MM",
+                "hometown": "Champ building pier 15",
+                "height": "5'5",
+                "weightClass": "135 LBS",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1997-08-28",
+                "normalizedName": "joel licuna",
+                "normalizedGym": "hidden blade mm"
+              },
+              "result": "",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Giner",
+                "lastName": "Burabod",
+                "displayName": "Giner Burabod",
+                "nickname": "SIKARAN",
+                "gym": "SIKARAN FREESTYLE",
+                "hometown": "BLK 8 LOT 3 BAMBANG NI PELES STA ANA TAGUIG CITY",
+                "height": "5'5",
+                "weightClass": "135 LBS",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1979-03-03",
+                "normalizedName": "giner burabod",
+                "normalizedGym": "sikaran freestyle"
+              },
+              "result": "",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 8,
+          "boutLabel": "BOUT #8 2-MINS / 2-ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "135 LBS",
+          "format": "2-MINS / 2-ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-2-bout-8",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Monsod",
+                "lastName": "Cadalso",
+                "displayName": "Monsod Cadalso",
+                "nickname": "BOYKA",
+                "gym": "HIDDEN BLADE MMA",
+                "hometown": "PAMPANGA",
+                "height": "5'6",
+                "weightClass": "135 LBS",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1992-08-24",
+                "normalizedName": "monsod cadalso",
+                "normalizedGym": "hidden blade mma"
+              },
+              "result": "",
+              "recordAtTime": "0-2-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Giner",
+                "lastName": "Burabod",
+                "displayName": "Giner Burabod",
+                "nickname": "SIKARAN",
+                "gym": "SIKARAN FREESTYLE",
+                "hometown": "BLK 8 LOT 3 BAMBANG NI PELES STA ANA TAGUIG CITY",
+                "height": "5'5",
+                "weightClass": "135 LBS",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1979-03-03",
+                "normalizedName": "giner burabod",
+                "normalizedGym": "sikaran freestyle"
+              },
+              "result": "",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 9,
+          "boutLabel": "BOUT #9 2-MINS / 2-ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "135 LBS",
+          "format": "2-MINS / 2-ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-2-bout-9",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Gemil Elizur",
+                "lastName": "Clariño",
+                "displayName": "Gemil Elizur Clariño",
+                "nickname": "Sai",
+                "gym": "BJMMA FITNES GYM",
+                "hometown": "Purok 5 BRGY. San Jose San Pablo Laguna",
+                "height": "5'7",
+                "weightClass": "135 LBS",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2000-11-28",
+                "normalizedName": "gemil elizur clariño",
+                "normalizedGym": "bjmma fitnes gym"
+              },
+              "result": "",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Dennis",
+                "lastName": "Quiñonero",
+                "displayName": "Dennis Quiñonero",
+                "nickname": "The Cannon",
+                "gym": "Dojo de QUIÑONERO",
+                "hometown": "Mati,Davao Oriental",
+                "height": "5'5",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1983-05-08",
+                "normalizedName": "dennis quiñonero",
+                "normalizedGym": "dojo de quiñonero"
+              },
+              "result": "",
+              "recordAtTime": "0-2-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 10,
+          "boutLabel": "BOUT #10 2-MINS / 2-ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "135 lbs",
+          "format": "2-MINS / 2-ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-2-bout-10",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Arsenio",
+                "lastName": "Balisacan",
+                "displayName": "Arsenio Balisacan",
+                "nickname": "The Assasin jr",
+                "gym": "athletic MMA",
+                "hometown": "nueva ecija",
+                "height": "5'6",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": null,
+                "normalizedName": "arsenio balisacan",
+                "normalizedGym": "athletic mma"
+              },
+              "result": "",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Dennis",
+                "lastName": "Quiñonero",
+                "displayName": "Dennis Quiñonero",
+                "nickname": "The Cannon",
+                "gym": "Dojo de QUIÑONERO",
+                "hometown": "Mati,Davao Oriental",
+                "height": "5'5",
+                "weightClass": "135 LBS.",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1983-05-08",
+                "normalizedName": "dennis quiñonero",
+                "normalizedGym": "dojo de quiñonero"
+              },
+              "result": "",
+              "recordAtTime": "0-2-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 11,
+          "boutLabel": "BOUT #11 2-MINS / 2-ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "135 lbs",
+          "format": "2-MINS / 2-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "marikina-barrio-brawls-2-bout-11",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Arsenio",
+                "lastName": "Balisacan",
+                "displayName": "Arsenio Balisacan",
+                "nickname": "The Assasin jr",
+                "gym": "athletic MMA",
+                "hometown": "nueva ecija",
+                "height": "5'6",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": null,
+                "normalizedName": "arsenio balisacan",
+                "normalizedGym": "athletic mma"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Alfredo Lariego",
+                "lastName": "Melendres",
+                "displayName": "Alfredo Lariego Melendres",
+                "nickname": "THE JOKER",
+                "gym": "ART OF JUGGLER / JOKERMMA /TEAM TITANS",
+                "hometown": "15 Narra st. Maywood 1 bf homes parañaque city",
+                "height": "5,11",
+                "weightClass": "135 lbs.",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1994-09-23",
+                "normalizedName": "alfredo lariego melendres",
+                "normalizedGym": "art of juggler jokermma team titans"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "STA LUCIA UGB45, BLAZE FC 9 -1",
+      "eventDate": "2026-04-25",
+      "venue": "ENTERRTAINMENT CENTER BUILDING 3, STA LUCIA MALL, CAINTA RIZAL",
+      "series": "Barrio Brawls / UGB / Blaze FC",
+      "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "sheetName": "sta.lucia barrio brawls 1",
+      "bouts": [
+        {
+          "boutOrder": 1,
+          "boutLabel": "BOUT #3 2-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "WELTERWEIGHT DIVISION",
+          "weightClass": "165 lbs",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "T.K.O/ Rear Naked Choked",
+          "round": "3rd",
+          "timeRemaining": "2:40 Sec. Remaining",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-1",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Troy Andy O.",
+                "lastName": "Nagares",
+                "displayName": "Troy Andy O. Nagares",
+                "nickname": "Valerius",
+                "gym": "Tanay Sikaran Martial Arts School",
+                "hometown": "Sitio Balimbing Brgy. Plaza Aldea Tanay, Rizal",
+                "height": "5'5",
+                "weightClass": "165 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2009-02-05",
+                "normalizedName": "troy andy nagares",
+                "normalizedGym": "tanay sikaran martial arts school"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Alexander Caragay",
+                "lastName": "Gaufo",
+                "displayName": "Alexander Caragay Gaufo",
+                "nickname": "(the great)",
+                "gym": "AFG MMA",
+                "hometown": "Rodriguez Rizal, brgy San Jose",
+                "height": "5,6",
+                "weightClass": "165 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2009-06-20",
+                "normalizedName": "alexander caragay gaufo",
+                "normalizedGym": "afg mma"
+              },
+              "result": "win",
+              "recordAtTime": "1-1- 0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 2,
+          "boutLabel": "BOUT #4 2-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "92 LBS",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-2",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Sean Kyrie M.",
+                "lastName": "Nagares",
+                "displayName": "Sean Kyrie M. Nagares",
+                "nickname": "",
+                "gym": "TANAY SIKARAN MARTIAL ARTS SCHOOL",
+                "hometown": "7 SITIO MACARULAY ST.",
+                "height": "4'8 ft",
+                "weightClass": "92 LBS",
+                "photoSourceUrl": "",
+                "dateOfBirth": null,
+                "normalizedName": "sean kyrie nagares",
+                "normalizedGym": "tanay sikaran martial arts school"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Saint Kristoff",
+                "lastName": "Vargas",
+                "displayName": "Saint Kristoff Vargas",
+                "nickname": "",
+                "gym": "AFG MMA",
+                "hometown": "Blk 1 Lot 45 Phase-1M Kasiglahan Village San Jose Rodriguez Rizal",
+                "height": "4'8 ft",
+                "weightClass": "92 LBS",
+                "photoSourceUrl": "",
+                "dateOfBirth": null,
+                "normalizedName": "saint kristoff vargas",
+                "normalizedGym": "afg mma"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 3,
+          "boutLabel": "BOUT #5 3-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "155lbs",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "T.K.O/ Ground and Pound",
+          "round": "3rd",
+          "timeRemaining": "1:59 Sec. Remaining",
+          "referee": "Alfredo Melendres",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-3",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Jordan Bradley C.",
+                "lastName": "Cruz",
+                "displayName": "Jordan Bradley C. Cruz",
+                "nickname": "",
+                "gym": "(KAMAO)/426 MMA/AJJP MMA",
+                "hometown": "Pasig",
+                "height": "5'10",
+                "weightClass": "155lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1995-07-19",
+                "normalizedName": "jordan bradley cruz",
+                "normalizedGym": "kamao 426 mma ajjp mma"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Nikko",
+                "lastName": "Garrido",
+                "displayName": "Nikko Garrido",
+                "nickname": "Akuma",
+                "gym": "Fitness8/Ground Zero fight team",
+                "hometown": "10b magalang st.herbosa tondo manila",
+                "height": "5'5",
+                "weightClass": "155lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1993-10-05",
+                "normalizedName": "nikko garrido",
+                "normalizedGym": "fitness8 ground zero fight team"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 4,
+          "boutLabel": "BOUT #6 3-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "115",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Alfredo Melendres",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-4",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Jerald Tagapan",
+                "lastName": "Galangue",
+                "displayName": "Jerald Tagapan Galangue",
+                "nickname": "The Mandirigma",
+                "gym": "Team Paocc Fitness gym",
+                "hometown": "Fb harrizon Pasay City",
+                "height": "5'1",
+                "weightClass": "115",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2002-10-28",
+                "normalizedName": "jerald tagapan galangue",
+                "normalizedGym": "team paocc fitness gym"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Limuel Bagarinao",
+                "lastName": "Malinao",
+                "displayName": "Limuel Bagarinao Malinao",
+                "nickname": "THE SNIPER",
+                "gym": "CENOJAS MMA/ MMAFIT",
+                "hometown": "Davao city",
+                "height": "5'2",
+                "weightClass": "115",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2002-03-25",
+                "normalizedName": "limuel bagarinao malinao",
+                "normalizedGym": "cenojas mma mmafit"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 5,
+          "boutLabel": "BOUT #7 3-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "115lbs",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Alfredo Melendres",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-5",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Rex Langub",
+                "lastName": "Cabudbud",
+                "displayName": "Rex Langub Cabudbud",
+                "nickname": "Rex",
+                "gym": "Alab Kapilan Union of Martial Arts",
+                "hometown": "San Leonardo, Diversion, Nueva Ecija",
+                "height": "5'6",
+                "weightClass": "115lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2007-08-13",
+                "normalizedName": "rex langub cabudbud",
+                "normalizedGym": "alab kapilan union of martial arts"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Alton John, Necesario",
+                "lastName": "Fuentes",
+                "displayName": "Alton John, Necesario Fuentes",
+                "nickname": "King Hercules",
+                "gym": "Cenojas mma/mmafit",
+                "hometown": "Davao City",
+                "height": "5'2",
+                "weightClass": "115lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1986-10-27",
+                "normalizedName": "alton john necesario fuentes",
+                "normalizedGym": "cenojas mma mmafit"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 6,
+          "boutLabel": "BOUT #8 3-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "135 lbs",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-6",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Renz",
+                "lastName": "Cabudbud",
+                "displayName": "Renz Cabudbud",
+                "nickname": "Rz",
+                "gym": "Alab kampilan",
+                "hometown": "Sanleonardo Nueva Ecija",
+                "height": "5'6",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2006-04-18",
+                "normalizedName": "renz cabudbud",
+                "normalizedGym": "alab kampilan"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Ronnel B.",
+                "lastName": "Losabia",
+                "displayName": "Ronnel B. Losabia",
+                "nickname": "THE HONEY BADGER",
+                "gym": "AFG- MMA",
+                "hometown": "Rodriguez rizal",
+                "height": "5,3",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2006-06-06",
+                "normalizedName": "ronnel losabia",
+                "normalizedGym": "afg mma"
+              },
+              "result": "win",
+              "recordAtTime": "2-1- 0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 7,
+          "boutLabel": "BOUT #9 2-MINS / 3-ROUNDS",
+          "category": "female",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "120 lbs",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "Technical Knockout",
+          "round": "1st",
+          "timeRemaining": "",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-7",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Jeria Mae",
+                "lastName": "Casemiro",
+                "displayName": "Jeria Mae Casemiro",
+                "nickname": "MORRIGAN",
+                "gym": "Alab Kampilan Union of Martial Arts -AKUMA",
+                "hometown": "Purok2, Sapang, Jaen Nueva Ecija",
+                "height": "5'6",
+                "weightClass": "120 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2005-11-02",
+                "normalizedName": "jeria mae casemiro",
+                "normalizedGym": "alab kampilan union of martial arts akuma"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Micka Ruchelle C.",
+                "lastName": "Malipot",
+                "displayName": "Micka Ruchelle C. Malipot",
+                "nickname": "Beatrisa",
+                "gym": "Art of juggler/Joker MMA",
+                "hometown": "PARANAQUE CITY",
+                "height": "5'4",
+                "weightClass": "120 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2005-01-26",
+                "normalizedName": "micka ruchelle malipot",
+                "normalizedGym": "art of juggler joker mma"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 8,
+          "boutLabel": "BOUT #10 3-MINS / 3-ROUNDS",
+          "category": "female",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "135 lbs",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "T.K.O/ Rear Naked Choked",
+          "round": "3rd",
+          "timeRemaining": "1:23 Sec. Remaining",
+          "referee": "Alfredo Melendres",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-8",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Benjo",
+                "lastName": "Obiena",
+                "displayName": "Benjo Obiena",
+                "nickname": "The Thorn",
+                "gym": "RLIMA",
+                "hometown": "Pasay City",
+                "height": "5'3",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1998-05-20",
+                "normalizedName": "benjo obiena",
+                "normalizedGym": "rlima"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Anjune",
+                "lastName": "Gallanosa",
+                "displayName": "Anjune Gallanosa",
+                "nickname": "the destroyer",
+                "gym": "",
+                "hometown": "Antipolo City",
+                "height": "5'8",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2000-06-03",
+                "normalizedName": "anjune gallanosa",
+                "normalizedGym": ""
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 9,
+          "boutLabel": "BOUT #11 2-MINS / 3-ROUNDS",
+          "category": "female",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "115 lbs",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "Unanimous Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Alfredo Melendres",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-9",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Mia",
+                "lastName": "Domingo",
+                "displayName": "Mia Domingo",
+                "nickname": "Sathana",
+                "gym": "Team Psychopath MMA/The Butchers Rampage Crew",
+                "hometown": "Trece Martires City, Cavite.",
+                "height": "5'5",
+                "weightClass": "115 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2005-10-30",
+                "normalizedName": "mia domingo",
+                "normalizedGym": "team psychopath mma the butchers rampage crew"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Elealynanne",
+                "lastName": "Padollon",
+                "displayName": "Elealynanne Padollon",
+                "nickname": "EL LUMINA",
+                "gym": "SPRAWL MMA",
+                "hometown": "Marikina City",
+                "height": "5ft",
+                "weightClass": "115 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2003-04-26",
+                "normalizedName": "elealynanne padollon",
+                "normalizedGym": "sprawl mma"
+              },
+              "result": "win",
+              "recordAtTime": "2-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 10,
+          "boutLabel": "BOUT #13 3-MINS / 3-ROUNDS",
+          "category": "female",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "135 lbs",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "Technical knockout",
+          "round": "1st",
+          "timeRemaining": "4:43 Sec. Remaining",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9-bout-10",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Dennis B.",
+                "lastName": "Quiñonero",
+                "displayName": "Dennis B. Quiñonero",
+                "nickname": "The Cannon",
+                "gym": "Dojo De Quiñonero",
+                "hometown": "Mati,Davao Oriental",
+                "height": "5'5",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1983-05-08",
+                "normalizedName": "dennis quiñonero",
+                "normalizedGym": "dojo de quiñonero"
+              },
+              "result": "win",
+              "recordAtTime": "1-2- 0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Adrian, M",
+                "lastName": "Bulado",
+                "displayName": "Adrian, M Bulado",
+                "nickname": "BAKI HANMA",
+                "gym": "Art of juggler / CircuitX Fitness hub",
+                "hometown": "BLK 79 LOT-6 K-38 KABAYANIHAN ST.KARANGALAN VILLAGE CAINTA RIZAL",
+                "height": "5'7",
+                "weightClass": "135 lbs",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2001-06-18",
+                "normalizedName": "adrian bulado",
+                "normalizedGym": "art of juggler circuitx fitness hub"
+              },
+              "result": "loss",
+              "recordAtTime": "2-1- 0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NEWBREED-1",
+      "eventDate": "2026-08-27",
+      "venue": "Recto Ave, Sampaloc, Manila, 1008 Metro Manila",
+      "series": "New Breed",
+      "sourceKey": "new-breed-1",
+      "sheetName": "NEW BREED 1",
+      "bouts": [
+        {
+          "boutOrder": 1,
+          "boutLabel": "BOUT #3 2-MINS / 3-ROUNDS",
+          "category": "minor",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "125 LBS",
+          "format": "2-MINS / 3-ROUNDS",
+          "method": "Majority Decision",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "Danillo Marquez Cañete",
+          "sourceKey": "new-breed-1-bout-1",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "John Dustin",
+                "lastName": "Dela Cruz",
+                "displayName": "John Dustin Dela Cruz",
+                "nickname": "RAMBO",
+                "gym": "AFG GYM",
+                "hometown": "San Mateo Rizal",
+                "height": "5'6",
+                "weightClass": "125 LBS",
+                "photoSourceUrl": "",
+                "dateOfBirth": null,
+                "normalizedName": "john dustin dela cruz",
+                "normalizedGym": "afg gym"
+              },
+              "result": "loss",
+              "recordAtTime": "0-2-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Clarence",
+                "lastName": "Gamelo",
+                "displayName": "Clarence Gamelo",
+                "nickname": "MARGALLIO",
+                "gym": "Rodriguez Arnis Martial Arts Association",
+                "hometown": "Montalban Rizal",
+                "height": "5\"7",
+                "weightClass": "125 LBS",
+                "photoSourceUrl": "",
+                "dateOfBirth": null,
+                "normalizedName": "clarence gamelo",
+                "normalizedGym": "rodriguez arnis martial arts association"
+              },
+              "result": "win",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 2,
+          "boutLabel": "BOUT #4 3-MINS / 3-ROUNDS",
+          "category": "amateur",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "125 lbs (Minor)",
+          "format": "3-MINS / 3-ROUNDS",
+          "method": "T.K.O/ Armbar",
+          "round": "3rd",
+          "timeRemaining": "2:08 Sec Remaining",
+          "referee": "Juvanie Bacus",
+          "sourceKey": "new-breed-1-bout-2",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Ronnel",
+                "lastName": "Losabia",
+                "displayName": "Ronnel Losabia",
+                "nickname": "The Honey Badger",
+                "gym": "AFG - MMA",
+                "hometown": "Rodriguez, Rizal",
+                "height": "5'3",
+                "weightClass": "125 lbs (Minor)",
+                "photoSourceUrl": "https://www.facebook.com/ronnel.losabia",
+                "dateOfBirth": "2006-06-06",
+                "normalizedName": "ronnel losabia",
+                "normalizedGym": "afg mma"
+              },
+              "result": "win",
+              "recordAtTime": "1 -1 -0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Daniel",
+                "lastName": "Capongha",
+                "displayName": "Daniel Capongha",
+                "nickname": "the dreamer",
+                "gym": "Rodriguez sikaran Elite Group",
+                "hometown": "Rodriguez, Rizal",
+                "height": "5'6",
+                "weightClass": "125 lbs (Minor)",
+                "photoSourceUrl": "",
+                "dateOfBirth": null,
+                "normalizedName": "daniel capongha",
+                "normalizedGym": "rodriguez sikaran elite group"
+              },
+              "result": "loss",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UGB- 46/ BLAZE FC-10 BARRIO BRAWLS",
+      "eventDate": "2026-08-28",
+      "venue": "/ Entertainment Center Bldg. 3 Sta. Lucia East Grandmall",
+      "series": "Barrio Brawls / UGB / Blaze FC",
+      "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "sheetName": "sta.lucia barrio brawls 2 ",
+      "bouts": [
+        {
+          "boutOrder": 1,
+          "boutLabel": "BOUT #4 2 MINS / 3 ROUNDS",
+          "category": "minor",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "STRAWWEIGHT DIVISION",
+          "format": "2 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-1",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Angeluz Rafael T.",
+                "lastName": "Jose",
+                "displayName": "Angeluz Rafael T. Jose",
+                "nickname": "",
+                "gym": "TANAY RAVEN SIKARAN MARTIAL ARTS SCHOOL",
+                "hometown": "1 A BONIFACIO ST. BRGY. KATIPUNAN BAYANI TANAY, RIZAL",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2012-10-23",
+                "normalizedName": "angeluz rafael jose",
+                "normalizedGym": "tanay raven sikaran martial arts school"
+              },
+              "result": "",
+              "recordAtTime": "DEBUT"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Raymond",
+                "lastName": "Wilson",
+                "displayName": "Raymond Wilson",
+                "nickname": "SHADOW",
+                "gym": "hidden blade mixed martial arts",
+                "hometown": "mabalacat city",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2010-03-08",
+                "normalizedName": "raymond wilson",
+                "normalizedGym": "hidden blade mixed martial arts"
+              },
+              "result": "",
+              "recordAtTime": "DEBUT"
+            }
+          ]
+        },
+        {
+          "boutOrder": 2,
+          "boutLabel": "BOUT #5 2 MINS / 3 ROUNDS",
+          "category": "minor",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "FLYWEIGHT DIVISION",
+          "format": "2 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-2",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Clarence Daniel",
+                "lastName": "Gamelo",
+                "displayName": "Clarence Daniel Gamelo",
+                "nickname": "Margallo",
+                "gym": "RODRIGUEZ SIKARAN ELITE GROUP",
+                "hometown": "RODRIGUEZ, RIZAL",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2011-11-03",
+                "normalizedName": "clarence daniel gamelo",
+                "normalizedGym": "rodriguez sikaran elite group"
+              },
+              "result": "",
+              "recordAtTime": "1-0-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "John Lucas",
+                "lastName": "Olavides",
+                "displayName": "John Lucas Olavides",
+                "nickname": "THE HEALER",
+                "gym": "AFG MMA",
+                "hometown": "RODRIGUEZ, RIZAL",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2010-06-14",
+                "normalizedName": "john lucas olavides",
+                "normalizedGym": "afg mma"
+              },
+              "result": "",
+              "recordAtTime": "DEBUT"
+            }
+          ]
+        },
+        {
+          "boutOrder": 3,
+          "boutLabel": "BOUT #6 3 MINS / 3 ROUNDS",
+          "category": "amateur",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "FLYWEIGHT DIVISION",
+          "format": "3 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-3",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Reynaldo P. Jr.",
+                "lastName": "Romero",
+                "displayName": "Reynaldo P. Jr. Romero",
+                "nickname": "Fury",
+                "gym": "Hidden Blade",
+                "hometown": "Pampangga",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2004-08-13",
+                "normalizedName": "reynaldo jr. romero",
+                "normalizedGym": "hidden blade"
+              },
+              "result": "",
+              "recordAtTime": "DEBUT"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Ronnel",
+                "lastName": "Losabia",
+                "displayName": "Ronnel Losabia",
+                "nickname": "THE HONEY BADGER",
+                "gym": "AFG- MMA",
+                "hometown": "188 libis Rosario Rodriguez rizal",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2006-06-06",
+                "normalizedName": "ronnel losabia",
+                "normalizedGym": "afg mma"
+              },
+              "result": "",
+              "recordAtTime": "2-1- 0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 4,
+          "boutLabel": "BOUT #7 3 MINS / 3 ROUNDS",
+          "category": "amateur",
+          "division": "WELTERWEIGHT DIVISION",
+          "weightClass": "WELTERWEIGHT DIVISION",
+          "format": "3 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-4",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Latterel",
+                "lastName": "Libiran",
+                "displayName": "Latterel Libiran",
+                "nickname": "Panther",
+                "gym": "Floe Combat",
+                "hometown": "Sta Maria, Bulacan",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2005-06-27",
+                "normalizedName": "latterel libiran",
+                "normalizedGym": "floe combat"
+              },
+              "result": "",
+              "recordAtTime": ""
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Juvanie",
+                "lastName": "Bacus",
+                "displayName": "Juvanie Bacus",
+                "nickname": "MONKEY KING",
+                "gym": "UGB / NEW BREED",
+                "hometown": "507 Pillar Building, Corner dalupan st. Sampaloc Manila",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1994-03-29",
+                "normalizedName": "juvanie bacus",
+                "normalizedGym": "ugb new breed"
+              },
+              "result": "",
+              "recordAtTime": "DEBUT"
+            }
+          ]
+        },
+        {
+          "boutOrder": 5,
+          "boutLabel": "BOUT #8 3 MINS / 3 ROUNDS",
+          "category": "amateur",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "FLYWEIGHT DIVISION",
+          "format": "3 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-5",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Alec",
+                "lastName": "Untal",
+                "displayName": "Alec Untal",
+                "nickname": "ALIAS:Grim reaper",
+                "gym": "UNDERDOGS FIGHT TEAM PH",
+                "hometown": "ADDRESS: MARIKINA HEIGHTS",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2007-06-17",
+                "normalizedName": "alec untal",
+                "normalizedGym": "underdogs fight team ph"
+              },
+              "result": "",
+              "recordAtTime": ""
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Mark Benjamin D.",
+                "lastName": "Aduana",
+                "displayName": "Mark Benjamin D. Aduana",
+                "nickname": "baby face slugger",
+                "gym": "GYM/TEAM: Hidden Blade /triple lock submission",
+                "hometown": "Pasay city",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2007-02-21",
+                "normalizedName": "mark benjamin aduana",
+                "normalizedGym": "gym team hidden blade triple lock submission"
+              },
+              "result": "",
+              "recordAtTime": "Debut"
+            }
+          ]
+        },
+        {
+          "boutOrder": 6,
+          "boutLabel": "BOUT #9 3 MINS / 3 ROUNDS",
+          "category": "amateur",
+          "division": "LIGHTWEIGHT DIVISION",
+          "weightClass": "LIGHTWEIGHT DIVISION",
+          "format": "3 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-6",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Jeff Gabriel V.",
+                "lastName": "Shahdadpuri,",
+                "displayName": "Jeff Gabriel V. Shahdadpuri,",
+                "nickname": "KC's Nightwing",
+                "gym": "",
+                "hometown": "44 Fuschia St, Del Nacia IV, Riverside, Sauyo QC",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2004-09-28",
+                "normalizedName": "jeff gabriel shahdadpuri",
+                "normalizedGym": ""
+              },
+              "result": "",
+              "recordAtTime": "DEBUT"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Jordan Bradley",
+                "lastName": "Cruz",
+                "displayName": "Jordan Bradley Cruz",
+                "nickname": "",
+                "gym": "Kali Arnis Martial Arts Organization (KAMAO)/426 MMA/AJJP MMA",
+                "hometown": "Pasig, Philippines",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1995-07-19",
+                "normalizedName": "jordan bradley cruz",
+                "normalizedGym": "kali arnis martial arts organization kamao 426 mma ajjp mma"
+              },
+              "result": "",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 7,
+          "boutLabel": "BOUT #10 3 MINS / 3 ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "BANTAMWEIGHT DIVISION",
+          "format": "3 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-7",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Jay",
+                "lastName": "Osinar",
+                "displayName": "Jay Osinar",
+                "nickname": "",
+                "gym": "Villamor Sikaran Arnis",
+                "hometown": "Tanay, Rizal",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1993-12-13",
+                "normalizedName": "jay osinar",
+                "normalizedGym": "villamor sikaran arnis"
+              },
+              "result": "",
+              "recordAtTime": "DEBUT"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Anjune T.",
+                "lastName": "Gallanosa",
+                "displayName": "Anjune T. Gallanosa",
+                "nickname": "THE DESTROYER",
+                "gym": "independent",
+                "hometown": "Sitio Sapinit barangay San Juan Antipolo City",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2000-06-03",
+                "normalizedName": "anjune gallanosa",
+                "normalizedGym": "independent"
+              },
+              "result": "",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 8,
+          "boutLabel": "BOUT #11 3 MINS / 3 ROUNDS",
+          "category": "amateur",
+          "division": "STRAWWEIGHT DIVISION",
+          "weightClass": "STRAWWEIGHT DIVISION",
+          "format": "3 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-8",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Benjo",
+                "lastName": "Obiena",
+                "displayName": "Benjo Obiena",
+                "nickname": "THE THORN",
+                "gym": "hidden blade MMA",
+                "hometown": "Pasay City",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1998-05-20",
+                "normalizedName": "benjo obiena",
+                "normalizedGym": "hidden blade mma"
+              },
+              "result": "",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Jerald T.",
+                "lastName": "Galangue",
+                "displayName": "Jerald T. Galangue",
+                "nickname": "The Mandirigma",
+                "gym": "Team Paocc Fitness gym",
+                "hometown": "Fb harrizon Pasay",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2002-10-28",
+                "normalizedName": "jerald galangue",
+                "normalizedGym": "team paocc fitness gym"
+              },
+              "result": "",
+              "recordAtTime": "0-1-0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 9,
+          "boutLabel": "BOUT #12 3 MINS / 3 ROUNDS",
+          "category": "amateur",
+          "division": "BANTAMWEIGHT DIVISION",
+          "weightClass": "BANTAMWEIGHT DIVISION",
+          "format": "3 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-9",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Coronado",
+                "lastName": "St. Michael",
+                "displayName": "Coronado St. Michael",
+                "nickname": "The Archangel",
+                "gym": "Mancol Empire Kingsville Dojo",
+                "hometown": "Brgy. San Jose, Antipolo City",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2003-10-05",
+                "normalizedName": "coronado st michael",
+                "normalizedGym": "mancol empire kingsville dojo"
+              },
+              "result": "",
+              "recordAtTime": "DEBUT"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Jesus",
+                "lastName": "Cabalquinto",
+                "displayName": "Jesus Cabalquinto",
+                "nickname": "The Silent",
+                "gym": "Hidden Blade MMA",
+                "hometown": "Panday Pira Dau Mabalacat City,Pampanga",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1993-12-03",
+                "normalizedName": "jesus cabalquinto",
+                "normalizedGym": "hidden blade mma"
+              },
+              "result": "",
+              "recordAtTime": "DEBUT"
+            }
+          ]
+        },
+        {
+          "boutOrder": 10,
+          "boutLabel": "BOUT #13 3 MINS / 3 ROUNDS",
+          "category": "pro",
+          "division": "FLYWEIGHT DIVISION",
+          "weightClass": "FLYWEIGHT DIVISION",
+          "format": "3 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-10",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Joel",
+                "lastName": "Lincuna",
+                "displayName": "Joel Lincuna",
+                "nickname": "angel slayer",
+                "gym": "Hidden Blade MMA",
+                "hometown": "recto manila",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1997-08-28",
+                "normalizedName": "joel lincuna",
+                "normalizedGym": "hidden blade mma"
+              },
+              "result": "",
+              "recordAtTime": "0-1-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Adrian, M",
+                "lastName": "Bulado ,",
+                "displayName": "Adrian, M Bulado ,",
+                "nickname": "BAKI HANMA",
+                "gym": "AOJ & NEW BREED FITNESS GYM",
+                "hometown": "KARANGALAN VILLAGE CAINTA RIZAL",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2001-06-18",
+                "normalizedName": "adrian bulado",
+                "normalizedGym": "aoj new breed fitness gym"
+              },
+              "result": "",
+              "recordAtTime": "1- 1- 0"
+            }
+          ]
+        },
+        {
+          "boutOrder": 11,
+          "boutLabel": "BOUT #14 3 MINS / 3 ROUNDS",
+          "category": "pro",
+          "division": "Semi Pro",
+          "weightClass": "Semi Pro",
+          "format": "3 MINS / 3 ROUNDS",
+          "method": "",
+          "round": "",
+          "timeRemaining": "",
+          "referee": "",
+          "sourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10-bout-11",
+          "participants": [
+            {
+              "corner": "blue",
+              "fighter": {
+                "firstName": "Dennis",
+                "lastName": "Quin̈onero",
+                "displayName": "Dennis Quin̈onero",
+                "nickname": "The Cannon",
+                "gym": "Dojo De Quiñonero",
+                "hometown": "Mati,Davao Oriental",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "1983-05-08",
+                "normalizedName": "dennis quin onero",
+                "normalizedGym": "dojo de quiñonero"
+              },
+              "result": "",
+              "recordAtTime": "1-0-0"
+            },
+            {
+              "corner": "red",
+              "fighter": {
+                "firstName": "Marwin",
+                "lastName": "Landong,",
+                "displayName": "Marwin Landong,",
+                "nickname": "The Subano",
+                "gym": "DBJ KORIDAS",
+                "hometown": "San Mateo",
+                "height": "",
+                "weightClass": "",
+                "photoSourceUrl": "",
+                "dateOfBirth": "2000-05-20",
+                "normalizedName": "marwin landong",
+                "normalizedGym": "dbj koridas"
+              },
+              "result": "",
+              "recordAtTime": "1-0-0"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fighters": [
+    {
+      "key": "cjaay beringuela||art of juggler mma",
+      "fighter": {
+        "firstName": "Cjaay",
+        "lastName": "Beringuela",
+        "displayName": "Cjaay Beringuela",
+        "nickname": "",
+        "gym": "Art of Juggler MMA",
+        "hometown": "Paranaque City,",
+        "height": "",
+        "weightClass": "135 lbs (Minor)",
+        "photoSourceUrl": "https://www.facebook.com/cjaay.beringuela",
+        "dateOfBirth": null,
+        "normalizedName": "cjaay beringuela",
+        "normalizedGym": "art of juggler mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "ronnel losabia||afg mma",
+      "fighter": {
+        "firstName": "Ronnel",
+        "lastName": "Losabia",
+        "displayName": "Ronnel Losabia",
+        "nickname": "The Honey Badger",
+        "gym": "AFG - MMA",
+        "hometown": "Rodriguez, Rizal",
+        "height": "5'3",
+        "weightClass": "135 lbs (Minor)",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1YBlXPzwZTFVb4kJZT892ruG_L60ky4cG",
+        "dateOfBirth": "2006-06-06",
+        "normalizedName": "ronnel losabia",
+        "normalizedGym": "afg mma"
+      },
+      "occurrences": 4,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "alexander gaufo||afg mma",
+      "fighter": {
+        "firstName": "Alexander",
+        "lastName": "Gaufo",
+        "displayName": "Alexander Gaufo",
+        "nickname": "The Great",
+        "gym": "AFG - MMA",
+        "hometown": "Rodriguez, Rizal",
+        "height": "5'6",
+        "weightClass": "190 LBS (Minors)",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1rYal4JfkB7usOGP_LsiuKYPkR3fk2VLJ",
+        "dateOfBirth": "2009-06-20",
+        "normalizedName": "alexander gaufo",
+        "normalizedGym": "afg mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "hydyne howard mina||hidden blade mma",
+      "fighter": {
+        "firstName": "Hydyne Howard",
+        "lastName": "Mina",
+        "displayName": "Hydyne Howard Mina",
+        "nickname": "MON",
+        "gym": "Hidden Blade MMA",
+        "hometown": "Angeles City, Pampanga, Philippines",
+        "height": "5'8",
+        "weightClass": "190 LBS (Minors)",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2008-02-20",
+        "normalizedName": "hydyne howard mina",
+        "normalizedGym": "hidden blade mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "aira quinto||",
+      "fighter": {
+        "firstName": "Aira",
+        "lastName": "Quinto",
+        "displayName": "Aira Quinto",
+        "nickname": "",
+        "gym": "",
+        "hometown": "Novaliches Quezon City",
+        "height": "5'5",
+        "weightClass": "125 LBS (Minor)",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2005-11-13",
+        "normalizedName": "aira quinto",
+        "normalizedGym": ""
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "christi espolong||pasig combat sports",
+      "fighter": {
+        "firstName": "Christi",
+        "lastName": "Espolong",
+        "displayName": "Christi Espolong",
+        "nickname": "Castle",
+        "gym": "Pasig Combat Sports",
+        "hometown": "Manggahan, Pasig City",
+        "height": "5'5",
+        "weightClass": "125 LBS (Minor)",
+        "photoSourceUrl": "https://www.facebook.com/ChristiEspolong",
+        "dateOfBirth": "2007-04-04",
+        "normalizedName": "christi espolong",
+        "normalizedGym": "pasig combat sports"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "justine martija||afg mma",
+      "fighter": {
+        "firstName": "Justine",
+        "lastName": "Martija",
+        "displayName": "Justine Martija",
+        "nickname": "",
+        "gym": "AFG - MMA",
+        "hometown": "Rodriguez, Rizal",
+        "height": "5'3",
+        "weightClass": "110 LBS",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1cAs_KFIahSvBg_HPNqcduxp_6t4xUjLB",
+        "dateOfBirth": "2006-02-01",
+        "normalizedName": "justine martija",
+        "normalizedGym": "afg mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "micheal jhon subasos||kyokushin fight academy binangonan",
+      "fighter": {
+        "firstName": "Micheal Jhon",
+        "lastName": "Subasos",
+        "displayName": "Micheal Jhon Subasos",
+        "nickname": "",
+        "gym": "Kyokushin Fight Academy Binangonan",
+        "hometown": "Morong, Rizal",
+        "height": "5'3",
+        "weightClass": "110 LBS",
+        "photoSourceUrl": "https://www.facebook.com/john.michael.abil",
+        "dateOfBirth": "2006-01-30",
+        "normalizedName": "micheal jhon subasos",
+        "normalizedGym": "kyokushin fight academy binangonan"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "adrian bulado||art of juggler",
+      "fighter": {
+        "firstName": "Adrian",
+        "lastName": "Bulado",
+        "displayName": "Adrian Bulado",
+        "nickname": "Baki Hanma",
+        "gym": "Art of Juggler",
+        "hometown": "CAINTA RIZAL",
+        "height": "5'7",
+        "weightClass": "125 LBS",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1Inea_bUMU12PlGKiKebdYQa6LqByAEL_",
+        "dateOfBirth": "2001-06-18",
+        "normalizedName": "adrian bulado",
+        "normalizedGym": "art of juggler"
+      },
+      "occurrences": 2,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "cyrus jonathan cabautan||kfa binangonan",
+      "fighter": {
+        "firstName": "Cyrus Jonathan",
+        "lastName": "Cabautan",
+        "displayName": "Cyrus Jonathan Cabautan",
+        "nickname": "The Ferocious",
+        "gym": "KFA Binangonan",
+        "hometown": "Binangonan, Rizal",
+        "height": "5'5",
+        "weightClass": "125 LBS",
+        "photoSourceUrl": "https://drive.google.com/file/d/1XgBUujsyfKdqw94bMI33t1u9gC0gahRt/view?usp=drivesdk",
+        "dateOfBirth": "2006-05-05",
+        "normalizedName": "cyrus jonathan cabautan",
+        "normalizedGym": "kfa binangonan"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "adeleon vargas||",
+      "fighter": {
+        "firstName": "Adeleon",
+        "lastName": "Vargas",
+        "displayName": "Adeleon Vargas",
+        "nickname": "",
+        "gym": "",
+        "hometown": "Taytay, Rizal",
+        "height": "5'2",
+        "weightClass": "105 LBS",
+        "photoSourceUrl": "https://drive.google.com/file/d/10QplxbNl_5pac_z6iqz3sjOjQ7VUqjU7/view?usp=drivesdk",
+        "dateOfBirth": "1994-07-25",
+        "normalizedName": "adeleon vargas",
+        "normalizedGym": ""
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "elealynanne padollon||ground zero",
+      "fighter": {
+        "firstName": "Elealynanne",
+        "lastName": "Padollon",
+        "displayName": "Elealynanne Padollon",
+        "nickname": "EL Tempest",
+        "gym": "Ground Zero",
+        "hometown": "Nangka, Marikina City",
+        "height": "5'0",
+        "weightClass": "105 LBS",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1JJizG0CBO3LWlTObQ_TT2skAwm8HnldJ",
+        "dateOfBirth": "2003-04-26",
+        "normalizedName": "elealynanne padollon",
+        "normalizedGym": "ground zero"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "mohammar sobair||hidden blade mma",
+      "fighter": {
+        "firstName": "Mohammar",
+        "lastName": "Sobair",
+        "displayName": "Mohammar Sobair",
+        "nickname": "The Fearless",
+        "gym": "Hidden Blade MMA",
+        "hometown": "Agapito Del Rosario, Pampanga",
+        "height": "5'7",
+        "weightClass": "140 LBS",
+        "photoSourceUrl": "https://www.facebook.com/mohamar.sobair.1",
+        "dateOfBirth": "2002-08-07",
+        "normalizedName": "mohammar sobair",
+        "normalizedGym": "hidden blade mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "dennis quiñonero||dojo de quiñonero",
+      "fighter": {
+        "firstName": "Dennis",
+        "lastName": "Quiñonero",
+        "displayName": "Dennis Quiñonero",
+        "nickname": "The Cannon",
+        "gym": "Dojo De Quiñonero",
+        "hometown": "Davao Oriental",
+        "height": "5'5",
+        "weightClass": "140 LBS",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1dn_c8CxovKIXZPAZ88ZWa5K9sC0aLQVc",
+        "dateOfBirth": "1983-05-08",
+        "normalizedName": "dennis quiñonero",
+        "normalizedGym": "dojo de quiñonero"
+      },
+      "occurrences": 4,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "monsod cadalso||hidden blade mma",
+      "fighter": {
+        "firstName": "Monsod",
+        "lastName": "Cadalso",
+        "displayName": "Monsod Cadalso",
+        "nickname": "Boyka",
+        "gym": "Hidden Blade MMA",
+        "hometown": "Mabalacat City, Pampanga",
+        "height": "5'4",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1e5CEoYjGufM-VqLIfI0A5bAZxwLIwjw7",
+        "dateOfBirth": "1992-08-24",
+        "normalizedName": "monsod cadalso",
+        "normalizedGym": "hidden blade mma"
+      },
+      "occurrences": 2,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "marwin landong||koridas mma gym",
+      "fighter": {
+        "firstName": "Marwin",
+        "lastName": "Landong",
+        "displayName": "Marwin Landong",
+        "nickname": "The Subano",
+        "gym": "KORIDAS MMA Gym",
+        "hometown": "San Mateo, Rizal",
+        "height": "5'7",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1SL24t8K2v31Ux16zluegPYMryEgO6xgp",
+        "dateOfBirth": "2000-05-19",
+        "normalizedName": "marwin landong",
+        "normalizedGym": "koridas mma gym"
+      },
+      "occurrences": 2,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "john dustin dela cruz||afg",
+      "fighter": {
+        "firstName": "John Dustin",
+        "lastName": "Dela Cruz",
+        "displayName": "John Dustin Dela Cruz",
+        "nickname": "Rambo",
+        "gym": "AFG",
+        "hometown": "San Mateo Rizal",
+        "height": "",
+        "weightClass": "115 lbs (MINOR)",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/176oa8mmHLE-KRIBp2Bevc9IDAq6tPrfg",
+        "dateOfBirth": "2010-12-06",
+        "normalizedName": "john dustin dela cruz",
+        "normalizedGym": "afg"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "lan gil basa||dbj koridas mma",
+      "fighter": {
+        "firstName": "Lan Gil",
+        "lastName": "Basa",
+        "displayName": "Lan Gil Basa",
+        "nickname": "The King Erector",
+        "gym": "DBJ koridas MMA",
+        "hometown": "San Mateo Rizal",
+        "height": "5'3",
+        "weightClass": "115 lbs (MINOR)",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2008-04-08",
+        "normalizedName": "lan gil basa",
+        "normalizedGym": "dbj koridas mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "adrian mananggit||alab kampilan union of martial arts",
+      "fighter": {
+        "firstName": "Adrian",
+        "lastName": "Mananggit",
+        "displayName": "Adrian Mananggit",
+        "nickname": "",
+        "gym": "Alab Kampilan Union of Martial Arts",
+        "hometown": "Nueva Ecija",
+        "height": "5'6",
+        "weightClass": "152 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2002-10-13",
+        "normalizedName": "adrian mananggit",
+        "normalizedGym": "alab kampilan union of martial arts"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "aljhon juno||naraphil",
+      "fighter": {
+        "firstName": "Aljhon",
+        "lastName": "Juno",
+        "displayName": "Aljhon Juno",
+        "nickname": "The Beast",
+        "gym": "Naraphil",
+        "hometown": "Las Pinas CIty",
+        "height": "5'8",
+        "weightClass": "152 lbs",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1vTJIULmmQBOwnt-DmE8uPCeXq7E_35G4",
+        "dateOfBirth": "2001-02-14",
+        "normalizedName": "aljhon juno",
+        "normalizedGym": "naraphil"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "joshua de guzman fernandez||alab kampilan union of martial arts",
+      "fighter": {
+        "firstName": "Joshua, De Guzman",
+        "lastName": "Fernandez",
+        "displayName": "Joshua, De Guzman Fernandez",
+        "nickname": "",
+        "gym": "Alab kampilan union of martial arts",
+        "hometown": "Pulo, San Isidro, Nueva Ecjia",
+        "height": "5'5",
+        "weightClass": "125 lbs",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1OWUWFqlBD_ypZLYsJOCZWt8Ox4o1AhwL",
+        "dateOfBirth": "2007-08-03",
+        "normalizedName": "joshua de guzman fernandez",
+        "normalizedGym": "alab kampilan union of martial arts"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "jhon fernandez||lionsden mma academy",
+      "fighter": {
+        "firstName": "Jhon",
+        "lastName": "Fernandez",
+        "displayName": "Jhon Fernandez",
+        "nickname": "Jhon \"\"Tyler\"\" ",
+        "gym": "Lionsden MMA Academy",
+        "hometown": "Legazpi City",
+        "height": "5'5",
+        "weightClass": "125 lbs",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/10N9XwfZgxDgAEevIiYh6TXRgkNGzpWqx",
+        "dateOfBirth": "2000-07-19",
+        "normalizedName": "jhon fernandez",
+        "normalizedGym": "lionsden mma academy"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "jesus cabalquinto||hidden blade mma",
+      "fighter": {
+        "firstName": "Jesus",
+        "lastName": "Cabalquinto",
+        "displayName": "Jesus Cabalquinto",
+        "nickname": "The Silent",
+        "gym": "Hidden Blade MMA",
+        "hometown": "Pampanga",
+        "height": "130 LBS",
+        "weightClass": "5'4",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1bVXVEbtmbITV4JTlFBo8bQV0x0Flduyd",
+        "dateOfBirth": "1993-12-03",
+        "normalizedName": "jesus cabalquinto",
+        "normalizedGym": "hidden blade mma"
+      },
+      "occurrences": 2,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "alberto patindol||art of juggler",
+      "fighter": {
+        "firstName": "Alberto",
+        "lastName": "Patindol",
+        "displayName": "Alberto Patindol",
+        "nickname": "The kamador",
+        "gym": "Art of Juggler",
+        "hometown": "Bacoor, Cavite",
+        "height": "130 LBS",
+        "weightClass": "5'5",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1997-11-24",
+        "normalizedName": "alberto patindol",
+        "normalizedGym": "art of juggler"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "ferdinand aquino||team psychopath mma",
+      "fighter": {
+        "firstName": "Ferdinand",
+        "lastName": "Aquino",
+        "displayName": "Ferdinand Aquino",
+        "nickname": "The Psychopath",
+        "gym": "Team Psychopath MMA",
+        "hometown": "Cavite",
+        "height": "5'5",
+        "weightClass": "130 lbs",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1bDlJ0xFTQv4NdR-f5D8aXTZNKwRm0Jx7",
+        "dateOfBirth": "1996-01-12",
+        "normalizedName": "ferdinand aquino",
+        "normalizedGym": "team psychopath mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "genil francisco||",
+      "fighter": {
+        "firstName": "Genil",
+        "lastName": "Francisco",
+        "displayName": "Genil Francisco",
+        "nickname": "The Untamed",
+        "gym": "",
+        "hometown": "Antipolo City",
+        "height": "",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": null,
+        "normalizedName": "genil francisco",
+        "normalizedGym": ""
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "joel licuna||hidden blade mm",
+      "fighter": {
+        "firstName": "Joel",
+        "lastName": "Licuna",
+        "displayName": "Joel Licuna",
+        "nickname": "Angelo",
+        "gym": "Hidden Blade MM",
+        "hometown": "Champ building pier 15",
+        "height": "5'5",
+        "weightClass": "135 LBS",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1997-08-28",
+        "normalizedName": "joel licuna",
+        "normalizedGym": "hidden blade mm"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "giner burabod||sikaran freestyle",
+      "fighter": {
+        "firstName": "Giner",
+        "lastName": "Burabod",
+        "displayName": "Giner Burabod",
+        "nickname": "SIKARAN",
+        "gym": "SIKARAN FREESTYLE",
+        "hometown": "BLK 8 LOT 3 BAMBANG NI PELES STA ANA TAGUIG CITY",
+        "height": "5'5",
+        "weightClass": "135 LBS",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1979-03-03",
+        "normalizedName": "giner burabod",
+        "normalizedGym": "sikaran freestyle"
+      },
+      "occurrences": 2,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "gemil elizur clariño||bjmma fitnes gym",
+      "fighter": {
+        "firstName": "Gemil Elizur",
+        "lastName": "Clariño",
+        "displayName": "Gemil Elizur Clariño",
+        "nickname": "Sai",
+        "gym": "BJMMA FITNES GYM",
+        "hometown": "Purok 5 BRGY. San Jose San Pablo Laguna",
+        "height": "5'7",
+        "weightClass": "135 LBS",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2000-11-28",
+        "normalizedName": "gemil elizur clariño",
+        "normalizedGym": "bjmma fitnes gym"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "arsenio balisacan||athletic mma",
+      "fighter": {
+        "firstName": "Arsenio",
+        "lastName": "Balisacan",
+        "displayName": "Arsenio Balisacan",
+        "nickname": "The Assasin jr",
+        "gym": "athletic MMA",
+        "hometown": "nueva ecija",
+        "height": "5'6",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": null,
+        "normalizedName": "arsenio balisacan",
+        "normalizedGym": "athletic mma"
+      },
+      "occurrences": 2,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "alfredo lariego melendres||art of juggler jokermma team titans",
+      "fighter": {
+        "firstName": "Alfredo Lariego",
+        "lastName": "Melendres",
+        "displayName": "Alfredo Lariego Melendres",
+        "nickname": "THE JOKER",
+        "gym": "ART OF JUGGLER / JOKERMMA /TEAM TITANS",
+        "hometown": "15 Narra st. Maywood 1 bf homes parañaque city",
+        "height": "5,11",
+        "weightClass": "135 lbs.",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1994-09-23",
+        "normalizedName": "alfredo lariego melendres",
+        "normalizedGym": "art of juggler jokermma team titans"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "troy andy nagares||tanay sikaran martial arts school",
+      "fighter": {
+        "firstName": "Troy Andy O.",
+        "lastName": "Nagares",
+        "displayName": "Troy Andy O. Nagares",
+        "nickname": "Valerius",
+        "gym": "Tanay Sikaran Martial Arts School",
+        "hometown": "Sitio Balimbing Brgy. Plaza Aldea Tanay, Rizal",
+        "height": "5'5",
+        "weightClass": "165 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2009-02-05",
+        "normalizedName": "troy andy nagares",
+        "normalizedGym": "tanay sikaran martial arts school"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "alexander caragay gaufo||afg mma",
+      "fighter": {
+        "firstName": "Alexander Caragay",
+        "lastName": "Gaufo",
+        "displayName": "Alexander Caragay Gaufo",
+        "nickname": "(the great)",
+        "gym": "AFG MMA",
+        "hometown": "Rodriguez Rizal, brgy San Jose",
+        "height": "5,6",
+        "weightClass": "165 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2009-06-20",
+        "normalizedName": "alexander caragay gaufo",
+        "normalizedGym": "afg mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "sean kyrie nagares||tanay sikaran martial arts school",
+      "fighter": {
+        "firstName": "Sean Kyrie M.",
+        "lastName": "Nagares",
+        "displayName": "Sean Kyrie M. Nagares",
+        "nickname": "",
+        "gym": "TANAY SIKARAN MARTIAL ARTS SCHOOL",
+        "hometown": "7 SITIO MACARULAY ST.",
+        "height": "4'8 ft",
+        "weightClass": "92 LBS",
+        "photoSourceUrl": "",
+        "dateOfBirth": null,
+        "normalizedName": "sean kyrie nagares",
+        "normalizedGym": "tanay sikaran martial arts school"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "saint kristoff vargas||afg mma",
+      "fighter": {
+        "firstName": "Saint Kristoff",
+        "lastName": "Vargas",
+        "displayName": "Saint Kristoff Vargas",
+        "nickname": "",
+        "gym": "AFG MMA",
+        "hometown": "Blk 1 Lot 45 Phase-1M Kasiglahan Village San Jose Rodriguez Rizal",
+        "height": "4'8 ft",
+        "weightClass": "92 LBS",
+        "photoSourceUrl": "",
+        "dateOfBirth": null,
+        "normalizedName": "saint kristoff vargas",
+        "normalizedGym": "afg mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "jordan bradley cruz||kamao 426 mma ajjp mma",
+      "fighter": {
+        "firstName": "Jordan Bradley C.",
+        "lastName": "Cruz",
+        "displayName": "Jordan Bradley C. Cruz",
+        "nickname": "",
+        "gym": "(KAMAO)/426 MMA/AJJP MMA",
+        "hometown": "Pasig",
+        "height": "5'10",
+        "weightClass": "155lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1995-07-19",
+        "normalizedName": "jordan bradley cruz",
+        "normalizedGym": "kamao 426 mma ajjp mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "nikko garrido||fitness8 ground zero fight team",
+      "fighter": {
+        "firstName": "Nikko",
+        "lastName": "Garrido",
+        "displayName": "Nikko Garrido",
+        "nickname": "Akuma",
+        "gym": "Fitness8/Ground Zero fight team",
+        "hometown": "10b magalang st.herbosa tondo manila",
+        "height": "5'5",
+        "weightClass": "155lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1993-10-05",
+        "normalizedName": "nikko garrido",
+        "normalizedGym": "fitness8 ground zero fight team"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "jerald tagapan galangue||team paocc fitness gym",
+      "fighter": {
+        "firstName": "Jerald Tagapan",
+        "lastName": "Galangue",
+        "displayName": "Jerald Tagapan Galangue",
+        "nickname": "The Mandirigma",
+        "gym": "Team Paocc Fitness gym",
+        "hometown": "Fb harrizon Pasay City",
+        "height": "5'1",
+        "weightClass": "115",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2002-10-28",
+        "normalizedName": "jerald tagapan galangue",
+        "normalizedGym": "team paocc fitness gym"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "limuel bagarinao malinao||cenojas mma mmafit",
+      "fighter": {
+        "firstName": "Limuel Bagarinao",
+        "lastName": "Malinao",
+        "displayName": "Limuel Bagarinao Malinao",
+        "nickname": "THE SNIPER",
+        "gym": "CENOJAS MMA/ MMAFIT",
+        "hometown": "Davao city",
+        "height": "5'2",
+        "weightClass": "115",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2002-03-25",
+        "normalizedName": "limuel bagarinao malinao",
+        "normalizedGym": "cenojas mma mmafit"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "rex langub cabudbud||alab kapilan union of martial arts",
+      "fighter": {
+        "firstName": "Rex Langub",
+        "lastName": "Cabudbud",
+        "displayName": "Rex Langub Cabudbud",
+        "nickname": "Rex",
+        "gym": "Alab Kapilan Union of Martial Arts",
+        "hometown": "San Leonardo, Diversion, Nueva Ecija",
+        "height": "5'6",
+        "weightClass": "115lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2007-08-13",
+        "normalizedName": "rex langub cabudbud",
+        "normalizedGym": "alab kapilan union of martial arts"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "alton john necesario fuentes||cenojas mma mmafit",
+      "fighter": {
+        "firstName": "Alton John, Necesario",
+        "lastName": "Fuentes",
+        "displayName": "Alton John, Necesario Fuentes",
+        "nickname": "King Hercules",
+        "gym": "Cenojas mma/mmafit",
+        "hometown": "Davao City",
+        "height": "5'2",
+        "weightClass": "115lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1986-10-27",
+        "normalizedName": "alton john necesario fuentes",
+        "normalizedGym": "cenojas mma mmafit"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "renz cabudbud||alab kampilan",
+      "fighter": {
+        "firstName": "Renz",
+        "lastName": "Cabudbud",
+        "displayName": "Renz Cabudbud",
+        "nickname": "Rz",
+        "gym": "Alab kampilan",
+        "hometown": "Sanleonardo Nueva Ecija",
+        "height": "5'6",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2006-04-18",
+        "normalizedName": "renz cabudbud",
+        "normalizedGym": "alab kampilan"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "jeria mae casemiro||alab kampilan union of martial arts akuma",
+      "fighter": {
+        "firstName": "Jeria Mae",
+        "lastName": "Casemiro",
+        "displayName": "Jeria Mae Casemiro",
+        "nickname": "MORRIGAN",
+        "gym": "Alab Kampilan Union of Martial Arts -AKUMA",
+        "hometown": "Purok2, Sapang, Jaen Nueva Ecija",
+        "height": "5'6",
+        "weightClass": "120 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2005-11-02",
+        "normalizedName": "jeria mae casemiro",
+        "normalizedGym": "alab kampilan union of martial arts akuma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "micka ruchelle malipot||art of juggler joker mma",
+      "fighter": {
+        "firstName": "Micka Ruchelle C.",
+        "lastName": "Malipot",
+        "displayName": "Micka Ruchelle C. Malipot",
+        "nickname": "Beatrisa",
+        "gym": "Art of juggler/Joker MMA",
+        "hometown": "PARANAQUE CITY",
+        "height": "5'4",
+        "weightClass": "120 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2005-01-26",
+        "normalizedName": "micka ruchelle malipot",
+        "normalizedGym": "art of juggler joker mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "benjo obiena||rlima",
+      "fighter": {
+        "firstName": "Benjo",
+        "lastName": "Obiena",
+        "displayName": "Benjo Obiena",
+        "nickname": "The Thorn",
+        "gym": "RLIMA",
+        "hometown": "Pasay City",
+        "height": "5'3",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1998-05-20",
+        "normalizedName": "benjo obiena",
+        "normalizedGym": "rlima"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "anjune gallanosa||",
+      "fighter": {
+        "firstName": "Anjune",
+        "lastName": "Gallanosa",
+        "displayName": "Anjune Gallanosa",
+        "nickname": "the destroyer",
+        "gym": "",
+        "hometown": "Antipolo City",
+        "height": "5'8",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2000-06-03",
+        "normalizedName": "anjune gallanosa",
+        "normalizedGym": ""
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "mia domingo||team psychopath mma the butchers rampage crew",
+      "fighter": {
+        "firstName": "Mia",
+        "lastName": "Domingo",
+        "displayName": "Mia Domingo",
+        "nickname": "Sathana",
+        "gym": "Team Psychopath MMA/The Butchers Rampage Crew",
+        "hometown": "Trece Martires City, Cavite.",
+        "height": "5'5",
+        "weightClass": "115 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2005-10-30",
+        "normalizedName": "mia domingo",
+        "normalizedGym": "team psychopath mma the butchers rampage crew"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "elealynanne padollon||sprawl mma",
+      "fighter": {
+        "firstName": "Elealynanne",
+        "lastName": "Padollon",
+        "displayName": "Elealynanne Padollon",
+        "nickname": "EL LUMINA",
+        "gym": "SPRAWL MMA",
+        "hometown": "Marikina City",
+        "height": "5ft",
+        "weightClass": "115 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2003-04-26",
+        "normalizedName": "elealynanne padollon",
+        "normalizedGym": "sprawl mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "elealynanne-padollon",
+          "displayName": "Elealynanne Padollon",
+          "gym": "Ground Zero"
+        }
+      ]
+    },
+    {
+      "key": "adrian bulado||art of juggler circuitx fitness hub",
+      "fighter": {
+        "firstName": "Adrian, M",
+        "lastName": "Bulado",
+        "displayName": "Adrian, M Bulado",
+        "nickname": "BAKI HANMA",
+        "gym": "Art of juggler / CircuitX Fitness hub",
+        "hometown": "BLK 79 LOT-6 K-38 KABAYANIHAN ST.KARANGALAN VILLAGE CAINTA RIZAL",
+        "height": "5'7",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2001-06-18",
+        "normalizedName": "adrian bulado",
+        "normalizedGym": "art of juggler circuitx fitness hub"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "adrian-bulado",
+          "displayName": "Adrian Bulado",
+          "gym": "Art of Juggler"
+        }
+      ]
+    },
+    {
+      "key": "john dustin dela cruz||afg gym",
+      "fighter": {
+        "firstName": "John Dustin",
+        "lastName": "Dela Cruz",
+        "displayName": "John Dustin Dela Cruz",
+        "nickname": "RAMBO",
+        "gym": "AFG GYM",
+        "hometown": "San Mateo Rizal",
+        "height": "5'6",
+        "weightClass": "125 LBS",
+        "photoSourceUrl": "",
+        "dateOfBirth": null,
+        "normalizedName": "john dustin dela cruz",
+        "normalizedGym": "afg gym"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "john-dustin-dela-cruz",
+          "displayName": "John Dustin Dela Cruz",
+          "gym": "AFG"
+        }
+      ]
+    },
+    {
+      "key": "clarence gamelo||rodriguez arnis martial arts association",
+      "fighter": {
+        "firstName": "Clarence",
+        "lastName": "Gamelo",
+        "displayName": "Clarence Gamelo",
+        "nickname": "MARGALLIO",
+        "gym": "Rodriguez Arnis Martial Arts Association",
+        "hometown": "Montalban Rizal",
+        "height": "5\"7",
+        "weightClass": "125 LBS",
+        "photoSourceUrl": "",
+        "dateOfBirth": null,
+        "normalizedName": "clarence gamelo",
+        "normalizedGym": "rodriguez arnis martial arts association"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "daniel capongha||rodriguez sikaran elite group",
+      "fighter": {
+        "firstName": "Daniel",
+        "lastName": "Capongha",
+        "displayName": "Daniel Capongha",
+        "nickname": "the dreamer",
+        "gym": "Rodriguez sikaran Elite Group",
+        "hometown": "Rodriguez, Rizal",
+        "height": "5'6",
+        "weightClass": "125 lbs (Minor)",
+        "photoSourceUrl": "",
+        "dateOfBirth": null,
+        "normalizedName": "daniel capongha",
+        "normalizedGym": "rodriguez sikaran elite group"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "angeluz rafael jose||tanay raven sikaran martial arts school",
+      "fighter": {
+        "firstName": "Angeluz Rafael T.",
+        "lastName": "Jose",
+        "displayName": "Angeluz Rafael T. Jose",
+        "nickname": "",
+        "gym": "TANAY RAVEN SIKARAN MARTIAL ARTS SCHOOL",
+        "hometown": "1 A BONIFACIO ST. BRGY. KATIPUNAN BAYANI TANAY, RIZAL",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2012-10-23",
+        "normalizedName": "angeluz rafael jose",
+        "normalizedGym": "tanay raven sikaran martial arts school"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "raymond wilson||hidden blade mixed martial arts",
+      "fighter": {
+        "firstName": "Raymond",
+        "lastName": "Wilson",
+        "displayName": "Raymond Wilson",
+        "nickname": "SHADOW",
+        "gym": "hidden blade mixed martial arts",
+        "hometown": "mabalacat city",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2010-03-08",
+        "normalizedName": "raymond wilson",
+        "normalizedGym": "hidden blade mixed martial arts"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "clarence daniel gamelo||rodriguez sikaran elite group",
+      "fighter": {
+        "firstName": "Clarence Daniel",
+        "lastName": "Gamelo",
+        "displayName": "Clarence Daniel Gamelo",
+        "nickname": "Margallo",
+        "gym": "RODRIGUEZ SIKARAN ELITE GROUP",
+        "hometown": "RODRIGUEZ, RIZAL",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2011-11-03",
+        "normalizedName": "clarence daniel gamelo",
+        "normalizedGym": "rodriguez sikaran elite group"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "john lucas olavides||afg mma",
+      "fighter": {
+        "firstName": "John Lucas",
+        "lastName": "Olavides",
+        "displayName": "John Lucas Olavides",
+        "nickname": "THE HEALER",
+        "gym": "AFG MMA",
+        "hometown": "RODRIGUEZ, RIZAL",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2010-06-14",
+        "normalizedName": "john lucas olavides",
+        "normalizedGym": "afg mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "reynaldo jr. romero||hidden blade",
+      "fighter": {
+        "firstName": "Reynaldo P. Jr.",
+        "lastName": "Romero",
+        "displayName": "Reynaldo P. Jr. Romero",
+        "nickname": "Fury",
+        "gym": "Hidden Blade",
+        "hometown": "Pampangga",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2004-08-13",
+        "normalizedName": "reynaldo jr. romero",
+        "normalizedGym": "hidden blade"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "latterel libiran||floe combat",
+      "fighter": {
+        "firstName": "Latterel",
+        "lastName": "Libiran",
+        "displayName": "Latterel Libiran",
+        "nickname": "Panther",
+        "gym": "Floe Combat",
+        "hometown": "Sta Maria, Bulacan",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2005-06-27",
+        "normalizedName": "latterel libiran",
+        "normalizedGym": "floe combat"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "juvanie bacus||ugb new breed",
+      "fighter": {
+        "firstName": "Juvanie",
+        "lastName": "Bacus",
+        "displayName": "Juvanie Bacus",
+        "nickname": "MONKEY KING",
+        "gym": "UGB / NEW BREED",
+        "hometown": "507 Pillar Building, Corner dalupan st. Sampaloc Manila",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1994-03-29",
+        "normalizedName": "juvanie bacus",
+        "normalizedGym": "ugb new breed"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "alec untal||underdogs fight team ph",
+      "fighter": {
+        "firstName": "Alec",
+        "lastName": "Untal",
+        "displayName": "Alec Untal",
+        "nickname": "ALIAS:Grim reaper",
+        "gym": "UNDERDOGS FIGHT TEAM PH",
+        "hometown": "ADDRESS: MARIKINA HEIGHTS",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2007-06-17",
+        "normalizedName": "alec untal",
+        "normalizedGym": "underdogs fight team ph"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "mark benjamin aduana||gym team hidden blade triple lock submission",
+      "fighter": {
+        "firstName": "Mark Benjamin D.",
+        "lastName": "Aduana",
+        "displayName": "Mark Benjamin D. Aduana",
+        "nickname": "baby face slugger",
+        "gym": "GYM/TEAM: Hidden Blade /triple lock submission",
+        "hometown": "Pasay city",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2007-02-21",
+        "normalizedName": "mark benjamin aduana",
+        "normalizedGym": "gym team hidden blade triple lock submission"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "jeff gabriel shahdadpuri||",
+      "fighter": {
+        "firstName": "Jeff Gabriel V.",
+        "lastName": "Shahdadpuri,",
+        "displayName": "Jeff Gabriel V. Shahdadpuri,",
+        "nickname": "KC's Nightwing",
+        "gym": "",
+        "hometown": "44 Fuschia St, Del Nacia IV, Riverside, Sauyo QC",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2004-09-28",
+        "normalizedName": "jeff gabriel shahdadpuri",
+        "normalizedGym": ""
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "jordan bradley cruz||kali arnis martial arts organization kamao 426 mma ajjp mma",
+      "fighter": {
+        "firstName": "Jordan Bradley",
+        "lastName": "Cruz",
+        "displayName": "Jordan Bradley Cruz",
+        "nickname": "",
+        "gym": "Kali Arnis Martial Arts Organization (KAMAO)/426 MMA/AJJP MMA",
+        "hometown": "Pasig, Philippines",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1995-07-19",
+        "normalizedName": "jordan bradley cruz",
+        "normalizedGym": "kali arnis martial arts organization kamao 426 mma ajjp mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "jordan-bradley-c-cruz",
+          "displayName": "Jordan Bradley C. Cruz",
+          "gym": "(KAMAO)/426 MMA/AJJP MMA"
+        }
+      ]
+    },
+    {
+      "key": "jay osinar||villamor sikaran arnis",
+      "fighter": {
+        "firstName": "Jay",
+        "lastName": "Osinar",
+        "displayName": "Jay Osinar",
+        "nickname": "",
+        "gym": "Villamor Sikaran Arnis",
+        "hometown": "Tanay, Rizal",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1993-12-13",
+        "normalizedName": "jay osinar",
+        "normalizedGym": "villamor sikaran arnis"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "anjune gallanosa||independent",
+      "fighter": {
+        "firstName": "Anjune T.",
+        "lastName": "Gallanosa",
+        "displayName": "Anjune T. Gallanosa",
+        "nickname": "THE DESTROYER",
+        "gym": "independent",
+        "hometown": "Sitio Sapinit barangay San Juan Antipolo City",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2000-06-03",
+        "normalizedName": "anjune gallanosa",
+        "normalizedGym": "independent"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "anjune-gallanosa",
+          "displayName": "Anjune Gallanosa",
+          "gym": ""
+        }
+      ]
+    },
+    {
+      "key": "benjo obiena||hidden blade mma",
+      "fighter": {
+        "firstName": "Benjo",
+        "lastName": "Obiena",
+        "displayName": "Benjo Obiena",
+        "nickname": "THE THORN",
+        "gym": "hidden blade MMA",
+        "hometown": "Pasay City",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1998-05-20",
+        "normalizedName": "benjo obiena",
+        "normalizedGym": "hidden blade mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "benjo-obiena",
+          "displayName": "Benjo Obiena",
+          "gym": "RLIMA"
+        }
+      ]
+    },
+    {
+      "key": "jerald galangue||team paocc fitness gym",
+      "fighter": {
+        "firstName": "Jerald T.",
+        "lastName": "Galangue",
+        "displayName": "Jerald T. Galangue",
+        "nickname": "The Mandirigma",
+        "gym": "Team Paocc Fitness gym",
+        "hometown": "Fb harrizon Pasay",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2002-10-28",
+        "normalizedName": "jerald galangue",
+        "normalizedGym": "team paocc fitness gym"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "coronado st michael||mancol empire kingsville dojo",
+      "fighter": {
+        "firstName": "Coronado",
+        "lastName": "St. Michael",
+        "displayName": "Coronado St. Michael",
+        "nickname": "The Archangel",
+        "gym": "Mancol Empire Kingsville Dojo",
+        "hometown": "Brgy. San Jose, Antipolo City",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2003-10-05",
+        "normalizedName": "coronado st michael",
+        "normalizedGym": "mancol empire kingsville dojo"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "joel lincuna||hidden blade mma",
+      "fighter": {
+        "firstName": "Joel",
+        "lastName": "Lincuna",
+        "displayName": "Joel Lincuna",
+        "nickname": "angel slayer",
+        "gym": "Hidden Blade MMA",
+        "hometown": "recto manila",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1997-08-28",
+        "normalizedName": "joel lincuna",
+        "normalizedGym": "hidden blade mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "adrian bulado||aoj new breed fitness gym",
+      "fighter": {
+        "firstName": "Adrian, M",
+        "lastName": "Bulado ,",
+        "displayName": "Adrian, M Bulado ,",
+        "nickname": "BAKI HANMA",
+        "gym": "AOJ & NEW BREED FITNESS GYM",
+        "hometown": "KARANGALAN VILLAGE CAINTA RIZAL",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2001-06-18",
+        "normalizedName": "adrian bulado",
+        "normalizedGym": "aoj new breed fitness gym"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "adrian-bulado",
+          "displayName": "Adrian Bulado",
+          "gym": "Art of Juggler"
+        },
+        {
+          "slug": "adrian-m-bulado",
+          "displayName": "Adrian, M Bulado",
+          "gym": "Art of juggler / CircuitX Fitness hub"
+        }
+      ]
+    },
+    {
+      "key": "dennis quin onero||dojo de quiñonero",
+      "fighter": {
+        "firstName": "Dennis",
+        "lastName": "Quin̈onero",
+        "displayName": "Dennis Quin̈onero",
+        "nickname": "The Cannon",
+        "gym": "Dojo De Quiñonero",
+        "hometown": "Mati,Davao Oriental",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1983-05-08",
+        "normalizedName": "dennis quin onero",
+        "normalizedGym": "dojo de quiñonero"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": []
+    },
+    {
+      "key": "marwin landong||dbj koridas",
+      "fighter": {
+        "firstName": "Marwin",
+        "lastName": "Landong,",
+        "displayName": "Marwin Landong,",
+        "nickname": "The Subano",
+        "gym": "DBJ KORIDAS",
+        "hometown": "San Mateo",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2000-05-20",
+        "normalizedName": "marwin landong",
+        "normalizedGym": "dbj koridas"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "marwin-landong",
+          "displayName": "Marwin Landong",
+          "gym": "KORIDAS MMA Gym"
+        }
+      ]
+    }
+  ],
+  "summaries": [
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Cjaay",
+      "lastName": "Beringuela",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "cjaay beringuela"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Ronnel",
+      "lastName": "Losabia",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "ronnel losabia"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Alexander",
+      "lastName": "Gaufo",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "alexander gaufo"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Hydyne Howard",
+      "lastName": "Mina",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "hydyne howard mina"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Aira",
+      "lastName": "Quinto",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "aira quinto"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Christi",
+      "lastName": "Espolong",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "christi espolong"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Justine",
+      "lastName": "Martija",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "justine martija"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Micheal Jhon",
+      "lastName": "Subasos",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "micheal jhon subasos"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Adrian",
+      "lastName": "Bulado",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "adrian bulado"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Cyrus Jonathan",
+      "lastName": "Cabautan",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "cyrus jonathan cabautan"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Adeleon",
+      "lastName": "Vargas",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "adeleon vargas"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Elealynanne",
+      "lastName": "Padollon",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "elealynanne padollon"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Mohammar",
+      "lastName": "Sobair",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "mohammar sobair"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Dennis",
+      "lastName": "Quiñonero",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "dennis quiñonero"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Monsod",
+      "lastName": "Cadalso",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "monsod cadalso"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-1",
+      "firstName": "Marwin",
+      "lastName": "Landong",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "marwin landong"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "John Dustin",
+      "lastName": "Dela Cruz",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "john dustin dela cruz"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Lan Gil",
+      "lastName": "Basa",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "lan gil basa"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Adrian",
+      "lastName": "Mananggit",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "adrian mananggit"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Aljhon",
+      "lastName": "Juno",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "aljhon juno"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Joshua De Guzman",
+      "lastName": "Fernandez",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "joshua de guzman fernandez"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "John",
+      "lastName": "Fernandez",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "john fernandez"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Jesus",
+      "lastName": "Cabalquinto",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "jesus cabalquinto"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Alberto",
+      "lastName": "Patindol",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "alberto patindol"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Adrian",
+      "lastName": "Bulado",
+      "corner": "blue",
+      "wins": 2,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "adrian bulado"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Marwin",
+      "lastName": "Landong",
+      "corner": "red",
+      "wins": 2,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "marwin landong"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Genial",
+      "lastName": "Francisco",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "genial francisco"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Giner",
+      "lastName": "Burabod",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "giner burabod"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Joel",
+      "lastName": "Lincuna",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "joel lincuna"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Giner",
+      "lastName": "Burabod",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "giner burabod"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Monsod",
+      "lastName": "Cadalso",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 2,
+      "draws": 0,
+      "normalizedName": "monsod cadalso"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Dennis",
+      "lastName": "Quiñonero",
+      "corner": "red",
+      "wins": 0,
+      "losses": 2,
+      "draws": 0,
+      "normalizedName": "dennis quiñonero"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Gemil Elixir",
+      "lastName": "Clariño",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "gemil elixir clariño"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Dennis",
+      "lastName": "Quiñonero",
+      "corner": "red",
+      "wins": 0,
+      "losses": 2,
+      "draws": 0,
+      "normalizedName": "dennis quiñonero"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Arsenio",
+      "lastName": "Balisacan",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "arsenio balisacan"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Alfredo Lariego",
+      "lastName": "Melendres",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "alfredo lariego melendres"
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "firstName": "Arsenio",
+      "lastName": "Balisacan",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "arsenio balisacan"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Troy Andy O",
+      "lastName": "Nagares",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "troy andy nagares"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Alexander C",
+      "lastName": "Gaufo",
+      "corner": "red",
+      "wins": 1,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "alexander gaufo"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Sean Kyrie M",
+      "lastName": "Nagares",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "sean kyrie nagares"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Saint Kristoff",
+      "lastName": "Vargas",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "saint kristoff vargas"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Jordan Bradley C",
+      "lastName": "Cruz",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "jordan bradley cruz"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Nikko",
+      "lastName": "Garrido",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "nikko garrido"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Gerald Tagapan",
+      "lastName": "Galangue",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "gerald tagapan galangue"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Limuel B",
+      "lastName": "Malinao",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "limuel malinao"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Rex Langub",
+      "lastName": "Cabudbud",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "rex langub cabudbud"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Alton B",
+      "lastName": "Fuentes",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "alton fuentes"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Renz",
+      "lastName": "Cabudbud",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "renz cabudbud"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Ronnel",
+      "lastName": "Losabia",
+      "corner": "red",
+      "wins": 2,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "ronnel losabia"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Jeria Mae",
+      "lastName": "Casemiro",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "jeria mae casemiro"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Micka Ruchelle B",
+      "lastName": "Malipot",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "micka ruchelle malipot"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Benjo",
+      "lastName": "Obiena",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "benjo obiena"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Anjune",
+      "lastName": "Gallanosa",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "anjune gallanosa"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Mia",
+      "lastName": "Domingo",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "mia domingo"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Elealynanne",
+      "lastName": "Padollon",
+      "corner": "red",
+      "wins": 2,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "elealynanne padollon"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Dennis B",
+      "lastName": "Quiñonero",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 2,
+      "draws": 0,
+      "normalizedName": "dennis quiñonero"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "firstName": "Adrian M",
+      "lastName": "Bulado",
+      "corner": "red",
+      "wins": 2,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "adrian bulado"
+    },
+    {
+      "eventSourceKey": "new-breed-1",
+      "firstName": "John Dustin",
+      "lastName": "Dela Cruz",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 2,
+      "draws": 0,
+      "normalizedName": "john dustin dela cruz"
+    },
+    {
+      "eventSourceKey": "new-breed-1",
+      "firstName": "Clarence",
+      "lastName": "Gamelo",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "clarence gamelo"
+    },
+    {
+      "eventSourceKey": "new-breed-1",
+      "firstName": "Ronnel",
+      "lastName": "Losabia",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "ronnel losabia"
+    },
+    {
+      "eventSourceKey": "new-breed-1",
+      "firstName": "Daniel",
+      "lastName": "Capongha",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "daniel capongha"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Angeluz Rafael T",
+      "lastName": "Jose",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 0,
+      "draws": 1,
+      "normalizedName": "angeluz rafael jose"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Raymond",
+      "lastName": "Wilson",
+      "corner": "red",
+      "wins": 0,
+      "losses": 0,
+      "draws": 1,
+      "normalizedName": "raymond wilson"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Clarence",
+      "lastName": "Gamelo",
+      "corner": "blue",
+      "wins": 2,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "clarence gamelo"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "John Lucas",
+      "lastName": "Olavibes",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "john lucas olavibes"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Reynaldo P Jr.",
+      "lastName": "Romero",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "reynaldo jr. romero"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Ronnel",
+      "lastName": "Losabia",
+      "corner": "red",
+      "wins": 2,
+      "losses": 2,
+      "draws": 0,
+      "normalizedName": "ronnel losabia"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Latterel",
+      "lastName": "Libiran",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "latterel libiran"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Juvanie",
+      "lastName": "Bacus",
+      "corner": "red",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "juvanie bacus"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Alec",
+      "lastName": "Untal",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "alec untal"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Mark Benjamin D",
+      "lastName": "Aduana",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "mark benjamin aduana"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Jeff Gabriel V.",
+      "lastName": "Shahdadpuri",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "jeff gabriel shahdadpuri"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Jordan Bradley",
+      "lastName": "Cruz",
+      "corner": "red",
+      "wins": 2,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "jordan bradley cruz"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Jay",
+      "lastName": "Osninar",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "jay osninar"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Anjune T",
+      "lastName": "Gallanosa",
+      "corner": "red",
+      "wins": 2,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "anjune gallanosa"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Benjo",
+      "lastName": "Obiena",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 2,
+      "draws": 0,
+      "normalizedName": "benjo obiena"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Jerald T",
+      "lastName": "Galangue",
+      "corner": "red",
+      "wins": 1,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "jerald galangue"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "St. Michael",
+      "lastName": "Coronado",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "st. michael coronado"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Jesus",
+      "lastName": "Cabalquinto",
+      "corner": "red",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "jesus cabalquinto"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Joel",
+      "lastName": "Licuna",
+      "corner": "blue",
+      "wins": 0,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "joel licuna"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Adrian M",
+      "lastName": "Bulado",
+      "corner": "red",
+      "wins": 3,
+      "losses": 1,
+      "draws": 0,
+      "normalizedName": "adrian bulado"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Dennis",
+      "lastName": "Quiñonero",
+      "corner": "blue",
+      "wins": 1,
+      "losses": 3,
+      "draws": 0,
+      "normalizedName": "dennis quiñonero"
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "firstName": "Marwin",
+      "lastName": "Landong",
+      "corner": "red",
+      "wins": 3,
+      "losses": 0,
+      "draws": 0,
+      "normalizedName": "marwin landong"
+    }
+  ],
+  "mismatches": [
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Ronnel Losabia",
+      "corner": "red",
+      "sheet": {
+        "wins": 2,
+        "losses": 2,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 2,
+        "losses": 1,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "fighterName": "Alexander C Gaufo",
+      "corner": "red",
+      "sheet": {
+        "wins": 1,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Adrian M Bulado",
+      "corner": "red",
+      "sheet": {
+        "wins": 3,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 2,
+        "losses": 1,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Dennis Quiñonero",
+      "corner": "blue",
+      "sheet": {
+        "wins": 1,
+        "losses": 3,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 1,
+        "losses": 1,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "fighterName": "Monsod Cadalso",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 2,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Marwin Landong",
+      "corner": "red",
+      "sheet": {
+        "wins": 3,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 2,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "fighterName": "John Fernandez",
+      "corner": "red",
+      "sheet": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Jesus Cabalquinto",
+      "corner": "red",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "fighterName": "Genial Francisco",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "fighterName": "Giner Burabod",
+      "corner": "red",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "fighterName": "Joel Lincuna",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "marikina-barrio-brawls-2",
+      "fighterName": "Gemil Elixir Clariño",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Jordan Bradley Cruz",
+      "corner": "red",
+      "sheet": {
+        "wins": 2,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "fighterName": "Gerald Tagapan Galangue",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "fighterName": "Limuel B Malinao",
+      "corner": "red",
+      "sheet": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-1-ugb45-blaze9",
+      "fighterName": "Alton B Fuentes",
+      "corner": "red",
+      "sheet": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Benjo Obiena",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 2,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Anjune T Gallanosa",
+      "corner": "red",
+      "sheet": {
+        "wins": 2,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Clarence Gamelo",
+      "corner": "blue",
+      "sheet": {
+        "wins": 2,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Angeluz Rafael T Jose",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 1
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Raymond Wilson",
+      "corner": "red",
+      "sheet": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 1
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "John Lucas Olavibes",
+      "corner": "red",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Reynaldo P Jr. Romero",
+      "corner": "blue",
+      "sheet": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Latterel Libiran",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Juvanie Bacus",
+      "corner": "red",
+      "sheet": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Alec Untal",
+      "corner": "blue",
+      "sheet": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Mark Benjamin D Aduana",
+      "corner": "red",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Jeff Gabriel V. Shahdadpuri",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Jay Osninar",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Jerald T Galangue",
+      "corner": "red",
+      "sheet": {
+        "wins": 1,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "St. Michael Coronado",
+      "corner": "blue",
+      "sheet": {
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    {
+      "eventSourceKey": "sta-lucia-barrio-brawls-2-ugb46-blaze10",
+      "fighterName": "Joel Licuna",
+      "corner": "blue",
+      "sheet": {
+        "wins": 0,
+        "losses": 1,
+        "draws": 0
+      },
+      "computed": {
+        "wins": 0,
+        "losses": 0,
+        "draws": 0
+      }
+    }
+  ],
+  "reviewQueue": [
+    {
+      "key": "elealynanne padollon||sprawl mma",
+      "fighter": {
+        "firstName": "Elealynanne",
+        "lastName": "Padollon",
+        "displayName": "Elealynanne Padollon",
+        "nickname": "EL LUMINA",
+        "gym": "SPRAWL MMA",
+        "hometown": "Marikina City",
+        "height": "5ft",
+        "weightClass": "115 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2003-04-26",
+        "normalizedName": "elealynanne padollon",
+        "normalizedGym": "sprawl mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "elealynanne-padollon",
+          "displayName": "Elealynanne Padollon",
+          "gym": "Ground Zero"
+        }
+      ]
+    },
+    {
+      "key": "adrian bulado||art of juggler circuitx fitness hub",
+      "fighter": {
+        "firstName": "Adrian, M",
+        "lastName": "Bulado",
+        "displayName": "Adrian, M Bulado",
+        "nickname": "BAKI HANMA",
+        "gym": "Art of juggler / CircuitX Fitness hub",
+        "hometown": "BLK 79 LOT-6 K-38 KABAYANIHAN ST.KARANGALAN VILLAGE CAINTA RIZAL",
+        "height": "5'7",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2001-06-18",
+        "normalizedName": "adrian bulado",
+        "normalizedGym": "art of juggler circuitx fitness hub"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "adrian-bulado",
+          "displayName": "Adrian Bulado",
+          "gym": "Art of Juggler"
+        }
+      ]
+    },
+    {
+      "key": "john dustin dela cruz||afg gym",
+      "fighter": {
+        "firstName": "John Dustin",
+        "lastName": "Dela Cruz",
+        "displayName": "John Dustin Dela Cruz",
+        "nickname": "RAMBO",
+        "gym": "AFG GYM",
+        "hometown": "San Mateo Rizal",
+        "height": "5'6",
+        "weightClass": "125 LBS",
+        "photoSourceUrl": "",
+        "dateOfBirth": null,
+        "normalizedName": "john dustin dela cruz",
+        "normalizedGym": "afg gym"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "john-dustin-dela-cruz",
+          "displayName": "John Dustin Dela Cruz",
+          "gym": "AFG"
+        }
+      ]
+    },
+    {
+      "key": "jordan bradley cruz||kali arnis martial arts organization kamao 426 mma ajjp mma",
+      "fighter": {
+        "firstName": "Jordan Bradley",
+        "lastName": "Cruz",
+        "displayName": "Jordan Bradley Cruz",
+        "nickname": "",
+        "gym": "Kali Arnis Martial Arts Organization (KAMAO)/426 MMA/AJJP MMA",
+        "hometown": "Pasig, Philippines",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1995-07-19",
+        "normalizedName": "jordan bradley cruz",
+        "normalizedGym": "kali arnis martial arts organization kamao 426 mma ajjp mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "jordan-bradley-c-cruz",
+          "displayName": "Jordan Bradley C. Cruz",
+          "gym": "(KAMAO)/426 MMA/AJJP MMA"
+        }
+      ]
+    },
+    {
+      "key": "anjune gallanosa||independent",
+      "fighter": {
+        "firstName": "Anjune T.",
+        "lastName": "Gallanosa",
+        "displayName": "Anjune T. Gallanosa",
+        "nickname": "THE DESTROYER",
+        "gym": "independent",
+        "hometown": "Sitio Sapinit barangay San Juan Antipolo City",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2000-06-03",
+        "normalizedName": "anjune gallanosa",
+        "normalizedGym": "independent"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "anjune-gallanosa",
+          "displayName": "Anjune Gallanosa",
+          "gym": ""
+        }
+      ]
+    },
+    {
+      "key": "benjo obiena||hidden blade mma",
+      "fighter": {
+        "firstName": "Benjo",
+        "lastName": "Obiena",
+        "displayName": "Benjo Obiena",
+        "nickname": "THE THORN",
+        "gym": "hidden blade MMA",
+        "hometown": "Pasay City",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1998-05-20",
+        "normalizedName": "benjo obiena",
+        "normalizedGym": "hidden blade mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "benjo-obiena",
+          "displayName": "Benjo Obiena",
+          "gym": "RLIMA"
+        }
+      ]
+    },
+    {
+      "key": "adrian bulado||aoj new breed fitness gym",
+      "fighter": {
+        "firstName": "Adrian, M",
+        "lastName": "Bulado ,",
+        "displayName": "Adrian, M Bulado ,",
+        "nickname": "BAKI HANMA",
+        "gym": "AOJ & NEW BREED FITNESS GYM",
+        "hometown": "KARANGALAN VILLAGE CAINTA RIZAL",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2001-06-18",
+        "normalizedName": "adrian bulado",
+        "normalizedGym": "aoj new breed fitness gym"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "adrian-bulado",
+          "displayName": "Adrian Bulado",
+          "gym": "Art of Juggler"
+        },
+        {
+          "slug": "adrian-m-bulado",
+          "displayName": "Adrian, M Bulado",
+          "gym": "Art of juggler / CircuitX Fitness hub"
+        }
+      ]
+    },
+    {
+      "key": "marwin landong||dbj koridas",
+      "fighter": {
+        "firstName": "Marwin",
+        "lastName": "Landong,",
+        "displayName": "Marwin Landong,",
+        "nickname": "The Subano",
+        "gym": "DBJ KORIDAS",
+        "hometown": "San Mateo",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2000-05-20",
+        "normalizedName": "marwin landong",
+        "normalizedGym": "dbj koridas"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "slug": "marwin-landong",
+          "displayName": "Marwin Landong",
+          "gym": "KORIDAS MMA Gym"
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "events": 5,
+    "bouts": 42,
+    "participants": 84,
+    "uniqueFighters": 72
+  }
+}

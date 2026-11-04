@@ -3,6 +3,8 @@
 import { ExternalLink, RefreshCw, Search } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AdminFighterClaimsPanel } from "@/components/admin/AdminFighterClaimsPanel";
+import { AdminFightRecordsImportPanel } from "@/components/admin/AdminFightRecordsImportPanel";
 import { AdminPortalHeader } from "@/components/admin/AdminPortalShell";
 import { fetchLicensedEnrichedFightersClient } from "@/lib/fighters/licensed";
 import type { EnrichedFighterProfile } from "@/lib/fighters/profile";
@@ -24,6 +26,7 @@ export function AdminLatayanologyPanel({ embedded = false }: { embedded?: boolea
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [section, setSection] = useState<"roster" | "import" | "claims">("roster");
 
   const refresh = useCallback(() => {
     setLoaded(false);
@@ -113,6 +116,34 @@ export function AdminLatayanologyPanel({ embedded = false }: { embedded?: boolea
         </div>
       ) : null}
 
+      <div className="flex flex-wrap gap-2">
+        {(
+          [
+            ["roster", "Licensed roster"],
+            ["import", "Fight card import"],
+            ["claims", "Claims"],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            className={`inline-flex min-h-11 items-center justify-center rounded-full border px-4 text-[0.62rem] font-black uppercase tracking-[0.14em] transition ${
+              section === id
+                ? "border-[#FF1010]/50 bg-[#FF1010]/15 text-white"
+                : "border-white/10 text-zinc-400 hover:text-white"
+            }`}
+            key={id}
+            onClick={() => setSection(id)}
+            type="button"
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {section === "import" ? <AdminFightRecordsImportPanel /> : null}
+      {section === "claims" ? <AdminFighterClaimsPanel /> : null}
+
+      {section === "roster" ? (
+      <>
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
         <div className="rounded-[1.25rem] border border-white/10 bg-white/[0.02] px-3 py-3 sm:px-4 sm:py-4">
           <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">Licensed Fighters</p>
@@ -283,6 +314,8 @@ export function AdminLatayanologyPanel({ embedded = false }: { embedded?: boolea
             </div>
         </div>
       )}
+      </>
+      ) : null}
     </div>
   );
 }

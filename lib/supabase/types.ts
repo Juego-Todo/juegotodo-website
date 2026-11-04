@@ -173,11 +173,19 @@ type ApplicationHistoryRow = {
   created_at: string;
 };
 
-type GenericTable<T extends Record<string, unknown>> = {
+type DbRelationship = {
+  foreignKeyName: string;
+  columns: string[];
+  isOneToOne?: boolean;
+  referencedRelation: string;
+  referencedColumns: string[];
+};
+
+type GenericTable<T extends Record<string, unknown>, R extends readonly DbRelationship[] = []> = {
   Row: T;
   Insert: Partial<T>;
   Update: Partial<T>;
-  Relationships: [];
+  Relationships: R;
 };
 
 type InquiryRow = {
@@ -337,6 +345,155 @@ type FightRecordRow = {
   updated_at: string;
 };
 
+type EventRow = {
+  id: string;
+  name: string;
+  event_date: string | null;
+  venue: string;
+  series: string;
+  source_key: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type FighterRow = {
+  id: string;
+  slug: string;
+  first_name: string;
+  last_name: string;
+  display_name: string;
+  nickname: string;
+  gym: string;
+  hometown: string;
+  height: string;
+  weight_class: string;
+  photo_url: string;
+  photo_source_url: string;
+  date_of_birth: string | null;
+  is_minor: boolean;
+  user_id: string | null;
+  claim_status: string;
+  public_visibility: boolean;
+  normalized_name: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type BoutRow = {
+  id: string;
+  event_id: string;
+  bout_order: number;
+  bout_label: string;
+  category: string;
+  division: string;
+  weight_class: string;
+  format: string;
+  method: string;
+  round: string;
+  time_remaining: string;
+  referee: string;
+  source_key: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type BoutParticipantRow = {
+  id: string;
+  bout_id: string;
+  fighter_id: string;
+  corner: string;
+  result: string;
+  record_at_time: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type FighterClaimRow = {
+  id: string;
+  fighter_id: string;
+  user_id: string;
+  status: string;
+  evidence_path: string;
+  reviewed_by: string | null;
+  note: string;
+  created_at: string;
+  updated_at: string;
+  reviewed_at: string | null;
+};
+
+type FighterClaimInviteRow = {
+  id: string;
+  fighter_id: string;
+  token_hash: string;
+  created_by: string;
+  expires_at: string;
+  used_at: string | null;
+  used_by: string | null;
+  created_at: string;
+};
+
+type FighterGuardianRow = {
+  id: string;
+  fighter_id: string;
+  guardian_user_id: string;
+  relationship: string;
+  status: string;
+  consent_signed_at: string | null;
+  proof_path: string;
+  reviewed_by: string | null;
+  note: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type FighterGuardianActionRow = {
+  id: string;
+  fighter_id: string;
+  guardian_user_id: string | null;
+  actor_user_id: string | null;
+  action: string;
+  details: Json;
+  created_at: string;
+};
+
+type FighterMatchReviewRow = {
+  id: string;
+  import_batch_id: string;
+  candidate_normalized_name: string;
+  candidate_first_name: string;
+  candidate_last_name: string;
+  candidate_gym: string;
+  existing_fighter_id: string | null;
+  status: string;
+  note: string;
+  payload: Json;
+  created_at: string;
+  updated_at: string;
+};
+
+type SheetRecordSnapshotRow = {
+  id: string;
+  import_batch_id: string;
+  event_source_key: string;
+  fighter_first_name: string;
+  fighter_last_name: string;
+  corner: string;
+  wins: number;
+  losses: number;
+  draws: number;
+  created_at: string;
+};
+
+type FighterRecordViewRow = {
+  fighter_id: string;
+  slug: string;
+  display_name: string;
+  wins: number;
+  losses: number;
+  draws: number;
+  no_contests: number;
+};
+
 type EmailOutboxRow = {
   id: string;
   to_email: string;
@@ -397,8 +554,59 @@ export type Database = {
       fight_records: GenericTable<FightRecordRow>;
       email_outbox: GenericTable<EmailOutboxRow>;
       pro_memberships: GenericTable<ProMembershipRow>;
+      events: GenericTable<EventRow>;
+      fighters: GenericTable<FighterRow>;
+      bouts: GenericTable<
+        BoutRow,
+        [
+          {
+            foreignKeyName: "bouts_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: true;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bout_participants_bout_id_fkey";
+            columns: ["id"];
+            isOneToOne: false;
+            referencedRelation: "bout_participants";
+            referencedColumns: ["bout_id"];
+          },
+        ]
+      >;
+      bout_participants: GenericTable<
+        BoutParticipantRow,
+        [
+          {
+            foreignKeyName: "bout_participants_bout_id_fkey";
+            columns: ["bout_id"];
+            isOneToOne: true;
+            referencedRelation: "bouts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bout_participants_fighter_id_fkey";
+            columns: ["fighter_id"];
+            isOneToOne: true;
+            referencedRelation: "fighters";
+            referencedColumns: ["id"];
+          },
+        ]
+      >;
+      fighter_claims: GenericTable<FighterClaimRow>;
+      fighter_claim_invites: GenericTable<FighterClaimInviteRow>;
+      fighter_guardians: GenericTable<FighterGuardianRow>;
+      fighter_guardian_actions: GenericTable<FighterGuardianActionRow>;
+      fighter_match_reviews: GenericTable<FighterMatchReviewRow>;
+      sheet_record_snapshots: GenericTable<SheetRecordSnapshotRow>;
     };
-    Views: Record<string, never>;
+    Views: {
+      fighter_records: {
+        Row: FighterRecordViewRow;
+        Relationships: [];
+      };
+    };
     Functions: {
       is_username_available: {
         Args: { check_username: string };

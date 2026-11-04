@@ -46,42 +46,43 @@ export function ClaimFighterButton({
   const returnPath = inviteToken
     ? `/latayanology/fighters/${slug}?invite=${encodeURIComponent(inviteToken)}&accept=1`
     : `/latayanology/fighters/${slug}`;
+  const activeInvitePreview = inviteToken ? invitePreview : null;
+  const activeInviteLoading = inviteToken ? inviteLoading : false;
 
   useEffect(() => {
-    if (!inviteToken) {
-      setInvitePreview(null);
-      setInviteLoading(false);
-      return;
-    }
+    if (!inviteToken) return;
 
     let active = true;
-    setInviteLoading(true);
-    void fetch(`/api/fighters/${fighterId}/claim-invites?token=${encodeURIComponent(inviteToken)}`)
-      .then(async (response) => {
-        const payload = (await response.json().catch(() => null)) as
-          | (InvitePreview & { error?: string })
-          | null;
-        if (!active) return;
-        if (!response.ok || !payload?.invitedEmail) {
-          setInvitePreview(null);
-          setError(payload?.error || "This invite link is invalid.");
-          return;
-        }
-        setInvitePreview(payload);
-        setError("");
-      })
-      .catch(() => {
-        if (active) {
-          setInvitePreview(null);
-          setError("Unable to load this invite.");
-        }
-      })
-      .finally(() => {
-        if (active) setInviteLoading(false);
-      });
+    const timer = window.setTimeout(() => {
+      setInviteLoading(true);
+      void fetch(`/api/fighters/${fighterId}/claim-invites?token=${encodeURIComponent(inviteToken)}`)
+        .then(async (response) => {
+          const payload = (await response.json().catch(() => null)) as
+            | (InvitePreview & { error?: string })
+            | null;
+          if (!active) return;
+          if (!response.ok || !payload?.invitedEmail) {
+            setInvitePreview(null);
+            setError(payload?.error || "This invite link is invalid.");
+            return;
+          }
+          setInvitePreview(payload);
+          setError("");
+        })
+        .catch(() => {
+          if (active) {
+            setInvitePreview(null);
+            setError("Unable to load this invite.");
+          }
+        })
+        .finally(() => {
+          if (active) setInviteLoading(false);
+        });
+    }, 0);
 
     return () => {
       active = false;
+      window.clearTimeout(timer);
     };
   }, [fighterId, inviteToken]);
 
@@ -122,7 +123,7 @@ export function ClaimFighterButton({
     setOpen(false);
   }
 
-  if (loading || inviteLoading) {
+  if (loading || activeInviteLoading) {
     return <div className="h-11 w-36 animate-pulse rounded-full bg-white/5" />;
   }
 
@@ -130,18 +131,18 @@ export function ClaimFighterButton({
     return <p className="max-w-md text-sm leading-6 text-emerald-200">{message}</p>;
   }
 
-  const inviteEmail = invitePreview?.invitedEmail ?? "";
-  const inviteValid = Boolean(invitePreview?.valid);
+  const inviteEmail = activeInvitePreview?.invitedEmail ?? "";
+  const inviteValid = Boolean(activeInvitePreview?.valid);
   const matchingEmail = emailsMatch(user?.email, inviteEmail);
   const showInviteAccept = Boolean(inviteToken && inviteValid && !isMinor);
   const showInviteGuardian = Boolean(inviteToken && inviteValid && isMinor && matchingEmail);
 
-  if (inviteToken && invitePreview && !inviteValid) {
+  if (inviteToken && activeInvitePreview && !inviteValid) {
     return (
       <p className="max-w-md text-sm leading-6 text-amber-200">
-        {invitePreview.used
+        {activeInvitePreview.used
           ? "This invite has already been used."
-          : invitePreview.expired
+          : activeInvitePreview.expired
             ? "This invite has expired. Ask an admin to resend it."
             : "This fighter is no longer available to claim with this invite."}
       </p>

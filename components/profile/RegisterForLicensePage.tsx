@@ -299,41 +299,50 @@ export function RegisterForLicensePage() {
   const [appsError, setAppsError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
-      setApplications([]);
-      setAppsLoading(false);
-      return;
-    }
+    if (!user) return;
+
     let cancelled = false;
-    setAppsLoading(true);
-    setAppsError(null);
-    void fetchLicenseApplicationsByUserId(user.id)
-      .then((rows) => {
-        if (!cancelled) {
-          setApplications(rows.filter((row) => row.applicationProgram !== "jt1_member" && row.applicationProgram !== "legacy"));
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setApplications([]);
-          setAppsError("Unable to load your license applications.");
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setAppsLoading(false);
-      });
+    const timer = window.setTimeout(() => {
+      setAppsLoading(true);
+      setAppsError(null);
+      void fetchLicenseApplicationsByUserId(user.id)
+        .then((rows) => {
+          if (!cancelled) {
+            setApplications(
+              rows.filter((row) => row.applicationProgram !== "jt1_member" && row.applicationProgram !== "legacy"),
+            );
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setApplications([]);
+            setAppsError("Unable to load your license applications.");
+          }
+        })
+        .finally(() => {
+          if (!cancelled) setAppsLoading(false);
+        });
+    }, 0);
+
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
   }, [user]);
 
+  const visibleApplications = useMemo(
+    () => (user ? applications : []),
+    [user, applications],
+  );
+  const visibleAppsLoading = user ? appsLoading : false;
+
   const appsByProgram = useMemo(() => {
     const map = new Map<LicenseApplicationProgram, LicenseApplication>();
-    for (const app of applications) {
+    for (const app of visibleApplications) {
       if (!map.has(app.applicationProgram)) map.set(app.applicationProgram, app);
     }
     return map;
-  }, [applications]);
+  }, [visibleApplications]);
 
   const expiresAt = membership?.expires_at ? formatProExpiryDate(membership.expires_at) : null;
 
@@ -378,13 +387,13 @@ export function RegisterForLicensePage() {
             </div>
           </div>
 
-          {appsLoading ? (
+          {visibleAppsLoading ? (
             <p className="mt-4 text-sm text-zinc-500">Loading applications…</p>
           ) : appsError ? (
             <div className="mt-4 rounded-xl border border-red-500/25 bg-red-500/[0.06] px-4 py-4 text-sm text-red-100">
               <p>{appsError}</p>
             </div>
-          ) : applications.length === 0 ? (
+          ) : visibleApplications.length === 0 ? (
             <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-8">
               <p className="text-sm font-semibold text-white">No license applications</p>
               <p className="mt-2 text-sm text-zinc-500">You haven&apos;t applied for a JuegoTodo license yet.</p>
@@ -397,7 +406,7 @@ export function RegisterForLicensePage() {
             </div>
           ) : (
             <ul className="mt-4 space-y-3">
-              {applications.map((app) => {
+              {visibleApplications.map((app) => {
                 const key = programToPresetKey(app.applicationProgram);
                 const preset = key ? LICENSE_PROGRAM_PRESETS[key] : null;
                 return (

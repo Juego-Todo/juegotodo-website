@@ -66,7 +66,15 @@ export async function updateSupabaseSession(request: NextRequest) {
       }
     }
   } catch {
-    // Transient network/timeouts must not force a re-login loop.
+    // Admin pages must fail closed. Other routes may continue so transient
+    // network/timeouts do not force a re-login loop.
+    if (request.nextUrl.pathname.startsWith("/admin") && !request.nextUrl.pathname.startsWith("/api/")) {
+      return redirectWithCookies(
+        request,
+        response,
+        `/login?next=${encodeURIComponent(request.nextUrl.pathname)}`,
+      );
+    }
     return response;
   }
 

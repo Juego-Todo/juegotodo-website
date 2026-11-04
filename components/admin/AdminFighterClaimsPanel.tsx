@@ -41,7 +41,8 @@ type InviteRow = {
   expiresAt: string;
   usedAt: string | null;
   createdAt: string;
-  status: "pending" | "used" | "expired" | string;
+  isPlaceholder?: boolean;
+  status: "pending" | "used" | "expired" | "needs_email" | string;
 };
 
 type FighterOption = {
@@ -72,6 +73,7 @@ export function AdminFighterClaimsPanel() {
   const [fighterSearchLoading, setFighterSearchLoading] = useState(false);
   const [selectedFighter, setSelectedFighter] = useState<FighterOption | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [emailDrafts, setEmailDrafts] = useState<Record<string, string>>({});
 
   const refresh = useCallback(() => {
     setLoaded(false);
@@ -183,31 +185,40 @@ export function AdminFighterClaimsPanel() {
     setError("");
     const response = await adminFetch("/api/admin/fighter-claim-invites", {
       method: "POST",
-      body: JSON.stringify({ fighterId: selectedFighter.id, email: inviteEmail.trim() }),
+      body: JSON.stringify({
+        action: "create",
+        fighterId: selectedFighter.id,
+        email: inviteEmail.trim() || undefined,
+      }),
     });
     const payload = (await response.json().catch(() => null)) as {
       error?: string;
       message?: string;
       sentTo?: string;
-      existingAccount?: boolean;
+      isPlaceholder?: boolean;
     } | null;
     setInviteBusy(false);
     if (!response.ok) {
-      setError(payload?.error || "Unable to send claim invite.");
+      setError(payload?.error || "Unable to provision fighter account.");
       return;
     }
-    setStatus(payload?.message || `Invite sent to ${payload?.sentTo || inviteEmail}.`);
+    setStatus(payload?.message || `Account ready for ${payload?.sentTo || selectedFighter.displayName}.`);
     setInviteEmail("");
+    setSelectedFighter(null);
     refresh();
   }
 
   async function resendInvite(invite: InviteRow) {
+    if (invite.isPlaceholder || invite.status === "needs_email") {
+      setError("Add a real email before sending the invite.");
+      return;
+    }
     setInviteBusy(true);
     setStatus("");
     setError("");
     const response = await adminFetch("/api/admin/fighter-claim-invites", {
       method: "POST",
-      body: JSON.stringify({ fighterId: invite.fighterId, email: invite.invitedEmail }),
+      body: JSON.stringify({ action: "create", fighterId: invite.fighterId, email: invite.invitedEmail }),
     });
     const payload = (await response.json().catch(() => null)) as { error?: string; message?: string } | null;
     setInviteBusy(false);
@@ -216,6 +227,34 @@ export function AdminFighterClaimsPanel() {
       return;
     }
     setStatus(payload?.message || "Invite resent.");
+    refresh();
+  }
+
+  async function assignEmail(invite: InviteRow) {
+    const email = (emailDrafts[invite.id] || "").trim();
+    if (!email) {
+      setError("Enter a real email for this fighter.");
+      return;
+    }
+    setInviteBusy(true);
+    setStatus("");
+    setError("");
+    const response = await adminFetch("/api/admin/fighter-claim-invites", {
+      method: "POST",
+      body: JSON.stringify({ action: "assign_email", inviteId: invite.id, email }),
+    });
+    const payload = (await response.json().catch(() => null)) as { error?: string; message?: string } | null;
+    setInviteBusy(false);
+    if (!response.ok) {
+      setError(payload?.error || "Unable to assign email.");
+      return;
+    }
+    setStatus(payload?.message || "Email assigned and invite sent.");
+    setEmailDrafts((current) => {
+      const next = { ...current };
+      delete next[invite.id];
+      return next;
+    });
     refresh();
   }
 
@@ -231,10 +270,10 @@ export function AdminFighterClaimsPanel() {
       ) : null}
 
       <form className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-4" onSubmit={sendInvite}>
-        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Provision account + claim invite</h3>
+        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Provision fighter account</h3>
         <p className="mt-2 text-sm text-zinc-400">
-          Creates the fighter&apos;s website login if it does not exist yet, then emails them to sign in and claim
-          their Latayanology record. Adults accept in one click. Minors still need a guardian request with proof.
+          Creates the website login now. Leave email blank to use a placeholder and fill the real address later.
+          With a real email, we also send the login + claim invite immediately.
         </p>
 
         <div className="mt-4 space-y-3">
@@ -296,13 +335,12 @@ export function AdminFighterClaimsPanel() {
 
           <label className="block">
             <span className="mb-1.5 block text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">
-              {selectedFighter?.isMinor ? "Guardian email" : "Fighter email"}
+              {selectedFighter?.isMinor ? "Guardian email (optional)" : "Fighter email (optional)"}
             </span>
             <input
               className={fieldClassName}
               onChange={(event) => setInviteEmail(event.target.value)}
-              placeholder="name@email.com"
-              required
+              placeholder="Leave blank for placeholder — add real email later"
               type="email"
               value={inviteEmail}
             />
@@ -311,32 +349,39 @@ export function AdminFighterClaimsPanel() {
 
         <button
           className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-[#FF1010] px-5 text-[0.68rem] font-black uppercase tracking-[0.14em] text-white disabled:opacity-60"
-          disabled={inviteBusy || !selectedFighter || !inviteEmail.trim()}
+          disabled={inviteBusy || !selectedFighter}
           type="submit"
         >
-          {inviteBusy ? "Provisioning..." : "Create account & send invite"}
+          {inviteBusy
+            ? "Provisioning..."
+            : inviteEmail.trim()
+              ? "Create account & send invite"
+              : "Create placeholder account"}
         </button>
       </form>
 
       <section className="space-y-3">
-        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Invite history</h3>
+        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Accounts & invites</h3>
         {!loaded ? <p className="text-sm text-zinc-400">Loading invites...</p> : null}
-        {loaded && invites.length === 0 ? <p className="text-sm text-zinc-400">No email invites yet.</p> : null}
+        {loaded && invites.length === 0 ? (
+          <p className="text-sm text-zinc-400">No fighter accounts provisioned yet.</p>
+        ) : null}
         {invites.map((invite) => (
           <article className="rounded-[1.35rem] border border-white/10 bg-black/30 p-4" key={invite.id}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="font-semibold text-white">{invite.fighterName}</p>
                 <p className="mt-1 text-sm text-zinc-400">
-                  {invite.invitedEmail}
-                  {invite.invitedUserId ? " · existing account" : " · needs signup"}
+                  {invite.isPlaceholder || invite.status === "needs_email"
+                    ? "Placeholder email — waiting for real address"
+                    : invite.invitedEmail}
                   {invite.isMinor ? " · minor / guardian" : ""}
                 </p>
-                <p className="mt-1 text-xs text-zinc-500">
-                  {invite.status} · expires {new Date(invite.expiresAt).toLocaleString()}
+                <p className="mt-1 break-all text-xs text-zinc-500">
+                  {invite.status} · {invite.invitedEmail} · expires {new Date(invite.expiresAt).toLocaleString()}
                 </p>
               </div>
-              {invite.status !== "used" ? (
+              {invite.status !== "used" && !invite.isPlaceholder && invite.status !== "needs_email" ? (
                 <button
                   className="inline-flex min-h-10 items-center justify-center rounded-full border border-white/10 px-4 text-[0.62rem] font-black uppercase tracking-[0.14em] text-zinc-300 disabled:opacity-60"
                   disabled={inviteBusy}
@@ -347,6 +392,27 @@ export function AdminFighterClaimsPanel() {
                 </button>
               ) : null}
             </div>
+            {invite.status !== "used" && (invite.isPlaceholder || invite.status === "needs_email") ? (
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                <input
+                  className={fieldClassName}
+                  onChange={(event) =>
+                    setEmailDrafts((current) => ({ ...current, [invite.id]: event.target.value }))
+                  }
+                  placeholder="Add real email when you have it"
+                  type="email"
+                  value={emailDrafts[invite.id] || ""}
+                />
+                <button
+                  className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-[#FF1010] px-4 text-[0.62rem] font-black uppercase tracking-[0.14em] text-white disabled:opacity-60"
+                  disabled={inviteBusy || !(emailDrafts[invite.id] || "").trim()}
+                  onClick={() => void assignEmail(invite)}
+                  type="button"
+                >
+                  Save email & send invite
+                </button>
+              </div>
+            ) : null}
           </article>
         ))}
       </section>

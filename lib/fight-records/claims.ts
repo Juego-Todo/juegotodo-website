@@ -1,6 +1,10 @@
 import { createHash, randomBytes } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { provisionFighterClaimAccount } from "@/lib/fight-records/provision-claim-account";
+import {
+  assignRealEmailToFighterClaimAccount,
+  isPlaceholderFighterEmail,
+  provisionFighterClaimAccount,
+} from "@/lib/fight-records/provision-claim-account";
 import type { Database, Json } from "@/lib/supabase/types";
 
 export type FightRecordsClient = SupabaseClient<Database>;
@@ -249,11 +253,14 @@ export async function createFighterClaimInvite(
   client: FightRecordsClient,
   fighterId: string,
   createdBy: string,
-  email: string,
+  email?: string | null,
 ) {
-  const invitedEmail = normalizeInviteEmail(email);
-  if (!EMAIL_PATTERN.test(invitedEmail)) {
+  const requestedEmail = email?.trim() ? normalizeInviteEmail(email) : "";
+  if (requestedEmail && !EMAIL_PATTERN.test(requestedEmail)) {
     throw new Error("A valid email address is required.");
+  }
+  if (requestedEmail && isPlaceholderFighterEmail(requestedEmail)) {
+    throw new Error("Enter a real email, or leave blank to use a placeholder.");
   }
 
   const { data: fighter, error: fighterError } = await client
@@ -274,19 +281,19 @@ export async function createFighterClaimInvite(
     .maybeSingle();
 
   const provision = await provisionFighterClaimAccount(client, {
-    email: invitedEmail,
+    email: requestedEmail || null,
+    fighterSlug: fighter.slug,
     fighterName: fighter.display_name,
     fighterDateOfBirth: fighterPrivate?.date_of_birth ?? null,
     isMinor: Boolean(fighter.is_minor),
   });
 
-  // Invalidate prior unused invites for the same fighter + email (resend).
+  // Invalidate prior unused invites for this fighter (resend / email update).
   const nowIso = new Date().toISOString();
   await client
     .from("fighter_claim_invites")
     .update({ used_at: nowIso })
     .eq("fighter_id", fighterId)
-    .eq("invited_email", invitedEmail)
     .is("used_at", null);
 
   const token = randomBytes(32).toString("hex");
@@ -298,7 +305,7 @@ export async function createFighterClaimInvite(
       token_hash: hashInviteToken(token),
       created_by: createdBy,
       expires_at: expiresAt,
-      invited_email: invitedEmail,
+      invited_email: provision.email,
       invited_user_id: provision.userId,
     })
     .select("id, expires_at, invited_email, invited_user_id")
@@ -318,7 +325,42 @@ export async function createFighterClaimInvite(
     accountCreated: provision.created,
     temporaryPassword: provision.temporaryPassword,
     existingFullName: provision.fullName,
+    isPlaceholder: provision.isPlaceholder,
   };
+}
+
+export async function assignEmailAndRefreshFighterClaimInvite(
+  client: FightRecordsClient,
+  input: {
+    inviteId: string;
+    email: string;
+    createdBy: string;
+  },
+) {
+  const { data: invite, error } = await client
+    .from("fighter_claim_invites")
+    .select("id, fighter_id, invited_email, invited_user_id, used_at, expires_at")
+    .eq("id", input.inviteId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!invite) throw new Error("Invite not found.");
+  if (invite.used_at) throw new Error("This invite was already used.");
+  if (!invite.invited_user_id) throw new Error("Invite has no linked account.");
+
+  const assigned = await assignRealEmailToFighterClaimAccount(client, {
+    userId: invite.invited_user_id,
+    newEmail: input.email,
+  });
+
+  // Fresh invite token after email assignment.
+  return createFighterClaimInvite(client, invite.fighter_id, input.createdBy, assigned.email).then((created) => ({
+    ...created,
+    temporaryPassword: assigned.temporaryPassword,
+    accountCreated: false,
+    existingAccount: true,
+    emailUpdated: true,
+    previousEmail: invite.invited_email,
+  }));
 }
 
 export type ClaimInvitePreview = {
@@ -477,6 +519,7 @@ export async function listPendingFighterClaimInvites(client: FightRecordsClient)
     const fighter = fighterById.get(row.fighter_id);
     const used = Boolean(row.used_at);
     const expired = !used && new Date(row.expires_at).getTime() < now;
+    const placeholder = isPlaceholderFighterEmail(row.invited_email);
     return {
       id: row.id,
       fighterId: row.fighter_id,
@@ -488,7 +531,8 @@ export async function listPendingFighterClaimInvites(client: FightRecordsClient)
       expiresAt: row.expires_at,
       usedAt: row.used_at,
       createdAt: row.created_at,
-      status: used ? "used" : expired ? "expired" : "pending",
+      isPlaceholder: placeholder,
+      status: used ? "used" : expired ? "expired" : placeholder ? "needs_email" : "pending",
     };
   });
 }

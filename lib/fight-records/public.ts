@@ -165,7 +165,7 @@ export function toPublicFighter(row: {
   height: string;
   weight_class: string;
   photo_url: string;
-  date_of_birth: string | null;
+  date_of_birth?: string | null;
   is_minor?: boolean | null;
   claim_status: string;
   user_id: string | null;
@@ -173,7 +173,7 @@ export function toPublicFighter(row: {
   losses?: number;
   draws?: number;
 }): PublicFighter {
-  const minor = row.is_minor ?? isMinorDob(row.date_of_birth);
+  const minor = row.is_minor ?? isMinorDob(row.date_of_birth ?? null);
   return {
     id: row.id,
     slug: row.slug,

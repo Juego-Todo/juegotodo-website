@@ -370,7 +370,30 @@ type FighterRow = {
   photo_url: string;
   photo_source_url: string;
   date_of_birth: string | null;
+  user_id: string | null;
+  claim_status: string;
+  public_visibility: boolean;
+  normalized_name: string;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Public projection — is_minor/age from fighter_is_minor / fighter_age; no DOB. */
+type FighterPublicViewRow = {
+  id: string;
+  slug: string;
+  first_name: string;
+  last_name: string;
+  display_name: string;
+  nickname: string;
+  gym: string;
+  hometown: string;
+  height: string;
+  weight_class: string;
+  photo_url: string;
+  photo_source_url: string;
   is_minor: boolean;
+  age: number | null;
   user_id: string | null;
   claim_status: string;
   public_visibility: boolean;
@@ -606,6 +629,10 @@ export type Database = {
         Row: FighterRecordViewRow;
         Relationships: [];
       };
+      fighters_public: {
+        Row: FighterPublicViewRow;
+        Relationships: [];
+      };
     };
     Functions: {
       is_username_available: {
@@ -615,6 +642,18 @@ export type Database = {
       next_membership_application_number: {
         Args: Record<string, never>;
         Returns: string;
+      };
+      fighter_is_minor: {
+        Args: { dob: string | null };
+        Returns: boolean;
+      };
+      fighter_age: {
+        Args: { dob: string | null };
+        Returns: number | null;
+      };
+      fighter_row_is_minor: {
+        Args: { target_fighter: string };
+        Returns: boolean;
       };
     };
     Enums: Record<string, never>;

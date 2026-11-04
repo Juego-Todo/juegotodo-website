@@ -85,7 +85,7 @@ export async function approveFighterClaim(client: FightRecordsClient, claimId: s
   if (claim.status !== "pending") throw new Error("Claim is not pending.");
 
   const { data: fighter, error: fighterError } = await client
-    .from("fighters")
+    .from("fighters_public")
     .select("id, is_minor, user_id")
     .eq("id", claim.fighter_id)
     .maybeSingle();
@@ -244,7 +244,7 @@ export async function createFighterClaimInvite(
   createdBy: string,
 ) {
   const { data: fighter, error: fighterError } = await client
-    .from("fighters")
+    .from("fighters_public")
     .select("id, slug, display_name, is_minor")
     .eq("id", fighterId)
     .maybeSingle();

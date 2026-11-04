@@ -29,8 +29,8 @@ export async function listPublicFighters(filters?: {
   if (!client) return [];
 
   let query = client
-    .from("fighters")
-    .select("id, slug, display_name, nickname, gym, hometown, height, weight_class, photo_url, date_of_birth, is_minor, claim_status, user_id, public_visibility")
+    .from("fighters_public")
+    .select("id, slug, display_name, nickname, gym, hometown, height, weight_class, photo_url, is_minor, claim_status, user_id, public_visibility")
     .eq("public_visibility", true)
     .order("display_name");
 
@@ -79,7 +79,7 @@ export async function getPublicFighterBySlug(slug: string): Promise<{
   const client = service();
   if (!client) return null;
 
-  const { data: fighter } = await client.from("fighters").select("*").eq("slug", slug).maybeSingle();
+  const { data: fighter } = await client.from("fighters_public").select("*").eq("slug", slug).maybeSingle();
   if (!fighter || !fighter.public_visibility) return null;
 
   const { data: record } = await client.from("fighter_records").select("*").eq("fighter_id", fighter.id).maybeSingle();

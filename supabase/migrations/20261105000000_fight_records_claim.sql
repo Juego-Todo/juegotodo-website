@@ -1,7 +1,36 @@
 -- Fight records, Latayanology fighters, claiming, and guardian access.
 -- Do not apply automatically; run manually after review.
+-- Safe to re-run: IF NOT EXISTS / DROP IF EXISTS / CREATE OR REPLACE.
 
 create extension if not exists "pgcrypto";
+
+-- ---------------------------------------------------------------------------
+-- Age helpers (STABLE — never use current_date in GENERATED columns)
+-- ---------------------------------------------------------------------------
+
+create or replace function public.fighter_is_minor(dob date)
+returns boolean
+language sql
+stable
+parallel safe
+as $$
+  select dob is not null and dob > (current_date - interval '18 years');
+$$;
+
+comment on function public.fighter_is_minor(date) is
+  'True when DOB is set and the person is under 18 as of current_date.';
+
+create or replace function public.fighter_age(dob date)
+returns integer
+language sql
+stable
+parallel safe
+as $$
+  select case
+    when dob is null then null
+    else date_part('year', age(current_date, dob))::integer
+  end;
+$$;
 
 -- ---------------------------------------------------------------------------
 -- Core fight card tables
@@ -32,12 +61,6 @@ create table if not exists public.fighters (
   photo_url text not null default '',
   photo_source_url text not null default '',
   date_of_birth date,
-  is_minor boolean generated always as (
-    case
-      when date_of_birth is null then false
-      else date_of_birth > (current_date - interval '18 years')
-    end
-  ) stored,
   user_id uuid unique references public.profiles (id) on delete set null,
   claim_status text not null default 'unclaimed'
     check (claim_status in ('unclaimed', 'pending', 'claimed')),
@@ -47,6 +70,9 @@ create table if not exists public.fighters (
   updated_at timestamptz not null default now(),
   constraint fighters_slug_unique unique (slug)
 );
+
+-- Drop any non-immutable generated / leftover is_minor column from earlier drafts.
+alter table public.fighters drop column if exists is_minor;
 
 create index if not exists fighters_normalized_name_idx on public.fighters (normalized_name);
 create index if not exists fighters_gym_idx on public.fighters (lower(gym));
@@ -136,6 +162,36 @@ select
 from public.fighters f
 left join public.bout_participants bp on bp.fighter_id = f.id
 group by f.id, f.slug, f.display_name;
+
+-- Public projection: no DOB; is_minor / age computed via stable helpers.
+create or replace view public.fighters_public
+with (security_invoker = true)
+as
+select
+  f.id,
+  f.slug,
+  f.first_name,
+  f.last_name,
+  f.display_name,
+  f.nickname,
+  f.gym,
+  case
+    when public.fighter_is_minor(f.date_of_birth) then ''
+    else f.hometown
+  end as hometown,
+  f.height,
+  f.weight_class,
+  f.photo_url,
+  f.photo_source_url,
+  public.fighter_is_minor(f.date_of_birth) as is_minor,
+  public.fighter_age(f.date_of_birth) as age,
+  f.user_id,
+  f.claim_status,
+  f.public_visibility,
+  f.normalized_name,
+  f.created_at,
+  f.updated_at
+from public.fighters f;
 
 -- ---------------------------------------------------------------------------
 -- Claiming
@@ -281,6 +337,24 @@ as $$
   );
 $$;
 
+-- True when the fighter row is currently a minor (uses fighter_is_minor).
+create or replace function public.fighter_row_is_minor(target_fighter uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (
+      select public.fighter_is_minor(f.date_of_birth)
+      from public.fighters f
+      where f.id = target_fighter
+    ),
+    false
+  );
+$$;
+
 -- ---------------------------------------------------------------------------
 -- RLS
 -- ---------------------------------------------------------------------------
@@ -297,64 +371,95 @@ alter table public.fighter_guardians enable row level security;
 alter table public.fighter_guardian_actions enable row level security;
 alter table public.fighter_profile_change_requests enable row level security;
 
+drop policy if exists events_public_read on public.events;
 create policy events_public_read on public.events for select to anon, authenticated using (true);
+drop policy if exists events_admin_write on public.events;
 create policy events_admin_write on public.events for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists fighters_public_read on public.fighters;
 create policy fighters_public_read on public.fighters for select to anon, authenticated
   using (public_visibility = true or public.is_admin() or user_id = auth.uid() or public.is_approved_guardian(id));
 
+drop policy if exists fighters_admin_write on public.fighters;
 create policy fighters_admin_write on public.fighters for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
+-- Claimed adult fighters may update their own row; minors need an approved guardian
+-- (or admin) even when they own the login.
+drop policy if exists fighters_owner_or_guardian_update on public.fighters;
 create policy fighters_owner_or_guardian_update on public.fighters for update to authenticated
-  using (public.is_claimed_fighter_owner(id) or public.is_approved_guardian(id))
-  with check (public.is_claimed_fighter_owner(id) or public.is_approved_guardian(id));
+  using (
+    public.is_admin()
+    or public.is_approved_guardian(id)
+    or (public.is_claimed_fighter_owner(id) and not public.fighter_row_is_minor(id))
+  )
+  with check (
+    public.is_admin()
+    or public.is_approved_guardian(id)
+    or (public.is_claimed_fighter_owner(id) and not public.fighter_row_is_minor(id))
+  );
 
+drop policy if exists bouts_public_read on public.bouts;
 create policy bouts_public_read on public.bouts for select to anon, authenticated using (true);
+drop policy if exists bouts_admin_write on public.bouts;
 create policy bouts_admin_write on public.bouts for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists bout_participants_public_read on public.bout_participants;
 create policy bout_participants_public_read on public.bout_participants for select to anon, authenticated using (true);
+drop policy if exists bout_participants_admin_write on public.bout_participants;
 create policy bout_participants_admin_write on public.bout_participants for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists fighter_match_reviews_admin on public.fighter_match_reviews;
 create policy fighter_match_reviews_admin on public.fighter_match_reviews for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists sheet_record_snapshots_admin on public.sheet_record_snapshots;
 create policy sheet_record_snapshots_admin on public.sheet_record_snapshots for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists fighter_claims_select_own_or_admin on public.fighter_claims;
 create policy fighter_claims_select_own_or_admin on public.fighter_claims for select to authenticated
   using (user_id = auth.uid() or public.is_admin());
+drop policy if exists fighter_claims_insert_own on public.fighter_claims;
 create policy fighter_claims_insert_own on public.fighter_claims for insert to authenticated
   with check (user_id = auth.uid());
+drop policy if exists fighter_claims_admin_update on public.fighter_claims;
 create policy fighter_claims_admin_update on public.fighter_claims for update to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists fighter_claim_invites_admin on public.fighter_claim_invites;
 create policy fighter_claim_invites_admin on public.fighter_claim_invites for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists fighter_guardians_select_related on public.fighter_guardians;
 create policy fighter_guardians_select_related on public.fighter_guardians for select to authenticated
   using (
     public.is_admin()
     or guardian_user_id = auth.uid()
     or public.is_claimed_fighter_owner(fighter_id)
   );
+drop policy if exists fighter_guardians_insert_own on public.fighter_guardians;
 create policy fighter_guardians_insert_own on public.fighter_guardians for insert to authenticated
   with check (guardian_user_id = auth.uid() or public.is_admin());
+drop policy if exists fighter_guardians_admin_update on public.fighter_guardians;
 create policy fighter_guardians_admin_update on public.fighter_guardians for update to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists fighter_guardian_actions_select on public.fighter_guardian_actions;
 create policy fighter_guardian_actions_select on public.fighter_guardian_actions for select to authenticated
   using (
     public.is_admin()
     or guardian_user_id = auth.uid()
     or public.is_claimed_fighter_owner(fighter_id)
   );
+drop policy if exists fighter_guardian_actions_insert on public.fighter_guardian_actions;
 create policy fighter_guardian_actions_insert on public.fighter_guardian_actions for insert to authenticated
   with check (actor_user_id = auth.uid() or public.is_admin());
 
+drop policy if exists fighter_change_requests_select on public.fighter_profile_change_requests;
 create policy fighter_change_requests_select on public.fighter_profile_change_requests for select to authenticated
   using (
     public.is_admin()
@@ -362,8 +467,10 @@ create policy fighter_change_requests_select on public.fighter_profile_change_re
     or public.is_approved_guardian(fighter_id)
     or public.is_claimed_fighter_owner(fighter_id)
   );
+drop policy if exists fighter_change_requests_insert on public.fighter_profile_change_requests;
 create policy fighter_change_requests_insert on public.fighter_profile_change_requests for insert to authenticated
   with check (requested_by = auth.uid());
+drop policy if exists fighter_change_requests_admin_or_guardian_update on public.fighter_profile_change_requests;
 create policy fighter_change_requests_admin_or_guardian_update on public.fighter_profile_change_requests for update to authenticated
   using (public.is_admin() or public.is_approved_guardian(fighter_id))
   with check (public.is_admin() or public.is_approved_guardian(fighter_id));
@@ -377,6 +484,7 @@ insert into storage.buckets (id, name, public)
 values ('fighter-guardian-proof', 'fighter-guardian-proof', false)
 on conflict (id) do nothing;
 
+drop policy if exists fighter_claim_evidence_owner_read on storage.objects;
 create policy fighter_claim_evidence_owner_read on storage.objects for select to authenticated
   using (
     bucket_id = 'fighter-claim-evidence'
@@ -386,12 +494,14 @@ create policy fighter_claim_evidence_owner_read on storage.objects for select to
     )
   );
 
+drop policy if exists fighter_claim_evidence_owner_insert on storage.objects;
 create policy fighter_claim_evidence_owner_insert on storage.objects for insert to authenticated
   with check (
     bucket_id = 'fighter-claim-evidence'
     and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists fighter_guardian_proof_owner_read on storage.objects;
 create policy fighter_guardian_proof_owner_read on storage.objects for select to authenticated
   using (
     bucket_id = 'fighter-guardian-proof'
@@ -401,6 +511,7 @@ create policy fighter_guardian_proof_owner_read on storage.objects for select to
     )
   );
 
+drop policy if exists fighter_guardian_proof_owner_insert on storage.objects;
 create policy fighter_guardian_proof_owner_insert on storage.objects for insert to authenticated
   with check (
     bucket_id = 'fighter-guardian-proof'

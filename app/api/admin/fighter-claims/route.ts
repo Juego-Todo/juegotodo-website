@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
   const [{ data: fighters }, { data: profiles }] = await Promise.all([
     fighterIds.length
-      ? admin.serviceClient.from("fighters").select("id, slug, display_name, is_minor").in("id", fighterIds)
+      ? admin.serviceClient.from("fighters_public").select("id, slug, display_name, is_minor").in("id", fighterIds)
       : Promise.resolve({ data: [] }),
     userIds.length
       ? admin.serviceClient.from("profiles").select("id, email, full_name").in("id", userIds)

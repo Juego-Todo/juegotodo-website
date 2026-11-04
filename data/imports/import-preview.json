@@ -1199,7 +1199,7 @@
           "boutLabel": "BOUT #6 3-MINS / 3-ROUNDS",
           "category": "minor",
           "division": "STRAWWEIGHT DIVISION",
-          "weightClass": "115",
+          "weightClass": "115.0",
           "format": "3-MINS / 3-ROUNDS",
           "method": "Unanimous Decision",
           "round": "",
@@ -1217,7 +1217,7 @@
                 "gym": "Team Paocc Fitness gym",
                 "hometown": "Fb harrizon Pasay City",
                 "height": "5'1",
-                "weightClass": "115",
+                "weightClass": "115.0",
                 "photoSourceUrl": "",
                 "dateOfBirth": "2002-10-28",
                 "normalizedName": "jerald tagapan galangue",
@@ -1236,7 +1236,7 @@
                 "gym": "CENOJAS MMA/ MMAFIT",
                 "hometown": "Davao city",
                 "height": "5'2",
-                "weightClass": "115",
+                "weightClass": "115.0",
                 "photoSourceUrl": "",
                 "dateOfBirth": "2002-03-25",
                 "normalizedName": "limuel bagarinao malinao",
@@ -2193,7 +2193,7 @@
                 "height": "",
                 "weightClass": "",
                 "photoSourceUrl": "",
-                "dateOfBirth": "1997-08-28",
+                "dateOfBirth": null,
                 "normalizedName": "joel lincuna",
                 "normalizedGym": "hidden blade mma"
               },
@@ -2447,7 +2447,16 @@
         "normalizedGym": "art of juggler"
       },
       "occurrences": 2,
-      "ambiguousMatches": []
+      "ambiguousMatches": [
+        {
+          "displayName": "Adrian, M Bulado",
+          "gym": "Art of juggler / CircuitX Fitness hub"
+        },
+        {
+          "displayName": "Adrian, M Bulado ,",
+          "gym": "AOJ & NEW BREED FITNESS GYM"
+        }
+      ]
     },
     {
       "key": "cyrus jonathan cabautan||kfa binangonan",
@@ -2504,7 +2513,12 @@
         "normalizedGym": "ground zero"
       },
       "occurrences": 1,
-      "ambiguousMatches": []
+      "ambiguousMatches": [
+        {
+          "displayName": "Elealynanne Padollon",
+          "gym": "SPRAWL MMA"
+        }
+      ]
     },
     {
       "key": "mohammar sobair||hidden blade mma",
@@ -2580,7 +2594,12 @@
         "normalizedGym": "koridas mma gym"
       },
       "occurrences": 2,
-      "ambiguousMatches": []
+      "ambiguousMatches": [
+        {
+          "displayName": "Marwin Landong,",
+          "gym": "DBJ KORIDAS"
+        }
+      ]
     },
     {
       "key": "john dustin dela cruz||afg",
@@ -2599,7 +2618,12 @@
         "normalizedGym": "afg"
       },
       "occurrences": 1,
-      "ambiguousMatches": []
+      "ambiguousMatches": [
+        {
+          "displayName": "John Dustin Dela Cruz",
+          "gym": "AFG GYM"
+        }
+      ]
     },
     {
       "key": "lan gil basa||dbj koridas mma",
@@ -2960,7 +2984,12 @@
         "normalizedGym": "kamao 426 mma ajjp mma"
       },
       "occurrences": 1,
-      "ambiguousMatches": []
+      "ambiguousMatches": [
+        {
+          "displayName": "Jordan Bradley Cruz",
+          "gym": "Kali Arnis Martial Arts Organization (KAMAO)/426 MMA/AJJP MMA"
+        }
+      ]
     },
     {
       "key": "nikko garrido||fitness8 ground zero fight team",
@@ -2991,7 +3020,7 @@
         "gym": "Team Paocc Fitness gym",
         "hometown": "Fb harrizon Pasay City",
         "height": "5'1",
-        "weightClass": "115",
+        "weightClass": "115.0",
         "photoSourceUrl": "",
         "dateOfBirth": "2002-10-28",
         "normalizedName": "jerald tagapan galangue",
@@ -3010,7 +3039,7 @@
         "gym": "CENOJAS MMA/ MMAFIT",
         "hometown": "Davao city",
         "height": "5'2",
-        "weightClass": "115",
+        "weightClass": "115.0",
         "photoSourceUrl": "",
         "dateOfBirth": "2002-03-25",
         "normalizedName": "limuel bagarinao malinao",
@@ -3131,7 +3160,12 @@
         "normalizedGym": "rlima"
       },
       "occurrences": 1,
-      "ambiguousMatches": []
+      "ambiguousMatches": [
+        {
+          "displayName": "Benjo Obiena",
+          "gym": "hidden blade MMA"
+        }
+      ]
     },
     {
       "key": "anjune gallanosa||",
@@ -3150,7 +3184,12 @@
         "normalizedGym": ""
       },
       "occurrences": 1,
-      "ambiguousMatches": []
+      "ambiguousMatches": [
+        {
+          "displayName": "Anjune T. Gallanosa",
+          "gym": "independent"
+        }
+      ]
     },
     {
       "key": "mia domingo||team psychopath mma the butchers rampage crew",
@@ -3190,7 +3229,6 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "elealynanne-padollon",
           "displayName": "Elealynanne Padollon",
           "gym": "Ground Zero"
         }
@@ -3215,9 +3253,12 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "adrian-bulado",
           "displayName": "Adrian Bulado",
           "gym": "Art of Juggler"
+        },
+        {
+          "displayName": "Adrian, M Bulado ,",
+          "gym": "AOJ & NEW BREED FITNESS GYM"
         }
       ]
     },
@@ -3240,7 +3281,6 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "john-dustin-dela-cruz",
           "displayName": "John Dustin Dela Cruz",
           "gym": "AFG"
         }
@@ -3493,7 +3533,6 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "jordan-bradley-c-cruz",
           "displayName": "Jordan Bradley C. Cruz",
           "gym": "(KAMAO)/426 MMA/AJJP MMA"
         }
@@ -3537,7 +3576,6 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "anjune-gallanosa",
           "displayName": "Anjune Gallanosa",
           "gym": ""
         }
@@ -3562,7 +3600,6 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "benjo-obiena",
           "displayName": "Benjo Obiena",
           "gym": "RLIMA"
         }
@@ -3618,7 +3655,7 @@
         "height": "",
         "weightClass": "",
         "photoSourceUrl": "",
-        "dateOfBirth": "1997-08-28",
+        "dateOfBirth": null,
         "normalizedName": "joel lincuna",
         "normalizedGym": "hidden blade mma"
       },
@@ -3644,12 +3681,10 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "adrian-bulado",
           "displayName": "Adrian Bulado",
           "gym": "Art of Juggler"
         },
         {
-          "slug": "adrian-m-bulado",
           "displayName": "Adrian, M Bulado",
           "gym": "Art of juggler / CircuitX Fitness hub"
         }
@@ -3693,7 +3728,6 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "marwin-landong",
           "displayName": "Marwin Landong",
           "gym": "KORIDAS MMA Gym"
         }
@@ -5016,27 +5050,30 @@
   ],
   "reviewQueue": [
     {
-      "key": "elealynanne padollon||sprawl mma",
+      "key": "adrian bulado||art of juggler",
       "fighter": {
-        "firstName": "Elealynanne",
-        "lastName": "Padollon",
-        "displayName": "Elealynanne Padollon",
-        "nickname": "EL LUMINA",
-        "gym": "SPRAWL MMA",
-        "hometown": "Marikina City",
-        "height": "5ft",
-        "weightClass": "115 lbs",
-        "photoSourceUrl": "",
-        "dateOfBirth": "2003-04-26",
-        "normalizedName": "elealynanne padollon",
-        "normalizedGym": "sprawl mma"
+        "firstName": "Adrian",
+        "lastName": "Bulado",
+        "displayName": "Adrian Bulado",
+        "nickname": "Baki Hanma",
+        "gym": "Art of Juggler",
+        "hometown": "CAINTA RIZAL",
+        "height": "5'7",
+        "weightClass": "125 LBS",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1Inea_bUMU12PlGKiKebdYQa6LqByAEL_",
+        "dateOfBirth": "2001-06-18",
+        "normalizedName": "adrian bulado",
+        "normalizedGym": "art of juggler"
       },
-      "occurrences": 1,
+      "occurrences": 2,
       "ambiguousMatches": [
         {
-          "slug": "elealynanne-padollon",
-          "displayName": "Elealynanne Padollon",
-          "gym": "Ground Zero"
+          "displayName": "Adrian, M Bulado",
+          "gym": "Art of juggler / CircuitX Fitness hub"
+        },
+        {
+          "displayName": "Adrian, M Bulado ,",
+          "gym": "AOJ & NEW BREED FITNESS GYM"
         }
       ]
     },
@@ -5059,109 +5096,12 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "adrian-bulado",
           "displayName": "Adrian Bulado",
           "gym": "Art of Juggler"
-        }
-      ]
-    },
-    {
-      "key": "john dustin dela cruz||afg gym",
-      "fighter": {
-        "firstName": "John Dustin",
-        "lastName": "Dela Cruz",
-        "displayName": "John Dustin Dela Cruz",
-        "nickname": "RAMBO",
-        "gym": "AFG GYM",
-        "hometown": "San Mateo Rizal",
-        "height": "5'6",
-        "weightClass": "125 LBS",
-        "photoSourceUrl": "",
-        "dateOfBirth": null,
-        "normalizedName": "john dustin dela cruz",
-        "normalizedGym": "afg gym"
-      },
-      "occurrences": 1,
-      "ambiguousMatches": [
+        },
         {
-          "slug": "john-dustin-dela-cruz",
-          "displayName": "John Dustin Dela Cruz",
-          "gym": "AFG"
-        }
-      ]
-    },
-    {
-      "key": "jordan bradley cruz||kali arnis martial arts organization kamao 426 mma ajjp mma",
-      "fighter": {
-        "firstName": "Jordan Bradley",
-        "lastName": "Cruz",
-        "displayName": "Jordan Bradley Cruz",
-        "nickname": "",
-        "gym": "Kali Arnis Martial Arts Organization (KAMAO)/426 MMA/AJJP MMA",
-        "hometown": "Pasig, Philippines",
-        "height": "",
-        "weightClass": "",
-        "photoSourceUrl": "",
-        "dateOfBirth": "1995-07-19",
-        "normalizedName": "jordan bradley cruz",
-        "normalizedGym": "kali arnis martial arts organization kamao 426 mma ajjp mma"
-      },
-      "occurrences": 1,
-      "ambiguousMatches": [
-        {
-          "slug": "jordan-bradley-c-cruz",
-          "displayName": "Jordan Bradley C. Cruz",
-          "gym": "(KAMAO)/426 MMA/AJJP MMA"
-        }
-      ]
-    },
-    {
-      "key": "anjune gallanosa||independent",
-      "fighter": {
-        "firstName": "Anjune T.",
-        "lastName": "Gallanosa",
-        "displayName": "Anjune T. Gallanosa",
-        "nickname": "THE DESTROYER",
-        "gym": "independent",
-        "hometown": "Sitio Sapinit barangay San Juan Antipolo City",
-        "height": "",
-        "weightClass": "",
-        "photoSourceUrl": "",
-        "dateOfBirth": "2000-06-03",
-        "normalizedName": "anjune gallanosa",
-        "normalizedGym": "independent"
-      },
-      "occurrences": 1,
-      "ambiguousMatches": [
-        {
-          "slug": "anjune-gallanosa",
-          "displayName": "Anjune Gallanosa",
-          "gym": ""
-        }
-      ]
-    },
-    {
-      "key": "benjo obiena||hidden blade mma",
-      "fighter": {
-        "firstName": "Benjo",
-        "lastName": "Obiena",
-        "displayName": "Benjo Obiena",
-        "nickname": "THE THORN",
-        "gym": "hidden blade MMA",
-        "hometown": "Pasay City",
-        "height": "",
-        "weightClass": "",
-        "photoSourceUrl": "",
-        "dateOfBirth": "1998-05-20",
-        "normalizedName": "benjo obiena",
-        "normalizedGym": "hidden blade mma"
-      },
-      "occurrences": 1,
-      "ambiguousMatches": [
-        {
-          "slug": "benjo-obiena",
-          "displayName": "Benjo Obiena",
-          "gym": "RLIMA"
+          "displayName": "Adrian, M Bulado ,",
+          "gym": "AOJ & NEW BREED FITNESS GYM"
         }
       ]
     },
@@ -5184,14 +5124,84 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "adrian-bulado",
           "displayName": "Adrian Bulado",
           "gym": "Art of Juggler"
         },
         {
-          "slug": "adrian-m-bulado",
           "displayName": "Adrian, M Bulado",
           "gym": "Art of juggler / CircuitX Fitness hub"
+        }
+      ]
+    },
+    {
+      "key": "elealynanne padollon||ground zero",
+      "fighter": {
+        "firstName": "Elealynanne",
+        "lastName": "Padollon",
+        "displayName": "Elealynanne Padollon",
+        "nickname": "EL Tempest",
+        "gym": "Ground Zero",
+        "hometown": "Nangka, Marikina City",
+        "height": "5'0",
+        "weightClass": "105 LBS",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1JJizG0CBO3LWlTObQ_TT2skAwm8HnldJ",
+        "dateOfBirth": "2003-04-26",
+        "normalizedName": "elealynanne padollon",
+        "normalizedGym": "ground zero"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "Elealynanne Padollon",
+          "gym": "SPRAWL MMA"
+        }
+      ]
+    },
+    {
+      "key": "elealynanne padollon||sprawl mma",
+      "fighter": {
+        "firstName": "Elealynanne",
+        "lastName": "Padollon",
+        "displayName": "Elealynanne Padollon",
+        "nickname": "EL LUMINA",
+        "gym": "SPRAWL MMA",
+        "hometown": "Marikina City",
+        "height": "5ft",
+        "weightClass": "115 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2003-04-26",
+        "normalizedName": "elealynanne padollon",
+        "normalizedGym": "sprawl mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "Elealynanne Padollon",
+          "gym": "Ground Zero"
+        }
+      ]
+    },
+    {
+      "key": "marwin landong||koridas mma gym",
+      "fighter": {
+        "firstName": "Marwin",
+        "lastName": "Landong",
+        "displayName": "Marwin Landong",
+        "nickname": "The Subano",
+        "gym": "KORIDAS MMA Gym",
+        "hometown": "San Mateo, Rizal",
+        "height": "5'7",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/1SL24t8K2v31Ux16zluegPYMryEgO6xgp",
+        "dateOfBirth": "2000-05-19",
+        "normalizedName": "marwin landong",
+        "normalizedGym": "koridas mma gym"
+      },
+      "occurrences": 2,
+      "ambiguousMatches": [
+        {
+          "displayName": "Marwin Landong,",
+          "gym": "DBJ KORIDAS"
         }
       ]
     },
@@ -5214,9 +5224,200 @@
       "occurrences": 1,
       "ambiguousMatches": [
         {
-          "slug": "marwin-landong",
           "displayName": "Marwin Landong",
           "gym": "KORIDAS MMA Gym"
+        }
+      ]
+    },
+    {
+      "key": "john dustin dela cruz||afg",
+      "fighter": {
+        "firstName": "John Dustin",
+        "lastName": "Dela Cruz",
+        "displayName": "John Dustin Dela Cruz",
+        "nickname": "Rambo",
+        "gym": "AFG",
+        "hometown": "San Mateo Rizal",
+        "height": "",
+        "weightClass": "115 lbs (MINOR)",
+        "photoSourceUrl": "https://drive.google.com/drive/folders/176oa8mmHLE-KRIBp2Bevc9IDAq6tPrfg",
+        "dateOfBirth": "2010-12-06",
+        "normalizedName": "john dustin dela cruz",
+        "normalizedGym": "afg"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "John Dustin Dela Cruz",
+          "gym": "AFG GYM"
+        }
+      ]
+    },
+    {
+      "key": "john dustin dela cruz||afg gym",
+      "fighter": {
+        "firstName": "John Dustin",
+        "lastName": "Dela Cruz",
+        "displayName": "John Dustin Dela Cruz",
+        "nickname": "RAMBO",
+        "gym": "AFG GYM",
+        "hometown": "San Mateo Rizal",
+        "height": "5'6",
+        "weightClass": "125 LBS",
+        "photoSourceUrl": "",
+        "dateOfBirth": null,
+        "normalizedName": "john dustin dela cruz",
+        "normalizedGym": "afg gym"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "John Dustin Dela Cruz",
+          "gym": "AFG"
+        }
+      ]
+    },
+    {
+      "key": "jordan bradley cruz||kamao 426 mma ajjp mma",
+      "fighter": {
+        "firstName": "Jordan Bradley C.",
+        "lastName": "Cruz",
+        "displayName": "Jordan Bradley C. Cruz",
+        "nickname": "",
+        "gym": "(KAMAO)/426 MMA/AJJP MMA",
+        "hometown": "Pasig",
+        "height": "5'10",
+        "weightClass": "155lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1995-07-19",
+        "normalizedName": "jordan bradley cruz",
+        "normalizedGym": "kamao 426 mma ajjp mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "Jordan Bradley Cruz",
+          "gym": "Kali Arnis Martial Arts Organization (KAMAO)/426 MMA/AJJP MMA"
+        }
+      ]
+    },
+    {
+      "key": "jordan bradley cruz||kali arnis martial arts organization kamao 426 mma ajjp mma",
+      "fighter": {
+        "firstName": "Jordan Bradley",
+        "lastName": "Cruz",
+        "displayName": "Jordan Bradley Cruz",
+        "nickname": "",
+        "gym": "Kali Arnis Martial Arts Organization (KAMAO)/426 MMA/AJJP MMA",
+        "hometown": "Pasig, Philippines",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1995-07-19",
+        "normalizedName": "jordan bradley cruz",
+        "normalizedGym": "kali arnis martial arts organization kamao 426 mma ajjp mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "Jordan Bradley C. Cruz",
+          "gym": "(KAMAO)/426 MMA/AJJP MMA"
+        }
+      ]
+    },
+    {
+      "key": "benjo obiena||rlima",
+      "fighter": {
+        "firstName": "Benjo",
+        "lastName": "Obiena",
+        "displayName": "Benjo Obiena",
+        "nickname": "The Thorn",
+        "gym": "RLIMA",
+        "hometown": "Pasay City",
+        "height": "5'3",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1998-05-20",
+        "normalizedName": "benjo obiena",
+        "normalizedGym": "rlima"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "Benjo Obiena",
+          "gym": "hidden blade MMA"
+        }
+      ]
+    },
+    {
+      "key": "benjo obiena||hidden blade mma",
+      "fighter": {
+        "firstName": "Benjo",
+        "lastName": "Obiena",
+        "displayName": "Benjo Obiena",
+        "nickname": "THE THORN",
+        "gym": "hidden blade MMA",
+        "hometown": "Pasay City",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "1998-05-20",
+        "normalizedName": "benjo obiena",
+        "normalizedGym": "hidden blade mma"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "Benjo Obiena",
+          "gym": "RLIMA"
+        }
+      ]
+    },
+    {
+      "key": "anjune gallanosa||",
+      "fighter": {
+        "firstName": "Anjune",
+        "lastName": "Gallanosa",
+        "displayName": "Anjune Gallanosa",
+        "nickname": "the destroyer",
+        "gym": "",
+        "hometown": "Antipolo City",
+        "height": "5'8",
+        "weightClass": "135 lbs",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2000-06-03",
+        "normalizedName": "anjune gallanosa",
+        "normalizedGym": ""
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "Anjune T. Gallanosa",
+          "gym": "independent"
+        }
+      ]
+    },
+    {
+      "key": "anjune gallanosa||independent",
+      "fighter": {
+        "firstName": "Anjune T.",
+        "lastName": "Gallanosa",
+        "displayName": "Anjune T. Gallanosa",
+        "nickname": "THE DESTROYER",
+        "gym": "independent",
+        "hometown": "Sitio Sapinit barangay San Juan Antipolo City",
+        "height": "",
+        "weightClass": "",
+        "photoSourceUrl": "",
+        "dateOfBirth": "2000-06-03",
+        "normalizedName": "anjune gallanosa",
+        "normalizedGym": "independent"
+      },
+      "occurrences": 1,
+      "ambiguousMatches": [
+        {
+          "displayName": "Anjune Gallanosa",
+          "gym": ""
         }
       ]
     }

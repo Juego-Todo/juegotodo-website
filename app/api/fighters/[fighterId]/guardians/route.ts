@@ -40,7 +40,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const client = createSupabaseServiceClient() ?? auth.supabase;
   const { data: fighter, error: fighterError } = await client
-    .from("fighters")
+    .from("fighters_public")
     .select("id, is_minor")
     .eq("id", fighterId)
     .maybeSingle();

@@ -274,11 +274,14 @@ export async function applyRegistrationImport(input?: {
         else accountsExisting += 1;
 
         if (provision.userId) {
-          await client
+          const { data: profile } = await client
             .from("profiles")
-            .update({ fighter_slug: slug })
+            .select("fighter_slug")
             .eq("id", provision.userId)
-            .is("fighter_slug", null);
+            .maybeSingle();
+          if (!profile?.fighter_slug) {
+            await client.from("profiles").update({ fighter_slug: slug }).eq("id", provision.userId);
+          }
         }
       }
 

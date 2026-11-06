@@ -132,8 +132,8 @@ export function AdminFightRecordsImportPanel() {
       <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-4 sm:p-5">
         <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">JT fighter registration roster</h3>
         <p className="mt-2 text-sm leading-6 text-zinc-400">
-          Import the JTPH fighter registration sheet into Latayanology and create website fighter accounts from emails.
-          Trial/test rows are skipped.
+          Import the JTPH fighter registration sheet into Latayanology and create/tag website fighter accounts from
+          emails. This does not run automatically on deploy — click the button below once. Trial/test rows are skipped.
         </p>
         {registrationPreview ? (
           <>

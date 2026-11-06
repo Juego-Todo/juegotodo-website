@@ -77,9 +77,40 @@ export async function provisionFighterClaimAccount(
   const email = requested || buildPlaceholderFighterEmail(input.fighterSlug);
   const isPlaceholder = isPlaceholderFighterEmail(email);
 
-  const { data: existing } = await client.from("profiles").select("id, email, full_name").ilike("email", email).maybeSingle();
+  const { data: existing } = await client
+    .from("profiles")
+    .select("id, email, full_name, assigned_tags, account_type, role")
+    .ilike("email", email)
+    .maybeSingle();
 
   if (existing) {
+    // Ensure returning registration fighters show under Member Directory → Fighters.
+    if (!input.isMinor) {
+      const tags = Array.isArray(existing.assigned_tags) ? [...existing.assigned_tags] : [];
+      let changed = false;
+      if (!tags.includes("fighter")) {
+        tags.push("fighter");
+        changed = true;
+      }
+      if (!tags.includes("regular_member")) {
+        tags.push("regular_member");
+        changed = true;
+      }
+      const nextAccountType =
+        existing.role === "admin" || existing.account_type === "partner" || existing.account_type === "coach"
+          ? existing.account_type
+          : "athlete";
+      if (changed || nextAccountType !== existing.account_type) {
+        await client
+          .from("profiles")
+          .update({
+            assigned_tags: tags,
+            account_type: nextAccountType,
+          })
+          .eq("id", existing.id);
+      }
+    }
+
     return {
       email,
       userId: existing.id,

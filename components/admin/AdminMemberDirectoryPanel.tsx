@@ -328,7 +328,11 @@ function downloadMembersCsv(rows: AdminMemberRecord[], filename: string) {
         member.lastName === "—" ? "" : member.lastName,
         member.username === "—" ? "" : member.username,
         member.email,
-        memberAccountKind(member) === "staff" || isTeamMember(member) ? "Team" : "Fan",
+        memberAccountKind(member) === "staff" || isTeamMember(member)
+          ? "Team"
+          : memberAccountKind(member) === "fighter"
+            ? "Fighter"
+            : "Fan",
         memberSystemAccess(member) === "admin" ? "Admin" : "User",
         planCaption(member),
         member.city,
@@ -358,6 +362,9 @@ function filtersForQuickView(view: QuickView): MemberDirectoryFilters {
       return { ...defaultMemberFilters, account: "staff" };
     case "fans":
       return { ...defaultMemberFilters, account: "fan" };
+    case "fighters":
+      // Quick-view filter is applied in filterMembers via quickView === "fighters".
+      return defaultMemberFilters;
     case "licensed":
       return { ...defaultMemberFilters, credentials: "licensed" };
     case "all":
@@ -928,6 +935,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
     { id: "all", label: "All Members", count: stats.total },
     { id: "team", label: "Team", count: stats.team },
     { id: "fans", label: "Fan Accounts", count: stats.fans },
+    { id: "fighters", label: "Fighters", count: stats.fighters },
     { id: "pro", label: "Pro Plan", count: proLoadError ? null : stats.pro },
     { id: "unlimited", label: "Unlimited", count: stats.unlimited },
     { id: "licensed", label: "Licensed", count: stats.licensed },
@@ -953,7 +961,7 @@ export function AdminMemberDirectoryPanel({ embedded = false }: { embedded?: boo
           ) : null}
           <p className="mt-1 text-sm text-zinc-400">
             {loaded
-              ? `${stats.total} members · ${stats.team} team · ${stats.fans} fans`
+              ? `${stats.total} members · ${stats.team} team · ${stats.fans} fans · ${stats.fighters} fighters`
               : "Loading member community…"}
           </p>
         </div>

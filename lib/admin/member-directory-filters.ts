@@ -18,7 +18,7 @@ export type AccountFilter = "all" | "fan" | "staff" | "admin";
 export type CredentialsFilter = "all" | "licensed" | "none" | "pending";
 export type RoleFilter = "all" | UserTypeTagId | "admin_role";
 export type JoinedFilter = "all" | "today" | "7d" | "30d" | "90d";
-export type QuickView = "all" | "team" | "fans" | "pro" | "unlimited" | "licensed";
+export type QuickView = "all" | "team" | "fans" | "fighters" | "pro" | "unlimited" | "licensed";
 export type MemberSortColumn =
   | "firstName"
   | "lastName"
@@ -151,6 +151,11 @@ export function isFanAccount(member: AdminMemberRecord) {
   return !isTeamMember(member);
 }
 
+/** Latayanology / athlete fighters — tagged fighter or athlete account type. */
+export function isFighterMember(member: AdminMemberRecord) {
+  return member.tags.includes("fighter") || member.accountType === "athlete";
+}
+
 export function isLicensed(member: AdminMemberRecord) {
   return member.licenseStatus === "Approved" || member.tags.some((tag) => CREDENTIAL_TAGS.has(tag));
 }
@@ -193,12 +198,14 @@ export function computeMemberStats(members: AdminMemberRecord[]) {
   let pending = 0;
   let expiring = 0;
   let fans = 0;
+  let fighters = 0;
 
   for (const member of members) {
     if (memberHasUnlimitedPlan(member)) unlimited += 1;
     else if (hasActiveProAccess(member)) pro += 1;
     if (isTeamMember(member)) team += 1;
     else fans += 1;
+    if (isFighterMember(member)) fighters += 1;
     if (isLicensed(member)) licensed += 1;
     if (isPendingCredential(member)) pending += 1;
     if (hasActiveProAccess(member) && member.proExpiresAt) {
@@ -214,6 +221,7 @@ export function computeMemberStats(members: AdminMemberRecord[]) {
     /** @deprecated alias for team — kept for older call sites */
     staff: team,
     fans,
+    fighters,
     licensed,
     pending,
     leadership: team,
@@ -251,6 +259,7 @@ export function filterMembers(
     if (input.quickView === "unlimited" && !memberHasUnlimitedPlan(member)) return false;
     if (input.quickView === "team" && !isTeamMember(member)) return false;
     if (input.quickView === "fans" && !isFanAccount(member)) return false;
+    if (input.quickView === "fighters" && !isFighterMember(member)) return false;
     if (input.quickView === "licensed" && !isLicensed(member)) return false;
 
     const { membership, account, credentials, role, joined } = input.filters;

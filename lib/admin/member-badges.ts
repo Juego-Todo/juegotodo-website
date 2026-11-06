@@ -35,7 +35,7 @@ const ROLE_DISPLAY_PRIORITY: UserTypeTagId[] = [
   "regular_member",
 ];
 
-export type MemberAccountKind = "fan" | "staff";
+export type MemberAccountKind = "fan" | "staff" | "fighter";
 export type MemberSystemAccess = "user" | "admin";
 
 export type MemberBadgeVariant = "account" | "permission" | "role" | "credential" | "leadership" | "status";
@@ -76,7 +76,9 @@ const COMPACT_CREDENTIAL_LABELS: Partial<Record<UserTypeTagId, string>> = {
 export function memberAccountKind(member: AdminMemberRecord): MemberAccountKind {
   const isStaff =
     member.role === "admin" || member.tags.some((tag) => STAFF_ACCOUNT_TAGS.has(tag));
-  return isStaff ? "staff" : "fan";
+  if (isStaff) return "staff";
+  if (member.tags.includes("fighter") || member.accountType === "athlete") return "fighter";
+  return "fan";
 }
 
 export function memberSystemAccess(member: AdminMemberRecord): MemberSystemAccess {
@@ -114,10 +116,26 @@ export function memberCredentialTags(member: AdminMemberRecord): UserTypeTagId[]
 
 export function resolveAccountBadge(member: AdminMemberRecord): MemberDisplayBadge {
   const kind = memberAccountKind(member);
+  if (kind === "staff") {
+    return {
+      id: "account-staff",
+      label: "Staff",
+      fullLabel: "Staff account",
+      variant: "account",
+    };
+  }
+  if (kind === "fighter") {
+    return {
+      id: "account-fighter",
+      label: "Fighter",
+      fullLabel: "Fighter account",
+      variant: "account",
+    };
+  }
   return {
-    id: `account-${kind}`,
-    label: kind === "staff" ? "Staff" : "Fan",
-    fullLabel: kind === "staff" ? "Staff account" : "Fan account",
+    id: "account-fan",
+    label: "Fan",
+    fullLabel: "Fan account",
     variant: "account",
   };
 }

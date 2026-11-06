@@ -1,29 +1,88 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { adminFetch } from "@/lib/auth/admin-fetch";
 import type { ImportPreview } from "@/lib/fight-records/import-types";
+
+type RegistrationPreview = {
+  source: string;
+  totalRows: number;
+  importable: number;
+  withEmail: number;
+  sample: Array<{
+    displayName: string;
+    alias: string;
+    email: string;
+    gym: string;
+    record: string;
+    dateOfBirth: string | null;
+  }>;
+};
 
 export function AdminFightRecordsImportPanel() {
   const [preview, setPreview] = useState<ImportPreview | null>(null);
+  const [registrationPreview, setRegistrationPreview] = useState<RegistrationPreview | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [registrationBusy, setRegistrationBusy] = useState(false);
 
   const loadSaved = useCallback(() => {
     setLoaded(false);
-    void fetch("/api/admin/fight-records/import")
-      .then(async (response) => {
-        const payload = (await response.json().catch(() => null)) as { error?: string; preview?: ImportPreview | null } | null;
+    void Promise.all([
+      fetch("/api/admin/fight-records/import").then(async (response) => {
+        const payload = (await response.json().catch(() => null)) as {
+          error?: string;
+          preview?: ImportPreview | null;
+        } | null;
         if (!response.ok) throw new Error(payload?.error || "Unable to load the import preview.");
-        setPreview(payload?.preview ?? null);
+        return payload?.preview ?? null;
+      }),
+      adminFetch("/api/admin/fight-records/registration-import").then(async (response) => {
+        const payload = (await response.json().catch(() => null)) as {
+          error?: string;
+          preview?: RegistrationPreview | null;
+        } | null;
+        if (!response.ok) throw new Error(payload?.error || "Unable to load registration roster.");
+        return payload?.preview ?? null;
+      }),
+    ])
+      .then(([fightPreview, regPreview]) => {
+        setPreview(fightPreview);
+        setRegistrationPreview(regPreview);
         setError("");
       })
       .catch((caught: unknown) => {
-        setError(caught instanceof Error ? caught.message : "Unable to load the import preview.");
+        setError(caught instanceof Error ? caught.message : "Unable to load import data.");
       })
       .finally(() => setLoaded(true));
   }, []);
+
+  async function onApplyRegistration() {
+    setRegistrationBusy(true);
+    setStatus("");
+    setError("");
+    const response = await adminFetch("/api/admin/fight-records/registration-import", {
+      method: "POST",
+      body: JSON.stringify({ action: "apply", createAccounts: true }),
+    });
+    const payload = (await response.json().catch(() => null)) as {
+      error?: string;
+      message?: string;
+      created?: number;
+      updated?: number;
+      accountsCreated?: number;
+      errorCount?: number;
+    } | null;
+    setRegistrationBusy(false);
+    if (!response.ok) {
+      setError(payload?.error || "Registration import failed.");
+      return;
+    }
+    setStatus(payload?.message || "Registration roster imported.");
+    loadSaved();
+  }
 
   useEffect(() => {
     const timer = window.setTimeout(() => loadSaved(), 0);
@@ -71,7 +130,56 @@ export function AdminFightRecordsImportPanel() {
   return (
     <div className="space-y-4">
       <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-4 sm:p-5">
-        <p className="text-sm leading-6 text-zinc-400">
+        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">JT fighter registration roster</h3>
+        <p className="mt-2 text-sm leading-6 text-zinc-400">
+          Import the JTPH fighter registration sheet into Latayanology and create website fighter accounts from emails.
+          Trial/test rows are skipped.
+        </p>
+        {registrationPreview ? (
+          <>
+            <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+              {(
+                [
+                  ["Rows", registrationPreview.totalRows],
+                  ["Importable", registrationPreview.importable],
+                  ["With email", registrationPreview.withEmail],
+                ] as const
+              ).map(([label, value]) => (
+                <div className="rounded-[1.25rem] border border-white/10 bg-black/20 px-3 py-3" key={label}>
+                  <p className="text-[0.58rem] font-black uppercase tracking-[0.16em] text-zinc-500">{label}</p>
+                  <p className="font-display mt-1 text-2xl text-white">{value}</p>
+                </div>
+              ))}
+            </div>
+            <ul className="mt-4 max-h-48 space-y-1 overflow-y-auto text-sm text-zinc-300">
+              {registrationPreview.sample.map((row) => (
+                <li key={`${row.displayName}-${row.email}`}>
+                  <span className="font-semibold text-white">{row.displayName}</span>
+                  {row.alias ? ` “${row.alias}”` : ""}
+                  {row.email ? ` · ${row.email}` : ""}
+                  {row.gym ? ` · ${row.gym}` : ""}
+                </li>
+              ))}
+            </ul>
+            <button
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-[#FF1010] px-5 text-[0.68rem] font-black uppercase tracking-[0.14em] text-white disabled:opacity-60"
+              disabled={registrationBusy || registrationPreview.importable === 0}
+              onClick={() => void onApplyRegistration()}
+              type="button"
+            >
+              {registrationBusy ? "Importing..." : "Import registration roster + accounts"}
+            </button>
+          </>
+        ) : (
+          <p className="mt-3 text-sm text-zinc-500">
+            No registration extract found at data/imports/jt-fighter-reg-extracted.json.
+          </p>
+        )}
+      </div>
+
+      <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+        <h3 className="text-sm font-black uppercase tracking-[0.16em] text-white">Fight card workbook</h3>
+        <p className="mt-2 text-sm leading-6 text-zinc-400">
           Load the saved preview or upload <span className="text-zinc-200">import-preview.json</span> / the exported
           workbook JSON. Birth dates are imported with the file and are not listed in this review.
         </p>

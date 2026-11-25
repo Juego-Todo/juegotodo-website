@@ -42,7 +42,11 @@ export async function listPublicFighters(filters?: {
   if (q) query = query.or(`display_name.ilike.%${q}%,nickname.ilike.%${q}%,gym.ilike.%${q}%`);
 
   const { data, error } = await query;
-  if (error || !data) return [];
+  if (error) {
+    console.error("[fight-records] listPublicFighters failed:", error.message);
+    return [];
+  }
+  if (!data) return [];
 
   let rows = data;
   const category = filters?.category?.trim().toLowerCase() ?? "";

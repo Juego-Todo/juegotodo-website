@@ -4,6 +4,7 @@
  * Usage:
  *   npx tsx scripts/import-fight-cards.ts --dry-run
  *   npx tsx scripts/import-fight-cards.ts --dry-run --xlsx data/imports/jt-record-for-latayanology.xlsx
+ *   npx tsx scripts/import-fight-cards.ts --apply   # writes to Supabase; needs NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
  *
  * The script prefers a pre-exported JSON workbook (via scripts/_export_sheet_json.py)
  * so it can run without a native xlsx dependency. Pass --xlsx to regenerate JSON first.
@@ -12,6 +13,7 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { loadRawWorkbookFromJsonFile, parseWorkbook } from "../lib/fight-records/parse-fight-cards";
+import { applyImportPreview } from "../lib/fight-records/server";
 
 const ROOT = process.cwd();
 const DEFAULT_XLSX = path.join(ROOT, "data/imports/jt-record-for-latayanology.xlsx");
@@ -47,7 +49,7 @@ function ensureJsonFromXlsx(xlsxPath: string, jsonPath: string) {
   console.log(`source xlsx: ${xlsxPath}`);
 }
 
-function main() {
+async function main() {
   const dryRun = hasFlag("--dry-run") || !hasFlag("--apply");
   const xlsxPath = getArg("--xlsx") || DEFAULT_XLSX;
   const jsonPath = getArg("--json") || DEFAULT_JSON;
@@ -108,7 +110,12 @@ function main() {
     return;
   }
 
-  console.log("Apply mode is reserved for the admin import API (service role).");
+  console.log("\nApplying import to Supabase...");
+  const result = await applyImportPreview(preview, `cli-import-${crypto.randomUUID()}`);
+  console.log(JSON.stringify(result, null, 2));
 }
 
-main();
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
+});

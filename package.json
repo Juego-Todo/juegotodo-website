@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/membership-validation.test.ts tests/membership-authorization.test.ts tests/platform-validation.test.ts tests/pro-entitlement.test.ts tests/fight-records-normalize.test.ts",
-    "import:fight-cards": "python scripts/dry_run_import.py"
+    "import:fight-cards": "python scripts/dry_run_import.py",
+    "import:fight-cards:apply": "npx tsx scripts/import-fight-cards.ts --apply"
   },
   "keywords": [
     "juego todo",
